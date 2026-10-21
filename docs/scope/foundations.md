@@ -57,10 +57,18 @@ WL-109. One matrix of role against action, enforced on the server, mirrored in t
 **Done when:** every protected endpoint returns 403 for a forbidden role, the matrix lives in one place, and the UI hides what the server blocks.
 - [ ] Design it (spec): `/architect permission matrix`
 
-### 6. Design system & UI foundation · planned · needs a decision
+### 6. Design system & UI foundation · in-progress
 Turn `design.md` into real tokens and shared components (buttons, inputs, dialogs, confirm prompts, toasts, tables, empty and error states) so every page and modal looks the same. Includes the Tailwind v4 upgrade.
 **Done when:** web-vrms uses only theme tokens (no raw hex), shared dialog, confirm and toast components exist, and base components meet WCAG AA contrast with visible focus and keyboard use.
-- [ ] Design it (spec): `/architect design system & UI foundation`
+spec [0001](../specs/0001-design-system-ui-foundation/index.md) · code in `welinc-web-vrms/src`
+- [x] Design it (spec): `/architect design system & UI foundation`
+- [x] Build it: `/develop design system & UI foundation`
+  - [x] Thin thread: React 19, Tailwind v4, tokens and aliases, light only, Inter, Button on `/dev/ui` with axe and lint (AC-1 to AC-6, AC-14, AC-18)
+  - [x] Feedback and overlays: sonner toasts, `confirm()`, ResponsiveDialog, menus, tooltip; ConfirmModal removed (AC-7 to AC-10)
+  - [x] Forms and data display: Field with react-hook-form and zod, inputs, badges, DataTable, empty and error states, KPI card (AC-11 to AC-13, AC-15, AC-16)
+  - [x] Enforcement sweep: palette reset, every page on tokens, lint errors everywhere, `design.md` updated (AC-2 to AC-4, AC-17)
+- [ ] Verify it: `/check verify design system & UI foundation`
+- [ ] Test it: `/test design system & UI foundation`
 
 ### 7. Language support (English + Filipino) · planned · needs a decision
 Let users switch the UI between English and Filipino. Set up during the UI refresh so pages are not touched twice.
