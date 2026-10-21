@@ -13,8 +13,8 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 
 | Epic | File | Status |
 |---|---|---|
-| Foundations | [foundations.md](foundations.md) | 8 existing, 7 planned |
-| UI refresh | [ui-refresh.md](ui-refresh.md) | 8 planned |
+| Foundations | [foundations.md](foundations.md) | 8 existing, 1 done, 6 planned |
+| UI refresh | [ui-refresh.md](ui-refresh.md) | 9 planned |
 | Repair workflow | [repair-workflow.md](repair-workflow.md) | 16 planned |
 | Platform | [platform.md](platform.md) | 6 planned |
 | Outsourcing | [outsourcing.md](outsourcing.md) | 4 planned |
@@ -38,7 +38,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 3 | Analytics & AI service boundary | Foundation | planned |
 | 4 | Data model v2 | Foundation | planned |
 | 5 | Permission matrix & enforcement | Foundation | planned |
-| 6 | Design system & UI foundation | Foundation | planned |
+| 6 | Design system & UI foundation | Foundation | done |
 | 7 | Language support (English + Filipino) | Foundation | planned |
 | 8 | App shell & role badge | UI refresh | planned |
 | 9 | Login & profile pages | UI refresh | planned |
@@ -48,6 +48,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 13 | History & audit log pages | UI refresh | planned |
 | 14 | User management page | UI refresh | planned |
 | 15 | Knowledge base & analytics pages | UI refresh | planned |
+| 50 | Portal on the design system | UI refresh | planned |
 | 16 | Ticket status lifecycle | Slice 1 | planned |
 | 17 | Chief Mechanic role | Slice 1 | planned |
 | 18 | New repair ticket & assignment | Slice 1 | planned |

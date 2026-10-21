@@ -43,3 +43,8 @@ User table and its create, edit, deactivate and reset modals.
 Knowledge articles and analytics charts on the new tokens.
 **Done when:** charts use theme colors, and both pages read well on a phone and in their empty states.
 - [ ] Build it: `/develop knowledge base & analytics refresh`
+
+### 50. Portal on the design system · planned · from spec 0001
+Copy the spec 0001 tokens and shared components into `welinc-web-portal` (already React 19, still Tailwind 3), so the SSO portal matches web-vrms. The portal is a shared repo, so agree on it with the other groups first.
+**Done when:** the portal runs Tailwind v4, uses only theme tokens, and its login and app picker use the shared components.
+- [ ] Build it: `/develop portal on the design system`
