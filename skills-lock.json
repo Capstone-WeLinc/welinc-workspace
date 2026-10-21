@@ -7,6 +7,12 @@
       "skillPath": "skills/architect/SKILL.md",
       "computedHash": "66856595ec9fd2477534954ff9ee1f0b91c537eabbce0b4b9a19f69329c02f72"
     },
+    "ask-sonner": {
+      "source": "emilkowalski/skills",
+      "sourceType": "github",
+      "skillPath": "skills/ask-sonner/SKILL.md",
+      "computedHash": "0168a6a129ba0a3561ccbda3a3d8d0dc0af1d556f373e315e9479e3364420dd3"
+    },
     "audit": {
       "source": "jsmastery-pro/skills",
       "sourceType": "github",
@@ -60,6 +66,12 @@
       "sourceType": "github",
       "skillPath": "prisma-client-api/SKILL.md",
       "computedHash": "5dcc0793337151efa73a444e5adbc7e1c24180778e83b4fe94c9109c391bd333"
+    },
+    "react-hook-form": {
+      "source": "pproenca/dot-skills",
+      "sourceType": "github",
+      "skillPath": "skills/.curated/react-hook-form/SKILL.md",
+      "computedHash": "c32b9536b64b2bbfb26ecadac5caf9ac85697f319edffe6f77c9ecd00db51d14"
     },
     "scope": {
       "source": "jsmastery-pro/skills",
