@@ -1,0 +1,97 @@
+name: auth-infrastructure
+
+services:
+  auth-db:
+    image: postgres:16-alpine
+    container_name: welinc_auth_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: welinc_auth_user
+      POSTGRES_PASSWORD: welinc_auth_pass
+      POSTGRES_DB: welinc_auth_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - auth_pgdata:/var/lib/postgresql/data
+    networks:
+      - welinc-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U welinc_auth_user -d welinc_auth_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  auth-redis:
+    image: redis:7-alpine
+    container_name: welinc_auth_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - auth_redisdata:/data
+    networks:
+      - welinc-network
+
+  auth-service:
+    build:
+      context: ./welinc-auth
+      dockerfile: Dockerfile.dev
+    container_name: welinc_auth_service
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./welinc-auth:/app
+      - /app/node_modules
+    environment:
+      PORT: 3001
+      DATABASE_URL: postgresql://welinc_auth_user:welinc_auth_pass@auth-db:5432/welinc_auth_db?schema=public
+      JWT_SECRET: dev_secret_key_change_in_production
+      JWT_REFRESH_SECRET: dev_refresh_secret_key_change_in_production
+      JWT_EXPIRY: 15m
+      JWT_REFRESH_EXPIRY: 7d
+      CORS_ORIGINS: http://localhost:8000,http://localhost:8001
+      NODE_ENV: development
+    depends_on:
+      auth-db:
+        condition: service_healthy
+      auth-redis:
+        condition: service_started
+    networks:
+      - welinc-network
+
+  api-gateway:
+    image: nginx:alpine
+    container_name: welinc_api_gateway
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./welinc-auth/nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - welinc-network
+
+  web-portal:
+    build:
+      context: ./welinc-web-portal
+      dockerfile: Dockerfile.dev
+    container_name: welinc_portal
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./welinc-web-portal:/app
+      - /app/node_modules
+    environment:
+      VITE_API_BASE_URL: http://localhost:3000
+    networks:
+      - welinc-network
+
+volumes:
+  auth_pgdata:
+  auth_redisdata:
+
+networks:
+  welinc-network:
+    name: welinc-network
+    driver: bridge

@@ -1,0 +1,73 @@
+name: vrms-core-environment
+
+services:
+  vrms-db:
+    image: postgres:16-alpine
+    container_name: welinc_vrms_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: welinc_vrms_user
+      POSTGRES_PASSWORD: welinc_vrms_pass
+      POSTGRES_DB: welinc_vrms_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - vrms_pgdata:/var/lib/postgresql/data
+    networks:
+      - welinc-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U welinc_vrms_user -d welinc_vrms_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  vrms-backend:
+    build:
+      context: ./welinc-backend-vrms
+      dockerfile: Dockerfile.dev
+    container_name: welinc_vrms_backend
+    restart: unless-stopped
+    ports:
+      - "3002:3002"
+    volumes:
+      - ./welinc-backend-vrms:/app
+      - /app/node_modules
+    environment:
+      PORT: 3002
+      DATABASE_URL: postgresql://welinc_vrms_user:welinc_vrms_pass@vrms-db:5432/welinc_vrms_db?schema=public
+      JWT_SECRET: dev_secret_key_change_in_production
+      JWT_REFRESH_SECRET: dev_refresh_secret_key_change_in_production
+      JWT_EXPIRY: 15m
+      JWT_REFRESH_EXPIRY: 7d
+      CORS_ORIGINS: http://localhost:8000,http://localhost:8001
+      NODE_ENV: development
+    depends_on:
+      vrms-db:
+        condition: service_healthy
+    networks:
+      - welinc-network
+
+  web-vrms:
+    build:
+      context: ./welinc-web-vrms
+      dockerfile: Dockerfile.dev
+    container_name: welinc_vrms_frontend
+    restart: unless-stopped
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./welinc-web-vrms:/app
+      - /app/node_modules
+    environment:
+      VITE_API_BASE_URL: http://localhost:3000
+      VITE_AUTH_MODE: portal
+    networks:
+      - welinc-network
+
+volumes:
+  vrms_pgdata:
+
+networks:
+  welinc-network:
+    name: welinc-network
+    external: true
