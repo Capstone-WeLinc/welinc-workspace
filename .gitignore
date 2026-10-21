@@ -1,0 +1,21 @@
+# Service repos are cloned separately (scripts/clone-all.sh)
+/welinc-*/
+
+# Env files: only examples are committed
+.env
+.env.*
+!.env.example
+
+# Raw source exports (Google Docs, Jira CSV)
+docs/_source/
+
+# Playwright MCP screenshots, snapshots and downloads
+.playwright-mcp/
+
+# Personal Claude Code overrides
+.claude/settings.local.json
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
