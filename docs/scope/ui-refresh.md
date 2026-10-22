@@ -30,10 +30,20 @@ spec [0002](../specs/0002-dashboard-attention-first/index.md) · code in `welinc
 - [ ] Verify it: `/check verify dashboard refresh`
 - [ ] Test it: `/test dashboard refresh`
 
-### 11. Repair list & detail · planned · Facade
+### 11. Repair list & detail · in-progress · Facade
 Ticket list with clear status pills and filters; ticket detail laid out around its one next action.
 **Done when:** status badges follow `design.md`, the list works as cards on a phone, and every modal and confirm prompt on these screens uses the shared dialog.
+spec [0004](../specs/0004-repair-list-detail-refresh/index.md) · code in `welinc-web-vrms/src/features/repair/`, `welinc-backend-vrms/src/modules/vrms/`
+- Note (2026-10-22): the list becomes an urgent first queue of open tickets and the detail page is built around one next step button. Like feature 13, this breaks Facade on purpose: spec 0004 adds query params (no migration) in welinc-backend-vrms.
+- [x] Design it (spec): `/architect repair list & detail refresh`
 - [ ] Build it: `/develop repair list & detail refresh`
+  - [ ] API: list filters, urgency order, mechanic scoping, zero costs, audit `ticketId`, 500 character limits (AC-3, AC-25 to AC-28)
+  - [ ] Repair list: shared helpers, URL filters, `DataTable` queue, states and refetch on focus (AC-1 to AC-11)
+  - [ ] Detail layout and next action: two column layout, side panel, status, cancel and unlock dialogs, bottom bar, 409 reload (AC-12 to AC-20, AC-24)
+  - [ ] Costs, AI and Activity: cost section with edit mode, AI restyle, ticket scoped Activity, old fields removed (AC-21 to AC-23, AC-29)
+  - [ ] Sweep: lint, typecheck, build, tests, 375px and 1280px with axe for both roles (AC-30)
+- [ ] Verify it: `/check verify repair list & detail refresh`
+- [ ] Test it: `/test repair list & detail refresh`
 
 ### 12. Repair form · planned · Facade
 The new repair form in the stakeholder approved layout (WL-201), with pickers instead of typing.

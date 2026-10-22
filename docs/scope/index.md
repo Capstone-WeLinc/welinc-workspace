@@ -43,7 +43,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 8 | App shell & role badge | UI refresh | done |
 | 9 | Login & profile pages | UI refresh | done |
 | 10 | Dashboard | UI refresh | in-progress |
-| 11 | Repair list & detail | UI refresh | planned |
+| 11 | Repair list & detail | UI refresh | in-progress |
 | 12 | Repair form | UI refresh | planned |
 | 13 | History & audit log pages | UI refresh | done |
 | 14 | User management page | UI refresh | planned |
