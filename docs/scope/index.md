@@ -40,12 +40,12 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 5 | Permission matrix & enforcement | Foundation | planned |
 | 6 | Design system & UI foundation | Foundation | done |
 | 7 | Language support (English + Filipino) | Foundation | planned |
-| 8 | App shell & role badge | UI refresh | planned |
-| 9 | Login & profile pages | UI refresh | planned |
-| 10 | Dashboard | UI refresh | planned |
+| 8 | App shell & role badge | UI refresh | done |
+| 9 | Login & profile pages | UI refresh | done |
+| 10 | Dashboard | UI refresh | in-progress |
 | 11 | Repair list & detail | UI refresh | planned |
 | 12 | Repair form | UI refresh | planned |
-| 13 | History & audit log pages | UI refresh | planned |
+| 13 | History & audit log pages | UI refresh | done |
 | 14 | User management page | UI refresh | planned |
 | 15 | Knowledge base & analytics pages | UI refresh | planned |
 | 50 | Portal on the design system | UI refresh | planned |
