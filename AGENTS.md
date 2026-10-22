@@ -52,6 +52,7 @@ Stored in `docs/specs/`. Format: `docs/specs/NNNN-title.md`. Product backlog liv
 ## Git
 
 - integration: on
+- merge target: `development` in every service repo. Branch from it and open PRs against it, never `main`. (This workspace repo itself has only `main`.)
 - branch prefix: feat/
 - commit: per-milestone
 
