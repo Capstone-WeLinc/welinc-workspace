@@ -1,7 +1,7 @@
 # 0004. Repair list as an urgent queue, repair detail around its next action
 
 **Date**: 2026-10-22
-**Status**: Proposed
+**Status**: In Progress
 
 ## Summary
 

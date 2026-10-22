@@ -36,12 +36,12 @@ Ticket list with clear status pills and filters; ticket detail laid out around i
 spec [0004](../specs/0004-repair-list-detail-refresh/index.md) · code in `welinc-web-vrms/src/features/repair/`, `welinc-backend-vrms/src/modules/vrms/`
 - Note (2026-10-22): the list becomes an urgent first queue of open tickets and the detail page is built around one next step button. Like feature 13, this breaks Facade on purpose: spec 0004 adds query params (no migration) in welinc-backend-vrms.
 - [x] Design it (spec): `/architect repair list & detail refresh`
-- [ ] Build it: `/develop repair list & detail refresh`
-  - [ ] API: list filters, urgency order, mechanic scoping, zero costs, audit `ticketId`, 500 character limits (AC-3, AC-25 to AC-28)
-  - [ ] Repair list: shared helpers, URL filters, `DataTable` queue, states and refetch on focus (AC-1 to AC-11)
-  - [ ] Detail layout and next action: two column layout, side panel, status, cancel and unlock dialogs, bottom bar, 409 reload (AC-12 to AC-20, AC-24)
-  - [ ] Costs, AI and Activity: cost section with edit mode, AI restyle, ticket scoped Activity, old fields removed (AC-21 to AC-23, AC-29)
-  - [ ] Sweep: lint, typecheck, build, tests, 375px and 1280px with axe for both roles (AC-30)
+- [x] Build it: `/develop repair list & detail refresh`
+  - [x] API: list filters, urgency order, mechanic scoping, zero costs, audit `ticketId`, 500 character limits (AC-3, AC-25 to AC-28)
+  - [x] Repair list: shared helpers, URL filters, `DataTable` queue, states and refetch on focus (AC-1 to AC-11)
+  - [x] Detail layout and next action: two column layout, side panel, status, cancel and unlock dialogs, bottom bar, 409 reload (AC-12 to AC-20, AC-24)
+  - [x] Costs, AI and Activity: cost section with edit mode, AI restyle, ticket scoped Activity, old fields removed (AC-21 to AC-23, AC-29)
+  - [x] Sweep: lint, typecheck, build, tests, 375px and 1280px with axe for both roles (AC-30)
 - [ ] Verify it: `/check verify repair list & detail refresh`
 - [ ] Test it: `/test repair list & detail refresh`
 
