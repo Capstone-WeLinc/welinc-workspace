@@ -57,6 +57,7 @@ Stored in `docs/specs/`. Format: `docs/specs/NNNN-title.md`. Product backlog liv
 - merge target: `development` in every service repo. Branch from it and open PRs against it, never `main`. (This workspace repo itself has only `main`.)
 - branch prefix: feat/
 - commit: per-milestone
+- attribution: none. Never add a `Co-Authored-By` trailer or a "Generated with Claude Code" line to commits or PR descriptions; commits are authored by the developer alone.
 
 ## Agent skills
 

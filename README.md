@@ -39,15 +39,27 @@ cd welinc-workspace
 sh scripts/clone-all.sh          # clones every service repo next to the workspace files
 ```
 
+`clone-all.sh` checks out `development` in every repo that has one and leaves the others on their default branch.
+
 ### Environment files
 
-Each repo has a `.env.example`. Copy it to `.env` for the backends and fill in what is blank.
+Each backend has a `.env.example` that already points at the local Docker databases. Copy it to `.env`:
 
 ```bash
 cp welinc-auth/.env.example welinc-auth/.env
 cp welinc-backend-vrms/.env.example welinc-backend-vrms/.env
-cp welinc-backend-vrms-analytics-ai/.env.example welinc-backend-vrms-analytics-ai/.env   # add your GEMINI_API_KEY
+cp welinc-backend-vrms-analytics-ai/.env.example welinc-backend-vrms-analytics-ai/.env
 ```
+
+Then add the values only you have:
+
+| File | Variable | Needed for |
+|---|---|---|
+| `welinc-backend-vrms-analytics-ai/.env` | `GEMINI_API_KEY` | AI triage. Create one at aistudio.google.com (Get API key, then Create API key). |
+| `welinc-auth/.env` | `SMTP_HOST`, `SMTP_USER`, `SMTP_PASS` (optional) | Sending OTP and reset emails. Left blank, emails are logged instead. |
+| `welinc-auth/.env`, `welinc-backend-vrms/.env` | `SEMAPHORE_API_KEY` (optional) | SMS. No code uses it yet. |
+
+The auth, VRMS backend and web containers take their settings from the compose files, so the stack starts without these. The one exception is auth: if `welinc-auth/.env` exists, the auth container also reads it, which is how it gets `SMTP_*` (without them, emails are printed to the auth log instead of sent). The compose values win on any overlap. The backend `.env` files are also used for running migrations, seeds or a service outside Docker. If you run one backend outside Docker, keep `JWT_SECRET` equal to the value in the compose files, or its tokens will not verify.
 
 | File | Purpose | Committed? |
 |---|---|---|
@@ -80,7 +92,7 @@ cd welinc-auth && npm install && npx prisma migrate deploy && npm run seed
 cd ../welinc-backend-vrms && npm install && npx prisma migrate deploy && npm run seed
 ```
 
-Seed logins for local testing are in `welinc-auth/prisma/seeds/users.seed.ts`.
+Seed logins for local testing are in `welinc-auth/prisma/seeds/users.seed.ts`, for example `vrms.admin@welinc.com`. The VRMS backend seed adds mechanics such as `mech.juan@welinc.com`.
 
 ### Open the apps
 
@@ -104,9 +116,11 @@ When teammates have pushed, bring your machine up to date. The workspace repo is
 
 ```bash
 git pull --ff-only                                   # workspace docs and compose files
-for d in welinc-*; do                                # each service repo
+for d in welinc-*; do                                # every service repo
+  [ -d "$d/.git" ] || continue
   git -C "$d" fetch --all --prune
-  git -C "$d" switch development && git -C "$d" pull --ff-only
+  git -C "$d" switch development 2>/dev/null || true # stay put if the repo has no development branch
+  git -C "$d" pull --ff-only
 done
 ```
 
