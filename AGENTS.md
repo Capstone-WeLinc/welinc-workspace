@@ -44,7 +44,9 @@ Stored in `docs/specs/`. Format: `docs/specs/NNNN-title.md`. Product backlog liv
 
 - Ask before any git write: commit, push, merge, branch switch, or opening a PR.
 - VMMS and BMS repos belong to other groups. Read them for integration context, never edit them.
-- Before calling a task done, run lint, typecheck and build in every repo you touched. Check UI changes in the real browser with Playwright.
+- Before calling a task done, run lint, typecheck and build in every repo you touched.
+- Playwright is expensive (snapshots and screenshots eat context). Do not run it after every change. Use it only for a new page or flow, a visual or layout change that code cannot prove, or at `/check verify` before a PR. Prefer `browser_snapshot` over screenshots, keep it to one pass, and never for backend-only or logic-only edits.
+- Say "Using skill: <name>" in the reply each time a skill is invoked, so the user can see it was applied.
 - Never read, print or commit `.env` values. Document new variables in `.env.example` only. `VITE_*` variables ship to the browser, so they must never hold secrets.
 - Work inside one repo at a time. Changes that cross repos (auth tokens, gateway routes, shared API shapes) need a spec first.
 - UI follows `design.md` at this root. Use theme tokens, never raw hex values in components.
@@ -72,6 +74,8 @@ MCP servers (configured in `.mcp.json`): playwright, shadcn, atlassian (Jira; ne
 - [docs/context/](docs/context/): project background, system overview (decisions and open questions), roles and users, glossary. Background only; code and Jira win.
 - [design.md](design.md): UI art direction and tokens for web-vrms and web-portal.
 - [welinc-web-vrms/AGENTS.md](welinc-web-vrms/AGENTS.md): VRMS SPA structure, API and auth handling, color tokens, and effect rules.
+- [welinc-backend-vrms/AGENTS.md](welinc-backend-vrms/AGENTS.md): NestJS API modules, guards, Prisma and migration rules, Docker restart gotcha.
+- [welinc-backend-vrms-analytics-ai/AGENTS.md](welinc-backend-vrms-analytics-ai/AGENTS.md): FastAPI AI and analytics service, the 30 second sync, stores and env variables.
 
 <!-- Nested AGENTS.md files are listed here as they are created -->
 
