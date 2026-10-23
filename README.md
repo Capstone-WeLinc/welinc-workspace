@@ -98,6 +98,30 @@ If a container fails on a missing package after a `package.json` change, rebuild
 docker compose -f docker-compose.vrms.yml up -d --build --renew-anon-volumes web-vrms
 ```
 
+## Update an existing setup
+
+When teammates have pushed, bring your machine up to date. The workspace repo is on `main`; each service repo is on `development` (or your own `feat/` branch, which you should rebase or merge `development` into).
+
+```bash
+git pull --ff-only                                   # workspace docs and compose files
+for d in welinc-*; do                                # each service repo
+  git -C "$d" fetch --all --prune
+  git -C "$d" switch development && git -C "$d" pull --ff-only
+done
+```
+
+Then refresh only what changed:
+
+| What changed | Run |
+|---|---|
+| `package.json` or `package-lock.json` | `npm install` in that repo |
+| `prisma/migrations/` | `npx prisma migrate deploy` in that backend |
+| Seed files | `npm run seed` in that backend |
+| A new variable in `.env.example` | Add it to your own `.env` or `.env.local` |
+| `Dockerfile` or compose files | `docker compose -f docker-compose.<name>.yml up -d --build` |
+
+If a container then fails on a missing package, see the rebuild command under "Start the stack".
+
 ## Daily commands
 
 Inside a Node repo:
@@ -113,9 +137,9 @@ Before calling a task done, run lint, typecheck and build in every repo you touc
 
 ## How we work
 
-- **Branches:** this workspace repo uses `main`. In the service repos, work on short lived branches named `feat/<feature>`, one per feature. The long lived branch differs per repo (for example `welinc-web-vrms` has an empty `main`, and the real work sits on `week-6`), so ask the team which branch to branch from and merge into before you start.
+- **Branches:** this workspace repo uses `main`. In every service repo, branch from `development` as `feat/<feature>`, one per feature, and open PRs back into `development`, never `main`.
 - **Commits:** Conventional Commits, one line, for example `feat(design-system): add DataTable`. One commit per milestone.
-- **Pull requests:** open one per feature branch into that repo's long lived branch. Do not push straight to it.
+- **Pull requests:** open one per feature branch into `development`. Do not push straight to it.
 - **One repo at a time.** A change that crosses repos (auth tokens, gateway routes, shared API shapes) needs a spec first.
 - **Specs:** designed in `docs/specs/` before building. The product backlog is in Jira, and Jira wins when it disagrees with a doc.
 - **UI:** follows `design.md`. Use theme tokens, never raw hex values in components. Lint enforces this.
