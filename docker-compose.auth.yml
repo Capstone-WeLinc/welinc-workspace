@@ -43,6 +43,10 @@ services:
     volumes:
       - ./welinc-auth:/app
       - /app/node_modules
+    # Optional: lets the container pick up SMTP_* from welinc-auth/.env. The environment block below wins on any overlap.
+    env_file:
+      - path: ./welinc-auth/.env
+        required: false
     environment:
       PORT: 3001
       DATABASE_URL: postgresql://welinc_auth_user:welinc_auth_pass@auth-db:5432/welinc_auth_db?schema=public
