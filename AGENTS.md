@@ -15,11 +15,11 @@ Workspace for VRMS (Vehicle Repair Management System), one subsystem of the WeLi
 
 - **Gateway**: Nginx on port 3000 routes `/auth`, `/vrms`, `/repairs`, `/ai` and `/analytics` (config currently in `welinc-auth/nginx.conf`).
 - **Package manager**: npm in every Node repo (`package-lock.json`); pip `requirements.txt` for the Python service.
-- **Runtime**: the backend `.nvmrc` files say Node 24, but the Dockerfiles use Node 20 and 22. Treat 24 as the target.
+- **Runtime**: Node 24 everywhere (`.nvmrc` and the Dockerfiles in auth, backend-vrms, web-vrms and web-portal; `engines` is `24.x` in the backends). The analytics service is Python.
 
 ## Build approach
 
-<TBD, set by /scope>
+Tracer Bullet: each feature is built end to end through every layer and working before the next. The UI refresh phase overrides this with Facade: build the UI first on the data it already has. Workflow level is Beta (after `/develop`: `/check verify`, then `/test`). Deadline: deployed by the end of November 2026. The plan lives in [docs/scope/index.md](docs/scope/index.md).
 
 ## Commands
 
