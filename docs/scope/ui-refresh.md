@@ -73,10 +73,21 @@ spec [0003](../specs/0003-history-audit-log-refresh/index.md) · code in `welinc
 - [x] Verify it: `/check verify history & audit log refresh`
 - [ ] Test it: `/test history & audit log refresh` (skipped 2026-10-22: marked done after verify passed)
 
-### 14. User management page · planned · needs a decision · Facade
+### 14. User management page · in-progress · Facade
 User table and its create, edit, deactivate and reset modals.
 **Done when:** every modal uses the shared dialog, destructive actions ask to confirm, and success and failure show a toast.
-- [ ] Design it (spec): `/architect user management refresh`
+spec [0006](../specs/0006-user-management-refresh/index.md) · code in `welinc-web-vrms/src/features/user-management/`, `welinc-web-vrms/src/components/shared/`, `welinc-backend-vrms/src/modules/vrms/config/`
+- Note (2026-10-25): the list sorts what needs attention first, reset emails a code instead of the shared `Password123!`, and deactivating a mechanic with open tickets is blocked. Like features 11 and 13, this breaks Facade on purpose: spec 0006 adds an `email` field (no migration) to `GET /vrms/mechanics/available` in welinc-backend-vrms. welinc-auth is not changed; its gaps are in the spec's Follow-up.
+- [x] Design it (spec): `/architect user management refresh`
+- [x] Build it: `/develop user management refresh`
+  - [x] Foundations and list: status, sort, URL filters, selectable tiles, `DataTable` with states, quiet refetch (AC-1 to AC-8)
+  - [x] Create and edit dialog: schema, payloads, create mail failure recovery, email change prompt, errors, discard guard, own row locks (AC-10 to AC-14, AC-22)
+  - [x] Account actions: per status menu, reset and setup codes, unlock, reactivate, deactivate, focus return (AC-9, AC-15, AC-17 to AC-21)
+  - [x] Open work check: `email` on the mechanics endpoint, fresh match and block, fails closed (AC-16, AC-23)
+  - [x] Cleanup and sweep: old code and `Password123!` removed, tokens only, 375px and 1280px with axe, lint, typecheck, build and tests (AC-24 to AC-26)
+- Note (2026-10-25): built. welinc-backend-vrms `npm run lint` runs `eslint --fix` and already fails on `development` (203 problems without fix, none in the touched file), so AC-26's backend lint is not green yet; build and the 44 tests pass.
+- [ ] Verify it: `/check verify user management refresh`
+- [ ] Test it: `/test user management refresh`
 
 ### 15. Knowledge base page · planned · needs a decision · Facade
 Knowledge articles on the new tokens.

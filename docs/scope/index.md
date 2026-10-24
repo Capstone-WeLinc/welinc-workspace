@@ -46,7 +46,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 11 | Repair list & detail | UI refresh | in-progress |
 | 12 | Repair form | UI refresh | in-progress |
 | 13 | History & audit log pages | UI refresh | done |
-| 14 | User management page | UI refresh | planned |
+| 14 | User management page | UI refresh | in-progress |
 | 15 | Knowledge base page | UI refresh | planned |
 | 50 | Portal on the design system | UI refresh | planned |
 | 51 | Analytics page | UI refresh | planned |
