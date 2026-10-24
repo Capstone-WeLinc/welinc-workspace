@@ -33,6 +33,7 @@ docker compose -f docker-compose.analytics.yml up -d
 npm install
 npm run lint
 npm run build
+npm run typecheck   # web-vrms only; the backends typecheck through npm run build
 npm run test        # NestJS repos only (Jest); the frontends have no tests yet
 ```
 
@@ -63,7 +64,7 @@ Stored in `docs/specs/`. Format: `docs/specs/NNNN-title.md`. Product backlog liv
 
 - [prisma-client-api](.claude/skills/prisma-client-api/), [prisma-cli](.claude/skills/prisma-cli/): `prisma/skills`, Prisma 7 queries and CLI (backend-vrms, auth)
 - [nestjs-best-practices](.claude/skills/nestjs-best-practices/): `kadajett/agent-nestjs-skills`, NestJS modules, DI, security (backend-vrms, auth)
-- [tailwind-4-docs](.claude/skills/tailwind-4-docs/): `lombiq/tailwind-agent-skills`, Tailwind v4 docs and the v3 to v4 migration. The frontends are still on v3, so use it for the upgrade, not for v3 code. Its docs snapshot is not downloaded yet.
+- [tailwind-4-docs](.claude/skills/tailwind-4-docs/): `lombiq/tailwind-agent-skills`, Tailwind v4 docs and the v3 to v4 migration. `welinc-web-vrms` is on v4 and `welinc-web-portal` is still on v3, so use it for v4 code and for upgrading the portal. Its docs snapshot is not downloaded yet.
 - [shadcn](.claude/skills/shadcn/): `shadcn-ui/ui`, shadcn/ui setup and component usage (frontends)
 - [vercel-react-best-practices](.claude/skills/vercel-react-best-practices/), [vercel-composition-patterns](.claude/skills/vercel-composition-patterns/): `vercel-labs/agent-skills`, React patterns and React 19 component APIs (frontends)
 - [fastapi](.claude/skills/fastapi/): `fastapi/fastapi`, FastAPI and Pydantic conventions (analytics-ai)
