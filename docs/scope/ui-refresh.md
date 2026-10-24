@@ -27,7 +27,7 @@ spec [0002](../specs/0002-dashboard-attention-first/index.md) · code in `welinc
   - [x] Admin view: attention tiles, Needs attention list and empty state, pipeline bar, spend cards with fixed timeframes, exports removed (AC-2 to AC-8, AC-17)
   - [x] Mechanic view: four tiles, urgency ordered work list, banner removed (AC-9 to AC-11, AC-17)
   - [x] States and sweep: skeleton, error and retry, dead widgets deleted, tokens only, 375px and 1280px with axe (AC-12, AC-15, AC-16)
-- [ ] Verify it: `/check verify dashboard refresh`
+- [x] Verify it: `/check verify dashboard refresh` (2026-10-25: passed; midnight and last month checks not run)
 - [ ] Test it: `/test dashboard refresh`
 
 ### 11. Repair list & detail · in-progress · Facade
@@ -42,7 +42,7 @@ spec [0004](../specs/0004-repair-list-detail-refresh/index.md) · code in `welin
   - [x] Detail layout and next action: two column layout, side panel, status, cancel and unlock dialogs, bottom bar, 409 reload (AC-12 to AC-20, AC-24)
   - [x] Costs, AI and Activity: cost section with edit mode, AI restyle, ticket scoped Activity, old fields removed (AC-21 to AC-23, AC-29)
   - [x] Sweep: lint, typecheck, build, tests, 375px and 1280px with axe for both roles (AC-30)
-- [ ] Verify it: `/check verify repair list & detail refresh`
+- [x] Verify it: `/check verify repair list & detail refresh` (2026-10-25: passed; a few value sourcing steps not run)
 - [ ] Test it: `/test repair list & detail refresh`
 
 ### 12. Repair form · planned · Facade

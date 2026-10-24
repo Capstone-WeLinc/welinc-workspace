@@ -72,7 +72,7 @@ MCP servers (configured in `.mcp.json`): playwright, shadcn, atlassian (Jira; ne
 
 ## Context files
 
-- [docs/context/](docs/context/): project background, system overview (decisions and open questions), roles and users, glossary. Background only; code and Jira win.
+- [docs/context/](docs/context/): project background, system overview (decisions and open questions), roles and users, glossary, requirements (BRD field rules, limits and targets, with the Jira overrides). Background only; code and Jira win.
 - [design.md](design.md): UI art direction and tokens for web-vrms and web-portal.
 - [welinc-web-vrms/AGENTS.md](welinc-web-vrms/AGENTS.md): VRMS SPA structure, API and auth handling, color tokens, and effect rules.
 - [welinc-backend-vrms/AGENTS.md](welinc-backend-vrms/AGENTS.md): NestJS API modules, guards, Prisma and migration rules, Docker restart gotcha.
