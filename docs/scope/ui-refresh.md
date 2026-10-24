@@ -45,10 +45,19 @@ spec [0004](../specs/0004-repair-list-detail-refresh/index.md) · code in `welin
 - [x] Verify it: `/check verify repair list & detail refresh` (2026-10-25: passed; a few value sourcing steps not run)
 - [ ] Test it: `/test repair list & detail refresh`
 
-### 12. Repair form · planned · Facade
+### 12. Repair form · in-progress · Facade
 The new repair form in the stakeholder approved layout (WL-201), with pickers instead of typing.
 **Done when:** the form matches the approved mockup, validation is inline, and it is usable with one thumb on a phone.
-- [ ] Build it: `/develop repair form refresh`
+spec [0005](../specs/0005-repair-form-refresh/index.md) · code in `welinc-web-vrms/src/features/repair/`, `welinc-web-vrms/src/main.tsx`, `welinc-web-vrms/src/components/ui/combobox.tsx`, `welinc-web-vrms/src/components/ui/toggle-group.tsx`
+- Note (2026-10-25): no mockup exists in the repo or Jira, so the layout follows `design.md` and the current fields. Frontend only; issue types, saved priority, open ticket counts and Assigned or Open on create stay with feature 18.
+- [x] Design it (spec): `/architect repair form refresh`
+- [x] Build it: `/develop repair form refresh`
+  - [x] Foundations: data router, `toggle-group`, extended `Combobox`, option getter, schema and the options hook (AC-5, AC-7, AC-9, AC-10, AC-12, AC-13, AC-14, AC-22)
+  - [x] Form sections: header, Vehicle, Issues, Priority and assignment, Billing, with list loading and failures (AC-1 to AC-15)
+  - [x] Submit flow: action bar, summary dialog, create, success and failure handling, in flight lock (AC-15 to AC-21)
+  - [x] Leave guard and sweep: `useBlocker` discard prompt, `beforeunload`, legacy code removed, 375px and 1280px with axe (AC-21, AC-23 to AC-25)
+- [ ] Verify it: `/check verify repair form refresh`
+- [ ] Test it: `/test repair form refresh`
 
 ### 13. History & audit log pages · done · Facade
 Filters, tables and detail views restyled.
@@ -64,18 +73,23 @@ spec [0003](../specs/0003-history-audit-log-refresh/index.md) · code in `welinc
 - [x] Verify it: `/check verify history & audit log refresh`
 - [ ] Test it: `/test history & audit log refresh` (skipped 2026-10-22: marked done after verify passed)
 
-### 14. User management page · planned · Facade
+### 14. User management page · planned · needs a decision · Facade
 User table and its create, edit, deactivate and reset modals.
 **Done when:** every modal uses the shared dialog, destructive actions ask to confirm, and success and failure show a toast.
-- [ ] Build it: `/develop user management refresh`
+- [ ] Design it (spec): `/architect user management refresh`
 
-### 15. Knowledge base & analytics pages · planned · Facade
-Knowledge articles and analytics charts on the new tokens.
-**Done when:** charts use theme colors, and both pages read well on a phone and in their empty states.
-- [ ] Build it: `/develop knowledge base & analytics refresh`
+### 15. Knowledge base page · planned · needs a decision · Facade
+Knowledge articles on the new tokens.
+**Done when:** the page uses the design system, and it reads well on a phone and in its empty, loading and error states.
+- [ ] Design it (spec): `/architect knowledge base refresh`
 
-### 50. Portal on the design system · planned · from spec 0001
+### 50. Portal on the design system · planned · needs a decision · from spec 0001
 Copy the spec 0001 tokens and shared components into `welinc-web-portal` (already React 19, still Tailwind 3), so the SSO portal matches web-vrms. The portal is a shared repo, so agree on it with the other groups first.
 **Done when:** the portal runs Tailwind v4, uses only theme tokens, and its login and app picker use the shared components.
-- [ ] Build it: `/develop portal on the design system`
+- [ ] Design it (spec): `/architect portal on the design system`
 - Note (2026-10-22): the shared login, OTP and forgot password screens live here, moved from feature 9. Restyling them changes the login for every subsystem.
+
+### 51. Analytics page · planned · needs a decision · Facade
+Analytics charts on the new tokens. Split from feature 15.
+**Done when:** charts use theme colors, and the page reads well on a phone and in its empty, loading and error states.
+- [ ] Design it (spec): `/architect analytics refresh`
