@@ -13,10 +13,10 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 
 | Epic | File | Status |
 |---|---|---|
-| Foundations | [foundations.md](foundations.md) | 8 existing, 1 done, 6 planned |
+| Foundations | [foundations.md](foundations.md) | 8 existing, 2 done, 5 planned |
 | UI refresh | [ui-refresh.md](ui-refresh.md) | 3 done, 5 in-progress, 2 planned |
 | Repair workflow | [repair-workflow.md](repair-workflow.md) | 17 planned |
-| Platform | [platform.md](platform.md) | 7 planned |
+| Platform | [platform.md](platform.md) | 1 in-progress, 6 planned |
 | Outsourcing | [outsourcing.md](outsourcing.md) | 4 planned |
 | Operations | [operations.md](operations.md) | 4 planned, 1 dropped |
 | Reports & AI | [reports-ai.md](reports-ai.md) | 3 planned |
@@ -33,7 +33,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | F | Dashboard | Built | existing |
 | G | AI diagnosis and knowledge base | Built | existing |
 | H | Analytics dashboards | Built | existing |
-| 1 | Coding standards & tooling | Foundation | planned |
+| 1 | Coding standards & tooling | Foundation | done |
 | 2 | Auth service boundary | Foundation | planned |
 | 3 | Analytics & AI service boundary | Foundation | planned |
 | 4 | Data model v2 | Foundation | planned |
@@ -62,7 +62,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 23 | Chief Mechanic verification | Slice 1 | planned |
 | 24 | Full ticket audit trail | Slice 1 | planned |
 | 25 | Vehicle availability | Slice 1 | planned |
-| 26 | Hosting, CI/CD & environments | Release | planned |
+| 26 | Hosting, CI/CD & environments | Release | in-progress |
 | 27 | Error monitoring | Release | planned |
 | 28 | In-app notifications | Slice 2 | planned |
 | 29 | Notification badge & queue counts | Slice 2 | planned |

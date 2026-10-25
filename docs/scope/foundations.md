@@ -32,10 +32,11 @@ Cost trends, vehicle KPIs, issue frequency, status breakdown, garage costs, agin
 
 ## Foundation
 
-### 1. Coding standards & tooling · planned
+### 1. Coding standards & tooling · done
 Capture each owned repo's real conventions so every later skill works from facts, not guesses.
 **Done when:** web-vrms, backend-vrms, analytics-ai, auth and portal each have an `AGENTS.md` from `/audit`, and lint, typecheck and build run clean in each.
-- [ ] Capture conventions per repo: `/audit`
+- [x] Capture conventions per repo: `/audit`
+- Built (2026-10-25) on `feat/tooling` in web-vrms, backend-vrms, auth, portal and analytics-ai (committed, not pushed): all five have an `AGENTS.md`; lint and build are clean in the four Node repos (typecheck through build, plus `typecheck` in web-vrms). analytics-ai only compiles: it has no linter or tests and is planned to retire (feature 3), so none was added. PRs open against `development`: backend-vrms #10, auth #4, web-portal #3, web-vrms #15, analytics-ai #3. Marked done by you on 2026-10-25, with analytics-ai accepted as compile only. Node 24 is now installed on this machine. The portal login, wrong password message and 30 second inactivity sign out were run in a browser and passed.
 
 ### 2. Auth service boundary · planned · needs a decision · GA
 backend-vrms carries its own login, OTP and user endpoints while `welinc-auth` is the shared auth service. Decide which owns what before roles and OTP change.

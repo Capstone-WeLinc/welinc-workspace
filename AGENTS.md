@@ -78,6 +78,8 @@ MCP servers (configured in `.mcp.json`): playwright, shadcn, atlassian (Jira; ne
 - [welinc-web-vrms/AGENTS.md](welinc-web-vrms/AGENTS.md): VRMS SPA structure, API and auth handling, color tokens, and effect rules.
 - [welinc-backend-vrms/AGENTS.md](welinc-backend-vrms/AGENTS.md): NestJS API modules, guards, Prisma and migration rules, Docker restart gotcha.
 - [welinc-backend-vrms-analytics-ai/AGENTS.md](welinc-backend-vrms-analytics-ai/AGENTS.md): FastAPI AI and analytics service, the 30 second sync, stores and env variables.
+- [welinc-auth/AGENTS.md](welinc-auth/AGENTS.md): shared auth service routes, role per system JWT, lockout, gateway nginx and CORS.
+- [welinc-web-portal/AGENTS.md](welinc-web-portal/AGENTS.md): SSO portal redirect by role, token handoff, Tailwind v3, session monitor.
 
 <!-- Nested AGENTS.md files are listed here as they are created -->
 
