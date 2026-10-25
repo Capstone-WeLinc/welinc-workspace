@@ -17,4 +17,5 @@ WL-603. The specific reports management asks for (outsourced cost, mechanic work
 ### 47. AI repair suggestions · planned · needs a decision
 Jira WL-E7 says optional local AI (Ollama); the code uses Gemini. Decide the provider and what the suggestion feature must do, building on feature G.
 **Done when:** the provider is recorded, suggestions appear on the ticket from the chosen provider, and the app still works when AI is down.
+- Note (2026-10-25): the AI is being rebuilt inside welinc-backend-vrms (see feature 3), so this builds on that rework and grounds its suggestions on the spec 0007 knowledge base, not on feature G. Design feature 3 first.
 - [ ] Design it (spec): `/architect AI repair suggestions`

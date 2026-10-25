@@ -14,11 +14,11 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | Epic | File | Status |
 |---|---|---|
 | Foundations | [foundations.md](foundations.md) | 8 existing, 1 done, 6 planned |
-| UI refresh | [ui-refresh.md](ui-refresh.md) | 10 planned |
-| Repair workflow | [repair-workflow.md](repair-workflow.md) | 16 planned |
-| Platform | [platform.md](platform.md) | 6 planned |
+| UI refresh | [ui-refresh.md](ui-refresh.md) | 3 done, 5 in-progress, 2 planned |
+| Repair workflow | [repair-workflow.md](repair-workflow.md) | 17 planned |
+| Platform | [platform.md](platform.md) | 7 planned |
 | Outsourcing | [outsourcing.md](outsourcing.md) | 4 planned |
-| Operations | [operations.md](operations.md) | 5 planned |
+| Operations | [operations.md](operations.md) | 4 planned, 1 dropped |
 | Reports & AI | [reports-ai.md](reports-ai.md) | 3 planned |
 
 ## At a glance
@@ -47,12 +47,14 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 12 | Repair form | UI refresh | in-progress |
 | 13 | History & audit log pages | UI refresh | done |
 | 14 | User management page | UI refresh | in-progress |
-| 15 | Knowledge base page | UI refresh | planned |
+| 15 | Knowledge base page | UI refresh | in-progress |
 | 50 | Portal on the design system | UI refresh | planned |
 | 51 | Analytics page | UI refresh | planned |
+| 52 | Configurable settings & modules | Release | planned |
 | 16 | Ticket status lifecycle | Slice 1 | planned |
 | 17 | Chief Mechanic role | Slice 1 | planned |
 | 18 | New repair ticket & assignment | Slice 1 | planned |
+| 53 | Admin ticket editing | Slice 1 | planned |
 | 19 | Mechanic status updates | Slice 1 | planned |
 | 20 | File upload & storage | Slice 1 | planned |
 | 21 | Vehicle photos | Slice 1 | planned |
@@ -75,7 +77,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 38 | Close outsourced repair | Slice 4 | planned |
 | 39 | Management approval for outsourced repairs | Slice 4 | planned |
 | 40 | Lookup lists & fewer typed fields | Slice 5 | planned |
-| 41 | Common issues picker | Slice 5 | planned |
+| 41 | Common issues picker | Slice 5 | dropped |
 | 42 | Deadlines & fix time estimates | Slice 5 | planned |
 | 43 | Stuck and stale ticket alerts | Slice 5 | planned |
 | 44 | Driver role | Slice 5 | planned |

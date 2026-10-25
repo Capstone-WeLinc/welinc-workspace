@@ -89,10 +89,22 @@ spec [0006](../specs/0006-user-management-refresh/index.md) · code in `welinc-w
 - [ ] Verify it: `/check verify user management refresh`
 - [ ] Test it: `/test user management refresh`
 
-### 15. Knowledge base page · planned · needs a decision · Facade
+### 15. Knowledge base page · in-progress · Facade
 Knowledge articles on the new tokens.
 **Done when:** the page uses the design system, and it reads well on a phone and in its empty, loading and error states.
-- [ ] Design it (spec): `/architect knowledge base refresh`
+spec [0007](../specs/0007-knowledge-base-fix-library/index.md) · code in `welinc-web-vrms/src/features/knowledge-base/`, `welinc-web-vrms/src/features/repair/`, `welinc-web-vrms/src/features/user-management/`, `welinc-backend-vrms/src/modules/knowledge/`, `welinc-backend-vrms/src/modules/vrms/`, `welinc-auth/prisma/`
+- Note (2026-10-25): redesigned as a common issues library (Jira WL-704) that fills itself from repairs, instead of a restyle of the fake localStorage SOPs. It also covers feature 41's picker (WL-702) and adds the `CHIEF_MECHANIC` role (the role part of feature 17). Breaks Facade on purpose: a migration in welinc-backend-vrms and an enum change in welinc-auth. No AI; the AI rework (feature 3) builds on it.
+- [x] Design it (spec): `/architect knowledge base refresh`
+- [x] Build it: `/develop knowledge base refresh`
+  - [x] Role and data: `CHIEF_MECHANIC` in auth, backend and web, one migration with category seed and backfill (AC-1 to AC-5)
+  - [x] Library and entry pages: read API, history stats, search and filters, every state, old page removed (AC-6 to AC-15, AC-37)
+  - [x] Editing: entry editor, status actions, change log, categories page, 409 handling (AC-16 to AC-23, AC-38)
+  - [x] Picker and ticket: repair form picker, Known fix checklist, link and relink, "What fixed it" on send for verification (AC-24 to AC-31)
+  - [x] Suggestions and sweep: grouping, create from group with backfill, mechanic suggestions, tests, axe at 375px and 1280px (AC-32 to AC-36, AC-39)
+- Note (2026-10-25): built on `feat/knowledge-base-refresh` in welinc-auth, welinc-backend-vrms and welinc-web-vrms (not pushed). 73 backend tests pass (29 new); lint, typecheck and build are green in the touched files and repos; axe finds nothing at 375px and 1280px for admin, chief mechanic and mechanic. The local auth database has no migration history (built with `db push`), so its `CHIEF_MECHANIC` migration was applied with `prisma db execute`. One call made during the build: issues linked from a suggestion group are linked even when the new entry is saved as a draft (history), while the picker and the ticket link stay Active only. Verify steps in the spec's `verify.md`.
+- Note (2026-10-25): follow up, not part of spec 0007. The ticket's Known fix checklist can only be ticked today. You want it to stay a helper, so each ticket should let you add, remove and reword its own copied steps without changing the knowledge base entry. Needs a small spec (`/architect per ticket checklist edits`) once feature 15 is verified.
+- [ ] Verify it: `/check verify knowledge base refresh`
+- [ ] Test it: `/test knowledge base refresh`
 
 ### 50. Portal on the design system · planned · needs a decision · from spec 0001
 Copy the spec 0001 tokens and shared components into `welinc-web-portal` (already React 19, still Tailwind 3), so the SSO portal matches web-vrms. The portal is a shared repo, so agree on it with the other groups first.

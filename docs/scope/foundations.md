@@ -41,20 +41,24 @@ Capture each owned repo's real conventions so every later skill works from facts
 backend-vrms carries its own login, OTP and user endpoints while `welinc-auth` is the shared auth service. Decide which owns what before roles and OTP change.
 **Done when:** one service owns login, OTP and users; the other only validates tokens; the portal and web-vrms log in through one path.
 - [ ] Design it (spec): `/architect auth service boundary`
+- Note (2026-10-25): from spec 0007's follow up. Adding a mechanic or chief mechanic on the Users page creates no VRMS `Mechanic` row (only seeds do), so new accounts can't be assigned tickets. Whichever service ends up owning users should create that row.
 
 ### 3. Analytics & AI service boundary · planned · needs a decision
 Decide whether analytics-ai stays its own service or merges into the main VRMS repos, and record its store choices (pgvector, DuckDB, Redis, MongoDB).
 **Done when:** a spec records the service boundary and every store it keeps, with MongoDB justified or removed.
+- Note (2026-10-25): direction chosen by you during spec 0007: the AI and the analytics both move into welinc-backend-vrms and are rebuilt from scratch, retiring welinc-backend-vrms-analytics-ai. AI ideas picked so far: triage while typing grounded on the knowledge base, search by meaning, cleaning "What fixed it" notes, AI drafted knowledge entries, duplicate ticket warnings. The spec also decides replacing spec 0007's `pg_trgm` grouping with embeddings and removing `autoEmbedIssues`.
 - [ ] Design it (spec): `/architect analytics & AI service boundary`
 
 ### 4. Data model v2 · planned · needs a decision
 One schema change that the Jira backlog needs: Chief Mechanic role, the new ticket statuses, verifier fields, attachments, notifications, outsourced shops, lookup lists. Also settle who owns the `Booking` and maintenance models copied into backend-vrms.
 **Done when:** the schema supports slices 1 to 6 without another breaking migration, and existing tickets migrate with no data loss.
+- Note (2026-10-25): spec 0007 lands part of this early: `CHIEF_MECHANIC`, `RepairPriority`, issue categories, and the knowledge base tables with new `RepairIssue` columns. Build on its migration rather than redoing them.
 - [ ] Design it (spec): `/architect data model v2`
 
 ### 5. Permission matrix & enforcement · planned · needs a decision · GA
 WL-109. One matrix of role against action, enforced on the server, mirrored in the UI.
 **Done when:** every protected endpoint returns 403 for a forbidden role, the matrix lives in one place, and the UI hides what the server blocks.
+- Note (2026-10-25): spec 0007 uses interim "Readers" and "Editors" role lists for the knowledge base; the matrix should take them over.
 - [ ] Design it (spec): `/architect permission matrix`
 
 ### 6. Design system & UI foundation · done

@@ -16,6 +16,11 @@ Catch errors in production before users report them.
 **Done when:** frontend and backend errors from staging and production reach one place with the release and user role attached, and no secrets or personal data are sent.
 - [ ] Design it (spec): `/architect error monitoring`
 
+### 52. Configurable settings & modules · planned · needs a decision · from spec 0007
+Admin managed settings stored in the database instead of code constants, and VRMS modules that can be switched on or off (for example the AI features). Replaces `KNOWLEDGE_SETTINGS` from spec 0007 first.
+**Done when:** an admin changes a threshold or turns a module off without a deploy, every change is audit logged, and code reads settings from one place.
+- [ ] Design it (spec): `/architect configurable settings & modules`
+
 ## Slice 3: Login hardening
 
 ### 34. Admin OTP · planned · GA
