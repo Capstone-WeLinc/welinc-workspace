@@ -6,10 +6,19 @@ Release, login security and the mechanic mobile app (Jira WL-E9, WL-E1, WL-E8). 
 
 Set up right after Slice 1 so every later slice demos from staging.
 
-### 26. Hosting, CI/CD & environments · planned · needs a decision
-WL-902 and WL-903. Staging and production with their own settings and databases, an automatic pipeline, and the go live. Decided so far: Vercel for frontends, Render for services (Jira not yet updated).
-**Done when:** pushing to main deploys to staging, production deploys need approval, builds fail when tests fail, production has HTTPS and scheduled database backups, and a smoke test passes after deploy.
-- [ ] Design it (spec): `/architect hosting & CI/CD`
+### 26. Hosting, CI/CD & environments · in-progress
+WL-902 and WL-903. Staging and production with their own settings and databases, an automatic pipeline, and the go live. Decided in spec 0008: Azure (Static Web Apps, Container Apps, one shared PostgreSQL server) on free credit, GitHub Actions for CI and CD. This replaces the earlier Vercel and Render plan (Jira not yet updated).
+**Done when:** pushing to `development` deploys to staging, production deploys only from a manual run on the `release` branch, builds fail when tests fail, production has HTTPS and scheduled database backups, and a smoke test passes after deploy.
+spec [0008](../specs/0008-hosting-and-ci-cd/index.md) · code in `infra/` of the workspace repo, plus `.github/workflows/` in each repo
+- [x] Design it (spec): `/architect hosting & CI/CD`
+- [ ] Build it: `/develop hosting & CI/CD`
+  - [x] CI on every pull request: `lint:ci` scripts and `ci.yml` in all five repos, can start now with no Azure (AC-1, AC-2, AC-11) (2026-10-26: PRs open, web-vrms #16, web-portal #4, backend-vrms #11, auth #5, analytics-ai #4; the first real GitHub run passed in all five. Milestones 2 to 5 are on hold: the team is not deploying yet)
+  - [ ] Make the apps deployable: Dockerfile.prod fixes, health endpoints, seed and CORS guards, SPA fallback config, gateway template (AC-5, AC-6, AC-9, AC-13)
+  - [ ] Setup as code and staging: Bicep, secrets and variable scripts, database roles, OIDC and `release` branches, staging applied (AC-5 to AC-8, AC-10, AC-12, AC-14)
+  - [ ] CD to staging: `deploy.yml` in four repos plus the gateway, first staging deploy, seed, smoke test (AC-3, AC-4, AC-6, AC-9, AC-14)
+  - [ ] Production and safety: prod applied and first release, restore drill, runbook (AC-4, AC-7, AC-8, AC-10, AC-13)
+- [ ] Verify it: `/check verify hosting & CI/CD`
+- [ ] Test it: `/test hosting & CI/CD`
 
 ### 27. Error monitoring · planned · needs a decision
 Catch errors in production before users report them.
