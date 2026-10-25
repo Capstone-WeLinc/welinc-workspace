@@ -32,6 +32,10 @@ services:
     volumes:
       - ./welinc-backend-vrms:/app
       - /app/node_modules
+    # Optional: lets the container pick up SMTP_* from welinc-backend-vrms/.env. The environment block below wins on any overlap.
+    env_file:
+      - path: ./welinc-backend-vrms/.env
+        required: false
     environment:
       PORT: 3002
       DATABASE_URL: postgresql://welinc_vrms_user:welinc_vrms_pass@vrms-db:5432/welinc_vrms_db?schema=public
