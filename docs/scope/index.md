@@ -33,7 +33,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | F | Dashboard | Built | existing |
 | G | AI diagnosis and knowledge base | Built | existing |
 | H | Analytics dashboards | Built | existing |
-| 1 | Coding standards & tooling | Foundation | planned |
+| 1 | Coding standards & tooling | Foundation | in-progress |
 | 2 | Auth service boundary | Foundation | planned |
 | 3 | Analytics & AI service boundary | Foundation | planned |
 | 4 | Data model v2 | Foundation | planned |
