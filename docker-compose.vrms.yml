@@ -32,7 +32,7 @@ services:
     volumes:
       - ./welinc-backend-vrms:/app
       - /app/node_modules
-    # Optional: lets the container pick up SMTP_* from welinc-backend-vrms/.env. The environment block below wins on any overlap.
+    # Optional: lets the container pick up extra variables from welinc-backend-vrms/.env. The environment block below wins on any overlap.
     env_file:
       - path: ./welinc-backend-vrms/.env
         required: false
@@ -40,9 +40,8 @@ services:
       PORT: 3002
       DATABASE_URL: postgresql://welinc_vrms_user:welinc_vrms_pass@vrms-db:5432/welinc_vrms_db?schema=public
       JWT_SECRET: dev_secret_key_change_in_production
-      JWT_REFRESH_SECRET: dev_refresh_secret_key_change_in_production
-      JWT_EXPIRY: 15m
-      JWT_REFRESH_EXPIRY: 7d
+      # welinc-auth on the internal network; every request's account check calls it (spec 0009)
+      AUTH_SERVICE_URL: http://auth-service:3001
       CORS_ORIGINS: http://localhost:8000,http://localhost:8001
       NODE_ENV: development
     depends_on:
@@ -64,7 +63,6 @@ services:
       - /app/node_modules
     environment:
       VITE_API_BASE_URL: http://localhost:3000
-      VITE_AUTH_MODE: portal
     networks:
       - welinc-network
 
