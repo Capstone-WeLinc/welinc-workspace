@@ -52,9 +52,11 @@ services:
       DATABASE_URL: postgresql://welinc_auth_user:welinc_auth_pass@auth-db:5432/welinc_auth_db?schema=public
       JWT_SECRET: dev_secret_key_change_in_production
       JWT_REFRESH_SECRET: dev_refresh_secret_key_change_in_production
-      JWT_EXPIRY: 15m
+      JWT_ACCESS_EXPIRY: 15m
       JWT_REFRESH_EXPIRY: 7d
       CORS_ORIGINS: http://localhost:8000,http://localhost:8001
+      # Public portal address for the links in setup and reset emails (spec 0009)
+      PORTAL_URL: http://localhost:8000
       NODE_ENV: development
     depends_on:
       auth-db:

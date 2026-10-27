@@ -38,11 +38,26 @@ Capture each owned repo's real conventions so every later skill works from facts
 - [x] Capture conventions per repo: `/audit`
 - Built (2026-10-25) on `feat/tooling` in web-vrms, backend-vrms, auth, portal and analytics-ai (committed, not pushed): all five have an `AGENTS.md`; lint and build are clean in the four Node repos (typecheck through build, plus `typecheck` in web-vrms). analytics-ai only compiles: it has no linter or tests and is planned to retire (feature 3), so none was added. PRs open against `development`: backend-vrms #10, auth #4, web-portal #3, web-vrms #15, analytics-ai #3. Marked done by you on 2026-10-25, with analytics-ai accepted as compile only. Node 24 is now installed on this machine. The portal login, wrong password message and 30 second inactivity sign out were run in a browser and passed.
 
-### 2. Auth service boundary · planned · needs a decision · GA
+### 2. Auth service boundary · in-progress · GA
 backend-vrms carries its own login, OTP and user endpoints while `welinc-auth` is the shared auth service. Decide which owns what before roles and OTP change.
 **Done when:** one service owns login, OTP and users; the other only validates tokens; the portal and web-vrms log in through one path.
-- [ ] Design it (spec): `/architect auth service boundary`
+spec [0009](../specs/0009-auth-service-boundary/index.md)
+- [x] Design it (spec): `/architect auth service boundary`
 - Note (2026-10-25): from spec 0007's follow up. Adding a mechanic or chief mechanic on the Users page creates no VRMS `Mechanic` row (only seeds do), so new accounts can't be assigned tickets. Whichever service ends up owning users should create that row.
+- Note (2026-10-27): spec 0009 decides welinc-auth owns everything; backend-vrms deletes its copy and user tables, checks each caller live, and syncs its `Mechanic` rows from welinc-auth. Crosses welinc-auth, backend-vrms and web-vrms; both databases need a reset.
+- [x] Build it: `/develop auth service boundary`
+  - [x] Thin thread: shared seed ids, VRMS auth copy and user tables removed, live account check with 503, mechanics and audit on the auth id (AC-1 to AC-8, AC-10, AC-22, AC-24 to AC-26)
+  - [x] Mechanic list in step and one door: sync, just in time rows, repair form by mechanic id, fallback login removed (AC-9, AC-11 to AC-15, AC-27)
+  - [x] welinc-auth hardening: no codes in logs, `PORTAL_URL`, reset and lock rules, admin safety guards (AC-16 to AC-19)
+  - [x] Admin change record: `UserChange` table and its endpoint (AC-20, AC-21)
+  - [x] Close out: lint, build, test and typecheck in all three repos (AC-23)
+  - Note (2026-10-27): all code built on `feat/auth-service-boundary` in welinc-auth, backend-vrms and web-vrms (not committed). Lint, build and tests pass in all three. Thin thread and change record stay open until their migrations are applied: `20261027000000_auth_service_boundary` (backend-vrms) and `20261027000000_user_changes` (auth) are written but both databases still need the reset and reseed.
+- code in `welinc-backend-vrms/src/auth/`, `welinc-backend-vrms/src/modules/vrms/mechanic-roster.service.ts`, `welinc-auth/src/auth/`, `welinc-web-vrms/src/lib/api/axios.ts`
+- Note (2026-10-27): both databases reset and reseeded, migrations applied, committed on `feat/auth-service-boundary` (not pushed). Verify found one bug, fixed in web-vrms: the mechanic sync sent a `null` body and the API answered 400. A new welinc-auth migration, `20261027000100_drop_unused_domain_tables`, drops the repair, booking and maintenance tables the early schema left in the auth database. The last admin race held over 30 rounds. Eight verify steps stay unticked and are left to `/test`: dashboard single call, `AUTH_SERVICE_URL` unset, HTML or 429 from auth, failing just in time write, `PORTAL_URL` in production, dead SMTP, the 409 shown in the UI, and the extra files in `src/auth/`.
+- [x] Verify it: `/check verify auth service boundary`
+- [x] Test it: `/test auth service boundary`
+- [x] Review it (fresh model): `/check review auth service boundary`
+- [x] Document it: `/document auth service boundary`
 
 ### 3. Analytics & AI service boundary · planned · needs a decision
 Decide whether analytics-ai stays its own service or merges into the main VRMS repos, and record its store choices (pgvector, DuckDB, Redis, MongoDB).

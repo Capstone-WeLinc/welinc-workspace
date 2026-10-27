@@ -149,6 +149,20 @@ npm run test          # NestJS repos only
 
 Before calling a task done, run lint, typecheck and build in every repo you touched, and check UI changes in a real browser.
 
+In `welinc-auth` and `welinc-backend-vrms`, `npm run lint` fixes files in place. `npm run lint:ci` only checks, and it is what CI runs.
+
+### Continuous integration
+
+Every service repo we own has a GitHub Actions workflow (`.github/workflows/ci.yml`) that runs on pull requests into `development` and on pushes to it:
+
+| Repo | Checks |
+|---|---|
+| `welinc-auth`, `welinc-backend-vrms` | `prisma generate`, `lint:ci`, build, tests |
+| `welinc-web-vrms`, `welinc-web-portal` | lint, build (web-vrms also typechecks) |
+| `welinc-backend-vrms-analytics-ai` | every Python file compiles (no linter or tests yet) |
+
+The checks warn but do not block a merge: GitHub Free cannot require them.
+
 ## How we work
 
 - **Branches:** this workspace repo uses `main`. In every service repo, branch from `development` as `feat/<feature>`, one per feature, and open PRs back into `development`, never `main`.
