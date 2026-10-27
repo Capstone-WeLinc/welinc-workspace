@@ -57,7 +57,7 @@ spec [0009](../specs/0009-auth-service-boundary/index.md)
 - [x] Verify it: `/check verify auth service boundary`
 - [x] Test it: `/test auth service boundary`
 - [x] Review it (fresh model): `/check review auth service boundary`
-- [ ] Document it: `/document auth service boundary`
+- [x] Document it: `/document auth service boundary`
 
 ### 3. Analytics & AI service boundary · planned · needs a decision
 Decide whether analytics-ai stays its own service or merges into the main VRMS repos, and record its store choices (pgvector, DuckDB, Redis, MongoDB).
