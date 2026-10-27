@@ -45,17 +45,18 @@ spec [0009](../specs/0009-auth-service-boundary/index.md)
 - [x] Design it (spec): `/architect auth service boundary`
 - Note (2026-10-25): from spec 0007's follow up. Adding a mechanic or chief mechanic on the Users page creates no VRMS `Mechanic` row (only seeds do), so new accounts can't be assigned tickets. Whichever service ends up owning users should create that row.
 - Note (2026-10-27): spec 0009 decides welinc-auth owns everything; backend-vrms deletes its copy and user tables, checks each caller live, and syncs its `Mechanic` rows from welinc-auth. Crosses welinc-auth, backend-vrms and web-vrms; both databases need a reset.
-- [ ] Build it: `/develop auth service boundary`
-  - [ ] Thin thread: shared seed ids, VRMS auth copy and user tables removed, live account check with 503, mechanics and audit on the auth id (AC-1 to AC-8, AC-10, AC-22, AC-24 to AC-26)
+- [x] Build it: `/develop auth service boundary`
+  - [x] Thin thread: shared seed ids, VRMS auth copy and user tables removed, live account check with 503, mechanics and audit on the auth id (AC-1 to AC-8, AC-10, AC-22, AC-24 to AC-26)
   - [x] Mechanic list in step and one door: sync, just in time rows, repair form by mechanic id, fallback login removed (AC-9, AC-11 to AC-15, AC-27)
   - [x] welinc-auth hardening: no codes in logs, `PORTAL_URL`, reset and lock rules, admin safety guards (AC-16 to AC-19)
-  - [ ] Admin change record: `UserChange` table and its endpoint (AC-20, AC-21)
+  - [x] Admin change record: `UserChange` table and its endpoint (AC-20, AC-21)
   - [x] Close out: lint, build, test and typecheck in all three repos (AC-23)
   - Note (2026-10-27): all code built on `feat/auth-service-boundary` in welinc-auth, backend-vrms and web-vrms (not committed). Lint, build and tests pass in all three. Thin thread and change record stay open until their migrations are applied: `20261027000000_auth_service_boundary` (backend-vrms) and `20261027000000_user_changes` (auth) are written but both databases still need the reset and reseed.
 - code in `welinc-backend-vrms/src/auth/`, `welinc-backend-vrms/src/modules/vrms/mechanic-roster.service.ts`, `welinc-auth/src/auth/`, `welinc-web-vrms/src/lib/api/axios.ts`
-- [ ] Verify it: `/check verify auth service boundary`
-- [ ] Test it: `/test auth service boundary`
-- [ ] Review it (fresh model): `/check review auth service boundary`
+- Note (2026-10-27): both databases reset and reseeded, migrations applied, committed on `feat/auth-service-boundary` (not pushed). Verify found one bug, fixed in web-vrms: the mechanic sync sent a `null` body and the API answered 400. A new welinc-auth migration, `20261027000100_drop_unused_domain_tables`, drops the repair, booking and maintenance tables the early schema left in the auth database. The last admin race held over 30 rounds. Eight verify steps stay unticked and are left to `/test`: dashboard single call, `AUTH_SERVICE_URL` unset, HTML or 429 from auth, failing just in time write, `PORTAL_URL` in production, dead SMTP, the 409 shown in the UI, and the extra files in `src/auth/`.
+- [x] Verify it: `/check verify auth service boundary`
+- [x] Test it: `/test auth service boundary`
+- [x] Review it (fresh model): `/check review auth service boundary`
 - [ ] Document it: `/document auth service boundary`
 
 ### 3. Analytics & AI service boundary · planned · needs a decision
