@@ -75,6 +75,7 @@ One schema change that the Jira backlog needs: Chief Mechanic role, the new tick
 WL-109. One matrix of role against action, enforced on the server, mirrored in the UI.
 **Done when:** every protected endpoint returns 403 for a forbidden role, the matrix lives in one place, and the UI hides what the server blocks.
 - Note (2026-10-25): spec 0007 uses interim "Readers" and "Editors" role lists for the knowledge base; the matrix should take them over.
+- Note (2026-10-28): spec 0009 leaves two pieces here. Scope welinc-auth's user list and `GET /auth/users/:id/changes` by system (today any ADMIN reads any user's change record). Also decide whether welinc-auth ever needs token refresh or whether its unused `RefreshToken` table is dropped (talk to the other groups first).
 - [ ] Design it (spec): `/architect permission matrix`
 
 ### 6. Design system & UI foundation · done

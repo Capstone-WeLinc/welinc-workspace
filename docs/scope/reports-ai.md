@@ -19,3 +19,9 @@ Jira WL-E7 says optional local AI (Ollama); the code uses Gemini. Decide the pro
 **Done when:** the provider is recorded, suggestions appear on the ticket from the chosen provider, and the app still works when AI is down.
 - Note (2026-10-25): the AI is being rebuilt inside welinc-backend-vrms (see feature 3), so this builds on that rework and grounds its suggestions on the spec 0007 knowledge base, not on feature G. Design feature 3 first.
 - [ ] Design it (spec): `/architect AI repair suggestions`
+
+### 54. Account changes view · planned · from spec 0009
+Admins see who changed an account and what changed, on the Users page, from the `GET /auth/users/:id/changes` endpoint spec 0009 already built.
+**Done when:** an admin opens a user and sees their change record (who, when, what), newest first, with empty, loading and error states, and only admins can read it.
+- Note (2026-10-28): enrolled from spec 0009's follow up. Feature 5 scopes the endpoint by system first, so build this after it. Small and frontend led, so likely no spec.
+- [ ] Build it: `/develop account changes view`

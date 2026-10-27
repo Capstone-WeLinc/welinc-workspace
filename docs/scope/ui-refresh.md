@@ -56,7 +56,7 @@ spec [0005](../specs/0005-repair-form-refresh/index.md) · code in `welinc-web-v
   - [x] Form sections: header, Vehicle, Issues, Priority and assignment, Billing, with list loading and failures (AC-1 to AC-15)
   - [x] Submit flow: action bar, summary dialog, create, success and failure handling, in flight lock (AC-15 to AC-21)
   - [x] Leave guard and sweep: `useBlocker` discard prompt, `beforeunload`, legacy code removed, 375px and 1280px with axe (AC-21, AC-23 to AC-25)
-- [ ] Verify it: `/check verify repair form refresh`
+- [x] Verify it: `/check verify repair form refresh` (2026-10-28: passed, every step run)
 - [ ] Test it: `/test repair form refresh`
 
 ### 13. History & audit log pages · done · Facade
@@ -86,7 +86,8 @@ spec [0006](../specs/0006-user-management-refresh/index.md) · code in `welinc-w
   - [x] Open work check: `email` on the mechanics endpoint, fresh match and block, fails closed (AC-16, AC-23)
   - [x] Cleanup and sweep: old code and `Password123!` removed, tokens only, 375px and 1280px with axe, lint, typecheck, build and tests (AC-24 to AC-26)
 - Note (2026-10-25): built. welinc-backend-vrms `npm run lint` runs `eslint --fix` and already fails on `development` (203 problems without fix, none in the touched file), so AC-26's backend lint is not green yet; build and the 44 tests pass.
-- [ ] Verify it: `/check verify user management refresh`
+- Note (2026-10-28): spec 0009 shipped `setupEmailSent` and the unlock on reset in welinc-auth, so this page can drop its workaround: simplify AC-10 and merge AC-20's two calls into one. Do it with the verify pass.
+- [x] Verify it: `/check verify user management refresh` (2026-10-28: passed; the repair form mechanic picker and most value sourcing steps not run; the Antonio step now uses Juan; backend lint ran as `lint:ci`, not the `--fix` script)
 - [ ] Test it: `/test user management refresh`
 
 ### 15. Knowledge base page · in-progress · Facade
@@ -103,7 +104,7 @@ spec [0007](../specs/0007-knowledge-base-fix-library/index.md) · code in `welin
   - [x] Suggestions and sweep: grouping, create from group with backfill, mechanic suggestions, tests, axe at 375px and 1280px (AC-32 to AC-36, AC-39)
 - Note (2026-10-25): built on `feat/knowledge-base-refresh` in welinc-auth, welinc-backend-vrms and welinc-web-vrms (not pushed). 73 backend tests pass (29 new); lint, typecheck and build are green in the touched files and repos; axe finds nothing at 375px and 1280px for admin, chief mechanic and mechanic. The local auth database has no migration history (built with `db push`), so its `CHIEF_MECHANIC` migration was applied with `prisma db execute`. One call made during the build: issues linked from a suggestion group are linked even when the new entry is saved as a draft (history), while the picker and the ticket link stay Active only. Verify steps in the spec's `verify.md`.
 - Note (2026-10-25): follow up, not part of spec 0007. The ticket's Known fix checklist can only be ticked today. You want it to stay a helper, so each ticket should let you add, remove and reword its own copied steps without changing the knowledge base entry. Needs a small spec (`/architect per ticket checklist edits`) once feature 15 is verified.
-- [ ] Verify it: `/check verify knowledge base refresh`
+- [x] Verify it: `/check verify knowledge base refresh`
 - [ ] Test it: `/test knowledge base refresh`
 
 ### 50. Portal on the design system · planned · needs a decision · from spec 0001

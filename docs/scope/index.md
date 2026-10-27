@@ -13,13 +13,13 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 
 | Epic | File | Status |
 |---|---|---|
-| Foundations | [foundations.md](foundations.md) | 8 existing, 2 done, 1 in-progress, 4 planned |
+| Foundations | [foundations.md](foundations.md) | 8 existing, 3 done, 4 planned |
 | UI refresh | [ui-refresh.md](ui-refresh.md) | 3 done, 5 in-progress, 2 planned |
 | Repair workflow | [repair-workflow.md](repair-workflow.md) | 17 planned |
 | Platform | [platform.md](platform.md) | 1 in-progress, 6 planned |
 | Outsourcing | [outsourcing.md](outsourcing.md) | 4 planned |
 | Operations | [operations.md](operations.md) | 4 planned, 1 dropped |
-| Reports & AI | [reports-ai.md](reports-ai.md) | 3 planned |
+| Reports & AI | [reports-ai.md](reports-ai.md) | 4 planned |
 
 ## At a glance
 
@@ -84,6 +84,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 45 | Reports module with filters & export | Slice 6 | planned |
 | 46 | Ready made reports | Slice 6 | planned |
 | 47 | AI repair suggestions | Slice 6 | planned |
+| 54 | Account changes view | Slice 6 | planned |
 | 48 | Mechanic mobile app (React Native) | Slice 7 | planned |
 | 49 | Offline save & sync | Slice 7 | planned |
 
