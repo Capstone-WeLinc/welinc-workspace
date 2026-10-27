@@ -34,7 +34,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | G | AI diagnosis and knowledge base | Built | existing |
 | H | Analytics dashboards | Built | existing |
 | 1 | Coding standards & tooling | Foundation | done |
-| 2 | Auth service boundary | Foundation | in-progress |
+| 2 | Auth service boundary | Foundation | done |
 | 3 | Analytics & AI service boundary | Foundation | planned |
 | 4 | Data model v2 | Foundation | planned |
 | 5 | Permission matrix & enforcement | Foundation | planned |
