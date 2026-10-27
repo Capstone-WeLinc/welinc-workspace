@@ -86,7 +86,8 @@ spec [0006](../specs/0006-user-management-refresh/index.md) · code in `welinc-w
   - [x] Open work check: `email` on the mechanics endpoint, fresh match and block, fails closed (AC-16, AC-23)
   - [x] Cleanup and sweep: old code and `Password123!` removed, tokens only, 375px and 1280px with axe, lint, typecheck, build and tests (AC-24 to AC-26)
 - Note (2026-10-25): built. welinc-backend-vrms `npm run lint` runs `eslint --fix` and already fails on `development` (203 problems without fix, none in the touched file), so AC-26's backend lint is not green yet; build and the 44 tests pass.
-- [ ] Verify it: `/check verify user management refresh`
+- Note (2026-10-28): spec 0009 shipped `setupEmailSent` and the unlock on reset in welinc-auth, so this page can drop its workaround: simplify AC-10 and merge AC-20's two calls into one. Do it with the verify pass.
+- [x] Verify it: `/check verify user management refresh` (2026-10-28: passed; the repair form mechanic picker and most value sourcing steps not run; the Antonio step now uses Juan; backend lint ran as `lint:ci`, not the `--fix` script)
 - [ ] Test it: `/test user management refresh`
 
 ### 15. Knowledge base page · in-progress · Facade
