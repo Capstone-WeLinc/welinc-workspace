@@ -56,7 +56,7 @@ spec [0005](../specs/0005-repair-form-refresh/index.md) · code in `welinc-web-v
   - [x] Form sections: header, Vehicle, Issues, Priority and assignment, Billing, with list loading and failures (AC-1 to AC-15)
   - [x] Submit flow: action bar, summary dialog, create, success and failure handling, in flight lock (AC-15 to AC-21)
   - [x] Leave guard and sweep: `useBlocker` discard prompt, `beforeunload`, legacy code removed, 375px and 1280px with axe (AC-21, AC-23 to AC-25)
-- [ ] Verify it: `/check verify repair form refresh`
+- [x] Verify it: `/check verify repair form refresh` (2026-10-28: passed, every step run)
 - [ ] Test it: `/test repair form refresh`
 
 ### 13. History & audit log pages · done · Facade
