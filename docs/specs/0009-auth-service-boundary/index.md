@@ -1,7 +1,7 @@
 # 0009. welinc-auth owns every account; VRMS only checks who is calling
 
 **Date**: 2026-10-27
-**Status**: In Progress
+**Status**: Accepted
 
 ## Summary
 
