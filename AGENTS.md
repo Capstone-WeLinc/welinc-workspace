@@ -62,12 +62,16 @@ Stored in `docs/specs/`. Format: `docs/specs/NNNN-title.md`. Product backlog liv
 
 ## Agent skills
 
-- [prisma-client-api](.claude/skills/prisma-client-api/), [prisma-cli](.claude/skills/prisma-cli/): `prisma/skills`, Prisma 7 queries and CLI (backend-vrms, auth)
-- [nestjs-best-practices](.claude/skills/nestjs-best-practices/): `kadajett/agent-nestjs-skills`, NestJS modules, DI, security (backend-vrms, auth)
-- [tailwind-4-docs](.claude/skills/tailwind-4-docs/): `lombiq/tailwind-agent-skills`, Tailwind v4 docs and the v3 to v4 migration. `welinc-web-vrms` is on v4 and `welinc-web-portal` is still on v3, so use it for v4 code and for upgrading the portal. Its docs snapshot is not downloaded yet.
-- [shadcn](.claude/skills/shadcn/): `shadcn-ui/ui`, shadcn/ui setup and component usage (frontends)
-- [vercel-react-best-practices](.claude/skills/vercel-react-best-practices/), [vercel-composition-patterns](.claude/skills/vercel-composition-patterns/): `vercel-labs/agent-skills`, React patterns and React 19 component APIs (frontends)
-- [fastapi](.claude/skills/fastapi/): `fastapi/fastapi`, FastAPI and Pydantic conventions (analytics-ai)
+Reference skills load on their own when the work matches (say "Using skill: <name>"). Audit and polish skills never run on their own, not even as a step of `/develop` or `/check verify`: offer them in one line and wait for a yes. Never run more than one taste skill on a change.
+
+- **Backend, load on match:** [prisma-client-api](.claude/skills/prisma-client-api/) and [prisma-cli](.claude/skills/prisma-cli/) for Prisma 7 (backend-vrms, auth); [nestjs-best-practices](.claude/skills/nestjs-best-practices/) for NestJS; [fastapi](.claude/skills/fastapi/) for analytics-ai.
+- **Frontend, load on match:** [shadcn](.claude/skills/shadcn/), [tailwind-4-docs](.claude/skills/tailwind-4-docs/) (web-vrms is on v4, web-portal still on v3; its docs snapshot is not downloaded yet), [vercel-react-best-practices](.claude/skills/vercel-react-best-practices/), [vercel-composition-patterns](.claude/skills/vercel-composition-patterns/), [react-hook-form](.claude/skills/react-hook-form/) for forms, [ask-sonner](.claude/skills/ask-sonner/) for toasts.
+- **Infra, load on match:** [docker-patterns](.claude/skills/docker-patterns/) for Dockerfiles and compose files (its examples use Node 22; we run 24). Azure hosting work (spec 0008): `azure-container-apps`, `azure-container-registry`, `azure-static-web-apps`, and `azure-deployment-preflight` before a Bicep deploy. Skip `azure-prepare` and `azure-deploy`: they assume azd.
+- **Ask first (demanding or writes extra code):**
+  - [web-design-guidelines](.claude/skills/web-design-guidelines/): accessibility and UX audit with `file:line` findings. Offer it after a UI change; it fetches its rules from GitHub.
+  - [break-ui](.claude/skills/break-ui/): worst case data stress test behind a dev only toggle. Offer it on pages with lists, tables or typed text.
+  - [impeccable](.claude/skills/impeccable/): critique and polish only; `design.md` wins, never rewrite it or add a `PRODUCT.md`, keep its edit hook off. Offer it on a new or reworked page, or when a screen looks off.
+  - [emil-design-eng](.claude/skills/emil-design-eng/): motion and polish review; yields to the effect rules in `welinc-web-vrms/AGENTS.md`. Offer it when animations, dialogs, popovers or tabs change.
 
 MCP servers (configured in `.mcp.json`): playwright, shadcn, atlassian (Jira; needs a one time sign in through `/mcp`)
 
