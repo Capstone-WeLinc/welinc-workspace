@@ -76,13 +76,14 @@ code in `welinc-backend-vrms/prisma/`, `welinc-backend-vrms/src/modules/vrms/`, 
 - Note (2026-10-29): spec 0010 squashes the 18 migrations into one baseline (everyone resets and reseeds; no real data exists, so "migrate with no data loss" holds trivially). You chose to drop the copied Booking and maintenance models now instead of waiting for feature 56. New tables (files, notifications, transfers, holds, shops, lookups) are designed in the spec and created by their own features. Crosses backend-vrms and web-vrms; the Python analytics service is left broken until feature 3.
 - Note (2026-10-29): checked the open branches before the squash. backend-vrms has no branch carrying a migration that is not already on `development`, so the build's first step is clear.
 - Note (2026-10-29): code built and green in both repos (backend lint, build, 136 tests; web lint, typecheck, build). Later the same day the baseline was applied locally (reset and seed), the database checks passed, and the backend container needed `prisma generate` inside it before it started clean. Both repos are committed on `feat/data-model-v2`, not pushed. History summary is now `finished`, `closed`, `cancelled`, `spend`. The repair form lost its Repair shop field and outsourced mechanics (back with features 36 and 37).
+- Note (2026-10-29): verified in the running stack: reset from empty, shadow database diff, reseed, API status flow, audit shape, and the UI pages. Verify found two gaps, both fixed uncommitted: no Disabled badge in the repair form vehicle picker (web-vrms), and the old Python analytics queries still read `completed_at` and the `COMPLETED` status (now `closed_at` and `CLOSED`, so the sync runs again; feature 3 still replaces the service).
 - [x] Design it (spec): `/architect data model v2`
 - [x] Build it: `/develop data model v2`
   - [x] Baseline and one ticket flow end to end: open branches cleared, v2 schema, squashed baseline, repairs service on new statuses and assignments, first seed pass, web list, detail and form (AC-1 to AC-5, AC-4a, AC-8, AC-10 to AC-14)
   - [x] One audit shape everywhere: timeline endpoint, knowledge change log, web timeline and history dialog (AC-6, AC-7, AC-9)
   - [x] The rest of the app on v2: dashboard, history, due dates, vehicle label, full seed, leftover search (AC-2, AC-11, AC-13 to AC-16)
   - [x] Close out: tests updated, lint, typecheck and build in both repos, Docker stack check (AC-17)
-- [ ] Verify it: `/check verify data model v2`
+- [x] Verify it: `/check verify data model v2`
 - [ ] Test it: `/test data model v2`
 
 ### 5. Permission matrix & enforcement · planned · needs a decision · GA
