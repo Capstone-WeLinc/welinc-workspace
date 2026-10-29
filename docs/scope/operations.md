@@ -32,3 +32,9 @@ WL-302 and WL-303, built on proposed defaults. A scheduled check flags tickets s
 WL-105. Jira has no proposed rules yet: decide whether drivers log in or are just names on a ticket.
 **Done when:** the decision is recorded and, if a role is needed, drivers can record drop off and pick up at outsourced shops.
 - [ ] Design it (spec): `/architect driver role`
+
+### 59. Mechanic home garage · planned · needs a decision · from spec 0011
+Mechanics belong to no garage today (only tickets do). Give each in house mechanic a home garage (branch), so Admin can move a mechanic between garages and the assignment picker can filter by the ticket's garage.
+**Done when:** each mechanic has a home garage that Admin can change (audit logged), the assignment picker can filter by garage, and moving a mechanic has its own permission key in the matrix (feature 5).
+- Note (2026-10-29): later, CASL rules can use it, for example a Chief Mechanic verifying only tickets in their garage.
+- [ ] Design it (spec): `/architect mechanic home garage`

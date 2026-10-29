@@ -15,12 +15,12 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 
 | Epic | File | Status |
 |---|---|---|
-| Foundations | [foundations.md](foundations.md) | 8 existing, 3 done, 1 in-progress, 4 planned |
+| Foundations | [foundations.md](foundations.md) | 8 existing, 3 done, 2 in-progress, 3 planned |
 | UI refresh | [ui-refresh.md](ui-refresh.md) | 3 done, 5 in-progress, 2 planned |
 | Repair workflow | [repair-workflow.md](repair-workflow.md) | 19 planned |
 | Platform | [platform.md](platform.md) | 1 in-progress, 7 planned |
 | Outsourcing | [outsourcing.md](outsourcing.md) | 4 planned |
-| Operations | [operations.md](operations.md) | 4 planned, 1 dropped |
+| Operations | [operations.md](operations.md) | 5 planned, 1 dropped |
 | Reports & AI | [reports-ai.md](reports-ai.md) | 4 planned |
 
 ## At a glance
@@ -39,7 +39,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 2 | Auth service boundary | Foundation | done |
 | 3 | Analytics & AI service boundary | Foundation | planned |
 | 4 | Data model v2 | Foundation | done |
-| 5 | Permission matrix & enforcement | Foundation | planned |
+| 5 | Permission matrix & enforcement | Foundation | in-progress |
 | 6 | Design system & UI foundation | Foundation | done |
 | 7 | Language support (English + Filipino) | Foundation | planned |
 | 52 | Configurable settings & modules | Foundation | planned |
@@ -87,6 +87,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 42 | Deadlines & fix time estimates | Slice 5 | planned |
 | 43 | Stuck and stale ticket alerts | Slice 5 | planned |
 | 44 | Driver role | Slice 5 | planned |
+| 59 | Mechanic home garage | Slice 5 | planned |
 | 45 | Reports module with filters & export | Slice 6 | planned |
 | 46 | Ready made reports | Slice 6 | planned |
 | 47 | AI repair suggestions | Slice 6 | planned |

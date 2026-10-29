@@ -87,13 +87,29 @@ code in `welinc-backend-vrms/prisma/`, `welinc-backend-vrms/src/modules/vrms/`, 
 - [x] Verify it: `/check verify data model v2` (2026-10-29: passed, every step run; one gap found and fixed, the Disabled badge in the vehicle picker)
 - [x] Test it: `/test data model v2` (2026-10-29: backend suite 167 passed, 31 new; web-vrms got Vitest for pure logic, 42 passed)
 
-### 5. Permission matrix & enforcement · planned · needs a decision · GA
+### 5. Permission matrix & enforcement · in-progress · GA
 WL-109. One matrix of role against action, enforced on the server, mirrored in the UI.
 **Done when:** every protected endpoint returns 403 for a forbidden role, the matrix lives in one place, and the UI hides what the server blocks.
 - Note (2026-10-25): spec 0007 uses interim "Readers" and "Editors" role lists for the knowledge base; the matrix should take them over.
 - Note (2026-10-28): spec 0009 leaves two pieces here. Scope welinc-auth's user list and `GET /auth/users/:id/changes` by system (today any ADMIN reads any user's change record). Also decide whether welinc-auth ever needs token refresh or whether its unused `RefreshToken` table is dropped (talk to the other groups first).
 - Note (2026-10-29): you chose an Admin editable matrix. The fixed roles stay, but each role's permissions are stored in the database and an Admin turns them on or off from the Settings hub (feature 52). Some rights stay locked (for example Admin keeps user management) so nobody locks themselves out, and every change is audit logged. No custom roles. This feature builds the stored matrix and the server checks; the editing screen lands with feature 52.
-- [ ] Design it (spec): `/architect permission matrix`
+spec [0011](../specs/0011-permission-matrix/index.md) · code in `welinc-backend-vrms/src/auth/permissions`, `welinc-web-vrms/src/lib/permissions`
+- Note (2026-10-29): spec 0011 enforces the matrix with CASL in backend-vrms and web-vrms only (other groups may copy the pattern). Chief Mechanic gets `ticket.view_all` now (read only, no costs). It also scopes welinc-auth admin endpoints by system (a shared repo change, so it goes on the feature 55 list), adds shared account rules and the WeLinc account picker on Add user, and replaces spec 0006 AC-16's deactivate block with "move tickets back to the queue or keep them". `RefreshToken` is deferred to feature 56.
+- [x] Design it (spec): `/architect permission matrix`
+- [x] Build it: `/develop permission matrix`
+  - [x] Thin thread: CASL compatibility check, matrix tables, catalog, backfill, per request version check, global guards, ticket reads on `accessibleBy`, `/permissions/me`, web ability and repairs routes (AC-1 to AC-6, AC-9, AC-10, AC-14, AC-16, AC-20, AC-21, AC-23)
+  - Note (2026-10-29): thin thread built. `@casl/prisma` needs the relation operator spelled out, so the ownership condition is `assignments.some.mechanic.is.authUserId` (same meaning). Analytics has no catalog key yet, so `/analytics` stays on the Admin role check until `/architect` adds one. Browser pass of the shell states still owed.
+  - [x] Every route and screen on the matrix: route mapping, costs, work vs administer, ticket `can` flags, knowledge, old role checks removed, route and e2e tests, matrix API, web `<Can>`, 403 handling, read only matrix section, the `analytics.view` key (AC-4, AC-7, AC-8, AC-11 to AC-13, AC-15, AC-17 to AC-19, AC-22, AC-22a, AC-24, AC-25)
+  - Note (2026-10-29): built and checked live. Hidden cost fields now come back as `null` (AC-11) instead of being left out. On phones the tab bar shows when every nav item fits in it, else the sheet menu, read from the nav instead of the role. A PATCH that names the same cell twice gets 400. The route table test runs inside `npm run test` (no database), not `test:e2e`. `analytics.view` gates the screen only until feature 3.
+  - [x] welinc-auth scoped by system: user list and changes, role edits, shared account rules, lookup, attach existing account (AC-26 to AC-30)
+  - Note (2026-10-29): built and checked live on `feat/permission-matrix` in welinc-auth. Rules live in `src/auth/user-scope.ts`; the caller's system rides on the actor. Create also refuses another system's role (403), like role edits. The lookup limit counts per replica, in memory. In the seed data nearly every VRMS mechanic also holds a VMMS role, so they are all shared accounts: Delete answers 403 for them until the next milestone hides it.
+  - [x] Open work: roster ignores lock, open work and release endpoints, ticket badges, Users page confirms and Add user picker (AC-31 to AC-36)
+  - Note (2026-10-29): open work built, not yet checked in a browser. The email and Set password lock for an account that is ADMIN elsewhere shows only after welinc-auth refuses (the list sends system names, not roles). The Users page has no Delete action, so there is nothing to hide. Changing a mechanic to Admin in the edit dialog also asks about open tickets (reason ROLE_REMOVED). Release also leaves OUTSOURCED and PENDING_APPROVAL tickets alone, as the spec says "FOR_VERIFICATION and later".
+  - [x] Close out: lint, build, tests and typecheck in all three repos (AC-37)
+- [ ] Verify it: `/check verify permission matrix`
+- [ ] Test it: `/test permission matrix`
+- [ ] Review it (fresh model): `/check review permission matrix`
+- [ ] Document it: `/document permission matrix`
 
 ### 6. Design system & UI foundation · done
 Turn `design.md` into real tokens and shared components (buttons, inputs, dialogs, confirm prompts, toasts, tables, empty and error states) so every page and modal looks the same. Includes the Tailwind v4 upgrade.
