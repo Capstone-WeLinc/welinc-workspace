@@ -15,9 +15,9 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 
 | Epic | File | Status |
 |---|---|---|
-| Foundations | [foundations.md](foundations.md) | 8 existing, 3 done, 5 planned |
+| Foundations | [foundations.md](foundations.md) | 8 existing, 3 done, 1 in-progress, 4 planned |
 | UI refresh | [ui-refresh.md](ui-refresh.md) | 3 done, 5 in-progress, 2 planned |
-| Repair workflow | [repair-workflow.md](repair-workflow.md) | 17 planned |
+| Repair workflow | [repair-workflow.md](repair-workflow.md) | 19 planned |
 | Platform | [platform.md](platform.md) | 1 in-progress, 7 planned |
 | Outsourcing | [outsourcing.md](outsourcing.md) | 4 planned |
 | Operations | [operations.md](operations.md) | 4 planned, 1 dropped |
@@ -38,7 +38,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 1 | Coding standards & tooling | Foundation | done |
 | 2 | Auth service boundary | Foundation | done |
 | 3 | Analytics & AI service boundary | Foundation | planned |
-| 4 | Data model v2 | Foundation | planned |
+| 4 | Data model v2 | Foundation | in-progress |
 | 5 | Permission matrix & enforcement | Foundation | planned |
 | 6 | Design system & UI foundation | Foundation | done |
 | 7 | Language support (English + Filipino) | Foundation | planned |
@@ -66,6 +66,8 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 23 | Chief Mechanic verification | Slice 1 | planned |
 | 24 | Full ticket audit trail | Slice 1 | planned |
 | 25 | Vehicle availability | Slice 1 | planned |
+| 57 | Mechanic workload on the Users page | Slice 1 | planned |
+| 58 | Per ticket checklist edits | Slice 1 | planned |
 | 26 | Hosting, CI/CD & environments | Release | in-progress |
 | 27 | Error monitoring | Release | planned |
 | 28 | In-app notifications | Slice 2 | planned |

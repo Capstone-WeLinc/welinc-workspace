@@ -63,14 +63,27 @@ spec [0009](../specs/0009-auth-service-boundary/index.md)
 Decide whether analytics-ai stays its own service or merges into the main VRMS repos, and record its store choices (pgvector, DuckDB, Redis, MongoDB).
 **Done when:** a spec records the service boundary and every store it keeps, with MongoDB justified or removed.
 - Note (2026-10-25): direction chosen by you during spec 0007: the AI and the analytics both move into welinc-backend-vrms and are rebuilt from scratch, retiring welinc-backend-vrms-analytics-ai. AI ideas picked so far: triage while typing grounded on the knowledge base, search by meaning, cleaning "What fixed it" notes, AI drafted knowledge entries, duplicate ticket warnings. The spec also decides replacing spec 0007's `pg_trgm` grouping with embeddings and removing `autoEmbedIssues`.
+- Note (2026-10-29): spec 0010 (data model v2) renames ticket statuses and drops tables, so the Python service breaks on its status breakdown, aging and AI vehicle history until this feature replaces it. The `vrms-db` image also needs pgvector here (today only the separate analytics database has it), and the analytics page's silent sample data fallback must not carry over.
 - [ ] Design it (spec): `/architect analytics & AI service boundary`
 
-### 4. Data model v2 · planned · needs a decision
+### 4. Data model v2 · in-progress
 One schema change that the Jira backlog needs: Chief Mechanic role, the new ticket statuses, verifier fields, attachments, notifications, outsourced shops, lookup lists. Also settle who owns the `Booking` and maintenance models copied into backend-vrms.
 **Done when:** the schema supports slices 1 to 6 without another breaking migration, and existing tickets migrate with no data loss.
+spec [0010](../specs/0010-data-model-v2/index.md)
+code in `welinc-backend-vrms/prisma/`, `welinc-backend-vrms/src/modules/vrms/`, `welinc-backend-vrms/src/modules/knowledge/`, `welinc-web-vrms/src/` (branch `feat/data-model-v2` in both)
 - Note (2026-10-25): spec 0007 lands part of this early: `CHIEF_MECHANIC`, `RepairPriority`, issue categories, and the knowledge base tables with new `RepairIssue` columns. Build on its migration rather than redoing them.
 - Note (2026-10-29): do the VRMS tables now. Who owns the copied Booking and maintenance models waits for feature 56.
-- [ ] Design it (spec): `/architect data model v2`
+- Note (2026-10-29): spec 0010 squashes the 18 migrations into one baseline (everyone resets and reseeds; no real data exists, so "migrate with no data loss" holds trivially). You chose to drop the copied Booking and maintenance models now instead of waiting for feature 56. New tables (files, notifications, transfers, holds, shops, lookups) are designed in the spec and created by their own features. Crosses backend-vrms and web-vrms; the Python analytics service is left broken until feature 3.
+- Note (2026-10-29): checked the open branches before the squash. backend-vrms has no branch carrying a migration that is not already on `development`, so the build's first step is clear.
+- Note (2026-10-29): code built and green in both repos (backend lint, build, 136 tests; web lint, typecheck, build). Later the same day the baseline was applied locally (reset and seed), the database checks passed, and the backend container needed `prisma generate` inside it before it started clean. Both repos are committed on `feat/data-model-v2`, not pushed. History summary is now `finished`, `closed`, `cancelled`, `spend`. The repair form lost its Repair shop field and outsourced mechanics (back with features 36 and 37).
+- [x] Design it (spec): `/architect data model v2`
+- [x] Build it: `/develop data model v2`
+  - [x] Baseline and one ticket flow end to end: open branches cleared, v2 schema, squashed baseline, repairs service on new statuses and assignments, first seed pass, web list, detail and form (AC-1 to AC-5, AC-4a, AC-8, AC-10 to AC-14)
+  - [x] One audit shape everywhere: timeline endpoint, knowledge change log, web timeline and history dialog (AC-6, AC-7, AC-9)
+  - [x] The rest of the app on v2: dashboard, history, due dates, vehicle label, full seed, leftover search (AC-2, AC-11, AC-13 to AC-16)
+  - [x] Close out: tests updated, lint, typecheck and build in both repos, Docker stack check (AC-17)
+- [ ] Verify it: `/check verify data model v2`
+- [ ] Test it: `/test data model v2`
 
 ### 5. Permission matrix & enforcement · planned · needs a decision · GA
 WL-109. One matrix of role against action, enforced on the server, mirrored in the UI.

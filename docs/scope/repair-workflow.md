@@ -11,16 +11,19 @@ WL-200. One official list of statuses and who may move a ticket from which statu
 **Done when:** final status names are recorded, invalid transitions are rejected with a clear error, and existing tickets migrate without loss.
 - [ ] Design it (spec): `/architect ticket status lifecycle`
 - Note (2026-10-25): today the backend allows forward moves only (`updateStatus` in `repairs.service.ts`). The lifecycle has to cover moving back (reject to In Progress, WL-200 and WL-212; admin override, WL-108) and decide what a backward move does to spec 0007's ticked checklist steps and the "What fixed it" notes saved on the way to For verification (AC-31).
+- Note (2026-10-29): spec 0010 fixes the nine status names (`OPEN` to `CLOSED`); this feature keeps the transition table. Also decide whether the Chief Mechanic can close (verify) a ticket, which only Admin can today, and add the optimistic lock that unlock and cancel lack (spec 0004).
 
 ### 17. Chief Mechanic role · planned
 WL-104. A role that sees all tickets and owns verification, following the permission matrix.
 **Done when:** Admin can assign the role, the Chief Mechanic sees every ticket and the verification queue, and the sidebar shows the badge.
 - Note (2026-10-25): spec 0007 (feature 15) adds the role itself: `CHIEF_MECHANIC` in welinc-auth, welinc-backend-vrms and the web app, assignable on the Users page, with its badge, knowledge base editing, and mechanic rules on tickets for now. What's left here is widening it to every ticket and the verification queue (with feature 23), once the permission matrix (feature 5) settles the exact rights.
+- Note (2026-10-29): spec 0002 asks for a Chief Mechanic dashboard (Jira VRMS-41) that reuses the dashboard tiles, with Waiting as the verification queue. Cover it here or with feature 23.
 - [ ] Build it: `/develop chief mechanic role`
 
 ### 18. New repair ticket & assignment · planned · needs a decision
 WL-201, WL-202, and the ordering half of WL-401. Create a ticket with pickers and auto-filled vehicle and reporter details, then assign in house mechanics first, showing each one's open ticket count.
 **Done when:** a ticket is created as Assigned or Open, vehicle details fill in within a second, in house options list first, and the mechanic is notified once notifications exist.
+- Note (2026-10-29): spec 0010 already stores priority and the reporter on the ticket. Still to decide here: whether `accountType` and `corporation` are stored or dropped from the form, and whether the server blocks a second open ticket on an `UNDER_REPAIR` truck (today only a warning).
 - [ ] Design it (spec): `/architect new repair ticket & assignment`
 
 ### 53. Admin ticket editing · planned · needs a decision
@@ -57,13 +60,26 @@ WL-212. Verify or reject finished work, with the verifier recorded.
 ### 24. Full ticket audit trail · planned · needs a decision
 WL-219. Every ticket event logged in one consistent shape, so history and reports can trust it.
 **Done when:** every event type in WL-219 writes actor, role, time, before and after, and note, and no entry can be edited or deleted from the UI.
+- Note (2026-10-29): spec 0010 gives the audit log one shape (one row per event, its changes as a JSON list). Remarks and mechanic assignments are still not audited; decide whether they join the timeline.
 - [ ] Design it (spec): `/architect full ticket audit trail`
 
 ### 25. Vehicle availability · planned
 WL-501, built on Jira's proposed rules. A truck under repair can't be dispatched.
 **Done when:** a vehicle turns Under Repair when its ticket is created, returns to Available when it closes, Admin can toggle it with a reason, and the history is kept per vehicle.
 - Note (2026-10-29): safe to build before the integration meeting, but feature 56 (integration contract) may change it: vehicle status is shared with VMMS (`UNDER_REPAIR` and `UNDER_MAINTENANCE` on the same vehicle).
+- Note (2026-10-29): spec 0010 adds `DISABLED` to the vehicle statuses and designs the `VehicleStatusChange` history table for this feature to create. Also fix the vehicle status change on close or cancel, which runs outside the status transaction today, so a failed write can leave the truck marked Available.
 - [ ] Build it: `/develop vehicle availability`
+
+### 57. Mechanic workload on the Users page · planned · from spec 0010
+See who is busy before assigning. Build after features 18 and 53, since it reuses their counts and the unassign endpoint.
+**Done when:** mechanic rows show an Occupied badge (at least one In Progress ticket) and open counts by status, an Occupied or Free filter stays in the address, the user dialog lists the mechanic's open tickets with links and Unassign or Reassign (each audit logged, with the 409 stale check), the assignment picker shows the same counts, and the Chief Mechanic sees it read only under the name Mechanics (a feature 5 permission). No new page.
+- [ ] Build it: `/develop mechanic workload`
+
+### 58. Per ticket checklist edits · planned · needs a decision · from spec 0007
+The Known fix checklist on a ticket can only be ticked today. You want it to stay a helper, so each ticket lets you add, remove and reword its own copied steps without changing the knowledge base entry.
+**Done when:** on a ticket, a user working it can add, remove and reword its copied steps, the knowledge base entry stays unchanged, and the edits survive a reload.
+- Note (2026-10-29): held back until feature 15 was verified, which it now is. A small spec: the copied steps already exist (`RepairIssueStep`), so the open points are who may edit them and what happens to ticked steps when one is removed.
+- [ ] Design it (spec): `/architect per ticket checklist edits`
 
 ## Slice 2: Mechanic workflow & notifications
 
@@ -83,16 +99,19 @@ WL-301. Unread count on the bell and counts on queue menus.
 ### 30. Transfer requests · planned
 WL-204. A mechanic asks to hand off a ticket; Admin approves or rejects.
 **Done when:** a mechanic can request with a reason, only one request is pending per ticket, Admin approves with a new mechanic or rejects with a reason, and everyone involved is notified.
+- Note (2026-10-29): the `TransferRequest` table is designed in spec 0010, including a partial unique index (raw SQL) for one pending request per mechanic per ticket. Prisma may not model it, so check the `prisma-cli` skill first and make sure later generated migrations do not drop it.
 - [ ] Build it: `/develop transfer requests`
 
 ### 31. On hold for parts · planned · needs a decision
 WL-208, built on proposed defaults. Pause a ticket for missing parts with the reason verified.
 **Done when:** a mechanic sets the hold with parts and reason, a verifier approves or rejects it, hold time is tracked for reports, and held tickets stand out in lists.
+- Note (2026-10-29): `TicketHold` is designed in spec 0010 with a partial unique index (raw SQL) for one open hold per ticket. Same Prisma drift risk as feature 30: check the `prisma-cli` skill and make sure later generated migrations do not drop it.
 - [ ] Design it (spec): `/architect on hold for parts`
 
 ### 32. Repair history timeline · planned
 WL-205. A clickable timeline inside the ticket view, linked from My Repairs.
 **Done when:** the timeline is built from the audit trail, entries expand to show details and files, it filters by event type, and mechanics see only their own tickets' history.
+- Note (2026-10-29): filter `COST_UPDATE` events out of the mechanic view, since mechanics must never see costs (spec 0010).
 - [ ] Build it: `/develop repair history timeline`
 
 ### 33. Admin status override · planned

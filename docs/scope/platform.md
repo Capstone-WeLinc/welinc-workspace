@@ -38,10 +38,12 @@ Get ready for the first integration meeting: know what the other groups changed,
 - [ ] Shared repo drift check (read only)
 - [ ] Setup guide for the shared stack
 - [ ] Meeting held, answers recorded for feature 56
+- Note (2026-10-29): add to the question list that `CHIEF_MECHANIC` now exists in the shared auth role list (spec 0007), and that the VMMS and BMS backends likely carry the same copied login module and `users` table that spec 0009 removed here.
 
 ### 56. Cross group integration contract · planned · needs a decision · GA
 One spec for everything VRMS shares with VMMS and BMS, written after the meeting: roles in the shared auth, gateway routes, vehicle status, the notification service, the one mobile app, who owns the copied Booking and maintenance models, and the environment, CI and dependency update standards.
 **Done when:** the spec records each shared contract, all three systems run together on staging behind one login, and every scope note that says feature 56 may change it is resolved.
+- Note (2026-10-29): spec 0010 dropped the copied `Booking`, `MaintenanceSchedule`, `ChecklistTemplate` and `ChecklistItem` models from VRMS. Bring them back only if the meeting decides VRMS owns them. Vehicle status now also has `DISABLED`, which VMMS shares.
 - [ ] Design it (spec): `/architect cross group integration`
 
 ## Slice 3: Login hardening
