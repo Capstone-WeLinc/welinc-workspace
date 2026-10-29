@@ -57,7 +57,6 @@ Then add the values only you have:
 |---|---|---|
 | `welinc-backend-vrms-analytics-ai/.env` | `GEMINI_API_KEY` | AI triage. Create one at aistudio.google.com (Get API key, then Create API key). |
 | `welinc-auth/.env` | `SMTP_HOST`, `SMTP_USER`, `SMTP_PASS` (optional) | Sending OTP and reset emails. Left blank, emails are logged instead. |
-| `welinc-auth/.env`, `welinc-backend-vrms/.env` | `SEMAPHORE_API_KEY` (optional) | SMS. No code uses it yet. |
 
 The auth, VRMS backend and web containers take their settings from the compose files, so the stack starts without these. The one exception is auth: if `welinc-auth/.env` exists, the auth container also reads it, which is how it gets `SMTP_*` (without them, emails are printed to the auth log instead of sent). The compose values win on any overlap. The backend `.env` files are also used for running migrations, seeds or a service outside Docker. If you run one backend outside Docker, keep `JWT_SECRET` equal to the value in the compose files, or its tokens will not verify.
 
