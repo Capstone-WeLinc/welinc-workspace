@@ -34,7 +34,7 @@ npm install
 npm run lint
 npm run build
 npm run typecheck   # web-vrms only; the backends typecheck through npm run build
-npm run test        # NestJS repos only (Jest); the frontends have no tests yet
+npm run test        # NestJS repos (Jest) and web-vrms (Vitest, pure logic only)
 ```
 
 ## Specs
