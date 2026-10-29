@@ -1,6 +1,6 @@
 # Platform
 
-Release, login security and the mechanic mobile app (Jira WL-E9, WL-E1, WL-E8). Back to [index](index.md).
+Release, cross group integration, login security and the mechanic mobile app (Jira WL-E9, WL-E1, WL-E8). Back to [index](index.md).
 
 ## Release
 
@@ -19,39 +19,58 @@ spec [0008](../specs/0008-hosting-and-ci-cd/index.md) · code in `infra/` of the
   - [ ] Production and safety: prod applied and first release, restore drill, runbook (AC-4, AC-7, AC-8, AC-10, AC-13)
 - [ ] Verify it: `/check verify hosting & CI/CD`
 - [ ] Test it: `/test hosting & CI/CD`
+- Note (2026-10-29): email moves off the personal Gmail to Brevo (subject to change) before staging, with a sender address you control; only the `SMTP_*` values change. See feature 28.
+- Note (2026-10-29): safe to build before the integration meeting, but feature 56 (integration contract) may change it: the Azure milestones host the shared gateway, auth and database, so the other groups' services must fit the same setup.
 
 ### 27. Error monitoring · planned · needs a decision
 Catch errors in production before users report them.
 **Done when:** frontend and backend errors from staging and production reach one place with the release and user role attached, and no secrets or personal data are sent.
 - [ ] Design it (spec): `/architect error monitoring`
 
-### 52. Configurable settings & modules · planned · needs a decision · from spec 0007
-Admin managed settings stored in the database instead of code constants, and VRMS modules that can be switched on or off (for example the AI features). Replaces `KNOWLEDGE_SETTINGS` from spec 0007 first.
-**Done when:** an admin changes a threshold or turns a module off without a deploy, every change is audit logged, and code reads settings from one place.
-- [ ] Design it (spec): `/architect configurable settings & modules`
+## Integration
+
+The VMMS and BMS groups went separate ways after Capstone 1. The integration meeting is planned for after the first week of November 2026; these two features prepare it and then settle what the three systems share.
+
+### 55. Integration kickoff prep · planned
+Get ready for the first integration meeting: know what the other groups changed, what you need to ask them, and how the shared setup works now.
+**Done when:** a question list covers their repos, mobile app repo, services, auth, environments and CI; every change they made to the shared repos (welinc-auth, welinc-web-portal) is listed from a read only check; and a setup guide for the shared stack (auth, portal, gateway, docker network, CI, environments, dependency updates) is ready to hand over.
+- [ ] Question list for VMMS and BMS
+- [ ] Shared repo drift check (read only)
+- [ ] Setup guide for the shared stack
+- [ ] Meeting held, answers recorded for feature 56
+
+### 56. Cross group integration contract · planned · needs a decision · GA
+One spec for everything VRMS shares with VMMS and BMS, written after the meeting: roles in the shared auth, gateway routes, vehicle status, the notification service, the one mobile app, who owns the copied Booking and maintenance models, and the environment, CI and dependency update standards.
+**Done when:** the spec records each shared contract, all three systems run together on staging behind one login, and every scope note that says feature 56 may change it is resolved.
+- [ ] Design it (spec): `/architect cross group integration`
 
 ## Slice 3: Login hardening
 
 ### 34. Admin OTP · planned · GA
 WL-102. Admins confirm login with the same OTP mechanics use.
 **Done when:** Admin pages are unreachable without a completed OTP step (checked on the server), codes expire after 5 minutes and work once, 5 wrong tries lock for 15 minutes, resend waits 60 seconds, and every OTP event is logged.
+- Note (2026-10-29): safe to build before the integration meeting, but feature 56 (integration contract) may change it: OTP lives in the shared welinc-auth and portal, which the other groups also use.
 - [ ] Build it: `/develop admin OTP`
 
 ### 35. reCAPTCHA on login · planned · needs a decision · GA
 WL-103. Block bots from guessing passwords.
 **Done when:** the token is verified on the server before the password check, failures show a clear message, keys live only in environment variables per environment, and it works on a phone.
+- Note (2026-10-29): safe to build before the integration meeting, but feature 56 (integration contract) may change it: the login page is the shared portal.
 - [ ] Design it (spec): `/architect reCAPTCHA on login`
 
 ## Slice 7: Mechanic mobile app
 
 After the web core loop. The responsive web stays the mechanic app until this ships.
 
-### 48. Mechanic mobile app (React Native) · planned · needs a decision
+### 48. Mechanic mobile app (shared with VMMS) · planned · needs a decision
 WL-802. The mechanic side as a native app on the same API. Epic sized: split into smaller features once its spec exists.
 **Done when:** a mechanic can log in with OTP, see their tickets, update status, upload photos and proof with the camera, get notifications and see history, from an installable build.
+- Note (2026-10-29): VMMS already has a mobile app for the same garage mechanics. Before the spec, ask the VMMS group whether VRMS repairs can live as a module in their app (one app for mechanics) or whether VRMS ships its own app that matches theirs (same welinc-auth login, same look). Their app's platform should inform this decision, so the "(React Native)" in the title is not settled yet. Either path crosses repos, so it needs a spec first.
+- Note (2026-10-29): decided, one mobile app shared with VMMS, not a separate VRMS app. VRMS adds its mechanic repair screens to it. Which app shell, repo and platform it uses is settled in feature 56 after the meeting.
 - [ ] Design it (spec): `/architect mechanic mobile app`
 
 ### 49. Offline save & sync · planned · needs a decision
 WL-804. Mechanics keep working with no signal; changes sync when back online.
 **Done when:** assigned tickets open offline, status changes, notes and photos queue locally with a pending count, sync is automatic, the conflict rule is recorded, and closing the app loses nothing.
+- Note (2026-10-29): safe to build before the integration meeting, but feature 56 (integration contract) may change it: offline behavior lives in the shared mobile app, so its rules must work for VMMS too.
 - [ ] Design it (spec): `/architect offline save & sync`

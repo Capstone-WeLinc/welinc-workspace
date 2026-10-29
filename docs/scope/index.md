@@ -9,14 +9,16 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 
 **Deadline:** deployed by the end of November 2026, about 5 weeks from this plan. The whole plan is in scope; nothing is set aside for trimming. Documentation and QA tasks (WL-E10, WL-E11) stay in Jira, not here.
 
+**Integration:** the meeting with VMMS and BMS is planned for after the first week of November 2026 (features 55 and 56). Work tagged "feature 56 may change it" is safe to build before then, but expect changes after.
+
 ## Epics
 
 | Epic | File | Status |
 |---|---|---|
-| Foundations | [foundations.md](foundations.md) | 8 existing, 3 done, 4 planned |
+| Foundations | [foundations.md](foundations.md) | 8 existing, 3 done, 5 planned |
 | UI refresh | [ui-refresh.md](ui-refresh.md) | 3 done, 5 in-progress, 2 planned |
 | Repair workflow | [repair-workflow.md](repair-workflow.md) | 17 planned |
-| Platform | [platform.md](platform.md) | 1 in-progress, 6 planned |
+| Platform | [platform.md](platform.md) | 1 in-progress, 7 planned |
 | Outsourcing | [outsourcing.md](outsourcing.md) | 4 planned |
 | Operations | [operations.md](operations.md) | 4 planned, 1 dropped |
 | Reports & AI | [reports-ai.md](reports-ai.md) | 4 planned |
@@ -40,6 +42,9 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 5 | Permission matrix & enforcement | Foundation | planned |
 | 6 | Design system & UI foundation | Foundation | done |
 | 7 | Language support (English + Filipino) | Foundation | planned |
+| 52 | Configurable settings & modules | Foundation | planned |
+| 55 | Integration kickoff prep | Integration | planned |
+| 56 | Cross group integration contract | Integration | planned |
 | 8 | App shell & role badge | UI refresh | done |
 | 9 | Login & profile pages | UI refresh | done |
 | 10 | Dashboard | UI refresh | in-progress |
@@ -50,7 +55,6 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 15 | Knowledge base page | UI refresh | in-progress |
 | 50 | Portal on the design system | UI refresh | planned |
 | 51 | Analytics page | UI refresh | planned |
-| 52 | Configurable settings & modules | Release | planned |
 | 16 | Ticket status lifecycle | Slice 1 | planned |
 | 17 | Chief Mechanic role | Slice 1 | planned |
 | 18 | New repair ticket & assignment | Slice 1 | planned |
@@ -85,13 +89,13 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 46 | Ready made reports | Slice 6 | planned |
 | 47 | AI repair suggestions | Slice 6 | planned |
 | 54 | Account changes view | Slice 6 | planned |
-| 48 | Mechanic mobile app (React Native) | Slice 7 | planned |
+| 48 | Mechanic mobile app (shared with VMMS) | Slice 7 | planned |
 | 49 | Offline save & sync | Slice 7 | planned |
 
 ## Why this order
 
 - **Foundations first.** The auth boundary, data model and permission matrix are the costliest things to redo, and every Jira story depends on them. (basis: foundations before features; data model is the costliest thing to redo; Jira dependencies on WL-109 and WL-200)
-- **UI refresh right after the design system.** You asked for every page, modal and prompt to look better, and for something visible to show at tomorrow's update. Restyling before Slice 1 means the new screens are built once, on the new components. (basis: your request; `design.md`)
+- **UI refresh right after the design system.** You asked for every page, modal and prompt to look better, and for something visible to show at the 2026-10-23 update. Restyling before Slice 1 means the new screens are built once, on the new components. (basis: your request; `design.md`)
 - **Slice 1 is the walking skeleton.** It is the thinnest real path from ticket creation to verification, and it follows the stakeholder confirmed flow. (basis: walking skeleton; WL-E2 confirmed by the stakeholder)
 - **Release straight after Slice 1.** Every later slice then demos from staging, and the end of November go live is not a single risky jump. (basis: Jira WL-902 planned for Sprint 3)
 - **Unanswered stakeholder items are planned on Jira's proposed rules** (WL-108, WL-303, WL-403, WL-501), as you chose. Change them if WL-1101 brings different answers.

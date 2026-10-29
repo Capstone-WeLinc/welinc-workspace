@@ -14,7 +14,7 @@
 | Shared monolith, shared database | Microservices, one database per service | Code; team lead 2026-10-22 |
 | 8 sprints of 2 weeks | Jira's sprint plan | Jira |
 | Driver details, license photo, cost vs income, daily and monthly reports | Not carried in Jira; treat as possibly dropped | [system-overview.md](system-overview.md) |
-| Mechanics on a separate mobile app | Responsive web now, React Native app later | Scope, slice 7 |
+| Mechanics on a separate mobile app | Responsive web now, then one mobile app shared with VMMS | Scope, slice 7 (feature 48) |
 
 The old backlog also contradicts the BRD on who fills the repair form: the BRD says Admin creates tickets, while VRMS002/009/010/012 say the mechanic submits it on mobile. Jira WL-201 decides.
 

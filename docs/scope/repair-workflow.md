@@ -62,6 +62,7 @@ WL-219. Every ticket event logged in one consistent shape, so history and report
 ### 25. Vehicle availability · planned
 WL-501, built on Jira's proposed rules. A truck under repair can't be dispatched.
 **Done when:** a vehicle turns Under Repair when its ticket is created, returns to Available when it closes, Admin can toggle it with a reason, and the history is kept per vehicle.
+- Note (2026-10-29): safe to build before the integration meeting, but feature 56 (integration contract) may change it: vehicle status is shared with VMMS (`UNDER_REPAIR` and `UNDER_MAINTENANCE` on the same vehicle).
 - [ ] Build it: `/develop vehicle availability`
 
 ## Slice 2: Mechanic workflow & notifications
@@ -69,8 +70,9 @@ WL-501, built on Jira's proposed rules. A truck under repair can't be dispatched
 Adds the alerts and hand offs around the core loop.
 
 ### 28. In-app notifications · planned · needs a decision
-WL-304. The shared notification service every alert uses.
-**Done when:** assignments, transfers, holds, verifications and deadline alerts create notifications, clicking one opens the ticket, and new ones appear without a reload.
+WL-304. The shared notification service every alert uses, across in app, email and push to the mobile app.
+**Done when:** assignments, transfers, holds, verifications and deadline alerts create notifications, clicking one opens the ticket, new ones appear without a reload, and each alert also goes out by email or push where its rule says so.
+- Note (2026-10-29): channels are in app, email and push to the mobile app. SMS is out of scope: it costs money per message (about 0.56 pesos a text at Semaphore, double for OTP) and in app plus push already reach mechanics. Today only welinc-auth sends email (OTP, reset, setup codes), and VMMS and BMS each run their own mail sender. Email goes through Brevo over SMTP, subject to change at the integration meeting or in the spec (it needs only new `SMTP_*` values). Today welinc-auth sends through a personal Gmail account, which is fine for development but must move to Brevo with a sender address you control before staging. The spec decides which alert goes on which channel. Feature 56 may turn this into one notification service for all three systems.
 - [ ] Design it (spec): `/architect in-app notifications`
 
 ### 29. Notification badge & queue counts · planned

@@ -8,6 +8,7 @@ Lookup lists, deadlines, alerts and the remaining roles (Jira WL-E2, WL-E3, WL-E
 WL-203. Replace free text with Admin managed pickers (issue types, parts, reasons, locations), replacing the hardcoded options in the repair form.
 **Done when:** every free text field is either a picker or an optional note, and Admin manages each list without a developer.
 - Note (2026-10-25): spec 0007 already makes the repair form's "System" list admin managed (`IssueCategory`, with a categories page). Reuse it as the issue type list instead of building a second one; this feature still owns parts, reasons and locations.
+- Note (2026-10-29): the lists are managed from the Settings hub (feature 52), not on pages of their own.
 - [ ] Design it (spec): `/architect lookup lists`
 
 ### 41. Common issues picker · dropped

@@ -69,6 +69,7 @@ Decide whether analytics-ai stays its own service or merges into the main VRMS r
 One schema change that the Jira backlog needs: Chief Mechanic role, the new ticket statuses, verifier fields, attachments, notifications, outsourced shops, lookup lists. Also settle who owns the `Booking` and maintenance models copied into backend-vrms.
 **Done when:** the schema supports slices 1 to 6 without another breaking migration, and existing tickets migrate with no data loss.
 - Note (2026-10-25): spec 0007 lands part of this early: `CHIEF_MECHANIC`, `RepairPriority`, issue categories, and the knowledge base tables with new `RepairIssue` columns. Build on its migration rather than redoing them.
+- Note (2026-10-29): do the VRMS tables now. Who owns the copied Booking and maintenance models waits for feature 56.
 - [ ] Design it (spec): `/architect data model v2`
 
 ### 5. Permission matrix & enforcement · planned · needs a decision · GA
@@ -76,6 +77,7 @@ WL-109. One matrix of role against action, enforced on the server, mirrored in t
 **Done when:** every protected endpoint returns 403 for a forbidden role, the matrix lives in one place, and the UI hides what the server blocks.
 - Note (2026-10-25): spec 0007 uses interim "Readers" and "Editors" role lists for the knowledge base; the matrix should take them over.
 - Note (2026-10-28): spec 0009 leaves two pieces here. Scope welinc-auth's user list and `GET /auth/users/:id/changes` by system (today any ADMIN reads any user's change record). Also decide whether welinc-auth ever needs token refresh or whether its unused `RefreshToken` table is dropped (talk to the other groups first).
+- Note (2026-10-29): you chose an Admin editable matrix. The fixed roles stay, but each role's permissions are stored in the database and an Admin turns them on or off from the Settings hub (feature 52). Some rights stay locked (for example Admin keeps user management) so nobody locks themselves out, and every change is audit logged. No custom roles. This feature builds the stored matrix and the server checks; the editing screen lands with feature 52.
 - [ ] Design it (spec): `/architect permission matrix`
 
 ### 6. Design system & UI foundation · done
@@ -95,3 +97,10 @@ spec [0001](../specs/0001-design-system-ui-foundation/index.md) · code in `weli
 Let users switch the UI between English and Filipino. Set up during the UI refresh so pages are not touched twice.
 **Done when:** every UI string comes from a translation file, a language switch persists per user, and dates and money format for the Philippines.
 - [ ] Design it (spec): `/architect language support`
+
+### 52. Configurable settings & modules · planned · needs a decision · from spec 0007
+Admin managed settings stored in the database instead of code constants, and VRMS modules that can be switched on or off (for example the AI features). Replaces `KNOWLEDGE_SETTINGS` from spec 0007 first.
+**Done when:** an admin changes a threshold or turns a module off without a deploy, every change is audit logged, and code reads settings from one place.
+- Note (2026-10-29): you chose one Admin Settings hub. This feature owns it, with sections for lookup lists (feature 40), thresholds, modules, and role permissions (feature 5). Done also means every section lives in that one hub.
+- Note (2026-10-29): moved from Release to right after the foundations, so the permission screen (feature 5) and lookup lists (feature 40) have a home before Slice 1. It is VRMS only, so it is safe before the integration meeting.
+- [ ] Design it (spec): `/architect configurable settings & modules`

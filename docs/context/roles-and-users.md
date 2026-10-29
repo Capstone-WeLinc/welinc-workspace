@@ -9,11 +9,11 @@ Roles are stored per system (`user_roles` / `UserRoleAssignment` with a `SystemT
 | Role | Status | In VRMS they can | They can't |
 |---|---|---|---|
 | **Admin** (IT, office staff) | In code | Create and assign tickets, set priority, cancel, encode costs, transfer to outsourced shops and close them, approve transfer requests, manage users and lookup lists, export reports | |
-| **Chief Mechanic** | Jira, confirmed (WL-104), not in code yet | View all tickets, verify or reject finished work (name is logged), handle outsourced closing | Exact permissions wait on the stakeholder flowchart |
+| **Chief Mechanic** | In code since spec 0007 (WL-104); full rights wait on the permission matrix | View all tickets, verify or reject finished work (name is logged), handle outsourced closing | Exact permissions wait on the stakeholder flowchart |
 | **Mechanic** | In code | See and update the status of their own tickets, upload vehicle photos and proof, request a transfer, put a ticket on hold for parts | Close or verify tickets, touch tickets not assigned to them, see costs, the driver verification flag or license photos |
 | **Driver** | Jira, unanswered (WL-105) | Maybe record drop-off and pick-up at outsourced shops | Nothing to build until confirmed |
 
-The code enum is `ADMIN, MECHANIC, CUSTOMER_SUPPORT, OPERATIONS`. Jira never mentions Operations or Customer Support, so they have no VRMS permissions; Chief Mechanic has to be added.
+The code enum is `ADMIN, MECHANIC, CHIEF_MECHANIC, CUSTOMER_SUPPORT, OPERATIONS` (Chief Mechanic added by spec 0007). Jira never mentions Operations or Customer Support, so they have no VRMS permissions. Today a Chief Mechanic follows the mechanic rules on tickets and edits the knowledge base; seeing every ticket and owning verification comes with scope features 17 and 23.
 
 ## Key rules
 

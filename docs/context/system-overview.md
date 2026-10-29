@@ -43,8 +43,8 @@ Shared tables owned by VRMS (other subsystems reference them): vehicles, garages
 ## Decisions (confirmed by the team lead, 2026-10-22)
 
 - **Architecture is microservices**, as in the code. The BRD and diagrams that show a modular monolith are outdated.
-- **Mechanic mobile app: React Native** (no repo yet). Jira still lists this as an open platform decision (WL-801, ticket missing). Update Jira.
-- **Hosting: Vercel (frontends) and Render; Semaphore for SMS.** Jira still says "Vercel vs Netlify" (WL-901, ticket missing). Update Jira. License photo storage may be dropped.
+- **Mechanic mobile app: one app shared with VMMS** (decided 2026-10-29). VMMS already has a mobile app; VRMS adds its repair screens to it. Its platform and repo are settled after the integration meeting (scope feature 56). Jira still lists this as an open platform decision (WL-801, ticket missing). Update Jira.
+- **Hosting: Azure** (Static Web Apps, Container Apps, one shared PostgreSQL server) with GitHub Actions, per spec 0008; this replaced the earlier Vercel and Render plan. Email is chosen in the notifications spec (scope feature 28); SMS is dropped as not worth the cost. Jira still says "Vercel vs Netlify" (WL-901, ticket missing). Update Jira. License photo storage may be dropped.
 - **AI and analytics is a Capstone 2 addition** not covered by BRD v1.1. It lives in its own repo only because an earlier requirement said it couldn't touch the main DB and backend. That requirement is gone, so merging it into the main VRMS repos is an open option (decide with `/architect`).
 
 ## Still open
