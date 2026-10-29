@@ -39,7 +39,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 2 | Auth service boundary | Foundation | done |
 | 3 | Analytics & AI service boundary | Foundation | planned |
 | 4 | Data model v2 | Foundation | done |
-| 5 | Permission matrix & enforcement | Foundation | in-progress |
+| 5 | Permission matrix & enforcement | Foundation | done |
 | 6 | Design system & UI foundation | Foundation | done |
 | 7 | Language support (English + Filipino) | Foundation | planned |
 | 52 | Configurable settings & modules | Foundation | planned |

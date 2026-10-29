@@ -1,7 +1,7 @@
 # 0011. Permission matrix: Admin editable grants, enforced with CASL
 
 **Date**: 2026-10-29
-**Status**: In Progress
+**Status**: Accepted
 
 ## Summary
 

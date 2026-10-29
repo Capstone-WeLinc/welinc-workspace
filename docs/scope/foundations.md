@@ -87,7 +87,7 @@ code in `welinc-backend-vrms/prisma/`, `welinc-backend-vrms/src/modules/vrms/`, 
 - [x] Verify it: `/check verify data model v2` (2026-10-29: passed, every step run; one gap found and fixed, the Disabled badge in the vehicle picker)
 - [x] Test it: `/test data model v2` (2026-10-29: backend suite 167 passed, 31 new; web-vrms got Vitest for pure logic, 42 passed)
 
-### 5. Permission matrix & enforcement · in-progress · GA
+### 5. Permission matrix & enforcement · done · GA
 WL-109. One matrix of role against action, enforced on the server, mirrored in the UI.
 **Done when:** every protected endpoint returns 403 for a forbidden role, the matrix lives in one place, and the UI hides what the server blocks.
 - Note (2026-10-25): spec 0007 uses interim "Readers" and "Editors" role lists for the knowledge base; the matrix should take them over.
@@ -98,18 +98,18 @@ spec [0011](../specs/0011-permission-matrix/index.md) · code in `welinc-backend
 - [x] Design it (spec): `/architect permission matrix`
 - [x] Build it: `/develop permission matrix`
   - [x] Thin thread: CASL compatibility check, matrix tables, catalog, backfill, per request version check, global guards, ticket reads on `accessibleBy`, `/permissions/me`, web ability and repairs routes (AC-1 to AC-6, AC-9, AC-10, AC-14, AC-16, AC-20, AC-21, AC-23)
-  - Note (2026-10-29): thin thread built. `@casl/prisma` needs the relation operator spelled out, so the ownership condition is `assignments.some.mechanic.is.authUserId` (same meaning). Analytics has no catalog key yet, so `/analytics` stays on the Admin role check until `/architect` adds one. Browser pass of the shell states still owed.
+  - Note (2026-10-29): thin thread built. `@casl/prisma` needs the relation operator spelled out, so the ownership condition is `assignments.some.mechanic.is.authUserId` (same meaning). The `analytics.view` key was added in the next chunk, and the browser pass of the shell states was done at `/check verify`.
   - [x] Every route and screen on the matrix: route mapping, costs, work vs administer, ticket `can` flags, knowledge, old role checks removed, route and e2e tests, matrix API, web `<Can>`, 403 handling, read only matrix section, the `analytics.view` key (AC-4, AC-7, AC-8, AC-11 to AC-13, AC-15, AC-17 to AC-19, AC-22, AC-22a, AC-24, AC-25)
   - Note (2026-10-29): built and checked live. Hidden cost fields now come back as `null` (AC-11) instead of being left out. On phones the tab bar shows when every nav item fits in it, else the sheet menu, read from the nav instead of the role. A PATCH that names the same cell twice gets 400. The route table test runs inside `npm run test` (no database), not `test:e2e`. `analytics.view` gates the screen only until feature 3.
   - [x] welinc-auth scoped by system: user list and changes, role edits, shared account rules, lookup, attach existing account (AC-26 to AC-30)
   - Note (2026-10-29): built and checked live on `feat/permission-matrix` in welinc-auth. Rules live in `src/auth/user-scope.ts`; the caller's system rides on the actor. Create also refuses another system's role (403), like role edits. The lookup limit counts per replica, in memory. In the seed data nearly every VRMS mechanic also holds a VMMS role, so they are all shared accounts: Delete answers 403 for them until the next milestone hides it.
   - [x] Open work: roster ignores lock, open work and release endpoints, ticket badges, Users page confirms and Add user picker (AC-31 to AC-36)
-  - Note (2026-10-29): open work built, not yet checked in a browser. The email and Set password lock for an account that is ADMIN elsewhere shows only after welinc-auth refuses (the list sends system names, not roles). The Users page has no Delete action, so there is nothing to hide. Changing a mechanic to Admin in the edit dialog also asks about open tickets (reason ROLE_REMOVED). Release also leaves OUTSOURCED and PENDING_APPROVAL tickets alone, as the spec says "FOR_VERIFICATION and later".
+  - Note (2026-10-29): open work built and checked in a browser at `/check verify`. The email and Set password lock for an account that is ADMIN elsewhere shows only after welinc-auth refuses (the list sends system names, not roles). The Users page has no Delete action, so there is nothing to hide. Changing a mechanic to Admin in the edit dialog also asks about open tickets (reason ROLE_REMOVED). Release also leaves OUTSOURCED and PENDING_APPROVAL tickets alone, as the spec says "FOR_VERIFICATION and later".
   - [x] Close out: lint, build, tests and typecheck in all three repos (AC-37)
 - [x] Verify it: `/check verify permission matrix`
 - [x] Test it: `/test permission matrix`
 - [ ] Review it (fresh model): `/check review permission matrix`
-- [ ] Document it: `/document permission matrix`
+- [x] Document it: `/document permission matrix`
 
 ### 6. Design system & UI foundation · done
 Turn `design.md` into real tokens and shared components (buttons, inputs, dialogs, confirm prompts, toasts, tables, empty and error states) so every page and modal looks the same. Includes the Tailwind v4 upgrade.
