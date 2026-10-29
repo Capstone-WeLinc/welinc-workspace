@@ -1,7 +1,7 @@
 # 0010. Data model v2: one clean baseline with the new ticket statuses
 
 **Date**: 2026-10-29
-**Status**: Accepted
+**Status**: In Progress
 
 Decision history (context, options, rationale): [rationale.md](rationale.md).
 
