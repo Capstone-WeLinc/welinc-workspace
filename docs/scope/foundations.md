@@ -106,8 +106,8 @@ spec [0011](../specs/0011-permission-matrix/index.md) · code in `welinc-backend
   - [x] Open work: roster ignores lock, open work and release endpoints, ticket badges, Users page confirms and Add user picker (AC-31 to AC-36)
   - Note (2026-10-29): open work built, not yet checked in a browser. The email and Set password lock for an account that is ADMIN elsewhere shows only after welinc-auth refuses (the list sends system names, not roles). The Users page has no Delete action, so there is nothing to hide. Changing a mechanic to Admin in the edit dialog also asks about open tickets (reason ROLE_REMOVED). Release also leaves OUTSOURCED and PENDING_APPROVAL tickets alone, as the spec says "FOR_VERIFICATION and later".
   - [x] Close out: lint, build, tests and typecheck in all three repos (AC-37)
-- [ ] Verify it: `/check verify permission matrix`
-- [ ] Test it: `/test permission matrix`
+- [x] Verify it: `/check verify permission matrix`
+- [x] Test it: `/test permission matrix`
 - [ ] Review it (fresh model): `/check review permission matrix`
 - [ ] Document it: `/document permission matrix`
 
