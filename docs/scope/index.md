@@ -15,7 +15,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 
 | Epic | File | Status |
 |---|---|---|
-| Foundations | [foundations.md](foundations.md) | 8 existing, 3 done, 2 in-progress, 3 planned |
+| Foundations | [foundations.md](foundations.md) | 8 existing, 5 done, 3 planned |
 | UI refresh | [ui-refresh.md](ui-refresh.md) | 3 done, 5 in-progress, 2 planned |
 | Repair workflow | [repair-workflow.md](repair-workflow.md) | 19 planned |
 | Platform | [platform.md](platform.md) | 1 in-progress, 7 planned |

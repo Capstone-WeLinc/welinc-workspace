@@ -281,4 +281,4 @@ Tracer Bullet: slice 1 is one thin thread through every layer (a seeded mechanic
 - [ ] A "Changes" view for `GET /auth/users/:id/changes` on the Users page, later (reports work).
 - [ ] Feature 5 (permission matrix): scope the changes endpoint and the user list by system.
 - [ ] welinc-auth has a `RefreshToken` table but no refresh endpoint. Decide whether refresh is ever needed or drop the table (talk to the other groups first).
-- [ ] Update `welinc-backend-vrms/AGENTS.md` and `welinc-auth/AGENTS.md` (new env vars, the account check, the sync), and the foundations rows A and B code paths, through `/sync`.
+- [x] Update `welinc-backend-vrms/AGENTS.md` and `welinc-auth/AGENTS.md` (new env vars, the account check, the sync), and the foundations rows A and B code paths, through `/sync`.

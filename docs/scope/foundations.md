@@ -7,13 +7,13 @@ What is already built (enrolled for context) and the ground every slice stands o
 These predate the workflow. `/develop` and `/sync` leave them alone; planned features below replace or extend parts of them.
 
 ### A. Login, OTP and password reset · existing
-Email and password login, mechanic OTP, forgot and reset password, profile and profile picture. Note: backend-vrms has its own auth module next to `welinc-auth` (feature 2 decides which one owns this). code in `welinc-backend-vrms/src/auth/`, `welinc-web-vrms/src/features/auth/`
+Email and password login, mechanic OTP, forgot and reset password, profile and profile picture. Since spec 0009, `welinc-auth` owns login, OTP and users; backend-vrms only checks tokens (`src/auth/account-check.ts`). code in `welinc-auth/src/auth/`, `welinc-web-vrms/src/features/auth/`
 
 ### B. User management · existing
-Admin lists, creates, edits, deactivates, unlocks and resets users. code in `welinc-backend-vrms/src/auth/`, `welinc-web-vrms/src/features/user-management/`
+Admin lists, creates, edits, deactivates, unlocks and resets users. The users live in `welinc-auth`; backend-vrms keeps a synced `Mechanic` roster. code in `welinc-auth/src/auth/`, `welinc-backend-vrms/src/modules/vrms/mechanic-roster.service.ts`, `welinc-web-vrms/src/features/user-management/`
 
 ### C. Repair tickets · existing
-Create, list, detail, status change (`PENDING → IN_PROGRESS → FOR_VERIFICATION → COMPLETED`, plus `CANCELLED`), cost encoding, unlock a closed ticket. The form's vehicle system and root cause options are hardcoded (`lib/mockConfig`). code in `welinc-backend-vrms/src/modules/vrms/`, `welinc-web-vrms/src/features/repair/`
+Create, list, detail, status change (statuses since spec 0010: `OPEN`, `ASSIGNED`, `IN_PROGRESS`, `ON_HOLD`, `FOR_VERIFICATION`, `OUTSOURCED`, `PENDING_APPROVAL`, `CLOSED`, `CANCELLED`; feature 16 builds the transitions), cost encoding, unlock a closed ticket. The form's vehicle system and root cause options are hardcoded (`lib/mockConfig`). code in `welinc-backend-vrms/src/modules/vrms/`, `welinc-web-vrms/src/features/repair/`
 
 ### D. Repair history · existing
 Closed tickets with filters. code in `welinc-backend-vrms/src/modules/vrms/` (`GET history`), `welinc-web-vrms/src/features/repair/pages/HistoryPage.tsx`
