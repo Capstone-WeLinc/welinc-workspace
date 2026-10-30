@@ -15,7 +15,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 
 | Epic | File | Status |
 |---|---|---|
-| Foundations | [foundations.md](foundations.md) | 8 existing, 5 done, 3 planned |
+| Foundations | [foundations.md](foundations.md) | 8 existing, 5 done, 1 in-progress, 2 planned |
 | UI refresh | [ui-refresh.md](ui-refresh.md) | 3 done, 5 in-progress, 2 planned |
 | Repair workflow | [repair-workflow.md](repair-workflow.md) | 19 planned |
 | Platform | [platform.md](platform.md) | 1 in-progress, 7 planned |
@@ -42,7 +42,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 5 | Permission matrix & enforcement | Foundation | done |
 | 6 | Design system & UI foundation | Foundation | done |
 | 7 | Language support (English + Filipino) | Foundation | planned |
-| 52 | Configurable settings & modules | Foundation | planned |
+| 52 | Configurable settings & modules | Foundation | in-progress |
 | 55 | Integration kickoff prep | Integration | planned |
 | 56 | Cross group integration contract | Integration | planned |
 | 8 | App shell & role badge | UI refresh | done |
@@ -120,6 +120,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | `done` | **you, when you decide it is** (any skill sets it when you say so); `/sync` reconciles | boxes you ran ticked, skipped ones marked skipped; the tier's last stage (`Prototype` → after `/develop`; `Alpha` → after `/check verify`; `Beta`/`GA` → after `/test`) is the suggested point to call it done; `/sync` captures conventions |
 
 - **Next step** = the first unticked box (always a command or a tracked milestone).
+- **Polish it / Extra skills** = one optional box after a feature's last pipeline box, listing the ask first skills that fit it (`impeccable` or `emil-design-eng`, never both on one change; `web-design-guidelines`; `break-ui`; `docker-patterns` and the Azure skills for hosting). It is never the next step while a pipeline box is open, and it never blocks `done`. Tick it once you ran or skipped what you wanted.
 - **needs a decision** = run `/architect` first; otherwise straight to `/develop` (or `/audit` for standards & tooling). The tag drops once the spec is captured.
 - **Atomic build tasks live in the spec's `## Build plan`, not here**: the scope carries only the milestone rollup.
 - **Status** `planned` → `in-progress` → `done`, plus `existing` (pre-workflow) and `dropped` (de-scoped, kept for history).

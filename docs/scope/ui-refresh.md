@@ -8,12 +8,14 @@ Every page, modal and prompt in web-vrms rebuilt on the design system (feature 6
 Sidebar, header and page frame on the new tokens, with the user's name and role badge (WL-101).
 **Done when:** the role badge comes from the token, shows when collapsed and on a 375px phone, and each role has its own badge color.
 - [x] Build it: `/develop app shell & role badge`
+- [ ] Polish it (optional, ask first): `impeccable` · `web-design-guidelines`
 - code in `welinc-web-vrms/src/components/layout/`
 
 ### 9. Login & profile pages · done · Facade
 Login, OTP, forgot password and profile restyled with clear errors and loading states.
 **Done when:** each screen works at 375px and 1280px, errors are inline and readable, and buttons show progress.
 - [x] Build it: `/develop login & profile pages`
+- [ ] Polish it (optional, ask first): `impeccable` · `web-design-guidelines` · `break-ui` (long names and emails, error text)
 - code in `welinc-web-vrms/src/features/auth/`
 - Note (2026-10-22): login, OTP and forgot password are the shared portal's screens, so they moved to feature 50. This feature covers what web-vrms owns: the SSO handoff screen, the standalone fallback login and the profile page.
 
@@ -29,6 +31,7 @@ spec [0002](../specs/0002-dashboard-attention-first/index.md) · code in `welinc
   - [x] States and sweep: skeleton, error and retry, dead widgets deleted, tokens only, 375px and 1280px with axe (AC-12, AC-15, AC-16)
 - [x] Verify it: `/check verify dashboard refresh` (2026-10-25: passed; midnight and last month checks not run)
 - [ ] Test it: `/test dashboard refresh`
+- [ ] Polish it (optional, ask first): `impeccable` · `web-design-guidelines` · `break-ui` (zero and huge counts, empty lists, long plates)
 
 ### 11. Repair list & detail · in-progress · Facade
 Ticket list with clear status pills and filters; ticket detail laid out around its one next action.
@@ -44,6 +47,7 @@ spec [0004](../specs/0004-repair-list-detail-refresh/index.md) · code in `welin
   - [x] Sweep: lint, typecheck, build, tests, 375px and 1280px with axe for both roles (AC-30)
 - [x] Verify it: `/check verify repair list & detail refresh` (2026-10-25: passed; a few value sourcing steps not run)
 - [ ] Test it: `/test repair list & detail refresh`
+- [ ] Polish it (optional, ask first): `impeccable` or `emil-design-eng` (one taste skill per change; motion: status, cancel and unlock dialogs, next action bar) · `web-design-guidelines` · `break-ui` (long plates and notes, 1 and 500 tickets, empty filters)
 
 ### 12. Repair form · in-progress · Facade
 The new repair form in the stakeholder approved layout (WL-201), with pickers instead of typing.
@@ -58,6 +62,7 @@ spec [0005](../specs/0005-repair-form-refresh/index.md) · code in `welinc-web-v
   - [x] Leave guard and sweep: `useBlocker` discard prompt, `beforeunload`, legacy code removed, 375px and 1280px with axe (AC-21, AC-23 to AC-25)
 - [x] Verify it: `/check verify repair form refresh` (2026-10-28: passed, every step run)
 - [ ] Test it: `/test repair form refresh`
+- [ ] Polish it (optional, ask first): `impeccable` or `emil-design-eng` (one taste skill per change; motion: summary dialog and pickers) · `web-design-guidelines` · `break-ui` (long descriptions, 10 issues, empty pickers)
 
 ### 13. History & audit log pages · done · Facade
 Filters, tables and detail views restyled.
@@ -72,6 +77,7 @@ spec [0003](../specs/0003-history-audit-log-refresh/index.md) · code in `welinc
   - [x] Audit timeline page, old endpoint removed, 375px and 1280px with axe (AC-9 to AC-15, AC-19, AC-20)
 - [x] Verify it: `/check verify history & audit log refresh`
 - [ ] Test it: `/test history & audit log refresh` (skipped 2026-10-22: marked done after verify passed)
+- [ ] Polish it (optional, ask first): `impeccable` · `web-design-guidelines` · `break-ui` (long actor names, empty months, many rows)
 
 ### 14. User management page · in-progress · Facade
 User table and its create, edit, deactivate and reset modals.
@@ -89,6 +95,7 @@ spec [0006](../specs/0006-user-management-refresh/index.md) · code in `welinc-w
 - Note (2026-10-28): spec 0009 shipped `setupEmailSent` and the unlock on reset in welinc-auth, so this page can drop its workaround: simplify AC-10 and merge AC-20's two calls into one. Do it with the verify pass.
 - [x] Verify it: `/check verify user management refresh` (2026-10-28: passed; the repair form mechanic picker and most value sourcing steps not run; the Antonio step now uses Juan; backend lint ran as `lint:ci`, not the `--fix` script)
 - [ ] Test it: `/test user management refresh`
+- [ ] Polish it (optional, ask first): `impeccable` or `emil-design-eng` (one taste skill per change; motion: create, edit and account action dialogs) · `web-design-guidelines` · `break-ui` (long names, unbreakable emails, many users). Wait for feature 52's milestone 3, which moves the permissions section off this page into Settings
 
 ### 15. Knowledge base page · in-progress · Facade
 Knowledge articles on the new tokens.
@@ -106,11 +113,13 @@ spec [0007](../specs/0007-knowledge-base-fix-library/index.md) · code in `welin
 - Note (2026-10-25): follow up, not part of spec 0007. The ticket's Known fix checklist can only be ticked today. You want it to stay a helper, so each ticket should let you add, remove and reword its own copied steps without changing the knowledge base entry. Needs a small spec (`/architect per ticket checklist edits`) once feature 15 is verified.
 - [x] Verify it: `/check verify knowledge base refresh`
 - [ ] Test it: `/test knowledge base refresh`
+- [ ] Polish it (optional, ask first): `impeccable` · `web-design-guidelines` · `break-ui` (long entry names and steps, empty library, many suggestions)
 
 ### 50. Portal on the design system · planned · needs a decision · from spec 0001
 Copy the spec 0001 tokens and shared components into `welinc-web-portal` (already React 19, still Tailwind 3), so the SSO portal matches web-vrms. The portal is a shared repo, so agree on it with the other groups first.
 **Done when:** the portal runs Tailwind v4, uses only theme tokens, and its login and app picker use the shared components.
 - [ ] Design it (spec): `/architect portal on the design system`
+- [ ] Polish it (optional, ask first): `impeccable` · `web-design-guidelines`
 - Note (2026-10-22): the shared login, OTP and forgot password screens live here, moved from feature 9. Restyling them changes the login for every subsystem.
 
 ### 51. Analytics page · planned · needs a decision · Facade
@@ -118,3 +127,4 @@ Analytics charts on the new tokens. Split from feature 15.
 **Done when:** charts use theme colors, and the page reads well on a phone and in its empty, loading and error states.
 - Note (2026-10-29): the page silently swaps in sample numbers when any of its nine calls fails, so CSV and PDF exports can carry fake data. Replace that with a clear error state, or label the sample data, before any demo.
 - [ ] Design it (spec): `/architect analytics refresh`
+- [ ] Polish it (optional, ask first): `impeccable` · `web-design-guidelines` · `break-ui` (extreme costs, empty charts, long garage names)

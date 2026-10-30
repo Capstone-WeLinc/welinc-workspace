@@ -19,6 +19,7 @@ spec [0008](../specs/0008-hosting-and-ci-cd/index.md) · code in `infra/` of the
   - [ ] Production and safety: prod applied and first release, restore drill, runbook (AC-4, AC-7, AC-8, AC-10, AC-13)
 - [ ] Verify it: `/check verify hosting & CI/CD`
 - [ ] Test it: `/test hosting & CI/CD`
+- [ ] Extra skills (optional, ask first): `docker-patterns` · `azure-container-apps` · `azure-container-registry` · `azure-static-web-apps` · `azure-deployment-preflight`
 - Note (2026-10-29): email moves off the personal Gmail to Brevo (subject to change) before staging, with a sender address you control; only the `SMTP_*` values change. See feature 28.
 - Note (2026-10-29): safe to build before the integration meeting, but feature 56 (integration contract) may change it: the Azure milestones host the shared gateway, auth and database, so the other groups' services must fit the same setup.
 
@@ -53,12 +54,14 @@ WL-102. Admins confirm login with the same OTP mechanics use.
 **Done when:** Admin pages are unreachable without a completed OTP step (checked on the server), codes expire after 5 minutes and work once, 5 wrong tries lock for 15 minutes, resend waits 60 seconds, and every OTP event is logged.
 - Note (2026-10-29): safe to build before the integration meeting, but feature 56 (integration contract) may change it: OTP lives in the shared welinc-auth and portal, which the other groups also use.
 - [ ] Build it: `/develop admin OTP`
+- [ ] Polish it (optional, ask first): `web-design-guidelines`
 
 ### 35. reCAPTCHA on login · planned · needs a decision · GA
 WL-103. Block bots from guessing passwords.
 **Done when:** the token is verified on the server before the password check, failures show a clear message, keys live only in environment variables per environment, and it works on a phone.
 - Note (2026-10-29): safe to build before the integration meeting, but feature 56 (integration contract) may change it: the login page is the shared portal.
 - [ ] Design it (spec): `/architect reCAPTCHA on login`
+- [ ] Polish it (optional, ask first): `web-design-guidelines`
 
 ## Slice 7: Mechanic mobile app
 
@@ -70,9 +73,11 @@ WL-802. The mechanic side as a native app on the same API. Epic sized: split int
 - Note (2026-10-29): VMMS already has a mobile app for the same garage mechanics. Before the spec, ask the VMMS group whether VRMS repairs can live as a module in their app (one app for mechanics) or whether VRMS ships its own app that matches theirs (same welinc-auth login, same look). Their app's platform should inform this decision, so the "(React Native)" in the title is not settled yet. Either path crosses repos, so it needs a spec first.
 - Note (2026-10-29): decided, one mobile app shared with VMMS, not a separate VRMS app. VRMS adds its mechanic repair screens to it. Which app shell, repo and platform it uses is settled in feature 56 after the meeting.
 - [ ] Design it (spec): `/architect mechanic mobile app`
+- [ ] Polish it (optional, ask first): `impeccable` or `emil-design-eng` (one taste skill per change; motion: screen transitions and sheets) · `web-design-guidelines`
 
 ### 49. Offline save & sync · planned · needs a decision
 WL-804. Mechanics keep working with no signal; changes sync when back online.
 **Done when:** assigned tickets open offline, status changes, notes and photos queue locally with a pending count, sync is automatic, the conflict rule is recorded, and closing the app loses nothing.
 - Note (2026-10-29): safe to build before the integration meeting, but feature 56 (integration contract) may change it: offline behavior lives in the shared mobile app, so its rules must work for VMMS too.
 - [ ] Design it (spec): `/architect offline save & sync`
+- [ ] Polish it (optional, ask first): `web-design-guidelines`

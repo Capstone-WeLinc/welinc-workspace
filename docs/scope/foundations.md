@@ -66,6 +66,7 @@ Decide whether analytics-ai stays its own service or merges into the main VRMS r
 - Note (2026-10-29): spec 0010 (data model v2) renames ticket statuses and drops tables, so the Python service breaks on its status breakdown, aging and AI vehicle history until this feature replaces it. The `vrms-db` image also needs pgvector here (today only the separate analytics database has it), and the analytics page's silent sample data fallback must not carry over.
 - Note (2026-10-29): until this feature replaces it, `welinc-backend-vrms-analytics-ai` got a small patch (PR 5, `feat/analytics-v2-columns`) so its sync reads `closed_at` and `CLOSED`; it runs again on the v2 database. Retire the patch with the service.
 - [ ] Design it (spec): `/architect analytics & AI service boundary`
+- [ ] Extra skills (optional, ask first): `docker-patterns`
 
 ### 4. Data model v2 · done
 One schema change that the Jira backlog needs: Chief Mechanic role, the new ticket statuses, verifier fields, attachments, notifications, outsourced shops, lookup lists. Also settle who owns the `Booking` and maintenance models copied into backend-vrms.
@@ -123,15 +124,30 @@ spec [0001](../specs/0001-design-system-ui-foundation/index.md) · code in `weli
   - [x] Enforcement sweep: palette reset, every page on tokens, lint errors everywhere, `design.md` updated (AC-2 to AC-4, AC-17)
 - [ ] Verify it: `/check verify design system & UI foundation` (skipped)
 - [ ] Test it: `/test design system & UI foundation` (skipped)
+- [ ] Polish it (optional, ask first): `emil-design-eng` (toasts, confirm, dialogs, menus, tooltip) · `web-design-guidelines`
 
 ### 7. Language support (English + Filipino) · planned · needs a decision
 Let users switch the UI between English and Filipino. Set up during the UI refresh so pages are not touched twice.
 **Done when:** every UI string comes from a translation file, a language switch persists per user, and dates and money format for the Philippines.
 - [ ] Design it (spec): `/architect language support`
+- [ ] Polish it (optional, ask first): `web-design-guidelines` · `break-ui` (long Filipino strings, peso amounts, dates)
 
-### 52. Configurable settings & modules · planned · needs a decision · from spec 0007
+### 52. Configurable settings & modules · in-progress · from spec 0007
 Admin managed settings stored in the database instead of code constants, and VRMS modules that can be switched on or off (for example the AI features). Replaces `KNOWLEDGE_SETTINGS` from spec 0007 first.
 **Done when:** an admin changes a threshold or turns a module off without a deploy, every change is audit logged, and code reads settings from one place.
 - Note (2026-10-29): you chose one Admin Settings hub. This feature owns it, with sections for lookup lists (feature 40), thresholds, modules, and role permissions (feature 5). Done also means every section lives in that one hub.
 - Note (2026-10-29): moved from Release to right after the foundations, so the permission screen (feature 5) and lookup lists (feature 40) have a home before Slice 1. It is VRMS only, so it is safe before the integration meeting.
-- [ ] Design it (spec): `/architect configurable settings & modules`
+spec [0012](../specs/0012-configurable-settings-modules/index.md) · code in `welinc-backend-vrms/src/settings/`, `welinc-backend-vrms/src/auth/permissions/`, `welinc-backend-vrms/src/modules/knowledge/`, `welinc-web-vrms/src/features/settings/`, `welinc-backend-vrms-analytics-ai/main.py`, `welinc-backend-vrms-analytics-ai/sync_service.py`
+- Note (2026-10-30): spec 0012 decided a code catalog with only changed values stored, switches for AI, Analytics and Knowledge base that remove their permission keys, and the Python service reading the AI and Analytics switches itself. Issue categories move to `config.read` and a new `lookups.manage`. Three new keys: `settings.manage`, `lookups.manage`, `ai.use`.
+- [x] Design it (spec): `/architect configurable settings & modules`
+- Note (2026-10-30): milestones 1 and 2 built. Two pieces of milestone 3 landed early because the knowledge switch needed them: the category routes now read with `config.read` and write with `lookups.manage`, and the web route `/knowledge-base/categories` needs `lookups.manage`. The hub shows only Modules and Thresholds until milestone 3 adds the other three sections, so its nav item follows `settings.manage` for now.
+- [ ] Build it: `/develop configurable settings & modules`
+  - [x] Thin thread: migration, settings catalog and service, combined version read, settings API with the change log, knowledge thresholds from the service, `/settings` shell and the Thresholds section (AC-1 to AC-7, AC-18, AC-21, AC-23, AC-27)
+  - [x] Modules end to end: key removal and `MODULE_DISABLED` on the server, dependencies, the Modules section and hiding in the web app, the Python service switch and sync steps (AC-8 to AC-17, AC-22)
+  - [x] Roles, lookup lists and change history: editable matrix, categories moved with the new keys, merged history (AC-19, AC-20, AC-24 to AC-26)
+    - [ ] Optional: look at `/settings` once in the browser with Playwright (a new page; the hub was never opened in a browser during milestones 1 and 2)
+  - [ ] Close out: seed, `settings:prune`, tests, states and keyboard pass, lint, typecheck, build and `py_compile`; then offer one `impeccable` pass (AC-28 to AC-30)
+    - Note (2026-10-30): seed reset, `settings:prune`, tests, lint, typecheck, build and `py_compile` are done and green. Still open: the keyboard and states pass in a real browser, and the `impeccable` offer.
+- [ ] Verify it: `/check verify configurable settings & modules`
+- [ ] Test it: `/test configurable settings & modules`
+- [ ] Polish it (optional, ask first): `impeccable` or `emil-design-eng` (one taste skill per change; motion: module confirm dialog and switches) · `web-design-guidelines` · `break-ui` (long names, notes and emails in Change history, an empty list, 20+ rows)
