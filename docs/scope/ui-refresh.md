@@ -121,6 +121,7 @@ Copy the spec 0001 tokens and shared components into `welinc-web-portal` (alread
 - [ ] Design it (spec): `/architect portal on the design system`
 - [ ] Polish it (optional, ask first): `impeccable` · `web-design-guidelines`
 - Note (2026-10-22): the shared login, OTP and forgot password screens live here, moved from feature 9. Restyling them changes the login for every subsystem.
+- Note (2026-10-30): the portal has no app picker yet (it redirects straight to one system). Feature 60 builds it; restyle the picker here only once it exists.
 
 ### 51. Analytics page · planned · needs a decision · Facade
 Analytics charts on the new tokens. Split from feature 15.

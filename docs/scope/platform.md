@@ -40,12 +40,27 @@ Get ready for the first integration meeting: know what the other groups changed,
 - [ ] Setup guide for the shared stack
 - [ ] Meeting held, answers recorded for feature 56
 - Note (2026-10-29): add to the question list that `CHIEF_MECHANIC` now exists in the shared auth role list (spec 0007), and that the VMMS and BMS backends likely carry the same copied login module and `users` table that spec 0009 removed here.
+- Note (2026-10-30): also ask which roles BMS has now (operations, customer service?), and tell them about feature 60 (the portal picker changes where their shared users land). Today admin is one separate grant per system; if the groups want a single suite wide superadmin instead, decide it in feature 56 (your Capstone 1 panel called one insecure).
+
+### 60. Portal system picker for shared accounts · planned · needs a decision · GA
+People with roles in more than one system (for example a mechanic in both VRMS and VMMS) can't reach anything but VRMS today, because the shared portal always sends them there. Send single system users straight in, and let shared accounts choose.
+**Done when:** someone with roles in one system lands in it with no extra screen; someone with roles in several sees a picker listing only their systems; each app's shell has a "Switch system" link back to the portal; no new role or permission is created (each system still checks its own roles on the server); and the change is agreed with the VMMS and BMS groups.
+- Note (2026-10-30): you chose to build this before the integration meeting, VRMS side first, but feature 56 (integration contract) may change it: the portal and token handoff are shared, so the picker also changes the landing for VMMS and BMS users who hold several systems. Changing the redirect or handoff needs a spec first (welinc-web-portal `AGENTS.md`).
+- [ ] Design it (spec): `/architect portal system picker`
+- [ ] Polish it (optional, ask first): `web-design-guidelines` · `break-ui` (one, two and three systems, long names)
 
 ### 56. Cross group integration contract · planned · needs a decision · GA
 One spec for everything VRMS shares with VMMS and BMS, written after the meeting: roles in the shared auth, gateway routes, vehicle status, the notification service, the one mobile app, who owns the copied Booking and maintenance models, and the environment, CI and dependency update standards.
 **Done when:** the spec records each shared contract, all three systems run together on staging behind one login, and every scope note that says feature 56 may change it is resolved.
 - Note (2026-10-29): spec 0010 dropped the copied `Booking`, `MaintenanceSchedule`, `ChecklistTemplate` and `ChecklistItem` models from VRMS. Bring them back only if the meeting decides VRMS owns them. Vehicle status now also has `DISABLED`, which VMMS shares.
 - [ ] Design it (spec): `/architect cross group integration`
+
+### 61. Suite admin model · planned · needs a decision · GA
+A safe way to have "someone who can do everything" across VRMS, VMMS and BMS, the way industry does it, instead of one superadmin role that skips every check (which your Capstone 1 panel called insecure).
+**Done when:** a platform admin in the shared auth can manage accounts and give or remove each system's roles but can't see any system's data without that system's own role; one or two break glass emergency accounts exist that need MFA, log a reason, and alert every admin on each login; an admin access report shows who holds admin in which system and since when; every admin role given or removed raises an alert and a log entry; nobody can raise their own access; and the VMMS and BMS groups agree.
+- Note (2026-10-30): you chose these three pieces. Temporary elevation (time limited extra rights with a reason) was left out as future work, and a single everyday `SUPERADMIN` role that bypasses checks is out on purpose. It builds on what exists: spec 0009's change record, spec 0011's system scoping in welinc-auth, and feature 34's OTP for the MFA step. It lives in the shared welinc-auth and portal, so it follows feature 56; the picker (feature 60) shows a suite admin every system they hold.
+- [ ] Design it (spec): `/architect suite admin model`
+- [ ] Polish it (optional, ask first): `web-design-guidelines` (access report)
 
 ## Slice 3: Login hardening
 
