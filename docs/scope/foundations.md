@@ -132,7 +132,7 @@ Let users switch the UI between English and Filipino. Set up during the UI refre
 - [ ] Design it (spec): `/architect language support`
 - [ ] Polish it (optional, ask first): `web-design-guidelines` · `break-ui` (long Filipino strings, peso amounts, dates)
 
-### 52. Configurable settings & modules · in-progress · from spec 0007
+### 52. Configurable settings & modules · done · from spec 0007
 Admin managed settings stored in the database instead of code constants, and VRMS modules that can be switched on or off (for example the AI features). Replaces `KNOWLEDGE_SETTINGS` from spec 0007 first.
 **Done when:** an admin changes a threshold or turns a module off without a deploy, every change is audit logged, and code reads settings from one place.
 - Note (2026-10-29): you chose one Admin Settings hub. This feature owns it, with sections for lookup lists (feature 40), thresholds, modules, and role permissions (feature 5). Done also means every section lives in that one hub.
@@ -141,13 +141,16 @@ spec [0012](../specs/0012-configurable-settings-modules/index.md) · code in `we
 - Note (2026-10-30): spec 0012 decided a code catalog with only changed values stored, switches for AI, Analytics and Knowledge base that remove their permission keys, and the Python service reading the AI and Analytics switches itself. Issue categories move to `config.read` and a new `lookups.manage`. Three new keys: `settings.manage`, `lookups.manage`, `ai.use`.
 - [x] Design it (spec): `/architect configurable settings & modules`
 - Note (2026-10-30): milestones 1 and 2 built. Two pieces of milestone 3 landed early because the knowledge switch needed them: the category routes now read with `config.read` and write with `lookups.manage`, and the web route `/knowledge-base/categories` needs `lookups.manage`. The hub shows only Modules and Thresholds until milestone 3 adds the other three sections, so its nav item follows `settings.manage` for now.
-- [ ] Build it: `/develop configurable settings & modules`
+- Note (2026-10-30): break-ui on the hub found Recent changes reading the newest 100 changes in the browser, so a section could say it had none while its changes sat further back. Spec 0012 was updated with AC-31 (a `keys` filter on the changes endpoint) and AC-26 (change rows with units, the reset value, and removed keys named). Build, Verify and Test are open again for that milestone only.
+- [x] Build it: `/develop configurable settings & modules`
   - [x] Thin thread: migration, settings catalog and service, combined version read, settings API with the change log, knowledge thresholds from the service, `/settings` shell and the Thresholds section (AC-1 to AC-7, AC-18, AC-21, AC-23, AC-27)
   - [x] Modules end to end: key removal and `MODULE_DISABLED` on the server, dependencies, the Modules section and hiding in the web app, the Python service switch and sync steps (AC-8 to AC-17, AC-22)
   - [x] Roles, lookup lists and change history: editable matrix, categories moved with the new keys, merged history (AC-19, AC-20, AC-24 to AC-26)
     - [x] Optional: look at `/settings` once in the browser with Playwright (looked at by hand instead, 2026-10-30) (a new page; the hub was never opened in a browser during milestones 1 and 2)
   - [x] Close out: seed, `settings:prune`, tests, states and keyboard pass, lint, typecheck, build and `py_compile` (AC-28 to AC-30)
     - Note (2026-10-30): seed reset, `settings:prune`, tests, lint, typecheck, build and `py_compile` are done and green. The hub was looked at by hand in the browser; a keyboard only pass was not run, so `/check verify` should cover it.
-- [x] Verify it: `/check verify configurable settings & modules`
-- [ ] Test it: `/test configurable settings & modules`
-- [ ] Polish it (optional, ask first): `impeccable` or `emil-design-eng` (one taste skill per change; motion: module confirm dialog and switches) · `web-design-guidelines` · `break-ui` (long names, notes and emails in Change history, an empty list, 20+ rows)
+  - [x] Recent changes by key: `keys` on `GET /vrms/settings/changes` in backend-vrms, Recent changes asking per section in web-vrms, the dev datasets honouring it (AC-26, AC-31)
+- [x] Verify it: `/check verify configurable settings & modules` (the new items at the end of `verify.md`)
+- [x] Test it: `/test configurable settings & modules`
+- [x] Polish it (optional, ask first): `impeccable` or `emil-design-eng` (one taste skill per change; motion: module confirm dialog and switches) · `web-design-guidelines` · `break-ui` (long names, notes and emails in Change history, an empty list, 20+ rows)
+  - Note (2026-10-30): `impeccable` critique scored 27/40 and its fixes landed in web-vrms: a review step before saving permission changes (a reason is required when a right is removed), gold edited cells, phone cards for the matrix, section headings and descriptions, tidier thresholds and recent changes. Merged: web-vrms #25, backend-vrms #22. The review dialog now has its own steps at the end of `verify.md` and unit tests; one step is still open (saving a removal for real, which changes live permissions).

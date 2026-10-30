@@ -1,6 +1,7 @@
 # 0011. Permission matrix: Admin editable grants, enforced with CASL
 
 **Date**: 2026-10-29
+**Updated**: 2026-10-30 (AC-25 replaced by spec 0012 AC-24: the matrix is read and edited in the Settings hub)
 **Status**: Accepted
 
 ## Summary
@@ -52,7 +53,7 @@ VRMS gets one list of everything a user can do (a permission catalog), and the d
 - **AC-22**: web-vrms builds one CASL ability (`@casl/ability`, `@casl/react`) from the keys in `/vrms/permissions/me` and uses it with `<Can>` for every route guard, nav item and page level button; ticket level buttons use the ticket's `can` flags (AC-12a). `RequireRole`, `KNOWLEDGE_EDITOR_ROLES`, `isKnowledgeEditor`, `isMechanicRole` and the role switch in `navItems.ts` are gone.
 - **AC-23**: The web app fetches `/vrms/permissions/me` after sign in, again when the window regains focus, every 60 seconds, and right after any 403. Until the first answer arrives, it shows the shell loading state and no guarded item. If that first fetch fails, it shows an error state with Retry instead of loading forever. A 401 follows the existing sign out flow. A user whose `keys` are empty sees a "No VRMS access" screen with Sign out.
 - **AC-24**: On a 403 the web app shows the toast `You no longer have permission to do that.` (this fixed text, whatever the body says; at most one such toast per 5 seconds), refetches the permissions, and sends the user to the dashboard if the current page needs a key they no longer hold.
-- **AC-25**: The Users page has a read only "Roles and permissions" section, shown only with `permissions.manage`. It reads `GET /vrms/permissions` and `GET /vrms/permissions/changes?limit=10`: a table of keys (grouped, with labels) against the three role labels, showing allowed, not allowed and locked, plus the last 10 changes (a null actor shows as System; a null before shows as Added, a null after as Removed). Editing waits for feature 52.
+- **AC-25** (replaced by spec 0012, AC-24, 2026-10-30; the Users page no longer has this section, and the matrix is read and edited in Settings, Roles and permissions): The Users page had a read only "Roles and permissions" section, shown only with `permissions.manage`. It read `GET /vrms/permissions` and `GET /vrms/permissions/changes?limit=10`: a table of keys (grouped, with labels) against the three role labels, showing allowed, not allowed and locked, plus the last 10 changes (a null actor shows as System; a null before shows as Added, a null after as Removed). Editing waited for feature 52.
 
 *welinc-auth: users scoped by system*
 - **AC-26**: Every admin user endpoint in welinc-auth acts only on users who hold a role in the caller's system (the request's resolved system, spec 0009 AC-24). The user list ignores a `system` query that differs and returns only those users; each user's `roles` holds only the caller's system roles, plus `otherSystems` (system names only, empty when none). Any other user answers 404, including `GET /auth/users/:id/changes`.
@@ -325,7 +326,7 @@ Tracer Bullet: the first slice runs one strand (ticket reads) through every laye
 - This replaces the deactivate block from spec 0006 AC-16 with a warning and a choice.
 - Three new tables and four new npm packages (`@casl/ability`, `@casl/prisma` in the backend, `@casl/ability`, `@casl/react` in the web app).
 - A Chief Mechanic sees every ticket from go live (pulled forward from feature 17).
-- The settings screen for editing arrives with feature 52; until then edits go through the API.
+- Admins edit the matrix in the Settings hub (feature 52, spec 0012, AC-24). Saving goes through `PATCH /vrms/permissions`, and the hub asks for a review and, when a right is taken away, a reason (the web app asks for it and `PATCH /vrms/permissions` answers 400 without one).
 
 ## Migration plan
 
@@ -340,7 +341,7 @@ Tracer Bullet: the first slice runs one strand (ticket reads) through every laye
 ## Follow-up
 
 - [ ] Feature 3 (analytics and AI boundary): put every analytics route behind `@RequirePermission('analytics.view')` in backend-vrms, and make the gateway stop passing `/analytics/*` straight to the unauthenticated Python service.
-- [ ] Feature 52 (Settings hub): the editing screen for the matrix, on `PATCH /vrms/permissions`, plus the change history view.
+- [x] Feature 52 (Settings hub): the editing screen for the matrix, on `PATCH /vrms/permissions`, plus the change history view (built in spec 0012, AC-24 and AC-26; merged in web-vrms #25 and backend-vrms #22).
 - [ ] Feature 28 (in-app notifications): push a "permissions changed" event so open browser tabs refetch at once instead of within 60 seconds.
 - [ ] Feature 27 (error monitoring): alert on a spike of 403 log lines from one user.
 - [ ] Feature 17 (Chief Mechanic): this spec turns `ticket.view_all` on for the Chief; what's left is the verification queue and dashboard.

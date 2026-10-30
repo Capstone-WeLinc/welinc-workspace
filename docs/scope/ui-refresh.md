@@ -95,7 +95,7 @@ spec [0006](../specs/0006-user-management-refresh/index.md) · code in `welinc-w
 - Note (2026-10-28): spec 0009 shipped `setupEmailSent` and the unlock on reset in welinc-auth, so this page can drop its workaround: simplify AC-10 and merge AC-20's two calls into one. Do it with the verify pass.
 - [x] Verify it: `/check verify user management refresh` (2026-10-28: passed; the repair form mechanic picker and most value sourcing steps not run; the Antonio step now uses Juan; backend lint ran as `lint:ci`, not the `--fix` script)
 - [ ] Test it: `/test user management refresh`
-- [ ] Polish it (optional, ask first): `impeccable` or `emil-design-eng` (one taste skill per change; motion: create, edit and account action dialogs) · `web-design-guidelines` · `break-ui` (long names, unbreakable emails, many users). Wait for feature 52's milestone 3, which moves the permissions section off this page into Settings
+- [ ] Polish it (optional, ask first): `impeccable` or `emil-design-eng` (one taste skill per change; motion: create, edit and account action dialogs) · `web-design-guidelines` · `break-ui` (long names, unbreakable emails, many users). Feature 52's milestone 3 has landed (the permissions section now lives in Settings), so this is no longer blocked
 
 ### 15. Knowledge base page · in-progress · Facade
 Knowledge articles on the new tokens.

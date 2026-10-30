@@ -50,3 +50,17 @@ The matrix pattern from spec 0011 is the deciding force. The team just built and
 Storing only changed values is where this departs from the matrix, on purpose. Permission defaults are a security posture, and freezing them is a feature. Threshold defaults are best guesses that will improve, and a row per key would pin every install to the first guess. Json values give up database type checks, but the catalog check on save plus "ignore and warn" on read covers the hand edit case, and avoiding a migration per setting matters with features 42 and 43 queued right behind this one.
 
 Gating modules through permission keys makes "off" real at almost no cost: the server refuses through the same guard, the web hides through the same `<Can>` and nav, and an open tab learns about it through the same refetch. Reaching into the Python service is the one place that crosses repos. It is justified because the AI switch is mostly about spend, the spend happens in that service, and feature 3 removes the coupling when it retires the service.
+
+## Update 2026-10-30: Recent changes asked by key
+
+**Context.** A break-ui pass on the hub found that each section's Recent changes fetched the newest 100 setting changes and kept the ones for its own keys. After 100 threshold edits, Modules said it had no changes while module changes existed further back: wrong data on an audit screen. The Change history list also shows no total, so a reader can't tell how far back it goes.
+
+**Options for the Recent changes gap.**
+- **Fix it in the web only**: keep loading pages until 5 matching rows turn up. No API change, but an unbounded number of requests for a section whose keys are rarely touched, and the wording problem comes back under load.
+- **A `keys` filter on the existing endpoint (chosen)**: one `IN` clause in the query that already merges both tables, applied before the limit. The section already holds its keys, the cursor and envelope stay the same, and a removed key stays readable.
+- **A `section` filter** (`modules` or `thresholds`) that the server maps to catalog kinds: the shortest URL and no list to validate, but it bakes the hub's current grouping into the API, so a third section of settings means another API change.
+
+**Total count for Change history: not added.** It needs a `COUNT` over the `UNION ALL` on every page, for a log that is small today; Load more already reaches every row. Revisit if people page far back.
+
+**Rationale.** The `keys` filter is the smallest change that makes the screen tell the truth: a fix in place on an endpoint built days ago, no new index (the key column already has one), no migration, and no change for the History section or spec 0011's endpoint.
+

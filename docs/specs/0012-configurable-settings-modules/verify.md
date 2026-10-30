@@ -66,3 +66,21 @@ _Until milestone 3 lands, the hub has two sections (Modules, Thresholds), its na
 - [x] Group min size: set it to 2 → suggestions list pairs of similar unlinked issues → Value sourcing (knowledge thresholds)
 - [x] `GET /vrms/settings` `updatedBy` after an Admin save shows that Admin's name and email; after a reset it still shows the last change → Value sourcing (`updatedAt`, `updatedBy`)
 - [x] Python lag: turn AI off and call `/ai/stats` at once → may answer 200 for up to 5 seconds, then 403 → Value sourcing (Python 5 second cache)
+
+## Update 2026-10-30 · Recent changes by key (AC-31) and change row reading (AC-26)
+- [x] Turn AI off with a reason, then save 101 threshold changes → Modules' Recent changes still lists the AI change; Thresholds lists its own 5 newest → AC-31
+- [x] `GET /vrms/settings/changes?kind=setting&keys=module.ai&limit=5` → only `module.ai` rows; with a `cursor` from page one → the next rows for that key only → AC-31
+- [x] `keys=` (empty), `keys=a,,b`, a trailing comma, `keys=a&keys=b`, 51 distinct keys, `keys=Module.AI` and a 61 character key → each 400 naming the rule; `keys=module.ai,module.ai` → same rows as one key → AC-31
+- [x] `kind=permission&keys=ticket.view` as a caller without `permissions.manage` → empty list → AC-31
+- [x] `?data=huge` in the browser → Modules' Recent changes shows the module change that sits more than 100 rows back → AC-31
+- [x] A section with no changes for its keys → "No changes yet." → AC-31
+- [x] History rows: `365 days → 1,095 days`; a reset reads `20 repairs → 3 repairs (default)`; a key gone from the catalog reads `Removed permission (<key>) for <role>`; a 500 character note starts at two lines with Show more → AC-26
+- [x] Unit tests for the `keys` parsing, the filter and each 400 pass; lint, typecheck and build in backend-vrms and web-vrms → AC-30, AC-31
+
+## Update 2026-10-30 · Review step for permission changes (added after the impeccable polish, beyond AC-24)
+- [x] Roles: untick an allowed right, choose Review and save → dialog "Save 1 permission change?" lists the role and "Loses <right>", the field reads "Reason *", Save changes is red → AC-24
+- [x] Same dialog, Save changes with no reason → stays open with "Give a reason of at least 5 characters." → AC-8
+- [x] Back to the matrix → the edit and the "1 permission changed" bar are still there; Esc also closes the dialog; Discard clears the bar → AC-27
+- [x] Roles: tick a right that was off, Review and save → "Gains <right>", the field reads "Note (optional)", Save changes is the normal navy → AC-24
+- [x] Unit tests for `reviewGrants` and `removesAny` pass; lint and typecheck in web-vrms → AC-30
+- [ ] Roles: save a removal with a reason → history row shows the change with the reason as "Note:"; the Mechanic or Chief Mechanic really loses the right on their next request (not run: it would change real permissions) → AC-24, AC-26

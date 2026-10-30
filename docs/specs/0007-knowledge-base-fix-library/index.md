@@ -1,6 +1,7 @@
 # 0007. Knowledge base as a fix library that fills itself from repairs
 
 **Date**: 2026-10-25
+**Updated**: 2026-10-30 (`KNOWLEDGE_SETTINGS` replaced by stored settings, spec 0012 AC-3)
 **Status**: In Progress
 
 ## Summary
@@ -261,7 +262,7 @@ Relationships: category 1:N entries, category 1:N repair issues, entry 1:N steps
 | Create ticket, link | copied steps | the entry's `KnowledgeEntryStep` rows at link time, same `position` and `text` |
 | Repair form | priority raise order | `LOW < MEDIUM < HIGH < CRITICAL` (`RepairPriority`) |
 | Any write | who | the JWT `email` (and `sub` as `userId` on change rows) |
-| Constants | `MIN_SAMPLES` 3, `REPEAT_THRESHOLD` 2, `REPEAT_WINDOW_DAYS` 365, `GROUP_MIN_SIZE` 3, `GROUP_SIMILARITY` 0.4, `SEARCH_SIMILARITY` 0.3, `GROUP_CANDIDATE_LIMIT` 500 | one exported `KNOWLEDGE_SETTINGS` object in `src/modules/knowledge/knowledge.settings.ts`, the single place the future settings spec replaces |
+| Constants | `MIN_SAMPLES` 3, `REPEAT_THRESHOLD` 2, `REPEAT_WINDOW_DAYS` 365, `GROUP_MIN_SIZE` 3, `GROUP_SIMILARITY` 0.4, `SEARCH_SIMILARITY` 0.3, `GROUP_CANDIDATE_LIMIT` 500 | replaced by spec 0012 (AC-3): `MIN_SAMPLES`, `REPEAT_THRESHOLD`, `REPEAT_WINDOW_DAYS` and `GROUP_MIN_SIZE` are now settings an Admin changes in the Settings hub (`knowledge.min_samples`, `knowledge.repeat_threshold`, `knowledge.repeat_window_days`, `knowledge.group_min_size`), read through `SettingsService`; `GROUP_SIMILARITY`, `SEARCH_SIMILARITY` and `GROUP_CANDIDATE_LIMIT` stay in code as `KNOWLEDGE_TUNING` in `knowledge.tuning.ts`. `knowledge.settings.ts` is gone |
 
 **Grouping** (`knowledge-grouping.ts`): candidates are up to `GROUP_CANDIDATE_LIMIT` newest issues with `knowledgeEntryId` null, `suggestionDismissedAt` null, ticket not cancelled. Each candidate's text is its description without the `[System] ` prefix plus its `resolutionNote`. One `$queryRaw` self join returns pairs with `a.id < b.id`, the same `categoryId` (or both null; pairing only inside a category keeps it to a few thousand comparisons) and `similarity(a.text, b.text) >= GROUP_SIMILARITY`. The trigram indexes don't serve this computed text or the combined search expression; at this table size a plain scan is fine. The service joins the pairs into groups (connected components), keeps groups of at least `GROUP_MIN_SIZE`, and sorts them by size then newest issue. It runs on each GET (no stored groups). The AI rework can swap the pair query for embeddings behind the same function.
 
@@ -331,7 +332,7 @@ The project default is Tracer Bullet; this UI refresh feature breaks Facade on p
 - [ ] Feature 17 widens the chief mechanic from mechanic rules to all tickets and the verification queue, and feature 5 (permission matrix) should take over the Readers and Editors lists here.
 - [ ] Feature 40 (lookup lists) should reuse `IssueCategory` as the issue type list instead of creating a new one.
 - [ ] Feature 3 (AI and analytics into welinc-backend-vrms): embeddings over entries and issues, grounded triage, search by meaning, cleaning "What fixed it" notes, AI drafted entries replacing `pg_trgm` grouping, duplicate ticket warnings; it also removes `autoEmbedIssues` and the Python `/ai/knowledge/articles`.
-- [ ] The future configurable settings spec replaces `KNOWLEDGE_SETTINGS` with stored settings.
+- [x] The future configurable settings spec replaces `KNOWLEDGE_SETTINGS` with stored settings (done by spec 0012, AC-3; merged in backend-vrms #22).
 - [ ] Existing gap, not caused by this spec: no flow creates a VRMS `Mechanic` row when a mechanic or chief mechanic account is added on the Users page (only seeds do), so new accounts can't be assigned tickets. Belongs to feature 2 (auth service boundary).
 - [ ] Tell the other groups that `CHIEF_MECHANIC` now exists in the shared `UserRole`, before integration.
 - [ ] `docs/context/roles-and-users.md` and the web and backend `AGENTS.md` role lines go stale once this ships (`/sync`).

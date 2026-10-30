@@ -15,7 +15,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 
 | Epic | File | Status |
 |---|---|---|
-| Foundations | [foundations.md](foundations.md) | 8 existing, 5 done, 1 in-progress, 2 planned |
+| Foundations | [foundations.md](foundations.md) | 8 existing, 6 done, 1 in-progress (3 designed), 1 planned |
 | UI refresh | [ui-refresh.md](ui-refresh.md) | 3 done, 5 in-progress, 2 planned |
 | Repair workflow | [repair-workflow.md](repair-workflow.md) | 19 planned |
 | Platform | [platform.md](platform.md) | 1 in-progress, 7 planned |
@@ -42,7 +42,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 5 | Permission matrix & enforcement | Foundation | done |
 | 6 | Design system & UI foundation | Foundation | done |
 | 7 | Language support (English + Filipino) | Foundation | planned |
-| 52 | Configurable settings & modules | Foundation | in-progress |
+| 52 | Configurable settings & modules | Foundation | done |
 | 55 | Integration kickoff prep | Integration | planned |
 | 56 | Cross group integration contract | Integration | planned |
 | 8 | App shell & role badge | UI refresh | done |
