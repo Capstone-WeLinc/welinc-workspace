@@ -59,14 +59,25 @@ spec [0009](../specs/0009-auth-service-boundary/index.md)
 - [x] Review it (fresh model): `/check review auth service boundary`
 - [x] Document it: `/document auth service boundary`
 
-### 3. Analytics & AI service boundary · planned · needs a decision
+### 3. Analytics & AI service boundary · in-progress
 Decide whether analytics-ai stays its own service or merges into the main VRMS repos, and record its store choices (pgvector, DuckDB, Redis, MongoDB).
 **Done when:** a spec records the service boundary and every store it keeps, with MongoDB justified or removed.
 - Note (2026-10-25): direction chosen by you during spec 0007: the AI and the analytics both move into welinc-backend-vrms and are rebuilt from scratch, retiring welinc-backend-vrms-analytics-ai. AI ideas picked so far: triage while typing grounded on the knowledge base, search by meaning, cleaning "What fixed it" notes, AI drafted knowledge entries, duplicate ticket warnings. The spec also decides replacing spec 0007's `pg_trgm` grouping with embeddings and removing `autoEmbedIssues`.
 - Note (2026-10-29): spec 0010 (data model v2) renames ticket statuses and drops tables, so the Python service breaks on its status breakdown, aging and AI vehicle history until this feature replaces it. The `vrms-db` image also needs pgvector here (today only the separate analytics database has it), and the analytics page's silent sample data fallback must not carry over.
 - Note (2026-10-29): until this feature replaces it, `welinc-backend-vrms-analytics-ai` got a small patch (PR 5, `feat/analytics-v2-columns`) so its sync reads `closed_at` and `CLOSED`; it runs again on the v2 database. Retire the patch with the service.
-- [ ] Design it (spec): `/architect analytics & AI service boundary`
-- [ ] Extra skills (optional, ask first): `docker-patterns`
+- Note (2026-10-30): from spec 0012's follow up. Embed each issue once on save and store the vector (never re-embed in a loop), add an `ai.embed_catchup_days` setting so turning AI back on embeds only the missing issues, declare `module.ai` as requiring `module.knowledge`, and remove the Python service's `app_settings` read when it retires.
+- Note (2026-10-30): spec 0013 moves analytics and AI into backend-vrms (`src/modules/analytics/`, `src/modules/ai/`) on the VRMS database with pgvector, uses Gemini behind an `AiProvider` adapter, and retires the Python service with MongoDB, Redis, DuckDB and the separate analytics database. It is a move, not a redesign: the new AI ideas and knowledge base grounding go to feature 47, so `module.ai` does not require `module.knowledge` yet. Two numbers change meaning: cancelled tickets leave spend, and months follow Manila time. "Run AI review" on closed tickets goes away (confirm in Jira).
+spec [0013](../specs/0013-analytics-ai-into-backend/index.md) · code in `welinc-backend-vrms/src/modules/analytics/`, `welinc-backend-vrms/src/modules/ai/`, `welinc-web-vrms/src/features/analytics/`, `welinc-web-vrms/src/features/repair/components/AiDiagnosisSection.tsx`
+- [x] Design it (spec): `/architect analytics & AI service boundary`
+- [ ] Build it: `/develop analytics & AI service boundary`
+  - [ ] Thin thread: pgvector migration and the three tables, `summary` with cost masking, `AiProvider` with embed on create, one diagnosis run end to end in the panel (AC-1, AC-2, AC-3, AC-5, AC-7, AC-9, AC-14, AC-20)
+  - [ ] All analytics, no sample data: the other seven endpoints on the metric rules, sample fallback removed, error and empty states, export guarded (AC-3 to AC-6)
+  - [ ] Complete the AI: part prices and confidence, latest diagnosis, errors and limits, feedback, AI stats from tables, `ai.use` on the server (AC-8 to AC-13, AC-17)
+  - [ ] Embedding upkeep and retirement: `ai.embed_catchup_days`, the catch up job, `ai:embed-all`, then remove the analytics compose file, gateway routes and `AI_SERVICE_URL`, and archive the repo (AC-15, AC-16, AC-18, AC-19)
+  - [ ] Close out: unit tests, route table test, lint, typecheck, build and test in backend-vrms and web-vrms (AC-21)
+- [ ] Verify it: `/check verify analytics & AI service boundary`
+- [ ] Test it: `/test analytics & AI service boundary`
+- [ ] Extra skills (optional, ask first): `docker-patterns` (compose and `vrms-db` image change) · `web-design-guidelines` (analytics error and empty states)
 
 ### 4. Data model v2 · done
 One schema change that the Jira backlog needs: Chief Mechanic role, the new ticket statuses, verifier fields, attachments, notifications, outsourced shops, lookup lists. Also settle who owns the `Booking` and maintenance models copied into backend-vrms.

@@ -37,7 +37,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | H | Analytics dashboards | Built | existing |
 | 1 | Coding standards & tooling | Foundation | done |
 | 2 | Auth service boundary | Foundation | done |
-| 3 | Analytics & AI service boundary | Foundation | planned |
+| 3 | Analytics & AI service boundary | Foundation | in-progress |
 | 4 | Data model v2 | Foundation | done |
 | 5 | Permission matrix & enforcement | Foundation | done |
 | 6 | Design system & UI foundation | Foundation | done |
