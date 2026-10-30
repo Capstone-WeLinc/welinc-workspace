@@ -148,6 +148,6 @@ spec [0012](../specs/0012-configurable-settings-modules/index.md) · code in `we
     - [x] Optional: look at `/settings` once in the browser with Playwright (looked at by hand instead, 2026-10-30) (a new page; the hub was never opened in a browser during milestones 1 and 2)
   - [x] Close out: seed, `settings:prune`, tests, states and keyboard pass, lint, typecheck, build and `py_compile` (AC-28 to AC-30)
     - Note (2026-10-30): seed reset, `settings:prune`, tests, lint, typecheck, build and `py_compile` are done and green. The hub was looked at by hand in the browser; a keyboard only pass was not run, so `/check verify` should cover it.
-- [ ] Verify it: `/check verify configurable settings & modules`
+- [x] Verify it: `/check verify configurable settings & modules`
 - [ ] Test it: `/test configurable settings & modules`
 - [ ] Polish it (optional, ask first): `impeccable` or `emil-design-eng` (one taste skill per change; motion: module confirm dialog and switches) · `web-design-guidelines` · `break-ui` (long names, notes and emails in Change history, an empty list, 20+ rows)
