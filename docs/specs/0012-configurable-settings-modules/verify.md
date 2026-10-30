@@ -83,4 +83,5 @@ _Until milestone 3 lands, the hub has two sections (Modules, Thresholds), its na
 - [x] Back to the matrix → the edit and the "1 permission changed" bar are still there; Esc also closes the dialog; Discard clears the bar → AC-27
 - [x] Roles: tick a right that was off, Review and save → "Gains <right>", the field reads "Note (optional)", Save changes is the normal navy → AC-24
 - [x] Unit tests for `reviewGrants` and `removesAny` pass; lint and typecheck in web-vrms → AC-30
-- [ ] Roles: save a removal with a reason → history row shows the change with the reason as "Note:"; the Mechanic or Chief Mechanic really loses the right on their next request (not run: it would change real permissions) → AC-24, AC-26
+- [x] Roles: save a removal with a reason → history row shows the change with the reason as "Note:" (run 2026-10-30 on "Edit lookup lists" for Chief Mechanic, then put back; the history shows "Allowed → Not allowed" with the note). Not run: a Chief Mechanic session making a request after the removal → AC-24, AC-26
+- [x] API: `PATCH /vrms/permissions` with a removal and no `note` answers 400 "Taking a right away needs a reason of 5 to 500 characters." and the matrix version does not change; an addition with no note saves → AC-24
