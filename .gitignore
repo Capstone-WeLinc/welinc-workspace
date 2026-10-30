@@ -19,3 +19,6 @@ docs/_source/
 .DS_Store
 Thumbs.db
 .vscode/
+
+# Impeccable critique snapshots
+.impeccable/
