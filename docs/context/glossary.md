@@ -14,7 +14,7 @@
 | **Vehicle system** | The part of the truck affected (engine, brakes, transmission…). Admin managed list. |
 | **Root cause** | Why it broke (wear and tear, accident damage…). Admin managed list. |
 | **Common issue** | *Jira (WL-702/704).* Admin-managed knowledge base entry (category, description template, suggested priority and fix). Mechanics pick one instead of typing. |
-| **Ticket status** | *Code:* `PENDING → IN_PROGRESS → FOR_VERIFICATION → COMPLETED`, plus `CANCELLED`. *Jira (WL-200, names not final):* Open, Assigned, In Progress, On Hold – No Parts, For Verification, Outsourced, Completed/Closed, Cancelled, with a role-based transition table. Verification can reject back to In Progress. |
+| **Ticket status** | Nine statuses (spec 0010): `OPEN`, `ASSIGNED`, `IN_PROGRESS`, `ON_HOLD`, `FOR_VERIFICATION`, `OUTSOURCED`, `PENDING_APPROVAL` (open) and `CLOSED`, `CANCELLED` (finished). Spec 0014 holds the one table of allowed moves and who may make each. Verification can send a ticket back to In Progress. *Jira WL-200.* |
 | **For Verification** | The mechanic finished and uploaded proof; the Chief Mechanic (or Admin) verifies → Closed, or rejects with a comment → In Progress. The verifier is stored (`verified_by`, `verified_at`). |
 | **Proof of completion** | *Jira (WL-211).* At least one photo or PDF required before a ticket can be marked done. For outsourced work, the shop's receipt counts. |
 | **On Hold – No Parts** | *Jira (WL-208, unsure).* Mechanic pauses a ticket for missing parts with a reason; someone verifies it. Hold time is tracked separately. |

@@ -1,6 +1,7 @@
 # 0010. Data model v2: one clean baseline with the new ticket statuses
 
 **Date**: 2026-10-29
+**Updated**: 2026-10-31 (the interim *State transitions* section is replaced by spec 0014's transition table)
 **Status**: Accepted
 
 Decision history (context, options, rationale): [rationale.md](rationale.md).
@@ -163,9 +164,7 @@ Each feature adds its table in its own migration, exactly as below, unless its o
 
 ### State transitions
 
-This spec fixes the names only. The moves allowed until feature 16 replaces them are today's forward moves on the new names:
-
-`ASSIGNED` → `IN_PROGRESS` → `FOR_VERIFICATION` → `CLOSED`, and any open status → `CANCELLED`. Mechanics and chief mechanics may only make the first two moves; Admin makes them all. Nothing creates `OPEN` yet (every ticket is created with a mechanic).
+Replaced by spec 0014 ([ticket status lifecycle](../0014-ticket-status-lifecycle/index.md)), which holds the one transition table: every move, its trigger, who may make it and what it needs. This spec only fixes the nine status names. The interim list that stood here (forward moves only, Admin for the last two, nothing creates `OPEN`) no longer applies.
 
 ### API surface
 

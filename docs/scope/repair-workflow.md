@@ -27,6 +27,7 @@ WL-104. A role that sees all tickets and owns verification, following the permis
 **Done when:** Admin can assign the role, the Chief Mechanic sees every ticket and the verification queue, and the sidebar shows the badge.
 - Note (2026-10-25): spec 0007 (feature 15) adds the role itself: `CHIEF_MECHANIC` in welinc-auth, welinc-backend-vrms and the web app, assignable on the Users page, with its badge, knowledge base editing, and mechanic rules on tickets for now. What's left here is widening it to every ticket and the verification queue (with feature 23), once the permission matrix (feature 5) settles the exact rights.
 - Note (2026-10-29): spec 0002 asks for a Chief Mechanic dashboard (Jira VRMS-41) that reuses the dashboard tiles, with Waiting as the verification queue. Cover it here or with feature 23.
+- Note (2026-11-01, replan): spec 0014 gave the Chief Mechanic the Verify and Send back moves (`ticket.verify`), without cancel or override. What is left here is the every ticket view and the dashboard.
 - [ ] Build it: `/develop chief mechanic role`
 - [ ] Polish it (optional, ask first): `web-design-guidelines`
 
@@ -34,6 +35,7 @@ WL-104. A role that sees all tickets and owns verification, following the permis
 WL-201, WL-202, and the ordering half of WL-401. Create a ticket with pickers and auto-filled vehicle and reporter details, then assign in house mechanics first, showing each one's open ticket count.
 **Done when:** a ticket is created as Assigned or Open, vehicle details fill in within a second, in house options list first, and the mechanic is notified once notifications exist.
 - Note (2026-10-29): spec 0010 already stores priority and the reporter on the ticket. Still to decide here: whether `accountType` and `corporation` are stored or dropped from the form, and whether the server blocks a second open ticket on an `UNDER_REPAIR` truck (today only a warning).
+- Note (2026-11-01, replan): from spec 0014. Switch on its moves M1 and M2 (assignment changes the status) when assignment is built here. Applies to features 53 and 57 too.
 - [ ] Design it (spec): `/architect new repair ticket & assignment`
 - [ ] Polish it (optional, ask first): `impeccable` · `web-design-guidelines` · `break-ui` (long plates and names, no free mechanics, many issues)
 
@@ -46,6 +48,7 @@ No Jira ticket yet. After a ticket is created, Admin can fix its driver, assigne
 ### 19. Mechanic status updates · planned
 WL-107. Mechanics move their own tickets forward from a phone.
 **Done when:** only the assigned mechanic sees the control, only allowed transitions show, the server rejects anyone else, and each change is logged.
+- Note (2026-11-01, replan): most of the server work landed in spec 0014 (transition table, `moves` on the ticket, `nextAction.ts`). What is left is the phone UI at 375px.
 - [ ] Build it: `/develop mechanic status updates`
 - [ ] Polish it (optional, ask first): `impeccable` or `emil-design-eng` (one taste skill per change; motion: status change on a phone, bottom sheets) · `web-design-guidelines`
 
@@ -64,12 +67,14 @@ WL-209 and WL-210. Mechanics snap photos from the phone camera; reviewers see th
 ### 22. Proof of completion · planned
 WL-211. No ticket is marked done without evidence.
 **Done when:** Mark as Complete stays disabled without a proof file, the server rejects completion without one, and proof shows on the verification screen.
+- Note (2026-11-01, replan): from spec 0014. Add `proof` to the needs of move M4 (to For verification) in the transition table.
 - [ ] Build it: `/develop proof of completion`
 - [ ] Polish it (optional, ask first): `web-design-guidelines` · `break-ui` (missing files, many attachments)
 
 ### 23. Chief Mechanic verification · planned
 WL-212. Verify or reject finished work, with the verifier recorded.
 **Done when:** finished tickets land in a verification queue, Verify closes and Reject returns to In Progress with a required comment, and the verifier's name and time are on the ticket and in reports.
+- Note (2026-11-01, replan): the Verify and Send back moves already exist (spec 0014, with the `lastRejection` banner and prefilled resend). What is left is the verification queue page and the proof files.
 - [ ] Build it: `/develop chief mechanic verification`
 - [ ] Polish it (optional, ask first): `emil-design-eng` (verify and reject dialogs) · `web-design-guidelines`
 - Note (2026-10-25): Reject is the first backward move. Follow feature 16's rule for the spec 0007 checklist and "What fixed it" notes when a ticket goes back to In Progress.
@@ -85,6 +90,7 @@ WL-501, built on Jira's proposed rules. A truck under repair can't be dispatched
 **Done when:** a vehicle turns Under Repair when its ticket is created, returns to Available when it closes, Admin can toggle it with a reason, and the history is kept per vehicle.
 - Note (2026-10-29): safe to build before the integration meeting, but feature 56 (integration contract) may change it: vehicle status is shared with VMMS (`UNDER_REPAIR` and `UNDER_MAINTENANCE` on the same vehicle).
 - Note (2026-10-29): spec 0010 adds `DISABLED` to the vehicle statuses and designs the `VehicleStatusChange` history table for this feature to create. Also fix the vehicle status change on close or cancel, which runs outside the status transaction today, so a failed write can leave the truck marked Available.
+- Note (2026-11-01, replan): that close and cancel fix shipped in spec 0014 (the truck release now runs inside the status transaction). What is left is the history table, the Admin toggle and Under Repair on create.
 - [ ] Build it: `/develop vehicle availability`
 - [ ] Polish it (optional, ask first): `web-design-guidelines`
 
@@ -109,6 +115,7 @@ Adds the alerts and hand offs around the core loop.
 WL-304. The shared notification service every alert uses, across in app, email and push to the mobile app.
 **Done when:** assignments, transfers, holds, verifications and deadline alerts create notifications, clicking one opens the ticket, new ones appear without a reload, and each alert also goes out by email or push where its rule says so.
 - Note (2026-10-29): channels are in app, email and push to the mobile app. SMS is out of scope: it costs money per message (about 0.56 pesos a text at Semaphore, double for OTP) and in app plus push already reach mechanics. Today only welinc-auth sends email (OTP, reset, setup codes), and VMMS and BMS each run their own mail sender. Email goes through Brevo over SMTP, subject to change at the integration meeting or in the spec (it needs only new `SMTP_*` values). Today welinc-auth sends through a personal Gmail account, which is fine for development but must move to Brevo with a sender address you control before staging. The spec decides which alert goes on which channel. Feature 56 may turn this into one notification service for all three systems.
+- Note (2026-11-01, replan): from spec 0014. Notify the mechanic on Send back and on Verify (WL-212).
 - [ ] Design it (spec): `/architect in-app notifications`
 - [ ] Polish it (optional, ask first): `emil-design-eng` (notification popover and toasts) · `web-design-guidelines`
 
@@ -129,6 +136,7 @@ WL-204. A mechanic asks to hand off a ticket; Admin approves or rejects.
 WL-208, built on proposed defaults. Pause a ticket for missing parts with the reason verified.
 **Done when:** a mechanic sets the hold with parts and reason, a verifier approves or rejects it, hold time is tracked for reports, and held tickets stand out in lists.
 - Note (2026-10-29): `TicketHold` is designed in spec 0010 with a partial unique index (raw SQL) for one open hold per ticket. Same Prisma drift risk as feature 30: check the `prisma-cli` skill and make sure later generated migrations do not drop it.
+- Note (2026-11-01, replan): from spec 0014. The hold moves (M7 to M13 in its table) are written but off; switch them on through `applyStatusMove` with this feature's trigger. Same for features 37, 38 and 39.
 - [ ] Design it (spec): `/architect on hold for parts`
 - [ ] Polish it (optional, ask first): `web-design-guidelines`
 
@@ -142,6 +150,7 @@ WL-205. A clickable timeline inside the ticket view, linked from My Repairs.
 ### 33. Admin status override · planned
 WL-108, built on Jira's proposed rules. Admin fixes a wrong status with a reason.
 **Done when:** Admin can set any valid status with a required reason, the entry is marked Override in the timeline, and the mechanic is notified.
+- Note (2026-11-01, replan): from spec 0014. Build this as the one bypass of the transition table, reusing the `applyStatusMove` effects and its finished field clearing. Until it ships, a ticket closed by mistake can't be reopened in the app.
 - [ ] Build it: `/develop admin status override`
 - [ ] Polish it (optional, ask first): `web-design-guidelines`
 - Note (2026-10-25): this is how you move a ticket back. Follow feature 16's rule for the spec 0007 checklist and "What fixed it" notes on any backward move.

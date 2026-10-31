@@ -13,6 +13,7 @@ WL-405. An Admin managed list of approved shops.
 ### 37. Transfer to outsourced shop · planned · needs a decision
 WL-401 and WL-404. Outsourcing only when no in house option is free, with a printable job order for the shop.
 **Done when:** outsourcing needs a justification or no available in house option, the ticket turns Outsourced with shop, date sent and expected completion, a job order PDF prints, and reports can show the in house vs outsourced ratio.
+- Note (2026-11-01, replan): from spec 0014. The outsourced moves (M7 to M13 in its table) are written but off; switch them on through `applyStatusMove` with this feature's trigger. Same for features 38 and 39.
 - [ ] Design it (spec): `/architect transfer to outsourced shop`
 - [ ] Polish it (optional, ask first): `impeccable` · `web-design-guidelines` · `break-ui` (long job order text for the printable page)
 
