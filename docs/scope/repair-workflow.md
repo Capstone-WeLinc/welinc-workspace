@@ -18,7 +18,7 @@ WL-200. One official list of statuses and who may move a ticket from which statu
   - [x] Existing data check and spec 0011 note (AC-20)
 - [x] Verify it: `/check verify ticket status lifecycle` (2026-10-31: passed, every step run; unassign release and atomic rollback proven live)
 - [x] Test it: `/test ticket status lifecycle` (2026-10-31: added `apply-status-move.spec.ts`, `dto/stale-lock.dto.spec.ts` and the `getInvalidTransition` cases; backend 703 and web 131 tests green)
-- [ ] Polish it (optional, ask first): `web-design-guidelines`
+- [x] Polish it (optional, ask first): `web-design-guidelines` · `break-ui` (2026-10-31: both run, all findings fixed except the "Run AI diagnosis" button at 185px, which belongs to feature 3)
 - Note (2026-10-25): today the backend allows forward moves only (`updateStatus` in `repairs.service.ts`). The lifecycle has to cover moving back (reject to In Progress, WL-200 and WL-212; admin override, WL-108) and decide what a backward move does to spec 0007's ticked checklist steps and the "What fixed it" notes saved on the way to For verification (AC-31).
 - Note (2026-10-29): spec 0010 fixes the nine status names (`OPEN` to `CLOSED`); this feature keeps the transition table. Also decide whether the Chief Mechanic can close (verify) a ticket, which only Admin can today, and add the optimistic lock that unlock and cancel lack (spec 0004).
 
