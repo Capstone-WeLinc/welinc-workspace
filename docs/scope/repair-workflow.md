@@ -36,8 +36,8 @@ WL-104. A role that sees all tickets and owns verification, following the permis
   - [x] Read only costs: catalog default, guarded data migration, close dialog wording (AC-1 to AC-3, AC-6)
   - [x] Costs before closing setting: boolean setting type, the `costs` need and 422 on close (AC-4, AC-5)
   - [x] Sweep: tests, fixtures, axe at 375px and 1280px for all three roles, lint, typecheck, build (AC-19, AC-20)
-- [ ] Verify it: `/check verify chief mechanic role`
-- [ ] Test it: `/test chief mechanic role`
+- [x] Verify it: `/check verify chief mechanic role`
+- [x] Test it: `/test chief mechanic role` (2026-11-01: added two AC-16 edge cases to `nextAction.test.ts`; web 141 tests green)
 - [ ] Polish it (optional, ask first): `impeccable` · `web-design-guidelines` · `break-ui` (empty and long queues, long names, clock skew)
 
 ### 18. New repair ticket & assignment · planned · needs a decision
