@@ -2,7 +2,8 @@ name: vrms-core-environment
 
 services:
   vrms-db:
-    image: postgres:16-alpine
+    # pgvector for the AI embeddings (spec 0013); same major version, so the volume carries over
+    image: pgvector/pgvector:pg16
     container_name: welinc_vrms_db
     restart: unless-stopped
     environment:
