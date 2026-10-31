@@ -126,6 +126,7 @@ Copy the spec 0001 tokens and shared components into `welinc-web-portal` (alread
 ### 51. Analytics page · planned · needs a decision · Facade
 Analytics charts on the new tokens. Split from feature 15.
 **Done when:** charts use theme colors, and the page reads well on a phone and in its empty, loading and error states.
-- Note (2026-10-29): the page silently swaps in sample numbers when any of its nine calls fails, so CSV and PDF exports can carry fake data. Replace that with a clear error state, or label the sample data, before any demo.
+- Note (2026-10-29): the page silently swapped in sample numbers when any of its nine calls failed, so CSV and PDF exports could carry fake data.
+- Note (2026-10-31, replan): feature 3 (spec 0013) fixed that: the sample data fallback is gone, and the page has error and empty states and a guarded export. What is left here is the token and chart restyle, and a phone check. Skip this if it looks fine to you.
 - [ ] Design it (spec): `/architect analytics refresh`
 - [ ] Polish it (optional, ask first): `impeccable` · `web-design-guidelines` · `break-ui` (extreme costs, empty charts, long garage names)

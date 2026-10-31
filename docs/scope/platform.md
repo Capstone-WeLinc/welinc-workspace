@@ -42,7 +42,7 @@ Get ready for the first integration meeting: know what the other groups changed,
 - [ ] Meeting held, answers recorded for feature 56
 - Note (2026-10-29): add to the question list that `CHIEF_MECHANIC` now exists in the shared auth role list (spec 0007), and that the VMMS and BMS backends likely carry the same copied login module and `users` table that spec 0009 removed here.
 - Note (2026-10-30): also ask which roles BMS has now (operations, customer service?), and tell them about feature 60 (the portal picker changes where their shared users land). Today admin is one separate grant per system; if the groups want a single suite wide superadmin instead, decide it in feature 56 (your Capstone 1 panel called one insecure).
-- Note (2026-10-31): from spec 0013. Tell the other groups that VRMS removes `/ai` and `/analytics` from `welinc-auth/nginx.conf` once feature 3 retires the Python service.
+- Note (2026-10-31): from spec 0013. Tell the other groups that VRMS removed `/ai` and `/analytics` from `welinc-auth/nginx.conf` (merged in welinc-auth PR 14, when feature 3 retired the Python service).
 
 ### 60. Portal system picker for shared accounts · planned · needs a decision · GA
 People with roles in more than one system (for example a mechanic in both VRMS and VMMS) can't reach anything but VRMS today, because the shared portal always sends them there. Send single system users straight in, and let shared accounts choose.
