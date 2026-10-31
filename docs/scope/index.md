@@ -15,7 +15,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 
 | Epic | File | Status |
 |---|---|---|
-| Foundations | [foundations.md](foundations.md) | 8 existing, 6 done, 1 in-progress (3 designed), 1 planned |
+| Foundations | [foundations.md](foundations.md) | 8 existing, 7 done, 1 planned |
 | UI refresh | [ui-refresh.md](ui-refresh.md) | 3 done, 5 in-progress, 2 planned |
 | Repair workflow | [repair-workflow.md](repair-workflow.md) | 19 planned |
 | Platform | [platform.md](platform.md) | 1 in-progress, 9 planned |
@@ -37,7 +37,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | H | Analytics dashboards | Built | existing |
 | 1 | Coding standards & tooling | Foundation | done |
 | 2 | Auth service boundary | Foundation | done |
-| 3 | Analytics & AI service boundary | Foundation | in-progress |
+| 3 | Analytics & AI service boundary | Foundation | done |
 | 4 | Data model v2 | Foundation | done |
 | 5 | Permission matrix & enforcement | Foundation | done |
 | 6 | Design system & UI foundation | Foundation | done |
