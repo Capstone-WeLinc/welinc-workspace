@@ -17,7 +17,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 |---|---|---|
 | Foundations | [foundations.md](foundations.md) | 8 existing, 7 done, 1 planned |
 | UI refresh | [ui-refresh.md](ui-refresh.md) | 3 done, 5 in-progress, 2 planned |
-| Repair workflow | [repair-workflow.md](repair-workflow.md) | 1 done, 18 planned |
+| Repair workflow | [repair-workflow.md](repair-workflow.md) | 1 done, 1 in-progress, 18 planned |
 | Platform | [platform.md](platform.md) | 1 in-progress, 9 planned |
 | Outsourcing | [outsourcing.md](outsourcing.md) | 4 planned |
 | Operations | [operations.md](operations.md) | 5 planned, 1 dropped |
@@ -58,7 +58,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 50 | Portal on the design system | UI refresh | planned |
 | 51 | Analytics page | UI refresh | planned |
 | 16 | Ticket status lifecycle | Slice 1 | done |
-| 17 | Chief Mechanic role | Slice 1 | planned |
+| 17 | Chief Mechanic role | Slice 1 | in-progress |
 | 18 | New repair ticket & assignment | Slice 1 | planned |
 | 53 | Admin ticket editing | Slice 1 | planned |
 | 19 | Mechanic status updates | Slice 1 | planned |
@@ -78,6 +78,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 31 | On hold for parts | Slice 2 | planned |
 | 32 | Repair history timeline | Slice 2 | planned |
 | 33 | Admin status override | Slice 2 | planned |
+| 62 | Costs after close | Slice 2 | planned |
 | 34 | Admin OTP | Slice 3 | planned |
 | 35 | reCAPTCHA on login | Slice 3 | planned |
 | 36 | Outsourced shop directory | Slice 4 | planned |

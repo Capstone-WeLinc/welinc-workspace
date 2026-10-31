@@ -22,14 +22,23 @@ WL-200. One official list of statuses and who may move a ticket from which statu
 - Note (2026-10-25): today the backend allows forward moves only (`updateStatus` in `repairs.service.ts`). The lifecycle has to cover moving back (reject to In Progress, WL-200 and WL-212; admin override, WL-108) and decide what a backward move does to spec 0007's ticked checklist steps and the "What fixed it" notes saved on the way to For verification (AC-31).
 - Note (2026-10-29): spec 0010 fixes the nine status names (`OPEN` to `CLOSED`); this feature keeps the transition table. Also decide whether the Chief Mechanic can close (verify) a ticket, which only Admin can today, and add the optimistic lock that unlock and cancel lack (spec 0004).
 
-### 17. Chief Mechanic role · planned
-WL-104. A role that sees all tickets and owns verification, following the permission matrix.
+### 17. Chief Mechanic role · in-progress
+WL-104. A role that sees all tickets and owns verification, following the permission matrix. Spec: [0015](../specs/0015-chief-mechanic-role/index.md)
 **Done when:** Admin can assign the role, the Chief Mechanic sees every ticket and the verification queue, and the sidebar shows the badge.
 - Note (2026-10-25): spec 0007 (feature 15) adds the role itself: `CHIEF_MECHANIC` in welinc-auth, welinc-backend-vrms and the web app, assignable on the Users page, with its badge, knowledge base editing, and mechanic rules on tickets for now. What's left here is widening it to every ticket and the verification queue (with feature 23), once the permission matrix (feature 5) settles the exact rights.
 - Note (2026-10-29): spec 0002 asks for a Chief Mechanic dashboard (Jira VRMS-41) that reuses the dashboard tiles, with Waiting as the verification queue. Cover it here or with feature 23.
 - Note (2026-11-01, replan): spec 0014 gave the Chief Mechanic the Verify and Send back moves (`ticket.verify`), without cancel or override. What is left here is the every ticket view and the dashboard.
-- [ ] Build it: `/develop chief mechanic role`
-- [ ] Polish it (optional, ask first): `web-design-guidelines`
+- Note (2026-11-01): spec 0015 decided the Chief's dashboard (queue first, oldest waiting, then own work, attention, pipeline, no spend), read only costs by default, and an Admin setting to require costs before closing (off by default). The verification queue moved here from feature 23. No new page or sidebar item.
+- [x] Design it (spec): `/architect chief mechanic role`
+- [x] Build it: `/develop chief mechanic role`
+  - [x] Thin thread: `status_changed_at` migration and backfill, the For verification sort, the Chief view with the queue section (AC-7 to AC-11, AC-14 to AC-16)
+  - [x] Rest of the Chief view: tiles, My work, Needs attention, pipeline, states, fallback (AC-12, AC-13, AC-17 to AC-19)
+  - [x] Read only costs: catalog default, guarded data migration, close dialog wording (AC-1 to AC-3, AC-6)
+  - [x] Costs before closing setting: boolean setting type, the `costs` need and 422 on close (AC-4, AC-5)
+  - [x] Sweep: tests, fixtures, axe at 375px and 1280px for all three roles, lint, typecheck, build (AC-19, AC-20)
+- [ ] Verify it: `/check verify chief mechanic role`
+- [ ] Test it: `/test chief mechanic role`
+- [ ] Polish it (optional, ask first): `impeccable` · `web-design-guidelines` · `break-ui` (empty and long queues, long names, clock skew)
 
 ### 18. New repair ticket & assignment · planned · needs a decision
 WL-201, WL-202, and the ordering half of WL-401. Create a ticket with pickers and auto-filled vehicle and reporter details, then assign in house mechanics first, showing each one's open ticket count.
@@ -75,6 +84,7 @@ WL-211. No ticket is marked done without evidence.
 WL-212. Verify or reject finished work, with the verifier recorded.
 **Done when:** finished tickets land in a verification queue, Verify closes and Reject returns to In Progress with a required comment, and the verifier's name and time are on the ticket and in reports.
 - Note (2026-11-01, replan): the Verify and Send back moves already exist (spec 0014, with the `lastRejection` banner and prefilled resend). What is left is the verification queue page and the proof files.
+- Note (2026-11-01): the verification queue moved to feature 17 (spec 0015, the Chief's dashboard plus the filtered repair list). What is left here is showing proof files at verification and the verifier in reports.
 - [ ] Build it: `/develop chief mechanic verification`
 - [ ] Polish it (optional, ask first): `emil-design-eng` (verify and reject dialogs) · `web-design-guidelines`
 - Note (2026-10-25): Reject is the first backward move. Follow feature 16's rule for the spec 0007 checklist and "What fixed it" notes when a ticket goes back to In Progress.
@@ -154,3 +164,10 @@ WL-108, built on Jira's proposed rules. Admin fixes a wrong status with a reason
 - [ ] Build it: `/develop admin status override`
 - [ ] Polish it (optional, ask first): `web-design-guidelines`
 - Note (2026-10-25): this is how you move a ticket back. Follow feature 16's rule for the spec 0007 checklist and "What fixed it" notes on any backward move.
+
+### 62. Costs after close · planned · needs a decision · from spec 0015
+Let an Admin add or fix costs on a closed ticket without unlocking it, the way shops post parts invoices and receipts after the truck has left (a separate financial close).
+**Done when:** an Admin can add or change costs on a closed ticket with no unlock, each change writes an audit row with before and after, the ticket stays closed, and reports pick up the new totals.
+- Note (2026-11-01): from spec 0015. Today a ticket closed without costs needs an Admin unlock to fix. This changes the closed ticket lock from specs 0004 and 0014, so it needs a spec.
+- [ ] Design it (spec): `/architect costs after close`
+- [ ] Polish it (optional, ask first): `web-design-guidelines`
