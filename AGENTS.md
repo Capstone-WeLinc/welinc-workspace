@@ -8,14 +8,13 @@ Workspace for VRMS (Vehicle Repair Management System), one subsystem of the WeLi
 |---|---|---|---|
 | `welinc-web-vrms` | us | React + Vite + Tailwind SPA | 8001 |
 | `welinc-backend-vrms` | us | NestJS + Prisma + PostgreSQL API | 3002 |
-| `welinc-backend-vrms-analytics-ai` | us | Python FastAPI: AI triage (Gemini, pgvector) and analytics (DuckDB, Redis, Mongo) | 8020 |
 | `welinc-auth` | shared | NestJS + Prisma auth service (JWT) | 3001 |
 | `welinc-web-portal` | shared | React + Vite SSO portal | 8000 |
 | `welinc-web-vmms`, `welinc-backend-vmms`, `welinc-web-bms`, `welinc-backend-bms` | other groups | read only for us | |
 
-- **Gateway**: Nginx on port 3000 routes `/auth`, `/vrms`, `/repairs`, `/ai` and `/analytics` (config currently in `welinc-auth/nginx.conf`).
-- **Package manager**: npm in every Node repo (`package-lock.json`); pip `requirements.txt` for the Python service.
-- **Runtime**: Node 24 everywhere (`.nvmrc` and the Dockerfiles in auth, backend-vrms, web-vrms and web-portal; `engines` is `24.x` in the backends). The analytics service is Python.
+- **Gateway**: Nginx on port 3000 routes `/auth`, `/vrms` and `/repairs` (config currently in `welinc-auth/nginx.conf`).
+- **Package manager**: npm in every Node repo (`package-lock.json`).
+- **Runtime**: Node 24 everywhere (`.nvmrc` and the Dockerfiles in auth, backend-vrms, web-vrms and web-portal; `engines` is `24.x` in the backends).
 
 ## Build approach
 
@@ -27,7 +26,6 @@ Tracer Bullet: each feature is built end to end through every layer and working 
 # Whole stack (start auth first: it creates the shared docker network)
 docker compose -f docker-compose.auth.yml up -d
 docker compose -f docker-compose.vrms.yml up -d
-docker compose -f docker-compose.analytics.yml up -d
 
 # Inside a Node repo
 npm install
@@ -64,7 +62,7 @@ Stored in `docs/specs/`. Format: `docs/specs/NNNN-title.md`. Product backlog liv
 
 Reference skills load on their own when the work matches (say "Using skill: <name>"). Audit and polish skills never run on their own, not even as a step of `/develop` or `/check verify`: offer them in one line and wait for a yes. Never run more than one taste skill on a change.
 
-- **Backend, load on match:** [prisma-client-api](.claude/skills/prisma-client-api/) and [prisma-cli](.claude/skills/prisma-cli/) for Prisma 7 (backend-vrms, auth); [nestjs-best-practices](.claude/skills/nestjs-best-practices/) for NestJS; [fastapi](.claude/skills/fastapi/) for analytics-ai.
+- **Backend, load on match:** [prisma-client-api](.claude/skills/prisma-client-api/) and [prisma-cli](.claude/skills/prisma-cli/) for Prisma 7 (backend-vrms, auth); [nestjs-best-practices](.claude/skills/nestjs-best-practices/) for NestJS.
 - **Frontend, load on match:** [tailwind-4-docs](.claude/skills/tailwind-4-docs/) (web-vrms is on v4, web-portal still on v3; its docs snapshot is not downloaded yet), [vercel-composition-patterns](.claude/skills/vercel-composition-patterns/), [react-hook-form](.claude/skills/react-hook-form/) for forms, [ask-sonner](.claude/skills/ask-sonner/) for toasts. Two larger ones load only for substantial work, not copy or class tweaks: [shadcn](.claude/skills/shadcn/) when building, restyling, theming or adding shadcn UI, and [vercel-react-best-practices](.claude/skills/vercel-react-best-practices/) for new components or hooks, effects, data fetching, lists, performance, or a React review.
 - **Ask first (demanding or writes extra code):**
   - [web-design-guidelines](.claude/skills/web-design-guidelines/): accessibility and UX audit with `file:line` findings. Offer it after a UI change; it fetches its rules from GitHub.
@@ -81,8 +79,7 @@ MCP servers (configured in `.mcp.json`): playwright, shadcn, atlassian (Jira; ne
 - [docs/context/](docs/context/): project background, system overview (decisions and open questions), roles and users, glossary, requirements (BRD field rules, limits and targets, with the Jira overrides). Background only; code and Jira win.
 - [design.md](design.md): UI art direction and tokens for web-vrms and web-portal.
 - [welinc-web-vrms/AGENTS.md](welinc-web-vrms/AGENTS.md): VRMS SPA structure, API and auth handling, color tokens, and effect rules.
-- [welinc-backend-vrms/AGENTS.md](welinc-backend-vrms/AGENTS.md): NestJS API modules, guards, Prisma and migration rules, Docker restart gotcha.
-- [welinc-backend-vrms-analytics-ai/AGENTS.md](welinc-backend-vrms-analytics-ai/AGENTS.md): FastAPI AI and analytics service, the 30 second sync, stores and env variables.
+- [welinc-backend-vrms/AGENTS.md](welinc-backend-vrms/AGENTS.md): NestJS API modules (including analytics and AI), guards, Prisma and migration rules, Docker restart gotcha.
 - [welinc-auth/AGENTS.md](welinc-auth/AGENTS.md): shared auth service routes, role per system JWT, lockout, gateway nginx and CORS.
 - [welinc-web-portal/AGENTS.md](welinc-web-portal/AGENTS.md): SSO portal redirect by role, token handoff, Tailwind v3, session monitor.
 
