@@ -22,7 +22,7 @@ WL-200. One official list of statuses and who may move a ticket from which statu
 - Note (2026-10-25): today the backend allows forward moves only (`updateStatus` in `repairs.service.ts`). The lifecycle has to cover moving back (reject to In Progress, WL-200 and WL-212; admin override, WL-108) and decide what a backward move does to spec 0007's ticked checklist steps and the "What fixed it" notes saved on the way to For verification (AC-31).
 - Note (2026-10-29): spec 0010 fixes the nine status names (`OPEN` to `CLOSED`); this feature keeps the transition table. Also decide whether the Chief Mechanic can close (verify) a ticket, which only Admin can today, and add the optimistic lock that unlock and cancel lack (spec 0004).
 
-### 17. Chief Mechanic role · in-progress
+### 17. Chief Mechanic role · done
 WL-104. A role that sees all tickets and owns verification, following the permission matrix. Spec: [0015](../specs/0015-chief-mechanic-role/index.md)
 **Done when:** Admin can assign the role, the Chief Mechanic sees every ticket and the verification queue, and the sidebar shows the badge.
 - Note (2026-10-25): spec 0007 (feature 15) adds the role itself: `CHIEF_MECHANIC` in welinc-auth, welinc-backend-vrms and the web app, assignable on the Users page, with its badge, knowledge base editing, and mechanic rules on tickets for now. What's left here is widening it to every ticket and the verification queue (with feature 23), once the permission matrix (feature 5) settles the exact rights.
@@ -38,7 +38,7 @@ WL-104. A role that sees all tickets and owns verification, following the permis
   - [x] Sweep: tests, fixtures, axe at 375px and 1280px for all three roles, lint, typecheck, build (AC-19, AC-20)
 - [x] Verify it: `/check verify chief mechanic role`
 - [x] Test it: `/test chief mechanic role` (2026-11-01: added two AC-16 edge cases to `nextAction.test.ts`; web 141 tests green)
-- [ ] Polish it (optional, ask first): `impeccable` · `web-design-guidelines` · `break-ui` (empty and long queues, long names, clock skew)
+- [x] Polish it (optional, ask first): `impeccable` · `web-design-guidelines` · `break-ui` (empty and long queues, long names, clock skew) (2026-11-01: ran `break-ui` only, fixes applied; the other two skipped)
 
 ### 18. New repair ticket & assignment · planned · needs a decision
 WL-201, WL-202, and the ordering half of WL-401. Create a ticket with pickers and auto-filled vehicle and reporter details, then assign in house mechanics first, showing each one's open ticket count.
