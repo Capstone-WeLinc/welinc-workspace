@@ -1,7 +1,7 @@
 # 0011. Permission matrix: Admin editable grants, enforced with CASL
 
 **Date**: 2026-10-29
-**Updated**: 2026-10-30 (AC-25 replaced by spec 0012 AC-24: the matrix is read and edited in the Settings hub)
+**Updated**: 2026-10-31 (AC-12 narrowed by spec 0014 AC-6: `ticket.administer` no longer closes a ticket, closing and sending back need the new `ticket.verify`; the status route guard gains `ticket.verify`) · 2026-10-30 (AC-25 replaced by spec 0012 AC-24: the matrix is read and edited in the Settings hub)
 **Status**: Accepted
 
 ## Summary
@@ -153,7 +153,8 @@ Every key also yields the flag rule `can(key, 'Permission')`, which is what `@Re
 | `GET /vrms/permissions`, `PATCH /vrms/permissions`, `GET /vrms/permissions/changes` | `permissions.manage` |
 | `POST /vrms/repairs`, `GET /vrms/repairs/available-mechanics` | `ticket.create` |
 | `GET /vrms/repairs`, `GET /vrms/repairs/history`, `GET /vrms/repairs/:id` | `ticket.view` or `ticket.view_all` (either; scope from the ability) |
-| `PATCH /vrms/repairs/:id/status`, `PATCH …/issues/:issueId/knowledge`, `PATCH …/issues/:issueId/steps/:stepId` | `ticket.work` or `ticket.administer` (either; ownership and transitions from the ability) |
+| `PATCH /vrms/repairs/:id/status` | `ticket.work`, `ticket.administer` or `ticket.verify` (any; each move's own right is checked in the service, spec 0014 AC-5, AC-6) |
+| `PATCH …/issues/:issueId/knowledge`, `PATCH …/issues/:issueId/steps/:stepId` | `ticket.work` or `ticket.administer` (either; ownership from the ability) |
 | `PATCH /vrms/repairs/:id/costs` | `ticket.costs.edit` |
 | `PATCH /vrms/repairs/:id/unlock` | `ticket.unlock` |
 | `GET /vrms/repairs/audit-logs`, `GET /vrms/repairs/audit-logs/actors` | `audit.view` |
