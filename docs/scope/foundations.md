@@ -59,7 +59,7 @@ spec [0009](../specs/0009-auth-service-boundary/index.md)
 - [x] Review it (fresh model): `/check review auth service boundary`
 - [x] Document it: `/document auth service boundary`
 
-### 3. Analytics & AI service boundary · in-progress
+### 3. Analytics & AI service boundary · done
 Decide whether analytics-ai stays its own service or merges into the main VRMS repos, and record its store choices (pgvector, DuckDB, Redis, MongoDB).
 **Done when:** a spec records the service boundary and every store it keeps, with MongoDB justified or removed.
 - Note (2026-10-25): direction chosen by you during spec 0007: the AI and the analytics both move into welinc-backend-vrms and are rebuilt from scratch, retiring welinc-backend-vrms-analytics-ai. AI ideas picked so far: triage while typing grounded on the knowledge base, search by meaning, cleaning "What fixed it" notes, AI drafted knowledge entries, duplicate ticket warnings. The spec also decides replacing spec 0007's `pg_trgm` grouping with embeddings and removing `autoEmbedIssues`.
@@ -80,8 +80,8 @@ spec [0013](../specs/0013-analytics-ai-into-backend/index.md) · code in `welinc
   - [x] Complete the AI: part prices and confidence, latest diagnosis, errors and limits, feedback, AI stats from tables, `ai.use` on the server (AC-8 to AC-13, AC-17)
   - [x] Embedding upkeep and retirement: `ai.embed_catchup_days`, the catch up job, `ai:embed-all`, then remove the analytics compose file, gateway routes and `AI_SERVICE_URL`, and archive the repo (AC-15, AC-16, AC-18, AC-19)
   - [x] Close out: unit tests, route table test, lint, typecheck, build and test in backend-vrms and web-vrms (AC-21)
-- [ ] Verify it: `/check verify analytics & AI service boundary`
-- [ ] Test it: `/test analytics & AI service boundary`
+- [x] Verify it: `/check verify analytics & AI service boundary`
+- [x] Test it: `/test analytics & AI service boundary`
 - [ ] Extra skills (optional, ask first): `docker-patterns` (compose and `vrms-db` image change) · `web-design-guidelines` (analytics error and empty states)
 
 ### 4. Data model v2 · done
