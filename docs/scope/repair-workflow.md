@@ -6,10 +6,18 @@ The core loop (Jira WL-E2, plus WL-E5 and the WL-E1 role work), then the mechani
 
 Admin creates and assigns a ticket, the mechanic works it from a phone with photos and proof, the Chief Mechanic verifies it, and every step is logged. The thinnest real thread through every layer.
 
-### 16. Ticket status lifecycle · planned · needs a decision
-WL-200. One official list of statuses and who may move a ticket from which status to which, enforced by the backend.
+### 16. Ticket status lifecycle · done
+WL-200. One official list of statuses and who may move a ticket from which status to which, enforced by the backend. Spec: [0014](../specs/0014-ticket-status-lifecycle/index.md)
 **Done when:** final status names are recorded, invalid transitions are rejected with a clear error, and existing tickets migrate without loss.
-- [ ] Design it (spec): `/architect ticket status lifecycle`
+- [x] Design it (spec): `/architect ticket status lifecycle`
+- [x] Build it: `/develop ticket status lifecycle` (code in `welinc-backend-vrms/src/modules/vrms/ticket-transitions.ts`, `apply-status-move.ts`; `welinc-web-vrms/src/features/repair/lib/nextAction.ts`)
+  - [x] Table and thin thread: transition table, `applyStatusMove`, required stale check in the transaction, truck release inside it, unassign on the helper (AC-1 to AC-4, AC-7, AC-10 to AC-12)
+  - [x] Moves to the web: `moves` and `can.verify` on the ticket, action list in `nextAction.ts`, error code handling (AC-13, AC-15, AC-19)
+  - [x] Verify right: `ticket.verify` key, CASL `verify` with no self verification, route guard (AC-5, AC-6)
+  - [x] Send back: reject move, backward rule, `lastRejection` banner, prefilled resend (AC-8, AC-9, AC-14, AC-16 to AC-18, AC-21)
+  - [x] Existing data check and spec 0011 note (AC-20)
+- [x] Verify it: `/check verify ticket status lifecycle` (2026-10-31: passed, every step run; unassign release and atomic rollback proven live)
+- [x] Test it: `/test ticket status lifecycle` (2026-10-31: added `apply-status-move.spec.ts`, `dto/stale-lock.dto.spec.ts` and the `getInvalidTransition` cases; backend 703 and web 131 tests green)
 - [ ] Polish it (optional, ask first): `web-design-guidelines`
 - Note (2026-10-25): today the backend allows forward moves only (`updateStatus` in `repairs.service.ts`). The lifecycle has to cover moving back (reject to In Progress, WL-200 and WL-212; admin override, WL-108) and decide what a backward move does to spec 0007's ticked checklist steps and the "What fixed it" notes saved on the way to For verification (AC-31).
 - Note (2026-10-29): spec 0010 fixes the nine status names (`OPEN` to `CLOSED`); this feature keeps the transition table. Also decide whether the Chief Mechanic can close (verify) a ticket, which only Admin can today, and add the optimistic lock that unlock and cancel lack (spec 0004).

@@ -57,7 +57,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 15 | Knowledge base page | UI refresh | in-progress |
 | 50 | Portal on the design system | UI refresh | planned |
 | 51 | Analytics page | UI refresh | planned |
-| 16 | Ticket status lifecycle | Slice 1 | planned |
+| 16 | Ticket status lifecycle | Slice 1 | done |
 | 17 | Chief Mechanic role | Slice 1 | planned |
 | 18 | New repair ticket & assignment | Slice 1 | planned |
 | 53 | Admin ticket editing | Slice 1 | planned |
