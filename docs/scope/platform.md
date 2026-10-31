@@ -22,6 +22,7 @@ spec [0008](../specs/0008-hosting-and-ci-cd/index.md) · code in `infra/` of the
 - [ ] Extra skills (optional, ask first): `docker-patterns` · `azure-container-apps` · `azure-container-registry` · `azure-static-web-apps` · `azure-deployment-preflight`
 - Note (2026-10-29): email moves off the personal Gmail to Brevo (subject to change) before staging, with a sender address you control; only the `SMTP_*` values change. See feature 28.
 - Note (2026-10-29): safe to build before the integration meeting, but feature 56 (integration contract) may change it: the Azure milestones host the shared gateway, auth and database, so the other groups' services must fit the same setup.
+- Note (2026-10-31): from spec 0013. The Bicep must set the flexible server configuration `azure.extensions` to include `VECTOR` before the migration job runs, because the VRMS database now stores AI embeddings with pgvector. Before go live, move `GEMINI_API_KEY` to a paid tier (the free tier caps at 500 and 1K requests a day).
 
 ### 27. Error monitoring · planned · needs a decision
 Catch errors in production before users report them.
@@ -41,6 +42,7 @@ Get ready for the first integration meeting: know what the other groups changed,
 - [ ] Meeting held, answers recorded for feature 56
 - Note (2026-10-29): add to the question list that `CHIEF_MECHANIC` now exists in the shared auth role list (spec 0007), and that the VMMS and BMS backends likely carry the same copied login module and `users` table that spec 0009 removed here.
 - Note (2026-10-30): also ask which roles BMS has now (operations, customer service?), and tell them about feature 60 (the portal picker changes where their shared users land). Today admin is one separate grant per system; if the groups want a single suite wide superadmin instead, decide it in feature 56 (your Capstone 1 panel called one insecure).
+- Note (2026-10-31): from spec 0013. Tell the other groups that VRMS removes `/ai` and `/analytics` from `welinc-auth/nginx.conf` once feature 3 retires the Python service.
 
 ### 60. Portal system picker for shared accounts · planned · needs a decision · GA
 People with roles in more than one system (for example a mechanic in both VRMS and VMMS) can't reach anything but VRMS today, because the shared portal always sends them there. Send single system users straight in, and let shared accounts choose.

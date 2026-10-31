@@ -10,7 +10,6 @@ welinc-auth
 welinc-web-portal
 welinc-web-vrms
 welinc-backend-vrms
-welinc-backend-vrms-analytics-ai
 welinc-web-vmms
 welinc-backend-vmms
 welinc-web-bms

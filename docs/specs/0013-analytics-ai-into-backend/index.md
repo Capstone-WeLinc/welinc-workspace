@@ -1,7 +1,7 @@
 # 0013. Analytics and AI move into backend-vrms; the Python service retires
 
 **Date**: 2026-10-30
-**Status**: Proposed
+**Status**: In Progress
 
 ## Summary
 
@@ -126,7 +126,7 @@ Diagnoses are kept until their ticket is deleted. No other table changes. The th
 5. Part prices: for each part, `AVG(unit_cost)` from `repair_parts` whose `description ILIKE '%' || partName || '%'` on counted tickets, rounded to 2 places, `null` when none.
 6. Confidence (today's rule): 3 points for a live answer, +2 for at least 3 similar cases (+1 for 1 or 2), +1 for any vehicle history, +2 for average similarity ≥ 0.80 (+1 for ≥ 0.65). A score of 6 or more is `High`, 3 to 5 `Moderate`, below 3 `Low`.
 
-**AiProvider** (`src/modules/ai/ai-provider.ts`): `embed(texts: string[], task: 'RETRIEVAL_DOCUMENT' | 'RETRIEVAL_QUERY'): Promise<number[][]>` and `generateJson<T>(prompt: string, schema: object): Promise<T>`. `GeminiProvider` uses `@google/genai` (not the deprecated `@google/generative-ai`). Timeouts: 20 seconds to generate, 10 seconds to embed. Up to 100 texts per embed call; a reply whose vector count or length (768) differs from the request is a provider error.
+**AiProvider** (`src/modules/ai/ai-provider.ts`): `embed(texts: string[], task: 'RETRIEVAL_DOCUMENT' | 'RETRIEVAL_QUERY'): Promise<number[][]>` and `generateJson<T>(prompt: string, schema: object): Promise<T>`. `GeminiProvider` uses `@google/genai` (not the deprecated `@google/generative-ai`). Timeouts: 20 seconds to generate, 10 seconds to embed. Up to 50 texts per embed call (100 hit the free tier's per minute limit, see Migration plan risks); each text goes in its own content object, because `gemini-embedding-2` reads a plain string array as parts of one content and returns a single combined vector (checked 2026-10-31). A reply whose vector count or length (768) differs from the request is a provider error.
 
 **Run transaction** (AC-11): the run goes inside `prisma.$transaction(fn, { timeout: 30000, maxWait: 5000 })`:
 1. `tx.$queryRaw` runs `SELECT pg_try_advisory_xact_lock(hashtextextended(${ticketId}, 0))`. False means `AI_BUSY`.
@@ -244,7 +244,7 @@ Tracer Bullet: one analytics chart and one AI run end to end first, then widen, 
 2. Run `npm run ai:embed-all` locally and on staging (the old vectors are fake and are not copied).
 3. Step 5 removes the Python stack. Old Mongo logs, DuckDB and vectors are dropped, not migrated: the logs are test data and the vectors are invalid.
 **Rollback**: revert the web-vrms PR to point back at `/ai` and `/analytics` and run `docker compose -f docker-compose.analytics.yml up` from the previous commit. This only works before step 5, and only because PR 5 patched the old service for the v2 schema; its similar cases stay broken. Archive the repo last.
-**Risks**: the free embedding quota is 1K requests a day per project (confirmed in AI Studio, not zero). It is unknown whether a batch of texts counts as one request or one per text, so test it before a large `ai:embed-all`; if it counts per text, run it over several days or on a paid key once. The old Python sync filled the old embedding model's daily limit in August, which a one time embed per issue avoids. Also, staging needs `vector` allowed before the migration job runs.
+**Risks**: the free embedding quota is 1K requests a day per project (confirmed in AI Studio, not zero). A batch of texts counts one request per text (checked 2026-10-31: a batch of 100 hit the per minute 429, a batch of 50 passed), so `ai:embed-all` sends 50 at a time with a pause between batches, and may need several days of the daily quota or a paid key once. The old Python sync filled the old embedding model's daily limit in August, which a one time embed per issue avoids. Also, staging needs `vector` allowed before the migration job runs.
 
 ## Consequences
 

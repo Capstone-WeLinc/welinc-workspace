@@ -12,7 +12,7 @@ Our group builds **VRMS** (Vehicle Repair Management System). VMMS and BMS belon
 | `docs/scope/` | The living plan: epics, features and their status |
 | `docs/specs/` | One folder per designed feature (`NNNN-title/`) with its spec and verify steps |
 | `design.md` | UI art direction and design tokens for the web apps |
-| `docker-compose.*.yml` | The local stack: auth, VRMS and analytics |
+| `docker-compose.*.yml` | The local stack: auth and VRMS |
 | `scripts/clone-all.sh` | Clones every service repo |
 | `AGENTS.md` | Project rules and context for AI tools (`CLAUDE.md` imports it) |
 
@@ -22,12 +22,11 @@ Our group builds **VRMS** (Vehicle Repair Management System). VMMS and BMS belon
 |---|---|---|---|
 | `welinc-web-vrms` | us | React, Vite and Tailwind app | 8001 |
 | `welinc-backend-vrms` | us | NestJS, Prisma and PostgreSQL API | 3002 |
-| `welinc-backend-vrms-analytics-ai` | us | FastAPI: AI triage and analytics | 8020 |
 | `welinc-auth` | shared | NestJS auth service (JWT) | 3001 |
 | `welinc-web-portal` | shared | SSO portal | 8000 |
 | `welinc-web-vmms`, `welinc-backend-vmms`, `welinc-web-bms`, `welinc-backend-bms` | other groups | read only for us | |
 
-An Nginx gateway on port 3000 routes `/auth`, `/vrms`, `/repairs`, `/ai` and `/analytics`.
+An Nginx gateway on port 3000 routes `/auth`, `/vrms`, `/repairs`. Analytics and AI live inside `welinc-backend-vrms` (spec 0013).
 
 ## Set up
 
@@ -48,14 +47,13 @@ Each backend has a `.env.example` that already points at the local Docker databa
 ```bash
 cp welinc-auth/.env.example welinc-auth/.env
 cp welinc-backend-vrms/.env.example welinc-backend-vrms/.env
-cp welinc-backend-vrms-analytics-ai/.env.example welinc-backend-vrms-analytics-ai/.env
 ```
 
 Then add the values only you have:
 
 | File | Variable | Needed for |
 |---|---|---|
-| `welinc-backend-vrms-analytics-ai/.env` | `GEMINI_API_KEY` | AI triage. Create one at aistudio.google.com (Get API key, then Create API key). |
+| `welinc-backend-vrms/.env` | `GEMINI_API_KEY` | AI diagnosis and issue embeddings. Create one at aistudio.google.com (Get API key, then Create API key). |
 | `welinc-auth/.env` | `SMTP_HOST`, `SMTP_USER`, `SMTP_PASS` (optional) | Sending OTP and reset emails. Left blank, emails are logged instead. |
 
 The auth, VRMS backend and web containers take their settings from the compose files, so the stack starts without these. The one exception is auth: if `welinc-auth/.env` exists, the auth container also reads it, which is how it gets `SMTP_*` (without them, emails are printed to the auth log instead of sent). The compose values win on any overlap. The backend `.env` files are also used for running migrations, seeds or a service outside Docker. If you run one backend outside Docker, keep `JWT_SECRET` equal to the value in the compose files, or its tokens will not verify.
@@ -81,7 +79,6 @@ Start auth first: it creates the shared Docker network.
 ```bash
 docker compose -f docker-compose.auth.yml up -d
 docker compose -f docker-compose.vrms.yml up -d
-docker compose -f docker-compose.analytics.yml up -d
 ```
 
 The containers do not run database migrations or seeds on start. The first time, run them from each backend repo on your machine (`.env` there points at the Docker databases on localhost):
@@ -158,7 +155,6 @@ Every service repo we own has a GitHub Actions workflow (`.github/workflows/ci.y
 |---|---|
 | `welinc-auth`, `welinc-backend-vrms` | `prisma generate`, `lint:ci`, build, tests |
 | `welinc-web-vrms`, `welinc-web-portal` | lint, build (web-vrms also typechecks) |
-| `welinc-backend-vrms-analytics-ai` | every Python file compiles (no linter or tests yet) |
 
 The checks warn but do not block a merge: GitHub Free cannot require them.
 
