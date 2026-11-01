@@ -22,6 +22,24 @@ services:
       timeout: 5s
       retries: 5
 
+  # Spec 0017: local Azure Blob Storage for ticket attachments (blob service only)
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite:3.35.0
+    container_name: welinc_vrms_azurite
+    restart: unless-stopped
+    command: azurite-blob --blobHost 0.0.0.0 --blobPort 10000 --location /data --loose --skipApiVersionCheck
+    ports:
+      - "10000:10000"
+    volumes:
+      - vrms_azurite:/data
+    networks:
+      - welinc-network
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z 127.0.0.1 10000 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   vrms-backend:
     build:
       context: ./welinc-backend-vrms
@@ -45,8 +63,15 @@ services:
       AUTH_SERVICE_URL: http://auth-service:3001
       CORS_ORIGINS: http://localhost:8000,http://localhost:8001
       NODE_ENV: development
+      # Spec 0017: Azurite's public development account key (not a secret). The backend talks to
+      # azurite:10000; links handed to the browser use localhost:10000.
+      STORAGE_CONNECTION_STRING: DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;
+      STORAGE_CONTAINER: vrms-attachments
+      STORAGE_PUBLIC_URL: http://localhost:10000/devstoreaccount1
     depends_on:
       vrms-db:
+        condition: service_healthy
+      azurite:
         condition: service_healthy
     networks:
       - welinc-network
@@ -69,6 +94,7 @@ services:
 
 volumes:
   vrms_pgdata:
+  vrms_azurite:
 
 networks:
   welinc-network:
