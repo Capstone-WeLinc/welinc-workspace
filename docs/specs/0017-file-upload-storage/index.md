@@ -1,7 +1,7 @@
 # 0017. File upload and storage: private Blob storage, signed links, and vehicle photos
 
 **Date**: 2026-11-01
-**Status**: In Progress
+**Status**: Accepted
 
 ## Summary
 

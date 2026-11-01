@@ -62,7 +62,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 18 | New repair ticket & assignment | Slice 1 | done |
 | 53 | Admin ticket editing | Slice 1 | planned |
 | 19 | Mechanic status updates | Slice 1 | done |
-| 20 | File upload & storage | Slice 1 | in-progress |
+| 20 | File upload & storage | Slice 1 | done |
 | 21 | Vehicle photos | Slice 1 | dropped |
 | 22 | Proof of completion | Slice 1 | planned |
 | 23 | Chief Mechanic verification | Slice 1 | planned |

@@ -75,19 +75,19 @@ WL-107. Mechanics move their own tickets forward from a phone.
 - [~] Test it: `/test mechanic status updates` (skipped 2026-11-01: spec 0014 tests already lock the behavior)
 - [ ] Polish it (optional, ask first): `impeccable` or `emil-design-eng` (one taste skill per change; motion: status change on a phone, bottom sheets) · `web-design-guidelines`
 
-### 20. File upload & storage · in-progress · GA
+### 20. File upload & storage · done · GA
 WL-218, plus WL-209 and WL-210 (feature 21 folded in). One private upload service for vehicle photos, proof, receipts and other documents, and the vehicle photos screens on top of it. Spec: [0017](../specs/0017-file-upload-storage/index.md)
 **Done when:** JPG, PNG, HEIC and PDF up to a set size are accepted, files open only through authorized links, and each file records ticket, type, uploader and time. Up to 5 photos per ticket upload with progress and retry, thumbnails show in Issue Details, and a mechanic can remove their own until the ticket closes.
 - Note (2026-11-01): spec 0017 decided it. Files go in private Azure Blob Storage (Azurite locally) and open through 10 to 20 minute signed links. Every upload goes through backend-vrms, which sniffs the type, converts HEIC, shrinks photos and rebuilds PDFs without scripts. Three settings (size 10 MB, 5 photos, 20 documents), three permission keys (`ticket.files.add`, `ticket.documents.add`, `ticket.files.remove_any`), receipts and other documents hidden without `ticket.costs.view`, soft delete with a 30 day purge. Feature 21 (vehicle photos) is built here. Crosses backend-vrms, web-vrms, the workspace compose file and `welinc-auth/nginx.conf`.
 - Note (2026-11-01): from spec 0017, carried to other features: 26 (spec 0008 Bicep gets the storage account, container, managed identity role, `STORAGE_*` settings and the gateway body size), 22 (a proof cap, and `proof` on move M4), 38 (`outsourcedJobId` on `Attachment` and the receipt upload), 49 (persist the upload queue).
 - [x] Design it (spec): `/architect file upload & storage`
-- [ ] Build it: `/develop file upload & storage`
+- [x] Build it: `/develop file upload & storage`
   - [x] Thin thread: Azurite, the `Attachment` migration, `FileStore` with signed links, one JPEG or PNG photo end to end into Issue Details, `/uploads/` route removed (AC-1, AC-2, AC-6, AC-15, AC-20)
   - [x] Upload rules: access guard, sniffing, size and pixel caps, HEIC, duplicates, caps under the lock, error order, rate limit, gateway limits (AC-3 to AC-14, AC-12a, AC-12b)
   - [x] Permissions, remove and audit: three keys and CASL actions, document visibility, delete, audit events and their filter (AC-15 to AC-18)
-  - [ ] Phone photo UX: Take photo and Choose photos, browser shrink, upload queue with retries, lightbox viewer, remove, link refresh (AC-21 to AC-26)
-  - [ ] Documents and retention: PDF disarm and rebuild, Documents card, purge and orphan sweep, tests and axe at 375px and 1280px (AC-4, AC-7, AC-19, AC-27, AC-28)
-- [ ] Verify it: `/check verify file upload & storage`
+  - [x] Phone photo UX: Take photo and Choose photos, browser shrink, upload queue with retries, lightbox viewer, remove, link refresh (AC-21 to AC-26)
+  - [x] Documents and retention: PDF disarm and rebuild, Documents card, purge and orphan sweep, tests and axe at 375px and 1280px (AC-4, AC-7, AC-19, AC-27, AC-28)
+- [x] Verify it: `/check verify file upload & storage`
 - [ ] Test it: `/test file upload & storage`
 - [ ] Review it (fresh model): `/check review file upload & storage`
 - [ ] Document it: `/document file upload & storage`
