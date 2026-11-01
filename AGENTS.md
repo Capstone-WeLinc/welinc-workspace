@@ -13,6 +13,7 @@ Workspace for VRMS (Vehicle Repair Management System), one subsystem of the WeLi
 | `welinc-web-vmms`, `welinc-backend-vmms`, `welinc-web-bms`, `welinc-backend-bms` | other groups | read only for us | |
 
 - **Gateway**: Nginx on port 3000 routes `/auth`, `/vrms` and `/repairs` (config currently in `welinc-auth/nginx.conf`).
+- **File storage**: Azurite (the local Blob Storage emulator, port 10000) in `docker-compose.vrms.yml`, Azure Blob Storage when hosted. Only `welinc-backend-vrms` talks to it (spec 0017); the browser gets signed links.
 - **Package manager**: npm in every Node repo (`package-lock.json`).
 - **Runtime**: Node 24 everywhere (`.nvmrc` and the Dockerfiles in auth, backend-vrms, web-vrms and web-portal; `engines` is `24.x` in the backends).
 
