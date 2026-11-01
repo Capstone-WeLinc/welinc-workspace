@@ -202,9 +202,9 @@ Tracer Bullet: first a thin thread through every layer (the safe create, end to 
 
 ## Follow-up
 
-- [ ] Spec 0010: note that `VehicleChange` replaces the planned `VehicleStatusChange`, and the new ticket columns `accountType`, `corporation` and `priorVehicleStatus`.
-- [ ] Spec 0014: note that M1 is switched on by `POST /repairs/:id/assignments`, and the release restores `DISABLED`.
-- [ ] Spec 0012: note the generic lookup lists in Lookup lists, the Vehicles section, and the `tickets.odometer_jump_warn_km` threshold.
+- [x] Spec 0010: note that `VehicleChange` replaces the planned `VehicleStatusChange`, and the new ticket columns `accountType`, `corporation` and `priorVehicleStatus`.
+- [x] Spec 0014: note that M1 is switched on by `POST /repairs/:id/assignments`, and the release restores `DISABLED`.
+- [x] Spec 0012: note the generic lookup lists in Lookup lists, the Vehicles section, and the `tickets.odometer_jump_warn_km` threshold.
 - [ ] Scope feature 25: use `VehicleChange` (`field: 'status'`) and add the status toggle to the Settings Vehicles section, behind `vehicle.manage`.
 - [ ] Scope feature 53: reuse `ticket.assign` for reassign; let an Admin correct a ticket's odometer (the floor follows it); add mechanics to Assigned or In Progress tickets.
 - [ ] Scope feature 57: reuse `openCount` and `busy`, and `ticket.assign` for Unassign and Reassign.
@@ -212,7 +212,7 @@ Tracer Bullet: first a thin thread through every layer (the safe create, end to 
 - [ ] Scope feature 28: notify the mechanic on create with mechanics and on assign (WL-201, VRMS-67).
 - [ ] Scope feature 36: add the outsourced group after In house in the picker (WL-401).
 - [ ] Scope feature 56: decide who owns vehicle type once VMMS shares vehicle records.
-- [ ] `docs/context/requirements.md` and the glossary: account type is now stored; the driver license is the key.
+- [x] `docs/context/requirements.md` and the glossary: account type is now stored; the driver license is the key.
 
 ## Rationale
 

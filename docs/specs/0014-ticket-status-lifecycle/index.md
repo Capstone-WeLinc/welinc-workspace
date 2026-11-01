@@ -1,6 +1,7 @@
 # 0014. Ticket status lifecycle: one transition table in code, verify and send back
 
 **Date**: 2026-10-31
+**Updated**: 2026-11-01 (spec 0016 switches on M1 and restores a Disabled truck on release)
 **Status**: Accepted
 
 ## Summary
@@ -78,7 +79,7 @@ Decided at write time (reasons in [rationale.md](rationale.md)):
 
 | # | From | To | Trigger (who switches it on) | Right | Needs | Kind |
 |---|---|---|---|---|---|---|
-| M1 | `OPEN` | `ASSIGNED` | `assignment`: first mechanic assigned (features 18, 53) | system | | forward |
+| M1 | `OPEN` | `ASSIGNED` | `assignment`: first mechanic assigned (feature 18, switched on by `POST /repairs/:id/assignments` with `ticket.assign`, spec 0016; feature 53) | system | | forward |
 | M2 | `ASSIGNED` | `OPEN` | `assignment`: last mechanic removed (features 53, 57) | system | | back |
 | M3 | `ASSIGNED` | `IN_PROGRESS` | `status`: Start work (**this feature**) | work or administer | | forward |
 | M4 | `IN_PROGRESS` | `FOR_VERIFICATION` | `status`: Send for verification (**this feature**) | work or administer | resolutions (knowledge on); proof added by feature 22 | forward |
@@ -188,7 +189,7 @@ export function statusMovesFrom(from: RepairStatus): TicketMove[];   // trigger 
 | unassign release (M2) | status, audit | `applyStatusMove` with trigger `assignment`, system actor; status recorded in the existing `MECHANIC_UNASSIGNED` row |
 | Send back | issues' `resolvedAt` | set to null |
 | Cancel | `cancellationReason`, `closedAt` | `dto.cancellationReason`, `now` |
-| finished move | vehicle status, odometer | `AVAILABLE`; `max(ticket.odometer, vehicle.odometer)` as today |
+| finished move | vehicle status, odometer | `DISABLED` when the ticket's `priorVehicleStatus` is `DISABLED`, else `AVAILABLE` (spec 0016); `max(ticket.odometer, vehicle.odometer)` as today |
 | detail read | `moves` | `statusMovesFrom(status)` filtered by the caller's rights (AC-6) |
 | detail read | `lastRejection.remarks`, `byName`, `at` | the newest first scan in AC-14: the reject row's `note`, `actorName ?? actorEmail`, `createdAt` |
 | detail read | issue note tag "Sent back, not resent yet" | `resolutionNote` set and `resolvedAt` null |
@@ -260,7 +261,8 @@ Tracer Bullet: the first slice runs the new table end to end on today's moves, t
 - [ ] Scope feature 19 (mechanic status updates): most of its server work lands here; what remains is the phone UI.
 - [ ] Scope feature 23 (Chief Mechanic verification): what remains is the verification queue page and proof files; the Verify and Send back moves exist.
 - [ ] Scope feature 33 (admin override): build it as the one bypass of the table, reusing `applyStatusMove` effects and the finished field clearing in *Key invariants*.
-- [ ] Features 18, 53, 57: switch on M1 and M2 when assignment changes.
+- [x] Feature 18: M1 is switched on by `POST /repairs/:id/assignments` (spec 0016).
+- [ ] Features 53, 57: switch on M2 (and M1 for adding mechanics later) when assignment changes.
 - [ ] Features 31, 37, 38, 39: switch on M7 to M13 through `applyStatusMove` with their trigger.
 - [ ] Feature 28: notify the mechanic on Send back and Verify (WL-212).
 - [ ] Feature 22: add `proof` to M4's needs.

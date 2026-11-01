@@ -23,7 +23,8 @@
 | **Vehicle status** | *Code:* `AVAILABLE`, `UNDER_REPAIR`, `UNDER_MAINTENANCE`, shared with VMMS; `UNDER_REPAIR` wins a conflict. *Jira (WL-501, unanswered):* set automatically from the ticket, plus a manual toggle with a reason. |
 | **In house / Outsourced** | Who does the repair. Business rule (WL-401, confirmed): try in-house first; outsourcing needs a justification. In-house mechanics are records in `mechanics`. |
 | **Outsourced shop** | *Jira (WL-405).* An entry in the Admin-managed shop directory. Shops get no system access: Admin or Chief Mechanic records the transfer, prints a job order, then uploads the receipt and total cost to close it (WL-404/402). Replaces the old free-text shop name. |
+| **Driver license number** | The driver key: an LTO number like `A01-23-456789`, unique per driver. A new driver is added by it, and a license that already belongs to a driver answers with that driver (spec 0016). |
 | **Driver verification** | `isVerified` flag on the ticket's driver, set by Admin. Hidden from mechanics. (BRD; not in Jira.) |
 | **Lump sum** | Parts cost entered as one total instead of itemized parts. (BRD.) |
 | **Total cost** | Parts cost + labor cost, computed automatically. Outsourced cost comes from the receipt. |
-| **Account type** | On a ticket: Online or Corporate customer (Corporate needs a corporation). The code's `AccountType` enum means something else: `IN_HOUSE` / `OUTSOURCED`. |
+| **Account type** | On a ticket: Online or Corporate customer (Corporate needs a corporation). Stored on the ticket since spec 0016, with the corporation name as a snapshot. The code's `AccountType` enum means something else: `IN_HOUSE` / `OUTSOURCED`. |

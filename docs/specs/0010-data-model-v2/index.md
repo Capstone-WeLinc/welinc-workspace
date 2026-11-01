@@ -2,6 +2,7 @@
 
 **Date**: 2026-10-29
 **Updated**: 2026-10-31 (the interim *State transitions* section is replaced by spec 0014's transition table)
+**Updated**: 2026-11-01 (spec 0016 stores `accountType`, `corporation` and `priorVehicleStatus` on the ticket, and `VehicleChange` replaces the planned `VehicleStatusChange`)
 **Status**: Accepted
 
 Decision history (context, options, rationale): [rationale.md](rationale.md).
@@ -81,6 +82,9 @@ The baseline is today's schema with the changes below. Every table and column no
 | `dueAtSource` | `DueAtSource` | yes | set together with `dueAt` |
 | `lastActivityAt` | timestamptz | no | default `now()`; see AC-10 |
 | `closedAt` | timestamptz | yes | renamed from `completedAt` |
+| `accountType` | `TicketAccountType` (`ONLINE`, `CORPORATE`) | yes | added by spec 0016; null on old tickets |
+| `corporation` | varchar(100) | yes | added by spec 0016; the corporation name as a snapshot, null for `ONLINE` |
+| `priorVehicleStatus` | `VehicleStatus` | yes | added by spec 0016; the truck's status just before create, so a `DISABLED` truck goes back to `DISABLED` after the repair |
 | removed | | | `isArchived`, `durationDays`, `durationHours`, `failedVerificationReason`, and the hidden `mechanics` many to many |
 
 New indexes: `(repairStatus, lastActivityAt)` for the stuck and stale checks, `(dueAt)` for overdue lists. The existing `(repairStatus, createdAt)` and `(vehicleId)` stay.
@@ -142,7 +146,7 @@ Values in `changes` are raw values stored as strings (`"IN_PROGRESS"`, `"1200.00
 
 Each feature adds its table in its own migration, exactly as below, unless its own spec finds a real reason to change it (then that spec says so). "Who" fields follow the same rule everywhere: a welinc-auth user id with no foreign key, plus a name copied at the time.
 
-**`VehicleStatusChange`** (feature 25): `id`, `vehicleId` (foreign key), `fromStatus` and `toStatus` (`VehicleStatus`), `reason` (text, required for a manual change), `repairTicketId` (optional foreign key), `changedByUserId` and `changedByName` (empty for automatic changes), `createdAt`. Index `(vehicleId, createdAt)`.
+**`VehicleStatusChange`** (feature 25; **replaced by `VehicleChange`** in spec 0016, one history per truck with a `field` column, so feature 25 writes `field: 'status'` rows there and does not create this table). Original design: `id`, `vehicleId` (foreign key), `fromStatus` and `toStatus` (`VehicleStatus`), `reason` (text, required for a manual change), `repairTicketId` (optional foreign key), `changedByUserId` and `changedByName` (empty for automatic changes), `createdAt`. Index `(vehicleId, createdAt)`.
 
 **`Attachment`** (feature 20): `id`, `repairTicketId` (foreign key), `outsourcedJobId` (optional foreign key, for receipts), `kind` (new enum `AttachmentKind`: `VEHICLE_PHOTO`, `PROOF`, `RECEIPT`), `storageKey` (unique, the bytes live where feature 20 decides), `thumbnailKey` (optional), `fileName` (varchar 255), `mimeType` (varchar 100), `sizeBytes` (int), `uploadedByUserId`, `uploadedByName`, `createdAt`, `deletedAt` (optional, soft delete so audit can still point at it). Index `(repairTicketId, kind)`.
 
@@ -287,7 +291,7 @@ Tracer Bullet, adjusted for a squash: the baseline is one piece and Prisma regen
 
 **Neutral**:
 - Which status moves are allowed (backward moves, override, holds, outsourcing) stays with feature 16.
-- The account and corporation fields in the create body (`accountType`, `corporation`) are still accepted and not stored; feature 18 decides them.
+- The account and corporation fields in the create body (`accountType`, `corporation`) are now stored (spec 0016 decided it in feature 18).
 
 ## Follow-up
 
@@ -296,7 +300,7 @@ Tracer Bullet, adjusted for a squash: the baseline is one piece and Prisma regen
 - [ ] Feature 3: record that the Python service breaks on this baseline, and that the pgvector image switch for `vrms-db` happens there.
 - [ ] Feature 56: record that `Booking`, `MaintenanceSchedule`, `ChecklistTemplate` and `ChecklistItem` were dropped from VRMS on 2026-10-29, and bring them back only if the meeting decides VRMS owns them.
 - [ ] New scope feature, Slice 1 after features 18 and 53: mechanic workload on the Users page (an Occupied badge when a mechanic has an `IN_PROGRESS` ticket, open counts by status, an Occupied or Free filter, a Tickets section with unassign or reassign in the user dialog, counts in the picker). The Chief Mechanic sees it read only, under the name **Mechanics**, through a feature 5 permission.
-- [ ] Feature 18: decide whether `accountType` and `corporation` are stored or removed from the form.
+- [x] Feature 18: decide whether `accountType` and `corporation` are stored or removed from the form. Stored, by spec 0016.
 - [ ] Features 30 and 31: Prisma may not model partial unique indexes, so a later generated migration could treat them as drift and drop them. Check the `prisma-cli` skill first; if Prisma 7 can't express them, write them as raw SQL with a `///` note on the model, and check every later migration doesn't drop them.
 - [ ] Feature 25: the vehicle status change on close or cancel runs outside the status transaction today (`repairs.service.ts`, the vehicle update before the audit write), so a failed write can leave the truck marked Available. Fix it when feature 25 rewrites that code.
 - [ ] Feature 32: filter `COST_UPDATE` events out of the mechanic timeline.

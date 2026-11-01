@@ -13,6 +13,7 @@
 | One active ticket per mechanic (auto-removed from the picker) | Not in Jira; the picker shows each mechanic's open-ticket count instead | Jira WL-201 |
 | Shared monolith, shared database | Microservices, one database per service | Code; team lead 2026-10-22 |
 | 8 sprints of 2 weeks | Jira's sprint plan | Jira |
+| Mechanic required on every new ticket, driver typed by name | Mechanics are optional so a ticket starts Open and is assigned later; a driver is picked by search or added in place, keyed by the LTO license number; a truck can have one open ticket at a time | Spec 0016 |
 | Driver details, license photo, cost vs income, daily and monthly reports | Not carried in Jira; treat as possibly dropped | [system-overview.md](system-overview.md) |
 | Mechanics on a separate mobile app | Responsive web now, then one mobile app shared with VMMS | Scope, slice 7 (feature 48) |
 
@@ -54,12 +55,12 @@ IDs are the BRD's (`VR-` validation rule, `AC-` acceptance criterion) and the ol
 |---|---|
 | Repair number | Unique, generated on submit, format `REP-YYYYMMDD-XXXX`, never changes after go live |
 | Created date and time | Auto (MM/DD/YYYY, HH:MM:SS in the BRD; the UI shows `YYYY-MM-DD` per `design.md`), not editable by anyone |
-| Account type | Dropdown: Online, Corporate. Admin-managed list. Mandatory |
-| Corporation | Dropdown, shown only for Corporate. Admin-managed |
+| Account type | Dropdown: Online, Corporate. Mandatory. Saved on the ticket (spec 0016) |
+| Corporation | Dropdown, shown only for Corporate. Admin-managed lookup list; the ticket stores the name as a snapshot (spec 0016) |
 | Plate number | Dropdown from Admin-managed list. Mandatory |
 | Garage location | Dropdown, predefined. Mandatory (VR-RL-09) |
 | Driver name | Text, required, **max 100** chars (VR-RL-05/07) |
-| Driver license number | Text, required, format validated, unique identifier to prevent duplicate drivers (VR-RL-06) |
+| Driver license number | Text, required, format validated, unique identifier to prevent duplicate drivers (VR-RL-06). It is the driver key: an LTO number such as `A01-23-456789`, and a duplicate answers with the existing driver (spec 0016) |
 | Odometer | Required, numeric (VR-RL-10) |
 | isVerified | Per ticket, unverified by default, Admin sets it. **Never visible to mechanics** (VR-RL-08) |
 | License photo | Optional, Admin only, web only, hidden from mechanics |

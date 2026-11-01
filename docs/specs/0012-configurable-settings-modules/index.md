@@ -2,6 +2,7 @@
 
 **Date**: 2026-10-30
 **Updated**: 2026-10-30 (Recent changes asked by key, AC-31; change rows read with units and the reset value, AC-26; AC-24 review step and a required reason when a right is removed)
+**Updated**: 2026-11-01 (spec 0016 adds generic lookup lists, a Vehicles section and one threshold; see Follow-up)
 **Status**: Accepted
 
 ## Summary
@@ -241,7 +242,10 @@ Tracer Bullet: one threshold end to end first, then modules through every layer,
 ## Follow-up
 
 - [ ] Feature 3 (analytics and AI boundary): switch to incremental embedding (embed each issue once on save and store the vector, never re-embed in a loop), then add an `ai.embed_catchup_days` setting to this catalog so turning AI back on embeds only the missing issues from that window. Declare `module.ai` `requires: ['module.knowledge']` once AI is grounded on the knowledge base, and remove the Python service's `app_settings` read when it retires.
-- [ ] Feature 40 (lookup lists): add parts, reasons and locations to the Lookup lists section on `lookups.manage`.
+- [ ] Feature 40 (lookup lists): add parts, reasons and locations to the Lookup lists section on `lookups.manage`. Spec 0016 already added the generic `LookupValue` table for this: add a list to the code catalog (`lookup-lists.ts`) and it appears.
+- [x] Spec 0016 widened the Lookup lists section (AC-25) with two generic lists beside Issue categories, `vehicle_type` (Vehicle types) and `corporation` (Corporations), behind `lookups.manage`. Their changes join Change history (AC-26) as another source with the actions Added, Renamed, Deactivated and Reactivated.
+- [x] Spec 0016 added a Vehicles section at `/settings/vehicles` (a type per truck), shown only with `vehicle.manage`, so the hub now has six sections where AC-21 says five.
+- [x] Spec 0016 added the threshold `tickets.odometer_jump_warn_km` (default 20000, min 1000, max 200000, unit km) to Thresholds (AC-23). A new ticket reading above the truck's last one by more than this needs confirming.
 - [ ] Features 42 and 43: add their durations and stuck or stale thresholds as catalog entries, not constants.
 - [x] Spec 0007: tick its follow-up "the future configurable settings spec replaces `KNOWLEDGE_SETTINGS`" when this ships.
 - [x] Spec 0011: note that AC-25 is replaced by this spec's AC-24, and tick its feature 52 follow-up when this ships.
