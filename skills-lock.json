@@ -19,6 +19,12 @@
       "skillPath": "skills/audit/SKILL.md",
       "computedHash": "f388e74b95dcfea40615dcce28223b9166e9213867ac35e9971b549b7cda1eae"
     },
+    "azure-blob-storage": {
+      "source": "microsoftdocs/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/azure-blob-storage/SKILL.md",
+      "computedHash": "120987f0a2386782eca9b4aafcb621c5de6cbc892795ab29cd5a16cbfe88c685"
+    },
     "azure-container-apps": {
       "source": "microsoftdocs/agent-skills",
       "sourceType": "github",
