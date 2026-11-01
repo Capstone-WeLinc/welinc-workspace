@@ -139,6 +139,10 @@ Values in `changes` are raw values stored as strings (`"IN_PROGRESS"`, `"1200.00
 | `UNLOCK` | `isUnlocked` (`"false"` to `"true"`) | the unlock reason (also kept in `unlockReason`) |
 | `GARAGE_CHANGE` (was `SHOP_CHANGE`) | `garage` (the garage names before and after) | none |
 | `KNOWLEDGE_LINK` | `knowledgeEntry` (entry names before and after), plus `issueId` (after only) so the timeline knows which issue | none |
+| `ATTACHMENT_ADDED` (spec 0017) | `attachment` (`"<Kind label>: <fileName>"` in after), plus `attachmentId` and `kind` (after only) so the timeline knows which file and the readers can hide documents | none |
+| `ATTACHMENT_REMOVED` (spec 0017) | `attachment` (`"<Kind label>: <fileName>"` in before), plus `attachmentId` and `kind` (after only) | none |
+
+Readers hide the two attachment actions when `kind` is `RECEIPT` or `OTHER_DOCUMENT` and the caller lacks `ticket.costs.view` (spec 0017, AC-16). A duplicate upload writes no row.
 
 `KnowledgeEntryChange` follows the same rule with its existing actions (`ENTRY_CREATED`, `ENTRY_UPDATED`, `ENTRY_STATUS`, `CATEGORY_CREATED`, `CATEGORY_UPDATED`, `CATEGORY_STATUS`): one row per save, with every changed field in `changes`. New actions in later features add a row to this table in their own spec.
 
@@ -148,7 +152,7 @@ Each feature adds its table in its own migration, exactly as below, unless its o
 
 **`VehicleStatusChange`** (feature 25; **replaced by `VehicleChange`** in spec 0016, one history per truck with a `field` column, so feature 25 writes `field: 'status'` rows there and does not create this table). Original design: `id`, `vehicleId` (foreign key), `fromStatus` and `toStatus` (`VehicleStatus`), `reason` (text, required for a manual change), `repairTicketId` (optional foreign key), `changedByUserId` and `changedByName` (empty for automatic changes), `createdAt`. Index `(vehicleId, createdAt)`.
 
-**`Attachment`** (feature 20): `id`, `repairTicketId` (foreign key), `outsourcedJobId` (optional foreign key, for receipts), `kind` (new enum `AttachmentKind`: `VEHICLE_PHOTO`, `PROOF`, `RECEIPT`), `storageKey` (unique, the bytes live where feature 20 decides), `thumbnailKey` (optional), `fileName` (varchar 255), `mimeType` (varchar 100), `sizeBytes` (int), `uploadedByUserId`, `uploadedByName`, `createdAt`, `deletedAt` (optional, soft delete so audit can still point at it). Index `(repairTicketId, kind)`.
+**`Attachment`** (feature 20): `id`, `repairTicketId` (foreign key), `outsourcedJobId` (optional foreign key, for receipts), `kind` (new enum `AttachmentKind`: `VEHICLE_PHOTO`, `PROOF`, `RECEIPT`), `storageKey` (unique, the bytes live where feature 20 decides), `thumbnailKey` (optional), `fileName` (varchar 255), `mimeType` (varchar 100), `sizeBytes` (int), `uploadedByUserId`, `uploadedByName`, `createdAt`, `deletedAt` (optional, soft delete so audit can still point at it). Index `(repairTicketId, kind)`. Built by [spec 0017](../0017-file-upload-storage/index.md) with changes listed there: kind `OTHER_DOCUMENT`, `issueId`, `width`, `height`, `sha256`, `deletedByUserId`, `deletedByName` and `purgedAt` added, and `outsourcedJobId` left for the outsourcing feature's migration.
 
 **`Notification`** (feature 28): `id`, `recipientUserId` (welinc-auth id, no foreign key), `type` (varchar 50, names in code like audit events), `repairTicketId` (optional foreign key), `message` (varchar 300), `readAt` (optional), `createdAt`. Index `(recipientUserId, readAt, createdAt desc)`. Email and push delivery records are feature 28's call.
 

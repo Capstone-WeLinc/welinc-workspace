@@ -10,6 +10,7 @@ WL-203. Replace free text with Admin managed pickers (issue types, parts, reason
 - Note (2026-10-25): spec 0007 already makes the repair form's "System" list admin managed (`IssueCategory`, with a categories page). Reuse it as the issue type list instead of building a second one; this feature still owns parts, reasons and locations.
 - Note (2026-10-29): the lists are managed from the Settings hub (feature 52), not on pages of their own.
 - Note (2026-10-30): spec 0012 built the Lookup lists section of the hub with issue categories on `lookups.manage`. Add parts, reasons and locations there.
+- Note (2026-11-01, replan): from spec 0016. Generic `LookupValue` lists already exist (vehicle types, corporations). Move root causes and other plain lists into them.
 - [ ] Design it (spec): `/architect lookup lists`
 - [ ] Polish it (optional, ask first): `impeccable` · `web-design-guidelines` · `break-ui` (long list items, empty lists, many items)
 

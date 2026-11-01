@@ -61,27 +61,40 @@ WL-201, WL-202, and the ordering half of WL-401. Create a ticket with pickers an
 No Jira ticket yet. After a ticket is created, Admin can fix its driver, assigned mechanics and issues (add, remove, edit). Today nothing on a ticket can change except status, costs, the known fix link and step ticks. Design it together with feature 18, after feature 16.
 **Done when:** Admin can edit the driver, mechanics and issues on an open ticket, each change writes an audit row with before and after, a mechanic sees a reassignment within 3 seconds (VR-RL-12), and a stale edit is rejected with the existing 409 reload.
 - Note (2026-11-01, replan): from spec 0015. When this adds its permission key, default the Chief Mechanic to reassign **on**.
+- Note (2026-11-01, replan): from spec 0016. Reuse `ticket.assign` for reassign. Let an Admin correct a ticket's odometer (the floor follows it). Add mechanics to Assigned or In Progress tickets.
 - [ ] Design it (spec): `/architect admin ticket editing`
 - [ ] Polish it (optional, ask first): `emil-design-eng` (edit dialogs) · `web-design-guidelines` · `break-ui` (long issue text, many mechanics)
 
-### 19. Mechanic status updates · planned
+### 19. Mechanic status updates · done
 WL-107. Mechanics move their own tickets forward from a phone.
 **Done when:** only the assigned mechanic sees the control, only allowed transitions show, the server rejects anyone else, and each change is logged.
 - Note (2026-11-01, replan): most of the server work landed in spec 0014 (transition table, `moves` on the ticket, `nextAction.ts`). What is left is the phone UI at 375px.
-- [ ] Build it: `/develop mechanic status updates`
+- Note (2026-11-01, develop): checked the code against the four Done when points. Spec 0014 already built and verified them, including the bottom action bar at 375px (`NextActionBar.tsx`, AC-15). Nothing is left to build, so Build it is skipped and the feature goes straight to verify as the Mechanic at 375px.
+- [~] Build it: `/develop mechanic status updates` (skipped, covered by spec 0014)
+- [x] Verify it: `/check verify mechanic status updates` (2026-11-01: passed as the seed Mechanic. API and a 375px browser pass, every Done when point shown)
+- [~] Test it: `/test mechanic status updates` (skipped 2026-11-01: spec 0014 tests already lock the behavior)
 - [ ] Polish it (optional, ask first): `impeccable` or `emil-design-eng` (one taste skill per change; motion: status change on a phone, bottom sheets) · `web-design-guidelines`
 
-### 20. File upload & storage · planned · needs a decision · GA
-WL-218. One private upload service for vehicle photos, proof and receipts.
-**Done when:** JPG, PNG, HEIC and PDF up to a set size are accepted, files open only through authorized links, and each file records ticket, type, uploader and time.
-- [ ] Design it (spec): `/architect file upload & storage`
-- [ ] Extra skills (optional, ask first): `docker-patterns`
+### 20. File upload & storage · in-progress · GA
+WL-218, plus WL-209 and WL-210 (feature 21 folded in). One private upload service for vehicle photos, proof, receipts and other documents, and the vehicle photos screens on top of it. Spec: [0017](../specs/0017-file-upload-storage/index.md)
+**Done when:** JPG, PNG, HEIC and PDF up to a set size are accepted, files open only through authorized links, and each file records ticket, type, uploader and time. Up to 5 photos per ticket upload with progress and retry, thumbnails show in Issue Details, and a mechanic can remove their own until the ticket closes.
+- Note (2026-11-01): spec 0017 decided it. Files go in private Azure Blob Storage (Azurite locally) and open through 10 to 20 minute signed links. Every upload goes through backend-vrms, which sniffs the type, converts HEIC, shrinks photos and rebuilds PDFs without scripts. Three settings (size 10 MB, 5 photos, 20 documents), three permission keys (`ticket.files.add`, `ticket.documents.add`, `ticket.files.remove_any`), receipts and other documents hidden without `ticket.costs.view`, soft delete with a 30 day purge. Feature 21 (vehicle photos) is built here. Crosses backend-vrms, web-vrms, the workspace compose file and `welinc-auth/nginx.conf`.
+- Note (2026-11-01): from spec 0017, carried to other features: 26 (spec 0008 Bicep gets the storage account, container, managed identity role, `STORAGE_*` settings and the gateway body size), 22 (a proof cap, and `proof` on move M4), 38 (`outsourcedJobId` on `Attachment` and the receipt upload), 49 (persist the upload queue).
+- [x] Design it (spec): `/architect file upload & storage`
+- [ ] Build it: `/develop file upload & storage`
+  - [x] Thin thread: Azurite, the `Attachment` migration, `FileStore` with signed links, one JPEG or PNG photo end to end into Issue Details, `/uploads/` route removed (AC-1, AC-2, AC-6, AC-15, AC-20)
+  - [x] Upload rules: access guard, sniffing, size and pixel caps, HEIC, duplicates, caps under the lock, error order, rate limit, gateway limits (AC-3 to AC-14, AC-12a, AC-12b)
+  - [x] Permissions, remove and audit: three keys and CASL actions, document visibility, delete, audit events and their filter (AC-15 to AC-18)
+  - [ ] Phone photo UX: Take photo and Choose photos, browser shrink, upload queue with retries, lightbox viewer, remove, link refresh (AC-21 to AC-26)
+  - [ ] Documents and retention: PDF disarm and rebuild, Documents card, purge and orphan sweep, tests and axe at 375px and 1280px (AC-4, AC-7, AC-19, AC-27, AC-28)
+- [ ] Verify it: `/check verify file upload & storage`
+- [ ] Test it: `/test file upload & storage`
+- [ ] Review it (fresh model): `/check review file upload & storage`
+- [ ] Document it: `/document file upload & storage`
+- [ ] Polish it / Extra skills (optional, ask first): `docker-patterns` (Azurite service) · `azure-blob-storage` once installed · `impeccable` or `emil-design-eng` (one taste skill per change; motion: photo viewer) · `web-design-guidelines` · `break-ui` (huge photos, many photos, failed uploads, long file names)
 
-### 21. Vehicle photos · planned
-WL-209 and WL-210. Mechanics snap photos from the phone camera; reviewers see thumbnails and a full size viewer.
-**Done when:** up to 5 photos per ticket upload with progress and retry, thumbnails show in Issue Details, and a mechanic can remove their own until the ticket closes.
-- [ ] Build it: `/develop vehicle photos`
-- [ ] Polish it (optional, ask first): `impeccable` or `emil-design-eng` (one taste skill per change; motion: photo viewer) · `web-design-guidelines` · `break-ui` (huge photos, many photos, failed uploads)
+### 21. Vehicle photos · dropped
+WL-209 and WL-210. Folded into feature 20 on 2026-11-01 (spec 0017 builds the photo screens with the upload service). Kept for history.
 
 ### 22. Proof of completion · planned
 WL-211. No ticket is marked done without evidence.
@@ -111,12 +124,14 @@ WL-501, built on Jira's proposed rules. A truck under repair can't be dispatched
 - Note (2026-10-29): safe to build before the integration meeting, but feature 56 (integration contract) may change it: vehicle status is shared with VMMS (`UNDER_REPAIR` and `UNDER_MAINTENANCE` on the same vehicle).
 - Note (2026-10-29): spec 0010 adds `DISABLED` to the vehicle statuses and designs the `VehicleStatusChange` history table for this feature to create. Also fix the vehicle status change on close or cancel, which runs outside the status transaction today, so a failed write can leave the truck marked Available.
 - Note (2026-11-01, replan): that close and cancel fix shipped in spec 0014 (the truck release now runs inside the status transaction). What is left is the history table, the Admin toggle and Under Repair on create.
+- Note (2026-11-01, replan): from spec 0016. Under Repair on create now ships in feature 18, with `VehicleChange` (`field: 'status'`) as the history table. What is left: the Admin status toggle in the Settings Vehicles section, behind `vehicle.manage`. A ticket's release restores the stored `priorVehicleStatus`, so the toggle must not be overwritten by it while a ticket is open.
 - [ ] Build it: `/develop vehicle availability`
 - [ ] Polish it (optional, ask first): `web-design-guidelines`
 
 ### 57. Mechanic workload on the Users page · planned · from spec 0010
 See who is busy before assigning. Build after features 18 and 53, since it reuses their counts and the unassign endpoint.
 **Done when:** mechanic rows show an Occupied badge (at least one In Progress ticket) and open counts by status, an Occupied or Free filter stays in the address, the user dialog lists the mechanic's open tickets with links and Unassign or Reassign (each audit logged, with the 409 stale check), the assignment picker shows the same counts, and the Chief Mechanic sees it read only under the name Mechanics (a feature 5 permission). No new page.
+- Note (2026-11-01, replan): from spec 0016. Reuse `openCount` and `busy` from the assignment picker, and `ticket.assign` for Unassign and Reassign.
 - [ ] Build it: `/develop mechanic workload`
 - [ ] Polish it (optional, ask first): `web-design-guidelines` · `break-ui` (busy and idle mechanics, huge counts)
 
@@ -136,6 +151,7 @@ WL-304. The shared notification service every alert uses, across in app, email a
 **Done when:** assignments, transfers, holds, verifications and deadline alerts create notifications, clicking one opens the ticket, new ones appear without a reload, and each alert also goes out by email or push where its rule says so.
 - Note (2026-10-29): channels are in app, email and push to the mobile app. SMS is out of scope: it costs money per message (about 0.56 pesos a text at Semaphore, double for OTP) and in app plus push already reach mechanics. Today only welinc-auth sends email (OTP, reset, setup codes), and VMMS and BMS each run their own mail sender. Email goes through Brevo over SMTP, subject to change at the integration meeting or in the spec (it needs only new `SMTP_*` values). Today welinc-auth sends through a personal Gmail account, which is fine for development but must move to Brevo with a sender address you control before staging. The spec decides which alert goes on which channel. Feature 56 may turn this into one notification service for all three systems.
 - Note (2026-11-01, replan): from spec 0014. Notify the mechanic on Send back and on Verify (WL-212).
+- Note (2026-11-01, replan): from spec 0016. Notify the mechanic on create with mechanics and on assign (WL-201, VRMS-67).
 - [ ] Design it (spec): `/architect in-app notifications`
 - [ ] Polish it (optional, ask first): `emil-design-eng` (notification popover and toasts) · `web-design-guidelines`
 
