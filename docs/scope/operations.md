@@ -24,6 +24,7 @@ spec [0007](../specs/0007-knowledge-base-fix-library/index.md)
 WL-206 and WL-207. Expected completion from priority and issue type, with a rule for which wins.
 **Done when:** each ticket shows a deadline from creation, Admin configures durations, changes need a logged reason, overdue tickets are highlighted, and the mechanic is warned 24 hours before.
 - Note (2026-10-30): spec 0012 follow up. Add the duration settings as entries in the settings catalog (Thresholds section), not code constants.
+- Note (2026-11-01, replan): from spec 0015. Default the Chief Mechanic to **on** for setting fix time estimates. Reuse `repair_tickets.status_changed_at` for time in status.
 - [ ] Design it (spec): `/architect deadlines & fix time estimates`
 - [ ] Polish it (optional, ask first): `web-design-guidelines` · `break-ui` (overdue by years, due today, missing estimates)
 
@@ -31,6 +32,7 @@ WL-206 and WL-207. Expected completion from priority and issue type, with a rule
 WL-302 and WL-303, built on proposed defaults. A scheduled check flags tickets stuck in Pending and escalates ones untouched for 30 days.
 **Done when:** the threshold is Admin configurable, stuck tickets get a tag and a filter, and stale ones escalate weekly and show on a report.
 - Note (2026-10-30): spec 0012 follow up. Add the stuck and stale thresholds as entries in the settings catalog, not code constants.
+- Note (2026-11-01, replan): from spec 0015. Measure time in status with `repair_tickets.status_changed_at`, not the audit log.
 - [ ] Design it (spec): `/architect stuck and stale ticket alerts`
 - [ ] Polish it (optional, ask first): `web-design-guidelines`
 

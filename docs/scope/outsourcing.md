@@ -14,6 +14,7 @@ WL-405. An Admin managed list of approved shops.
 WL-401 and WL-404. Outsourcing only when no in house option is free, with a printable job order for the shop.
 **Done when:** outsourcing needs a justification or no available in house option, the ticket turns Outsourced with shop, date sent and expected completion, a job order PDF prints, and reports can show the in house vs outsourced ratio.
 - Note (2026-11-01, replan): from spec 0014. The outsourced moves (M7 to M13 in its table) are written but off; switch them on through `applyStatusMove` with this feature's trigger. Same for features 38 and 39.
+- Note (2026-11-01, replan): from spec 0015. Default the Chief Mechanic to **on** for recording an outsourced transfer and for closing it (feature 38).
 - [ ] Design it (spec): `/architect transfer to outsourced shop`
 - [ ] Polish it (optional, ask first): `impeccable` · `web-design-guidelines` · `break-ui` (long job order text for the printable page)
 
@@ -26,5 +27,6 @@ WL-402. Admin or Chief Mechanic uploads the receipt and total cost and marks it 
 ### 39. Management approval for outsourced repairs · planned
 WL-403, built on Jira's proposed rules. An approver signs off outsourced work before it closes.
 **Done when:** after the receipt upload the ticket waits for approval, the approver is notified and approves or rejects with a reason, and their name and date are recorded.
+- Note (2026-11-01, replan): from spec 0015. Default the Chief Mechanic to **off** for approving outsourced spend, since that is a management call.
 - [ ] Build it: `/develop management approval`
 - [ ] Polish it (optional, ask first): `web-design-guidelines`

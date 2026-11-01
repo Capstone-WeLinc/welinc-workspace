@@ -40,17 +40,27 @@ WL-104. A role that sees all tickets and owns verification, following the permis
 - [x] Test it: `/test chief mechanic role` (2026-11-01: added two AC-16 edge cases to `nextAction.test.ts`; web 141 tests green)
 - [x] Polish it (optional, ask first): `impeccable` · `web-design-guidelines` · `break-ui` (empty and long queues, long names, clock skew) (2026-11-01: ran `break-ui` only, fixes applied; the other two skipped)
 
-### 18. New repair ticket & assignment · planned · needs a decision
-WL-201, WL-202, and the ordering half of WL-401. Create a ticket with pickers and auto-filled vehicle and reporter details, then assign in house mechanics first, showing each one's open ticket count.
+### 18. New repair ticket & assignment · done
+WL-201, WL-202, and the ordering half of WL-401. Create a ticket with pickers and auto-filled vehicle and reporter details, then assign in house mechanics first, showing each one's open ticket count. Spec: [0016](../specs/0016-new-ticket-assignment/index.md)
 **Done when:** a ticket is created as Assigned or Open, vehicle details fill in within a second, in house options list first, and the mechanic is notified once notifications exist.
 - Note (2026-10-29): spec 0010 already stores priority and the reporter on the ticket. Still to decide here: whether `accountType` and `corporation` are stored or dropped from the form, and whether the server blocks a second open ticket on an `UNDER_REPAIR` truck (today only a warning).
 - Note (2026-11-01, replan): from spec 0014. Switch on its moves M1 and M2 (assignment changes the status) when assignment is built here. Applies to features 53 and 57 too.
-- [ ] Design it (spec): `/architect new repair ticket & assignment`
+- Note (2026-11-01): spec 0016 decided it. Create is one locked transaction with one open ticket per truck (409), tickets may start Open and get an Assign action (M1, new `ticket.assign` key), account type and corporation are stored, drivers are keyed by LTO license, and there are new generic lookup lists (vehicle types, corporations) plus a Settings Vehicles section (new `vehicle.manage` key). Its Follow-up carries notes for features 25, 28, 36, 40, 53, 56 and 57.
+- [x] Design it (spec): `/architect new repair ticket & assignment`
+- [x] Build it: `/develop new repair ticket & assignment` (code in `welinc-backend-vrms/src/modules/vrms/`, `welinc-web-vrms/src/features/repair/`, `welinc-web-vrms/src/features/settings/`)
+  - [x] Thin thread, safe create: migration, locked transaction, Open or Assigned, one open ticket per truck, Disabled restore, form handling (AC-1 to AC-3, AC-9, AC-15)
+  - [x] Form data: account type and corporation, description fallback, driver by license, odometer floor and jump (AC-4 to AC-8, AC-13)
+  - [x] Vehicle facts and picker: vehicle summary card, driver prefill, open counts and Busy (AC-10 to AC-12, AC-14)
+  - [x] Assign later: `ticket.assign`, the assignments endpoint through M1, Assign mechanic dialog (AC-16 to AC-18)
+  - [x] Settings and sweep: lookup lists, Vehicles section with `vehicle.manage`, Change history, tests, axe, lint, typecheck, build (AC-19 to AC-22). The axe pass at 375px and 1280px is not run yet, left for `/check verify`
+- [x] Verify it: `/check verify new repair ticket & assignment` (2026-11-01: passed after the seed; the picker contrast and popup name were fixed in `819f8dc`)
+- [x] Test it: `/test new repair ticket & assignment` (2026-11-01: 18 tests added in backend-vrms; 812 backend and 159 web tests pass)
 - [ ] Polish it (optional, ask first): `impeccable` · `web-design-guidelines` · `break-ui` (long plates and names, no free mechanics, many issues)
 
 ### 53. Admin ticket editing · planned · needs a decision
 No Jira ticket yet. After a ticket is created, Admin can fix its driver, assigned mechanics and issues (add, remove, edit). Today nothing on a ticket can change except status, costs, the known fix link and step ticks. Design it together with feature 18, after feature 16.
 **Done when:** Admin can edit the driver, mechanics and issues on an open ticket, each change writes an audit row with before and after, a mechanic sees a reassignment within 3 seconds (VR-RL-12), and a stale edit is rejected with the existing 409 reload.
+- Note (2026-11-01, replan): from spec 0015. When this adds its permission key, default the Chief Mechanic to reassign **on**.
 - [ ] Design it (spec): `/architect admin ticket editing`
 - [ ] Polish it (optional, ask first): `emil-design-eng` (edit dialogs) · `web-design-guidelines` · `break-ui` (long issue text, many mechanics)
 
@@ -132,6 +142,7 @@ WL-304. The shared notification service every alert uses, across in app, email a
 ### 29. Notification badge & queue counts · planned
 WL-301. Unread count on the bell and counts on queue menus.
 **Done when:** the bell shows the unread count (99+ above 99) updating without a refresh, and sidebar queues show their pending counts.
+- Note (2026-11-01, replan): from spec 0015. The verification queue has no sidebar item, so its count lives on the Waiting for you tile of the Chief's dashboard. Reconsider a badge there.
 - [ ] Build it: `/develop notification badge`
 - [ ] Polish it (optional, ask first): `emil-design-eng` (badge changes) · `web-design-guidelines` · `break-ui` (0, 99 and 1000+ counts)
 
@@ -147,6 +158,7 @@ WL-208, built on proposed defaults. Pause a ticket for missing parts with the re
 **Done when:** a mechanic sets the hold with parts and reason, a verifier approves or rejects it, hold time is tracked for reports, and held tickets stand out in lists.
 - Note (2026-10-29): `TicketHold` is designed in spec 0010 with a partial unique index (raw SQL) for one open hold per ticket. Same Prisma drift risk as feature 30: check the `prisma-cli` skill and make sure later generated migrations do not drop it.
 - Note (2026-11-01, replan): from spec 0014. The hold moves (M7 to M13 in its table) are written but off; switch them on through `applyStatusMove` with this feature's trigger. Same for features 37, 38 and 39.
+- Note (2026-11-01, replan): from spec 0015. Default the Chief Mechanic's "approve a parts hold" key to **on**.
 - [ ] Design it (spec): `/architect on hold for parts`
 - [ ] Polish it (optional, ask first): `web-design-guidelines`
 
