@@ -88,10 +88,10 @@ WL-218, plus WL-209 and WL-210 (feature 21 folded in). One private upload servic
   - [x] Phone photo UX: Take photo and Choose photos, browser shrink, upload queue with retries, lightbox viewer, remove, link refresh (AC-21 to AC-26)
   - [x] Documents and retention: PDF disarm and rebuild, Documents card, purge and orphan sweep, tests and axe at 375px and 1280px (AC-4, AC-7, AC-19, AC-27, AC-28)
 - [x] Verify it: `/check verify file upload & storage`
-- [ ] Test it: `/test file upload & storage`
+- [x] Test it: `/test file upload & storage`
 - [ ] Review it (fresh model): `/check review file upload & storage`
 - [ ] Document it: `/document file upload & storage`
-- [ ] Polish it / Extra skills (optional, ask first): `docker-patterns` (Azurite service) · `azure-blob-storage` once installed · `impeccable` or `emil-design-eng` (one taste skill per change; motion: photo viewer) · `web-design-guidelines` · `break-ui` (huge photos, many photos, failed uploads, long file names)
+- [x] Polish it / Extra skills (optional, ask first): `docker-patterns` (Azurite service) · `azure-blob-storage` once installed · `impeccable` or `emil-design-eng` (one taste skill per change; motion: photo viewer) · `web-design-guidelines` · `break-ui` (huge photos, many photos, failed uploads, long file names) (2026-11-01: ran `web-design-guidelines` and `break-ui`, all findings fixed; the rest skipped; axe on AC-28 still owed)
 
 ### 21. Vehicle photos · dropped
 WL-209 and WL-210. Folded into feature 20 on 2026-11-01 (spec 0017 builds the photo screens with the upload service). Kept for history.
