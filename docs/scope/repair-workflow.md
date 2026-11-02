@@ -110,7 +110,7 @@ WL-211. No ticket is marked done without evidence. Spec: [0018](../specs/0018-be
   - [x] Hardening: axe at 375px and 1280px, the race and release tests, and the unit tests (AC-7, AC-19)
 - [x] Verify it: `/check verify proof of completion`
 - [x] Test it: `/test proof of completion`
-- [ ] Polish it (optional, ask first): `emil-design-eng` (photo viewer menu) · `web-design-guidelines` · `break-ui` (missing photos, full groups, many photos, long uploader names)
+- [x] Polish it (optional, ask first): `emil-design-eng` (photo viewer menu) · `web-design-guidelines` · `break-ui` (missing photos, full groups, many photos, long uploader names)
 
 ### 23. Chief Mechanic verification · planned
 WL-212. Verify or reject finished work, with the verifier recorded.
