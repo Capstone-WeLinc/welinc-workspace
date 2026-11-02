@@ -212,7 +212,7 @@ Tracer Bullet: first a thin thread through every layer (the safe create, end to 
 - [ ] Scope feature 28: notify the mechanic on create with mechanics and on assign (WL-201, VRMS-67).
 - [ ] Scope feature 36: add the outsourced group after In house in the picker (WL-401).
 - [ ] Scope feature 56: decide who owns vehicle type once VMMS shares vehicle records.
-- [x] `docs/context/requirements.md` and the glossary: account type is now stored; the driver license is the key.
+- [x] `docs/context/vrms/requirements.md` and the glossary: account type is now stored; the driver license is the key.
 
 ## Rationale
 

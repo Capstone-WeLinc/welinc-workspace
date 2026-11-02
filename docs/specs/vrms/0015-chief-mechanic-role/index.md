@@ -197,7 +197,7 @@ Tracer Bullet: the first task runs one thin thread from the database to the Chie
 - [ ] Spec 0012: note the new yes or no value entry type and the `tickets.require_costs_to_close` key.
 - [ ] Spec 0014: note the `costs` need on the move to `CLOSED`, gated by the setting.
 - [ ] Spec 0010: note the new `repair_tickets.status_changed_at` column and index.
-- [ ] `docs/context/roles-and-users.md`: the Chief row gains read only costs and the verification queue dashboard.
+- [ ] `docs/context/vrms/roles-and-users.md`: the Chief row gains read only costs and the verification queue dashboard.
 - [ ] Chief defaults for later features, decided here (real world shop foreman split). When each feature adds its key, default the Chief to: feature 53 reassign **on**; feature 31 approve a parts hold **on**; features 37 and 38 record an outsourced transfer and close it **on**; feature 39 approve outsourced spend **off** (management); feature 42 set fix time estimates **on**.
 - [ ] Feature 29 (badges): the queue has no sidebar item, so its count lives on the Waiting for you tile; reconsider a badge there.
 - [ ] Features 42 and 43: reuse `status_changed_at` for time in status.

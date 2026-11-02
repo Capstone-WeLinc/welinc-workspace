@@ -17,7 +17,7 @@ WL-203. Replace free text with Admin managed pickers (issue types, parts, reason
 ### 41. Common issues picker · dropped
 WL-704 and WL-702. A curated list of recurring issues that fills in the ticket when picked. Decide how it relates to the existing AI knowledge base (feature G).
 **Done when:** Admin and Chief Mechanic manage common issues, the form lists them searchable and most used first, picking one fills type, template, priority and estimate, and Other allows free text.
-spec [0007](../specs/0007-knowledge-base-fix-library/index.md)
+spec [0007](../../specs/vrms/0007-knowledge-base-fix-library/index.md)
 - Note (2026-10-25): merged into feature 15 (knowledge base page). Spec 0007 builds the common issues library (WL-704) and this picker (WL-702, its AC-24 to AC-26), so the work is tracked and built there. The estimate shows as info only; saving it is feature 42's call.
 - [x] Design it (spec): covered by spec 0007
 
@@ -26,6 +26,7 @@ WL-206 and WL-207. Expected completion from priority and issue type, with a rule
 **Done when:** each ticket shows a deadline from creation, Admin configures durations, changes need a logged reason, overdue tickets are highlighted, and the mechanic is warned 24 hours before.
 - Note (2026-10-30): spec 0012 follow up. Add the duration settings as entries in the settings catalog (Thresholds section), not code constants.
 - Note (2026-11-01, replan): from spec 0015. Default the Chief Mechanic to **on** for setting fix time estimates. Reuse `repair_tickets.status_changed_at` for time in status.
+- Note (2026-11-03, replan): from spec 0019. Admins can now change a ticket's priority after create. Decide whether that recomputes a `dueAt` that came from priority.
 - [ ] Design it (spec): `/architect deadlines & fix time estimates`
 - [ ] Polish it (optional, ask first): `web-design-guidelines` · `break-ui` (overdue by years, due today, missing estimates)
 

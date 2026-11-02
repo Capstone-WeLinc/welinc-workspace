@@ -193,7 +193,7 @@ Links across databases (no foreign keys, by design): `Mechanic.authUserId` → w
 
 **Configuration required**:
 - `AUTH_SERVICE_URL` (welinc-backend-vrms): internal base URL of welinc-auth, `http://auth-service:3001` in Docker, `http://localhost:3001` locally. Add it to `.env.example` and `docker-compose.vrms.yml`.
-- `PORTAL_URL` (welinc-auth): the portal's public base URL for email links. Add it to `.env.example` and `docker-compose.auth.yml`. Required in production.
+- `PORTAL_URL` (welinc-auth): the portal's public base URL for email links. Add it to `.env.example` and `docker-compose.shared.yml`. Required in production.
 
 **Critical test scenarios**:
 - Happy path: add mechanic Pedro on the Users page; the sync runs; Pedro is in the `/repairs/new` picker; he signs in through the portal and sees only his tickets; verifies **AC-11**, **AC-12**, **AC-8**, **AC-22**.

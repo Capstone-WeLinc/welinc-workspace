@@ -7,7 +7,7 @@ The core loop (Jira WL-E2, plus WL-E5 and the WL-E1 role work), then the mechani
 Admin creates and assigns a ticket, the mechanic works it from a phone with photos and proof, the Chief Mechanic verifies it, and every step is logged. The thinnest real thread through every layer.
 
 ### 16. Ticket status lifecycle · done
-WL-200. One official list of statuses and who may move a ticket from which status to which, enforced by the backend. Spec: [0014](../specs/0014-ticket-status-lifecycle/index.md)
+WL-200. One official list of statuses and who may move a ticket from which status to which, enforced by the backend. Spec: [0014](../../specs/vrms/0014-ticket-status-lifecycle/index.md)
 **Done when:** final status names are recorded, invalid transitions are rejected with a clear error, and existing tickets migrate without loss.
 - [x] Design it (spec): `/architect ticket status lifecycle`
 - [x] Build it: `/develop ticket status lifecycle` (code in `welinc-backend-vrms/src/modules/vrms/ticket-transitions.ts`, `apply-status-move.ts`; `welinc-web-vrms/src/features/repair/lib/nextAction.ts`)
@@ -23,7 +23,7 @@ WL-200. One official list of statuses and who may move a ticket from which statu
 - Note (2026-10-29): spec 0010 fixes the nine status names (`OPEN` to `CLOSED`); this feature keeps the transition table. Also decide whether the Chief Mechanic can close (verify) a ticket, which only Admin can today, and add the optimistic lock that unlock and cancel lack (spec 0004).
 
 ### 17. Chief Mechanic role · done
-WL-104. A role that sees all tickets and owns verification, following the permission matrix. Spec: [0015](../specs/0015-chief-mechanic-role/index.md)
+WL-104. A role that sees all tickets and owns verification, following the permission matrix. Spec: [0015](../../specs/vrms/0015-chief-mechanic-role/index.md)
 **Done when:** Admin can assign the role, the Chief Mechanic sees every ticket and the verification queue, and the sidebar shows the badge.
 - Note (2026-10-25): spec 0007 (feature 15) adds the role itself: `CHIEF_MECHANIC` in welinc-auth, welinc-backend-vrms and the web app, assignable on the Users page, with its badge, knowledge base editing, and mechanic rules on tickets for now. What's left here is widening it to every ticket and the verification queue (with feature 23), once the permission matrix (feature 5) settles the exact rights.
 - Note (2026-10-29): spec 0002 asks for a Chief Mechanic dashboard (Jira VRMS-41) that reuses the dashboard tiles, with Waiting as the verification queue. Cover it here or with feature 23.
@@ -41,7 +41,7 @@ WL-104. A role that sees all tickets and owns verification, following the permis
 - [x] Polish it (optional, ask first): `impeccable` · `web-design-guidelines` · `break-ui` (empty and long queues, long names, clock skew) (2026-11-01: ran `break-ui` only, fixes applied; the other two skipped)
 
 ### 18. New repair ticket & assignment · done
-WL-201, WL-202, and the ordering half of WL-401. Create a ticket with pickers and auto-filled vehicle and reporter details, then assign in house mechanics first, showing each one's open ticket count. Spec: [0016](../specs/0016-new-ticket-assignment/index.md)
+WL-201, WL-202, and the ordering half of WL-401. Create a ticket with pickers and auto-filled vehicle and reporter details, then assign in house mechanics first, showing each one's open ticket count. Spec: [0016](../../specs/vrms/0016-new-ticket-assignment/index.md)
 **Done when:** a ticket is created as Assigned or Open, vehicle details fill in within a second, in house options list first, and the mechanic is notified once notifications exist.
 - Note (2026-10-29): spec 0010 already stores priority and the reporter on the ticket. Still to decide here: whether `accountType` and `corporation` are stored or dropped from the form, and whether the server blocks a second open ticket on an `UNDER_REPAIR` truck (today only a warning).
 - Note (2026-11-01, replan): from spec 0014. Switch on its moves M1 and M2 (assignment changes the status) when assignment is built here. Applies to features 53 and 57 too.
@@ -62,7 +62,7 @@ No Jira ticket yet. After a ticket is created, Admin can fix its driver, assigne
 **Done when:** Admin can edit the driver, mechanics and issues on an open ticket, each change writes an audit row with before and after, a mechanic sees a reassignment within 3 seconds (VR-RL-12), and a stale edit is rejected with the existing 409 reload.
 - Note (2026-11-01, replan): from spec 0015. When this adds its permission key, default the Chief Mechanic to reassign **on**.
 - Note (2026-11-01, replan): from spec 0016. Reuse `ticket.assign` for reassign. Let an Admin correct a ticket's odometer (the floor follows it). Add mechanics to Assigned or In Progress tickets.
-spec [0019](../specs/0019-admin-ticket-editing/index.md)
+spec [0019](../../specs/vrms/0019-admin-ticket-editing/index.md)
 - Note (2026-11-03): spec 0019 decided per section Edit dialogs on the detail page, a new `ticket.edit` key (Admin) beside `ticket.assign` (Admin and Chief), priority and account type with corporation added to the editable fields, edits in every open status and on unlocked closed tickets with a reason, an empty mechanic list allowed (Assigned goes back to Open, later statuses get a "No mechanic" flag), at least one issue always, an `edited*` stamp on the ticket, and 3 second polling while visible for VR-RL-12.
 - [x] Design it (spec): `/architect admin ticket editing`
 - [x] Build it: `/develop admin ticket editing` (2026-11-03: branch `feat/admin-ticket-editing` in backend-vrms and web-vrms; 1114 backend and 262 web tests pass; axe at 375px and 1280px as Admin, only the dev only Demo data pill flagged)
@@ -87,7 +87,7 @@ WL-107. Mechanics move their own tickets forward from a phone.
 - [ ] Polish it (optional, ask first): `impeccable` or `emil-design-eng` (one taste skill per change; motion: status change on a phone, bottom sheets) · `web-design-guidelines`
 
 ### 20. File upload & storage · done · GA
-WL-218, plus WL-209 and WL-210 (feature 21 folded in). One private upload service for vehicle photos, proof, receipts and other documents, and the vehicle photos screens on top of it. Spec: [0017](../specs/0017-file-upload-storage/index.md)
+WL-218, plus WL-209 and WL-210 (feature 21 folded in). One private upload service for vehicle photos, proof, receipts and other documents, and the vehicle photos screens on top of it. Spec: [0017](../../specs/vrms/0017-file-upload-storage/index.md)
 **Done when:** JPG, PNG, HEIC and PDF up to a set size are accepted, files open only through authorized links, and each file records ticket, type, uploader and time. Up to 5 photos per ticket upload with progress and retry, thumbnails show in Issue Details, and a mechanic can remove their own until the ticket closes.
 - Note (2026-11-01): spec 0017 decided it. Files go in private Azure Blob Storage (Azurite locally) and open through 10 to 20 minute signed links. Every upload goes through backend-vrms, which sniffs the type, converts HEIC, shrinks photos and rebuilds PDFs without scripts. Three settings (size 10 MB, 5 photos, 20 documents), three permission keys (`ticket.files.add`, `ticket.documents.add`, `ticket.files.remove_any`), receipts and other documents hidden without `ticket.costs.view`, soft delete with a 30 day purge. Feature 21 (vehicle photos) is built here. Crosses backend-vrms, web-vrms, the workspace compose file and `welinc-auth/nginx.conf`.
 - Note (2026-11-01): from spec 0017, carried to other features: 26 (spec 0008 Bicep gets the storage account, container, managed identity role, `STORAGE_*` settings and the gateway body size), 22 (a proof cap, and `proof` on move M4), 38 (`outsourcedJobId` on `Attachment` and the receipt upload), 49 (persist the upload queue).
@@ -108,7 +108,7 @@ WL-218, plus WL-209 and WL-210 (feature 21 folded in). One private upload servic
 WL-209 and WL-210. Folded into feature 20 on 2026-11-01 (spec 0017 builds the photo screens with the upload service). Kept for history.
 
 ### 22. Proof of completion · done
-WL-211. No ticket is marked done without evidence. Spec: [0018](../specs/0018-before-after-photos/index.md) · code in `welinc-backend-vrms/src/modules/attachments/`, `welinc-web-vrms/src/features/repair/`
+WL-211. No ticket is marked done without evidence. Spec: [0018](../../specs/vrms/0018-before-after-photos/index.md) · code in `welinc-backend-vrms/src/modules/attachments/`, `welinc-web-vrms/src/features/repair/`
 **Done when:** Mark as Complete stays disabled without a proof file, the server rejects completion without one, and proof shows on the verification screen.
 - Note (2026-11-01, replan): from spec 0014. Add `proof` to the needs of move M4 (to For verification) in the transition table.
 - Note (2026-11-02): spec 0018 makes this before and after photos on one strip, labelled by whether work has started, with Admin switches for Start work, Send for verification and Close. It also renames "Send back" to "Return to mechanic".
@@ -141,6 +141,7 @@ Code in `welinc-backend-vrms/src/modules/vrms/repairs.service.ts` (`findHistory`
 WL-219. Every ticket event logged in one consistent shape, so history and reports can trust it.
 **Done when:** every event type in WL-219 writes actor, role, time, before and after, and note, and no entry can be edited or deleted from the UI.
 - Note (2026-10-29): spec 0010 gives the audit log one shape (one row per event, its changes as a JSON list). Remarks and mechanic assignments are still not audited; decide whether they join the timeline.
+- Note (2026-11-03, replan): from spec 0019. Mechanic assignments and the new edit actions (driver, odometer, priority, account, issues) already write audit rows and join the timeline. Remarks are the main gap left.
 - [ ] Design it (spec): `/architect full ticket audit trail`
 
 ### 25. Vehicle availability · planned
@@ -157,6 +158,7 @@ WL-501, built on Jira's proposed rules. A truck under repair can't be dispatched
 See who is busy before assigning. Build after features 18 and 53, since it reuses their counts and the unassign endpoint.
 **Done when:** mechanic rows show an Occupied badge (at least one In Progress ticket) and open counts by status, an Occupied or Free filter stays in the address, the user dialog lists the mechanic's open tickets with links and Unassign or Reassign (each audit logged, with the 409 stale check), the assignment picker shows the same counts, and the Chief Mechanic sees it read only under the name Mechanics (a feature 5 permission). No new page.
 - Note (2026-11-01, replan): from spec 0016. Reuse `openCount` and `busy` from the assignment picker, and `ticket.assign` for Unassign and Reassign.
+- Note (2026-11-03, replan): from spec 0019. Unassign and Reassign should call `PUT /repairs/:id/assignments` (it already runs M1 and M2, the verifier block and the audit rows), not a new endpoint.
 - [ ] Build it: `/develop mechanic workload`
 - [ ] Polish it (optional, ask first): `web-design-guidelines` · `break-ui` (busy and idle mechanics, huge counts)
 
@@ -177,6 +179,7 @@ WL-304. The shared notification service every alert uses, across in app, email a
 - Note (2026-10-29): channels are in app, email and push to the mobile app. SMS is out of scope: it costs money per message (about 0.56 pesos a text at Semaphore, double for OTP) and in app plus push already reach mechanics. Today only welinc-auth sends email (OTP, reset, setup codes), and VMMS and BMS each run their own mail sender. Email goes through Brevo over SMTP, subject to change at the integration meeting or in the spec (it needs only new `SMTP_*` values). Today welinc-auth sends through a personal Gmail account, which is fine for development but must move to Brevo with a sender address you control before staging. The spec decides which alert goes on which channel. Feature 56 may turn this into one notification service for all three systems.
 - Note (2026-11-01, replan): from spec 0014. Notify the mechanic on Send back and on Verify (WL-212).
 - Note (2026-11-01, replan): from spec 0016. Notify the mechanic on create with mechanics and on assign (WL-201, VRMS-67).
+- Note (2026-11-03, replan): from spec 0019. Notify a mechanic when added to or removed from a ticket by an edit. Once a push channel exists, consider replacing the 3 second visible poll (`useVisiblePoll`) with SSE, or at least a light `GET /repairs/:id/version` check so phones on mobile data fetch only on change.
 - [ ] Design it (spec): `/architect in-app notifications`
 - [ ] Polish it (optional, ask first): `emil-design-eng` (notification popover and toasts) · `web-design-guidelines`
 
@@ -214,6 +217,7 @@ WL-205. A clickable timeline inside the ticket view, linked from My Repairs.
 WL-108, built on Jira's proposed rules. Admin fixes a wrong status with a reason.
 **Done when:** Admin can set any valid status with a required reason, the entry is marked Override in the timeline, and the mechanic is notified.
 - Note (2026-11-01, replan): from spec 0014. Build this as the one bypass of the transition table, reusing the `applyStatusMove` effects and its finished field clearing. Until it ships, a ticket closed by mistake can't be reopened in the app.
+- Note (2026-11-03, replan): from spec 0019. A ticket can now be In progress with no mechanic. Today only `ticket.administer` can move such an ownerless ticket; keep that path working here.
 - [ ] Build it: `/develop admin status override`
 - [ ] Polish it (optional, ask first): `web-design-guidelines`
 - Note (2026-10-25): this is how you move a ticket back. Follow feature 16's rule for the spec 0007 checklist and "What fixed it" notes on any backward move.
