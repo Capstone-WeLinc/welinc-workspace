@@ -57,12 +57,23 @@ WL-201, WL-202, and the ordering half of WL-401. Create a ticket with pickers an
 - [x] Test it: `/test new repair ticket & assignment` (2026-11-01: 18 tests added in backend-vrms; 812 backend and 159 web tests pass)
 - [ ] Polish it (optional, ask first): `impeccable` · `web-design-guidelines` · `break-ui` (long plates and names, no free mechanics, many issues)
 
-### 53. Admin ticket editing · planned · needs a decision
+### 53. Admin ticket editing · in-progress
 No Jira ticket yet. After a ticket is created, Admin can fix its driver, assigned mechanics and issues (add, remove, edit). Today nothing on a ticket can change except status, costs, the known fix link and step ticks. Design it together with feature 18, after feature 16.
 **Done when:** Admin can edit the driver, mechanics and issues on an open ticket, each change writes an audit row with before and after, a mechanic sees a reassignment within 3 seconds (VR-RL-12), and a stale edit is rejected with the existing 409 reload.
 - Note (2026-11-01, replan): from spec 0015. When this adds its permission key, default the Chief Mechanic to reassign **on**.
 - Note (2026-11-01, replan): from spec 0016. Reuse `ticket.assign` for reassign. Let an Admin correct a ticket's odometer (the floor follows it). Add mechanics to Assigned or In Progress tickets.
-- [ ] Design it (spec): `/architect admin ticket editing`
+spec [0019](../specs/0019-admin-ticket-editing/index.md)
+- Note (2026-11-03): spec 0019 decided per section Edit dialogs on the detail page, a new `ticket.edit` key (Admin) beside `ticket.assign` (Admin and Chief), priority and account type with corporation added to the editable fields, edits in every open status and on unlocked closed tickets with a reason, an empty mechanic list allowed (Assigned goes back to Open, later statuses get a "No mechanic" flag), at least one issue always, an `edited*` stamp on the ticket, and 3 second polling while visible for VR-RL-12.
+- [x] Design it (spec): `/architect admin ticket editing`
+- [x] Build it: `/develop admin ticket editing` (2026-11-03: branch `feat/admin-ticket-editing` in backend-vrms and web-vrms; 1114 backend and 262 web tests pass; axe at 375px and 1280px as Admin, only the dev only Demo data pill flagged)
+  - code in `welinc-backend-vrms/src/modules/vrms/ticket-edits.service.ts`, `welinc-web-vrms/src/features/repair/components/edit/`
+  - [x] Thin thread: migration, `ticket.edit`, priority edit end to end with stamp, audit row, lock rules and 409 (AC-1 to AC-3, AC-6, AC-8, AC-18 to AC-20)
+  - [x] Live updates: shared 3 second visible poll on detail, list and dashboard, removed mechanic toast (AC-21 to AC-23)
+  - [x] Rest of details: driver swap, odometer floor and ceiling, account type and corporation (AC-4, AC-5, AC-7, AC-8)
+  - [x] Mechanics: PUT assignments with M1/M2, verifier block, audit rows, "No mechanic" attention item (AC-8b to AC-13)
+  - [x] Issues and sweep: add, edit, remove, audit labels, tests, axe at 375px and 1280px (AC-14 to AC-17, AC-19b, AC-20)
+- [x] Verify it: `/check verify admin ticket editing` (2026-11-03: all 40 steps passed. Fixed on the way: axe `button-name` on dropdowns and step checkboxes, and a duplicate license 409 shown as a stale ticket. Spec change: no odometer floor for a truck's oldest ticket)
+- [ ] Test it: `/test admin ticket editing`
 - [ ] Polish it (optional, ask first): `emil-design-eng` (edit dialogs) · `web-design-guidelines` · `break-ui` (long issue text, many mechanics)
 
 ### 19. Mechanic status updates · done
