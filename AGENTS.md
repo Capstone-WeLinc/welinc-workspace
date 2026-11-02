@@ -1,31 +1,73 @@
-# WeLinc VRMS workspace
+# WeLinc workspace
 
-Workspace for VRMS (Vehicle Repair Management System), one subsystem of the WeLinc fleet suite (Capstone 2). Each `welinc-*` folder is its own git repo, cloned with `scripts/clone-all.sh` and ignored by this workspace repo.
+Shared workspace for the WeLinc fleet suite (Capstone 2): three systems, VRMS, VMMS and BMS, each built by its own group on shared auth, portal and gateway services. Each `welinc-*` folder is its own git repo, cloned with `scripts/clone-all.sh` and ignored by this workspace repo. The suite level picture is in [docs/context/suite-overview.md](docs/context/suite-overview.md).
+
+This file has the suite rules first, then one part per system. Read the suite part plus the part for the system you work on.
+
+## Shared services
+
+| Repo | What it is | Port |
+|---|---|---|
+| `welinc-auth` | NestJS + Prisma auth service (JWT, a role per system) | 3001 |
+| `welinc-web-portal` | React + Vite SSO portal | 8000 |
+| Gateway | Nginx; config currently in `welinc-auth/nginx.conf` | 3000 |
+
+- Run them with `docker compose -f docker-compose.shared.yml up -d`, always first: it creates the `welinc-network` Docker network every system joins. Its compose project name stays `auth-infrastructure` so existing containers and volumes keep working.
+- Architecture: microservices between systems (own containers, database and deployment, API calls through the gateway), a modular monolith inside each system. No system reads another system's database.
+
+## Ownership
+
+- **Shared:** `welinc-auth`, `welinc-web-portal`, and the shared files here (root files, `docker-compose.shared.yml`, `docs/integration/`, `docs/context/suite-overview.md`, `docs/scope/index.md`, `docs/specs/_root/`). A change to any of them affects every group: write a spec first and open a pull request the other groups can see.
+- **Per system:** each group owns its repos and its folders (`docs/context/<system>/`, `docs/scope/<system>/`, `docs/specs/<system>/`, `docs/reviews/<system>/`, `docker-compose.<system>.yml`) and its part of this file.
+- **VMMS and BMS repos belong to other groups.** Read them for integration context, never edit them. The local clones may be stale: as of 2026-11-03 those groups work in their own repos until they move into the Capstone-WeLinc org.
+
+## Docs layout
+
+- `docs/context/`: `suite-overview.md`, then one folder per system.
+- `docs/integration/`: setup guide, meeting notes and contracts between systems.
+- `docs/scope/index.md` maps each system's scope (`docs/scope/<system>/`); suite wide work goes in `docs/scope/_root/`.
+- `docs/specs/<system>/NNNN-title/`, numbered per system; suite wide specs in `docs/specs/_root/`.
+
+## Suite rules
+
+- Ask before any git write: commit, push, merge, branch switch, or opening a PR.
+- Never read, print or commit `.env` values. Document new variables in `.env.example` only. `VITE_*` variables ship to the browser, so they must never hold secrets.
+- Work inside one repo at a time. Changes that cross repos (auth tokens, gateway routes, shared API shapes) need a spec first.
+- A new system picks free ports and adds them to the repos table in `README.md`.
+
+## Git
+
+- integration: on
+- merge target: `development` in every service repo. Branch from it and open PRs against it, never `main`. (This workspace repo itself has only `main`.)
+- branch prefix: feat/
+- commit: per-milestone
+- attribution: none. Never add a `Co-Authored-By` trailer or a "Generated with Claude Code" line to commits or PR descriptions; commits are authored by the developer alone.
+
+# VRMS
+
+Vehicle Repair Management System, built by our group.
 
 ## Stack
 
-| Repo | Owner | What it is | Port |
-|---|---|---|---|
-| `welinc-web-vrms` | us | React + Vite + Tailwind SPA | 8001 |
-| `welinc-backend-vrms` | us | NestJS + Prisma + PostgreSQL API | 3002 |
-| `welinc-auth` | shared | NestJS + Prisma auth service (JWT) | 3001 |
-| `welinc-web-portal` | shared | React + Vite SSO portal | 8000 |
-| `welinc-web-vmms`, `welinc-backend-vmms`, `welinc-web-bms`, `welinc-backend-bms` | other groups | read only for us | |
+| Repo | What it is | Port |
+|---|---|---|
+| `welinc-web-vrms` | React + Vite + Tailwind SPA | 8001 |
+| `welinc-backend-vrms` | NestJS + Prisma + PostgreSQL API | 3002 |
 
-- **Gateway**: Nginx on port 3000 routes `/auth`, `/vrms` and `/repairs` (config currently in `welinc-auth/nginx.conf`).
+- **Gateway routes**: `/vrms` and `/repairs`.
 - **File storage**: Azurite (the local Blob Storage emulator, port 10000) in `docker-compose.vrms.yml`, Azure Blob Storage when hosted. Only `welinc-backend-vrms` talks to it (spec 0017); the browser gets signed links.
 - **Package manager**: npm in every Node repo (`package-lock.json`).
 - **Runtime**: Node 24 everywhere (`.nvmrc` and the Dockerfiles in auth, backend-vrms, web-vrms and web-portal; `engines` is `24.x` in the backends).
 
 ## Build approach
 
-Tracer Bullet: each feature is built end to end through every layer and working before the next. The UI refresh phase overrides this with Facade: build the UI first on the data it already has. Workflow level is Beta (after `/develop`: `/check verify`, then `/test`). Deadline: deployed by the end of November 2026. The plan lives in [docs/scope/index.md](docs/scope/index.md).
+Tracer Bullet: each feature is built end to end through every layer and working before the next. The UI refresh phase overrides this with Facade: build the UI first on the data it already has. Workflow level is Beta (after `/develop`: `/check verify`, then `/test`). Deadline: deployed by the end of November 2026. The plan lives in [docs/scope/vrms/index.md](docs/scope/vrms/index.md).
 
 ## Commands
 
 ```bash
-# Whole stack (start auth first: it creates the shared docker network)
-docker compose -f docker-compose.auth.yml up -d
+# Whole stack (start the shared stack first: it creates the shared docker network)
+docker compose -f docker-compose.shared.yml up -d
 docker compose -f docker-compose.vrms.yml up -d
 
 # Inside a Node repo
@@ -38,26 +80,14 @@ npm run test        # NestJS repos (Jest) and web-vrms (Vitest, pure logic only)
 
 ## Specs
 
-Stored in `docs/specs/`. Format: `docs/specs/NNNN-title.md`. Product backlog lives in Jira (read it through the Atlassian MCP); Jira wins when it disagrees with a doc.
+Stored in `docs/specs/vrms/`. Format: `docs/specs/vrms/NNNN-title/`. Product backlog lives in Jira (read it through the Atlassian MCP); Jira wins when it disagrees with a doc.
 
 ## Rules
 
-- Ask before any git write: commit, push, merge, branch switch, or opening a PR.
-- VMMS and BMS repos belong to other groups. Read them for integration context, never edit them.
 - Before calling a task done, run lint, typecheck and build in every repo you touched.
 - Playwright is expensive (snapshots and screenshots eat context). Do not run it after every change. Use it only for a new page or flow, a visual or layout change that code cannot prove, or at `/check verify` before a PR. Prefer `browser_snapshot` over screenshots, keep it to one pass, and never for backend-only or logic-only edits.
 - Say "Using skill: <name>" in the reply each time a skill is invoked, so the user can see it was applied.
-- Never read, print or commit `.env` values. Document new variables in `.env.example` only. `VITE_*` variables ship to the browser, so they must never hold secrets.
-- Work inside one repo at a time. Changes that cross repos (auth tokens, gateway routes, shared API shapes) need a spec first.
 - UI follows `design.md` at this root. Use theme tokens, never raw hex values in components.
-
-## Git
-
-- integration: on
-- merge target: `development` in every service repo. Branch from it and open PRs against it, never `main`. (This workspace repo itself has only `main`.)
-- branch prefix: feat/
-- commit: per-milestone
-- attribution: none. Never add a `Co-Authored-By` trailer or a "Generated with Claude Code" line to commits or PR descriptions; commits are authored by the developer alone.
 
 ## Agent skills
 
@@ -77,13 +107,19 @@ MCP servers (configured in `.mcp.json`): playwright, shadcn, atlassian (Jira; ne
 
 ## Context files
 
-- [docs/context/](docs/context/): project background, system overview (decisions and open questions), roles and users, glossary, requirements (BRD field rules, limits and targets, with the Jira overrides). Background only; code and Jira win.
+- [docs/context/vrms/](docs/context/vrms/): project background, system overview (decisions and open questions), roles and users, glossary, requirements (BRD field rules, limits and targets, with the Jira overrides). Background only; code and Jira win.
 - [design.md](design.md): UI art direction and tokens for web-vrms and web-portal.
 - [welinc-web-vrms/AGENTS.md](welinc-web-vrms/AGENTS.md): VRMS SPA structure, API and auth handling, color tokens, and effect rules.
 - [welinc-backend-vrms/AGENTS.md](welinc-backend-vrms/AGENTS.md): NestJS API modules (including analytics and AI), guards, Prisma and migration rules, Docker restart gotcha.
 - [welinc-auth/AGENTS.md](welinc-auth/AGENTS.md): shared auth service routes, role per system JWT, lockout, gateway nginx and CORS.
 - [welinc-web-portal/AGENTS.md](welinc-web-portal/AGENTS.md): SSO portal redirect by role, token handoff, Tailwind v3, session monitor.
 
-<!-- Nested AGENTS.md files are listed here as they are created -->
+# VMMS
+
+Not added yet. The VMMS group adds its stack, build approach, rules and context files here.
+
+# BMS
+
+Not added yet. The BMS group adds its stack, build approach, rules and context files here.
 
 _Drafted by /audit from the repo, worth a quick human pass. Edit freely: once a line stops matching this draft, later runs treat it as curated and will flag rather than overwrite it._

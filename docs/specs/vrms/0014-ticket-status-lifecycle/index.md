@@ -266,7 +266,7 @@ Tracer Bullet: the first slice runs the new table end to end on today's moves, t
 - [ ] Features 31, 37, 38, 39: switch on M7 to M13 through `applyStatusMove` with their trigger.
 - [ ] Feature 28: notify the mechanic on Send back and Verify (WL-212).
 - [ ] Feature 22: add `proof` to M4's needs.
-- [x] `docs/context/glossary.md` *Ticket status* row still shows the old code names; point it at this spec.
+- [x] `docs/context/vrms/glossary.md` *Ticket status* row still shows the old code names; point it at this spec.
 
 ## Rationale
 

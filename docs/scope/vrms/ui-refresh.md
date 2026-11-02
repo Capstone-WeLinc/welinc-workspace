@@ -22,7 +22,7 @@ Login, OTP, forgot password and profile restyled with clear errors and loading s
 ### 10. Dashboard · in-progress · Facade
 Answers "what needs my attention?" first: open, overdue and waiting tickets up top.
 **Done when:** stat tiles and lists use the design system, and empty, loading and error states render.
-spec [0002](../specs/0002-dashboard-attention-first/index.md) · code in `welinc-web-vrms/src/features/dashboard/`
+spec [0002](../../specs/vrms/0002-dashboard-attention-first/index.md) · code in `welinc-web-vrms/src/features/dashboard/`
 - [x] Design it (spec): `/architect dashboard refresh`
 - [x] Build it: `/develop dashboard refresh`
   - [x] Data layer: attention helpers on one `fetchedAt`, `useDashboardData` with visible tab polling, refresh state and truncation flag, audit fetch dropped (AC-1, AC-3, AC-13, AC-14, AC-18)
@@ -36,7 +36,7 @@ spec [0002](../specs/0002-dashboard-attention-first/index.md) · code in `welinc
 ### 11. Repair list & detail · in-progress · Facade
 Ticket list with clear status pills and filters; ticket detail laid out around its one next action.
 **Done when:** status badges follow `design.md`, the list works as cards on a phone, and every modal and confirm prompt on these screens uses the shared dialog.
-spec [0004](../specs/0004-repair-list-detail-refresh/index.md) · code in `welinc-web-vrms/src/features/repair/`, `welinc-backend-vrms/src/modules/vrms/`
+spec [0004](../../specs/vrms/0004-repair-list-detail-refresh/index.md) · code in `welinc-web-vrms/src/features/repair/`, `welinc-backend-vrms/src/modules/vrms/`
 - Note (2026-10-22): the list becomes an urgent first queue of open tickets and the detail page is built around one next step button. Like feature 13, this breaks Facade on purpose: spec 0004 adds query params (no migration) in welinc-backend-vrms.
 - [x] Design it (spec): `/architect repair list & detail refresh`
 - [x] Build it: `/develop repair list & detail refresh`
@@ -52,7 +52,7 @@ spec [0004](../specs/0004-repair-list-detail-refresh/index.md) · code in `welin
 ### 12. Repair form · in-progress · Facade
 The new repair form in the stakeholder approved layout (WL-201), with pickers instead of typing.
 **Done when:** the form matches the approved mockup, validation is inline, and it is usable with one thumb on a phone.
-spec [0005](../specs/0005-repair-form-refresh/index.md) · code in `welinc-web-vrms/src/features/repair/`, `welinc-web-vrms/src/main.tsx`, `welinc-web-vrms/src/components/ui/combobox.tsx`, `welinc-web-vrms/src/components/ui/toggle-group.tsx`
+spec [0005](../../specs/vrms/0005-repair-form-refresh/index.md) · code in `welinc-web-vrms/src/features/repair/`, `welinc-web-vrms/src/main.tsx`, `welinc-web-vrms/src/components/ui/combobox.tsx`, `welinc-web-vrms/src/components/ui/toggle-group.tsx`
 - Note (2026-10-25): no mockup exists in the repo or Jira, so the layout follows `design.md` and the current fields. Frontend only; issue types, saved priority, open ticket counts and Assigned or Open on create stay with feature 18.
 - [x] Design it (spec): `/architect repair form refresh`
 - [x] Build it: `/develop repair form refresh`
@@ -67,7 +67,7 @@ spec [0005](../specs/0005-repair-form-refresh/index.md) · code in `welinc-web-v
 ### 13. History & audit log pages · done · Facade
 Filters, tables and detail views restyled.
 **Done when:** both pages use the shared table, filters fit a phone, and empty states explain what to do.
-spec [0003](../specs/0003-history-audit-log-refresh/index.md) · code in `welinc-web-vrms/src/features/repair/pages/HistoryPage.tsx`, `welinc-web-vrms/src/features/audit-logs/`, `welinc-backend-vrms/src/modules/vrms/`
+spec [0003](../../specs/vrms/0003-history-audit-log-refresh/index.md) · code in `welinc-web-vrms/src/features/repair/pages/HistoryPage.tsx`, `welinc-web-vrms/src/features/audit-logs/`, `welinc-backend-vrms/src/modules/vrms/`
 - Note (2026-10-22): history becomes a month grouped archive and the audit log a day grouped timeline. This feature breaks Facade on purpose: spec 0003 adds a migration and API changes in welinc-backend-vrms.
 - [x] Design it (spec): `/architect history & audit log refresh`
 - [x] Build it: `/develop history & audit log refresh`
@@ -82,7 +82,7 @@ spec [0003](../specs/0003-history-audit-log-refresh/index.md) · code in `welinc
 ### 14. User management page · in-progress · Facade
 User table and its create, edit, deactivate and reset modals.
 **Done when:** every modal uses the shared dialog, destructive actions ask to confirm, and success and failure show a toast.
-spec [0006](../specs/0006-user-management-refresh/index.md) · code in `welinc-web-vrms/src/features/user-management/`, `welinc-web-vrms/src/components/shared/`, `welinc-backend-vrms/src/modules/vrms/config/`
+spec [0006](../../specs/vrms/0006-user-management-refresh/index.md) · code in `welinc-web-vrms/src/features/user-management/`, `welinc-web-vrms/src/components/shared/`, `welinc-backend-vrms/src/modules/vrms/config/`
 - Note (2026-10-25): the list sorts what needs attention first, reset emails a code instead of the shared `Password123!`, and deactivating a mechanic with open tickets is blocked. Like features 11 and 13, this breaks Facade on purpose: spec 0006 adds an `email` field (no migration) to `GET /vrms/mechanics/available` in welinc-backend-vrms. welinc-auth is not changed; its gaps are in the spec's Follow-up.
 - [x] Design it (spec): `/architect user management refresh`
 - [x] Build it: `/develop user management refresh`
@@ -100,7 +100,7 @@ spec [0006](../specs/0006-user-management-refresh/index.md) · code in `welinc-w
 ### 15. Knowledge base page · in-progress · Facade
 Knowledge articles on the new tokens.
 **Done when:** the page uses the design system, and it reads well on a phone and in its empty, loading and error states.
-spec [0007](../specs/0007-knowledge-base-fix-library/index.md) · code in `welinc-web-vrms/src/features/knowledge-base/`, `welinc-web-vrms/src/features/repair/`, `welinc-web-vrms/src/features/user-management/`, `welinc-backend-vrms/src/modules/knowledge/`, `welinc-backend-vrms/src/modules/vrms/`, `welinc-auth/prisma/`
+spec [0007](../../specs/vrms/0007-knowledge-base-fix-library/index.md) · code in `welinc-web-vrms/src/features/knowledge-base/`, `welinc-web-vrms/src/features/repair/`, `welinc-web-vrms/src/features/user-management/`, `welinc-backend-vrms/src/modules/knowledge/`, `welinc-backend-vrms/src/modules/vrms/`, `welinc-auth/prisma/`
 - Note (2026-10-25): redesigned as a common issues library (Jira WL-704) that fills itself from repairs, instead of a restyle of the fake localStorage SOPs. It also covers feature 41's picker (WL-702) and adds the `CHIEF_MECHANIC` role (the role part of feature 17). Breaks Facade on purpose: a migration in welinc-backend-vrms and an enum change in welinc-auth. No AI; the AI rework (feature 3) builds on it.
 - [x] Design it (spec): `/architect knowledge base refresh`
 - [x] Build it: `/develop knowledge base refresh`

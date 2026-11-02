@@ -81,9 +81,9 @@ The engineer asked if seeding both environments is acceptable. Seed data is fake
 ## References
 
 **Project sources** (verifiable, in this repo):
-- `docker-compose.auth.yml`, `docker-compose.vrms.yml`, `docker-compose.analytics.yml`, `welinc-auth/nginx.conf`: the services, ports and gateway routes that exist today.
+- `docker-compose.shared.yml`, `docker-compose.vrms.yml`, `docker-compose.analytics.yml`, `welinc-auth/nginx.conf`: the services, ports and gateway routes that exist today.
 - `Dockerfile.prod` in auth, backend-vrms, web-vrms and web-portal: the images this spec reuses and the gaps it fixes.
-- `docs/scope/platform.md`, feature 26: the done criteria and the earlier Vercel and Render note.
+- `docs/scope/vrms/platform.md`, feature 26: the done criteria and the earlier Vercel and Render note.
 - `AGENTS.md` (workspace root): `development` as the merge target, Node 24, no attribution lines on commits.
 
 **Practices & standards**:

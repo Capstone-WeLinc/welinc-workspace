@@ -42,9 +42,9 @@ Sign in through the portal (`http://localhost:8000/login`) with `vrms.admin@weli
 - [x] Throttle the network → one skeleton shaped like the tiles and list (plus pipeline and spend for admins), not a spinner → AC-12
 - [x] Block `**/vrms/repairs**` and reload → error state with "Try again"; unblock and click it → skeleton, then data → AC-12
 - [x] Under the header, a status line reads "Last updated 10:42 AM" style (12 hour, local) → AC-13 (Value sourcing: Last updated line)
-- [x] After a load, block `**/vrms/repairs**` and wait 15s → the line turns red: "Couldn't refresh, showing data from …", the data stays, no toast. Unblock → it returns to "Last updated" on the next tick → AC-13 (Value sourcing: Refresh failed state)
+- [x] After a load, block `**/vrms/repairs**` and wait 3s → the line turns red: "Couldn't refresh, showing data from …", the data stays, no toast. Unblock → it returns to "Last updated" on the next tick → AC-13 (Value sourcing: Refresh failed state)
 - [x] As admin, block only `**/vrms/repairs/history**` after a load → the same "Couldn't refresh" line (either fetch failing counts) → AC-13
-- [x] Hide the tab (switch tabs) for 30s → no `/vrms/repairs` requests. Show it → exactly one fetch right away, then every 15s → AC-13
+- [x] Hide the tab (switch tabs) for 30s → no `/vrms/repairs` requests. Show it → exactly one fetch right away, then every 3s → AC-13
 - [x] Network panel on `/dashboard` → no `audit-logs` request → AC-14
 - [x] When an API `total` is larger than the rows returned (for example, lower the admin limit locally), "Showing the first {rows} tickets, so counts may be low." appears under the tiles → AC-18 (Value sourcing: Truncation warning)
 - [ ] Every time based value (overdue, day counts, this month) uses the fetch time: leave the page open across midnight; the tiles and Due text change only when the next fetch lands, and always agree with each other → AC-1 (Value sourcing: fetchedAt)

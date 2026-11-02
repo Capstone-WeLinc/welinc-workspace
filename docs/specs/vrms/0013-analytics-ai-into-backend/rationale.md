@@ -105,7 +105,7 @@ Failure handling: an honest 503 beats today's keyword guesser, because a confide
 - welinc-backend-vrms-analytics-ai `AGENTS.md` and code (`sync_service.py`, `ai_service.py`, `analytics_service.py`, `duckdb_refresh.py`)
 - Spec 0007 (knowledge base, the `autoEmbedIssues` follow up), spec 0008 (hosting, analytics not deployed), spec 0010 (data model v2), spec 0011 (permission matrix, cost nulling), spec 0012 (module switches, the feature 3 follow up)
 - welinc-backend-vrms `package.json` (Prisma 7.8, `@nestjs/schedule` already installed)
-- Scope feature 3 notes in `docs/scope/foundations.md`
+- Scope feature 3 notes in `docs/scope/vrms/foundations.md`
 
 **Practices & standards**:
 - Strangler pattern for replacing a live system

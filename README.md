@@ -1,32 +1,37 @@
 # WeLinc workspace
 
-The workspace for the WeLinc fleet suite (Capstone 2). It holds the specs, scope, design direction and the local Docker stack. The service code lives in separate `welinc-*` repos that you clone next to this one; this repo ignores them.
+The shared workspace for the WeLinc fleet suite (Capstone 2): three systems, VRMS, VMMS and BMS, on shared auth, portal and gateway services. It holds the docs, the local Docker stack, scripts and AI agent files for all three. The service code lives in separate `welinc-*` repos that you clone next to this one; this repo ignores them.
 
-Our group builds **VRMS** (Vehicle Repair Management System). VMMS and BMS belong to other groups: read them for context, never edit them.
+Each group owns its own system's folders and repos. The shared parts (the root files, `docker-compose.shared.yml`, `docs/integration/`, `docs/context/suite-overview.md`) belong to everyone, so change them through a pull request the other groups can see. For how the systems fit together, start with [docs/context/suite-overview.md](docs/context/suite-overview.md).
 
 ## What is where
 
 | Path | What it is |
 |---|---|
-| `docs/context/` | Project background, system overview, roles and users, glossary |
-| `docs/scope/` | The living plan: epics, features and their status |
-| `docs/specs/` | One folder per designed feature (`NNNN-title/`) with its spec and verify steps |
-| `design.md` | UI art direction and design tokens for the web apps |
-| `docker-compose.*.yml` | The local stack: auth and VRMS |
+| `docs/context/suite-overview.md` | The three systems, the shared services, and how they fit together |
+| `docs/context/<system>/` | One system's background, roles and users, glossary and requirements |
+| `docs/integration/` | What the systems share: setup guide, meeting notes, contracts |
+| `docs/scope/` | The living plan. [index.md](docs/scope/index.md) maps each system's scope in `docs/scope/<system>/` |
+| `docs/specs/<system>/` | One folder per designed feature (`NNNN-title/`) with its spec and verify steps. Suite wide specs go in `docs/specs/_root/` |
+| `docs/reviews/<system>/` | Code review reports |
+| `design.md` | UI art direction and design tokens (VRMS and the portal today) |
+| `docker-compose.shared.yml` | The shared stack: auth, its database and Redis, the gateway, the portal |
+| `docker-compose.<system>.yml` | One system's stack (only `docker-compose.vrms.yml` so far) |
 | `scripts/clone-all.sh` | Clones every service repo |
-| `AGENTS.md` | Project rules and context for AI tools (`CLAUDE.md` imports it) |
+| `AGENTS.md` | Rules and context for AI tools: suite rules first, then one section per system (`CLAUDE.md` imports it) |
 
 ## The repos
 
 | Repo | Owner | What it is | Port |
 |---|---|---|---|
-| `welinc-web-vrms` | us | React, Vite and Tailwind app | 8001 |
-| `welinc-backend-vrms` | us | NestJS, Prisma and PostgreSQL API | 3002 |
-| `welinc-auth` | shared | NestJS auth service (JWT) | 3001 |
+| `welinc-auth` | shared | NestJS auth service (JWT), plus the gateway config | 3001 |
 | `welinc-web-portal` | shared | SSO portal | 8000 |
-| `welinc-web-vmms`, `welinc-backend-vmms`, `welinc-web-bms`, `welinc-backend-bms` | other groups | read only for us | |
+| `welinc-web-vrms` | VRMS group | React, Vite and Tailwind app | 8001 |
+| `welinc-backend-vrms` | VRMS group | NestJS, Prisma and PostgreSQL API | 3002 |
+| `welinc-web-vmms`, `welinc-backend-vmms` | VMMS group | | |
+| `welinc-web-bms`, `welinc-backend-bms` | BMS group | | |
 
-An Nginx gateway on port 3000 routes `/auth`, `/vrms`, `/repairs`. Analytics and AI live inside `welinc-backend-vrms` (spec 0013).
+An Nginx gateway on port 3000 routes each path to its service (today `/auth`, `/vrms`, `/repairs`). Pick free ports for a new system and add them to this table.
 
 ## Set up
 
@@ -74,10 +79,10 @@ Rules:
 
 ### Start the stack
 
-Start auth first: it creates the shared Docker network.
+Start the shared stack first: it creates the shared Docker network. Then start the system you work on.
 
 ```bash
-docker compose -f docker-compose.auth.yml up -d
+docker compose -f docker-compose.shared.yml up -d
 docker compose -f docker-compose.vrms.yml up -d
 ```
 
@@ -149,7 +154,7 @@ In `welinc-auth` and `welinc-backend-vrms`, `npm run lint` fixes files in place.
 
 ### Continuous integration
 
-Every service repo we own has a GitHub Actions workflow (`.github/workflows/ci.yml`) that runs on pull requests into `development` and on pushes to it:
+The shared repos and the VRMS repos each have a GitHub Actions workflow (`.github/workflows/ci.yml`) that runs on pull requests into `development` and on pushes to it:
 
 | Repo | Checks |
 |---|---|
@@ -164,7 +169,7 @@ The checks warn but do not block a merge: GitHub Free cannot require them.
 - **Commits:** Conventional Commits, one line, for example `feat(design-system): add DataTable`. One commit per milestone.
 - **Pull requests:** open one per feature branch into `development`. Do not push straight to it.
 - **One repo at a time.** A change that crosses repos (auth tokens, gateway routes, shared API shapes) needs a spec first.
-- **Specs:** designed in `docs/specs/` before building. The product backlog is in Jira, and Jira wins when it disagrees with a doc.
+- **Specs:** designed in `docs/specs/<system>/` before building, or `docs/specs/_root/` when the systems share it. The VRMS backlog is in Jira (project `VRMS`), and Jira wins when it disagrees with a VRMS doc.
 - **UI:** follows `design.md`. Use theme tokens, never raw hex values in components. Lint enforces this.
 
 ## Troubleshooting

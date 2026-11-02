@@ -351,4 +351,4 @@ Tracer Bullet: the first slice runs one strand (ticket reads) through every laye
 - [ ] Feature 55 (kickoff prep): add the welinc-auth scoping change to the list of changes to the shared repos.
 - [x] Mechanic home garage (branch): enrolled as scope feature 59 in Operations.
 - [ ] CASL Agent Skill skipped for now (only community skills found: `tuannguyen151/foxdemon-plugins` `casl-authorization`, `ramziddin/ccplugins` `authorization`). Revisit if an official one appears.
-- [ ] Update `docs/context/roles-and-users.md`: Chief Mechanic sees all tickets, and the matrix lives in `catalog.ts` plus `role_permissions`.
+- [ ] Update `docs/context/vrms/roles-and-users.md`: Chief Mechanic sees all tickets, and the matrix lives in `catalog.ts` plus `role_permissions`.

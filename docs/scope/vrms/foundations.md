@@ -41,7 +41,7 @@ Capture each owned repo's real conventions so every later skill works from facts
 ### 2. Auth service boundary · done · GA
 backend-vrms carries its own login, OTP and user endpoints while `welinc-auth` is the shared auth service. Decide which owns what before roles and OTP change.
 **Done when:** one service owns login, OTP and users; the other only validates tokens; the portal and web-vrms log in through one path.
-spec [0009](../specs/0009-auth-service-boundary/index.md)
+spec [0009](../../specs/vrms/0009-auth-service-boundary/index.md)
 - [x] Design it (spec): `/architect auth service boundary`
 - Note (2026-10-25): from spec 0007's follow up. Adding a mechanic or chief mechanic on the Users page creates no VRMS `Mechanic` row (only seeds do), so new accounts can't be assigned tickets. Whichever service ends up owning users should create that row.
 - Note (2026-10-27): spec 0009 decides welinc-auth owns everything; backend-vrms deletes its copy and user tables, checks each caller live, and syncs its `Mechanic` rows from welinc-auth. Crosses welinc-auth, backend-vrms and web-vrms; both databases need a reset.
@@ -67,7 +67,7 @@ Decide whether analytics-ai stays its own service or merges into the main VRMS r
 - Note (2026-10-29): until this feature replaces it, `welinc-backend-vrms-analytics-ai` got a small patch (PR 5, `feat/analytics-v2-columns`) so its sync reads `closed_at` and `CLOSED`; it runs again on the v2 database. Retire the patch with the service.
 - Note (2026-10-30): from spec 0012's follow up. Embed each issue once on save and store the vector (never re-embed in a loop), add an `ai.embed_catchup_days` setting so turning AI back on embeds only the missing issues, declare `module.ai` as requiring `module.knowledge`, and remove the Python service's `app_settings` read when it retires.
 - Note (2026-10-30): spec 0013 moves analytics and AI into backend-vrms (`src/modules/analytics/`, `src/modules/ai/`) on the VRMS database with pgvector, uses Gemini behind an `AiProvider` adapter, and retires the Python service with MongoDB, Redis, DuckDB and the separate analytics database. It is a move, not a redesign: the new AI ideas and knowledge base grounding go to feature 47, so `module.ai` does not require `module.knowledge` yet. Two numbers change meaning: cancelled tickets leave spend, and months follow Manila time. "Run AI review" on closed tickets goes away (confirm in Jira).
-spec [0013](../specs/0013-analytics-ai-into-backend/index.md) · code in `welinc-backend-vrms/src/modules/analytics/`, `welinc-backend-vrms/src/modules/ai/`, `welinc-web-vrms/src/features/analytics/`, `welinc-web-vrms/src/features/repair/components/AiDiagnosisSection.tsx`
+spec [0013](../../specs/vrms/0013-analytics-ai-into-backend/index.md) · code in `welinc-backend-vrms/src/modules/analytics/`, `welinc-backend-vrms/src/modules/ai/`, `welinc-web-vrms/src/features/analytics/`, `welinc-web-vrms/src/features/repair/components/AiDiagnosisSection.tsx`
 - Note (2026-10-31, replan): the `/sync` that note 76 left open has landed (the AGENTS.md sync PRs are merged in the workspace, backend-vrms and web-vrms). Open follow ups from spec 0013 that stay out of this feature: confirm in Jira that dropping "Run AI review" is fine (a question for the PM), and the retention limit for `ai_diagnoses` and the paid Gemini tier before go live (both already noted on feature 26).
 - [x] Design it (spec): `/architect analytics & AI service boundary`
 - Note (2026-10-31): milestones 1 to 3 are built and checked live with a real Gemini key (a diagnosis in about 2 seconds, similarity up to 100% on matching issues, `AI_BUSY` on parallel runs, 429 on the 21st run, AI off gives 403 `MODULE_DISABLED`, embed on save). Two things the spec did not know: `gemini-embedding-2` needs one content object per text (a plain string array returns a single combined vector, fixed in `gemini.provider.ts`), and a batch of 100 texts hit the free tier 429 while 50 passed, so a batch counts per text against the 100 a minute limit. `ai:embed-all` (milestone 4) should send 50 at a time with a pause, not 100. Local `vrms-db` is `pgvector/pgvector:pg16` (data kept, reindexed).
@@ -88,7 +88,7 @@ spec [0013](../specs/0013-analytics-ai-into-backend/index.md) · code in `welinc
 ### 4. Data model v2 · done
 One schema change that the Jira backlog needs: Chief Mechanic role, the new ticket statuses, verifier fields, attachments, notifications, outsourced shops, lookup lists. Also settle who owns the `Booking` and maintenance models copied into backend-vrms.
 **Done when:** the schema supports slices 1 to 6 without another breaking migration, and existing tickets migrate with no data loss.
-spec [0010](../specs/0010-data-model-v2/index.md)
+spec [0010](../../specs/vrms/0010-data-model-v2/index.md)
 code in `welinc-backend-vrms/prisma/`, `welinc-backend-vrms/src/modules/vrms/`, `welinc-backend-vrms/src/modules/knowledge/`, `welinc-web-vrms/src/` (branch `feat/data-model-v2` in both)
 - Note (2026-10-25): spec 0007 lands part of this early: `CHIEF_MECHANIC`, `RepairPriority`, issue categories, and the knowledge base tables with new `RepairIssue` columns. Build on its migration rather than redoing them.
 - Note (2026-10-29): do the VRMS tables now. Who owns the copied Booking and maintenance models waits for feature 56.
@@ -111,7 +111,7 @@ WL-109. One matrix of role against action, enforced on the server, mirrored in t
 - Note (2026-10-25): spec 0007 uses interim "Readers" and "Editors" role lists for the knowledge base; the matrix should take them over.
 - Note (2026-10-28): spec 0009 leaves two pieces here. Scope welinc-auth's user list and `GET /auth/users/:id/changes` by system (today any ADMIN reads any user's change record). Also decide whether welinc-auth ever needs token refresh or whether its unused `RefreshToken` table is dropped (talk to the other groups first).
 - Note (2026-10-29): you chose an Admin editable matrix. The fixed roles stay, but each role's permissions are stored in the database and an Admin turns them on or off from the Settings hub (feature 52). Some rights stay locked (for example Admin keeps user management) so nobody locks themselves out, and every change is audit logged. No custom roles. This feature builds the stored matrix and the server checks; the editing screen lands with feature 52.
-spec [0011](../specs/0011-permission-matrix/index.md) · code in `welinc-backend-vrms/src/auth/permissions`, `welinc-web-vrms/src/lib/permissions`
+spec [0011](../../specs/vrms/0011-permission-matrix/index.md) · code in `welinc-backend-vrms/src/auth/permissions`, `welinc-web-vrms/src/lib/permissions`
 - Note (2026-10-29): spec 0011 enforces the matrix with CASL in backend-vrms and web-vrms only (other groups may copy the pattern). Chief Mechanic gets `ticket.view_all` now (read only, no costs). It also scopes welinc-auth admin endpoints by system (a shared repo change, so it goes on the feature 55 list), adds shared account rules and the WeLinc account picker on Add user, and replaces spec 0006 AC-16's deactivate block with "move tickets back to the queue or keep them". `RefreshToken` is deferred to feature 56.
 - [x] Design it (spec): `/architect permission matrix`
 - [x] Build it: `/develop permission matrix`
@@ -132,7 +132,7 @@ spec [0011](../specs/0011-permission-matrix/index.md) · code in `welinc-backend
 ### 6. Design system & UI foundation · done
 Turn `design.md` into real tokens and shared components (buttons, inputs, dialogs, confirm prompts, toasts, tables, empty and error states) so every page and modal looks the same. Includes the Tailwind v4 upgrade.
 **Done when:** web-vrms uses only theme tokens (no raw hex), shared dialog, confirm and toast components exist, and base components meet WCAG AA contrast with visible focus and keyboard use.
-spec [0001](../specs/0001-design-system-ui-foundation/index.md) · code in `welinc-web-vrms/src`
+spec [0001](../../specs/vrms/0001-design-system-ui-foundation/index.md) · code in `welinc-web-vrms/src`
 - [x] Design it (spec): `/architect design system & UI foundation`
 - [x] Build it: `/develop design system & UI foundation`
   - [x] Thin thread: React 19, Tailwind v4, tokens and aliases, light only, Inter, Button on `/dev/ui` with axe and lint (AC-1 to AC-6, AC-14, AC-18)
@@ -154,7 +154,7 @@ Admin managed settings stored in the database instead of code constants, and VRM
 **Done when:** an admin changes a threshold or turns a module off without a deploy, every change is audit logged, and code reads settings from one place.
 - Note (2026-10-29): you chose one Admin Settings hub. This feature owns it, with sections for lookup lists (feature 40), thresholds, modules, and role permissions (feature 5). Done also means every section lives in that one hub.
 - Note (2026-10-29): moved from Release to right after the foundations, so the permission screen (feature 5) and lookup lists (feature 40) have a home before Slice 1. It is VRMS only, so it is safe before the integration meeting.
-spec [0012](../specs/0012-configurable-settings-modules/index.md) · code in `welinc-backend-vrms/src/settings/`, `welinc-backend-vrms/src/auth/permissions/`, `welinc-backend-vrms/src/modules/knowledge/`, `welinc-web-vrms/src/features/settings/`, `welinc-backend-vrms-analytics-ai/main.py`, `welinc-backend-vrms-analytics-ai/sync_service.py`
+spec [0012](../../specs/vrms/0012-configurable-settings-modules/index.md) · code in `welinc-backend-vrms/src/settings/`, `welinc-backend-vrms/src/auth/permissions/`, `welinc-backend-vrms/src/modules/knowledge/`, `welinc-web-vrms/src/features/settings/`, `welinc-backend-vrms-analytics-ai/main.py`, `welinc-backend-vrms-analytics-ai/sync_service.py`
 - Note (2026-10-30): spec 0012 decided a code catalog with only changed values stored, switches for AI, Analytics and Knowledge base that remove their permission keys, and the Python service reading the AI and Analytics switches itself. Issue categories move to `config.read` and a new `lookups.manage`. Three new keys: `settings.manage`, `lookups.manage`, `ai.use`.
 - [x] Design it (spec): `/architect configurable settings & modules`
 - Note (2026-10-30): milestones 1 and 2 built. Two pieces of milestone 3 landed early because the knowledge switch needed them: the category routes now read with `config.read` and write with `lookups.manage`, and the web route `/knowledge-base/categories` needs `lookups.manage`. The hub shows only Modules and Thresholds until milestone 3 adds the other three sections, so its nav item follows `settings.manage` for now.

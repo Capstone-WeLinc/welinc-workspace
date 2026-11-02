@@ -335,5 +335,5 @@ The project default is Tracer Bullet; this UI refresh feature breaks Facade on p
 - [x] The future configurable settings spec replaces `KNOWLEDGE_SETTINGS` with stored settings (done by spec 0012, AC-3; merged in backend-vrms #22).
 - [ ] Existing gap, not caused by this spec: no flow creates a VRMS `Mechanic` row when a mechanic or chief mechanic account is added on the Users page (only seeds do), so new accounts can't be assigned tickets. Belongs to feature 2 (auth service boundary).
 - [ ] Tell the other groups that `CHIEF_MECHANIC` now exists in the shared `UserRole`, before integration.
-- [ ] `docs/context/roles-and-users.md` and the web and backend `AGENTS.md` role lines go stale once this ships (`/sync`).
+- [ ] `docs/context/vrms/roles-and-users.md` and the web and backend `AGENTS.md` role lines go stale once this ships (`/sync`).
 - [ ] The `react-hook-form` skill is installed but not listed in root `AGENTS.md` `## Agent skills`; it is frontend wide, so it belongs in `welinc-web-vrms/AGENTS.md`.
