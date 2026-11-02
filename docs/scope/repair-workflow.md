@@ -112,14 +112,18 @@ WL-211. No ticket is marked done without evidence. Spec: [0018](../specs/0018-be
 - [x] Test it: `/test proof of completion`
 - [x] Polish it (optional, ask first): `emil-design-eng` (photo viewer menu) · `web-design-guidelines` · `break-ui` (missing photos, full groups, many photos, long uploader names)
 
-### 23. Chief Mechanic verification · planned
+### 23. Chief Mechanic verification · done
 WL-212. Verify or reject finished work, with the verifier recorded.
 **Done when:** finished tickets land in a verification queue, Verify closes and Reject returns to In Progress with a required comment, and the verifier's name and time are on the ticket and in reports.
 - Note (2026-11-01, replan): the Verify and Send back moves already exist (spec 0014, with the `lastRejection` banner and prefilled resend). What is left is the verification queue page and the proof files.
 - Note (2026-11-01): the verification queue moved to feature 17 (spec 0015, the Chief's dashboard plus the filtered repair list). What is left here is showing proof files at verification and the verifier in reports.
 - Note (2026-11-02): feature 22 (spec 0018) now builds the proof view at verification, and renames Send back to "Return to mechanic". What is left here is the verifier's name and time in reports.
-- [ ] Build it: `/develop chief mechanic verification`
-- [ ] Polish it (optional, ask first): `emil-design-eng` (verify and reject dialogs) · `web-design-guidelines`
+- Note (2026-11-03): with the reports module (feature 45) not built yet, History stands in as the report: a "Verified by" column and filter, plus the verified time on the ticket side panel.
+- [x] Build it: `/develop chief mechanic verification`
+- [x] Verify it: `/check verify chief mechanic verification`
+- [x] Test it: `/test chief mechanic verification`
+- [x] Polish it (optional, ask first): `emil-design-eng` (verify and reject dialogs, skipped) · `web-design-guidelines` (skipped) · `break-ui` (long verifier names, many verifiers in the filter, ran 2026-11-03)
+Code in `welinc-backend-vrms/src/modules/vrms/repairs.service.ts` (`findHistory`), `welinc-web-vrms/src/features/repair/` (History page and filters, `TicketSidePanel`)
 - Note (2026-10-25): Reject is the first backward move. Follow feature 16's rule for the spec 0007 checklist and "What fixed it" notes when a ticket goes back to In Progress.
 
 ### 24. Full ticket audit trail · planned · needs a decision

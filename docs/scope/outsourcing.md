@@ -16,6 +16,7 @@ WL-401 and WL-404. Outsourcing only when no in house option is free, with a prin
 **Done when:** outsourcing needs a justification or no available in house option, the ticket turns Outsourced with shop, date sent and expected completion, a job order PDF prints, and reports can show the in house vs outsourced ratio.
 - Note (2026-11-01, replan): from spec 0014. The outsourced moves (M7 to M13 in its table) are written but off; switch them on through `applyStatusMove` with this feature's trigger. Same for features 38 and 39.
 - Note (2026-11-01, replan): from spec 0015. Default the Chief Mechanic to **on** for recording an outsourced transfer and for closing it (feature 38).
+- Note (2026-11-03, replan): from spec 0018. Decide whether a returned outsourced truck needs an After photo. The photo rules skip moves M9 to M13 (M9 only sets `workStartedAt`).
 - [ ] Design it (spec): `/architect transfer to outsourced shop`
 - [ ] Polish it (optional, ask first): `impeccable` · `web-design-guidelines` · `break-ui` (long job order text for the printable page)
 

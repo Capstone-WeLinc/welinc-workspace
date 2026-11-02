@@ -98,5 +98,6 @@ WL-802. The mechanic side as a native app on the same API. Epic sized: split int
 WL-804. Mechanics keep working with no signal; changes sync when back online.
 **Done when:** assigned tickets open offline, status changes, notes and photos queue locally with a pending count, sync is automatic, the conflict rule is recorded, and closing the app loses nothing.
 - Note (2026-10-29): safe to build before the integration meeting, but feature 56 (integration contract) may change it: offline behavior lives in the shared mobile app, so its rules must work for VMMS too.
+- Note (2026-11-03, replan): from spec 0018. Queued photo uploads must keep `takenAt`, read from the original file before it is queued.
 - [ ] Design it (spec): `/architect offline save & sync`
 - [ ] Polish it (optional, ask first): `web-design-guidelines`
