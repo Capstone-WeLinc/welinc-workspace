@@ -227,9 +227,9 @@ Tracer Bullet: the first slice runs one photo through every layer with its label
 
 ## Follow-up
 
-- [ ] Record `exifr` as a web-vrms dependency and its Agent Skill search as declined (2026-11-02) in `welinc-web-vrms/AGENTS.md` (via /sync).
-- [ ] backend-vrms `AGENTS.md`: `workStartedAt` is written only by `applyStatusMove`. Attachments `AGENTS.md`: the derived kind, the PATCH move, the Before protection, the duplicate pool and the photo rules (via /sync).
-- [ ] Feature 23: drop "showing proof files at verification" from its remaining work.
-- [ ] Feature 49 (offline): queued uploads must keep `takenAt` read from the original file.
-- [ ] Outsourcing (features 37, 38): decide whether a returned truck needs an After photo; the rules here skip M9 to M13 (M9 only sets `workStartedAt`).
-- [ ] Consider a `verify.md` for this spec before `/check verify`.
+- [x] Record `exifr` as a web-vrms dependency and its Agent Skill search as declined (2026-11-02) in `welinc-web-vrms/AGENTS.md` (via /sync).
+- [x] backend-vrms `AGENTS.md`: `workStartedAt` is written only by `applyStatusMove`. Attachments `AGENTS.md`: the derived kind, the PATCH move, the Before protection, the duplicate pool and the photo rules (via /sync).
+- [x] Feature 23: drop "showing proof files at verification" from its remaining work.
+- [x] Feature 49 (offline): queued uploads must keep `takenAt` read from the original file.
+- [ ] Outsourcing (features 37, 38): decide whether a returned truck needs an After photo; the rules here skip M9 to M13 (M9 only sets `workStartedAt`). Carried as a note on feature 37 (2026-11-03); the decision is still open.
+- [x] Consider a `verify.md` for this spec before `/check verify`.
