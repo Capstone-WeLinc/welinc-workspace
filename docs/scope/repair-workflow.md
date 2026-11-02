@@ -96,18 +96,28 @@ WL-218, plus WL-209 and WL-210 (feature 21 folded in). One private upload servic
 ### 21. Vehicle photos · dropped
 WL-209 and WL-210. Folded into feature 20 on 2026-11-01 (spec 0017 builds the photo screens with the upload service). Kept for history.
 
-### 22. Proof of completion · planned
-WL-211. No ticket is marked done without evidence.
+### 22. Proof of completion · in-progress
+WL-211. No ticket is marked done without evidence. Spec: [0018](../specs/0018-before-after-photos/index.md) · code in `welinc-backend-vrms/src/modules/attachments/`, `welinc-web-vrms/src/features/repair/`
 **Done when:** Mark as Complete stays disabled without a proof file, the server rejects completion without one, and proof shows on the verification screen.
 - Note (2026-11-01, replan): from spec 0014. Add `proof` to the needs of move M4 (to For verification) in the transition table.
-- [ ] Build it: `/develop proof of completion`
-- [ ] Polish it (optional, ask first): `web-design-guidelines` · `break-ui` (missing files, many attachments)
+- Note (2026-11-02): spec 0018 makes this before and after photos on one strip, labelled by whether work has started, with Admin switches for Start work, Send for verification and Close. It also renames "Send back" to "Return to mechanic".
+- [x] Design it (spec): `/architect proof of completion`
+- [x] Build it: `/develop proof of completion`
+  - [x] Thin thread: the migration (`workStartedAt`, `takenAt`, one duplicate pool), the derived Before or After label, the After limit, and one photo strip with two groups (AC-1 to AC-3, AC-16, AC-17, AC-21)
+  - [x] Photo rules on the moves: the three switches, `photoNeedUnmet()` in `applyStatusMove`, `blockedBy`, disabled buttons with reasons, wait for uploads (AC-4 to AC-8, AC-20)
+  - [x] Move and protect: the PATCH move, Before protection, `canMove` and `canRemove`, the audit event and Before and After wording (AC-9 to AC-11, AC-18)
+  - [x] Evidence signals: exifr `takenAt`, the "Taken before work started" flag for verifiers, "Added after return", and the "Return to mechanic" wording (AC-12 to AC-15)
+  - [x] Hardening: axe at 375px and 1280px, the race and release tests, and the unit tests (AC-7, AC-19)
+- [ ] Verify it: `/check verify proof of completion`
+- [ ] Test it: `/test proof of completion`
+- [ ] Polish it (optional, ask first): `emil-design-eng` (photo viewer menu) · `web-design-guidelines` · `break-ui` (missing photos, full groups, many photos, long uploader names)
 
 ### 23. Chief Mechanic verification · planned
 WL-212. Verify or reject finished work, with the verifier recorded.
 **Done when:** finished tickets land in a verification queue, Verify closes and Reject returns to In Progress with a required comment, and the verifier's name and time are on the ticket and in reports.
 - Note (2026-11-01, replan): the Verify and Send back moves already exist (spec 0014, with the `lastRejection` banner and prefilled resend). What is left is the verification queue page and the proof files.
 - Note (2026-11-01): the verification queue moved to feature 17 (spec 0015, the Chief's dashboard plus the filtered repair list). What is left here is showing proof files at verification and the verifier in reports.
+- Note (2026-11-02): feature 22 (spec 0018) now builds the proof view at verification, and renames Send back to "Return to mechanic". What is left here is the verifier's name and time in reports.
 - [ ] Build it: `/develop chief mechanic verification`
 - [ ] Polish it (optional, ask first): `emil-design-eng` (verify and reject dialogs) · `web-design-guidelines`
 - Note (2026-10-25): Reject is the first backward move. Follow feature 16's rule for the spec 0007 checklist and "What fixed it" notes when a ticket goes back to In Progress.

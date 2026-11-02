@@ -30,7 +30,7 @@ spec [0002](../specs/0002-dashboard-attention-first/index.md) · code in `welinc
   - [x] Mechanic view: four tiles, urgency ordered work list, banner removed (AC-9 to AC-11, AC-17)
   - [x] States and sweep: skeleton, error and retry, dead widgets deleted, tokens only, 375px and 1280px with axe (AC-12, AC-15, AC-16)
 - [x] Verify it: `/check verify dashboard refresh` (2026-10-25: passed; midnight and last month checks not run)
-- [ ] Test it: `/test dashboard refresh`
+- [ ] Test it: `/test dashboard refresh` (deferred 2026-11-02: the UI may be redone, so tests wait until it settles)
 - [ ] Polish it (optional, ask first): `impeccable` · `web-design-guidelines` · `break-ui` (zero and huge counts, empty lists, long plates)
 
 ### 11. Repair list & detail · in-progress · Facade
@@ -46,7 +46,7 @@ spec [0004](../specs/0004-repair-list-detail-refresh/index.md) · code in `welin
   - [x] Costs, AI and Activity: cost section with edit mode, AI restyle, ticket scoped Activity, old fields removed (AC-21 to AC-23, AC-29)
   - [x] Sweep: lint, typecheck, build, tests, 375px and 1280px with axe for both roles (AC-30)
 - [x] Verify it: `/check verify repair list & detail refresh` (2026-10-25: passed; a few value sourcing steps not run)
-- [ ] Test it: `/test repair list & detail refresh`
+- [ ] Test it: `/test repair list & detail refresh` (deferred 2026-11-02: the UI may be redone, so tests wait until it settles)
 - [ ] Polish it (optional, ask first): `impeccable` or `emil-design-eng` (one taste skill per change; motion: status, cancel and unlock dialogs, next action bar) · `web-design-guidelines` · `break-ui` (long plates and notes, 1 and 500 tickets, empty filters)
 
 ### 12. Repair form · in-progress · Facade
@@ -61,7 +61,7 @@ spec [0005](../specs/0005-repair-form-refresh/index.md) · code in `welinc-web-v
   - [x] Submit flow: action bar, summary dialog, create, success and failure handling, in flight lock (AC-15 to AC-21)
   - [x] Leave guard and sweep: `useBlocker` discard prompt, `beforeunload`, legacy code removed, 375px and 1280px with axe (AC-21, AC-23 to AC-25)
 - [x] Verify it: `/check verify repair form refresh` (2026-10-28: passed, every step run)
-- [ ] Test it: `/test repair form refresh`
+- [ ] Test it: `/test repair form refresh` (deferred 2026-11-02: the UI may be redone, so tests wait until it settles)
 - [ ] Polish it (optional, ask first): `impeccable` or `emil-design-eng` (one taste skill per change; motion: summary dialog and pickers) · `web-design-guidelines` · `break-ui` (long descriptions, 10 issues, empty pickers)
 
 ### 13. History & audit log pages · done · Facade
@@ -94,7 +94,7 @@ spec [0006](../specs/0006-user-management-refresh/index.md) · code in `welinc-w
 - Note (2026-10-25): built. welinc-backend-vrms `npm run lint` runs `eslint --fix` and already fails on `development` (203 problems without fix, none in the touched file), so AC-26's backend lint is not green yet; build and the 44 tests pass.
 - Note (2026-10-28): spec 0009 shipped `setupEmailSent` and the unlock on reset in welinc-auth, so this page can drop its workaround: simplify AC-10 and merge AC-20's two calls into one. Do it with the verify pass.
 - [x] Verify it: `/check verify user management refresh` (2026-10-28: passed; the repair form mechanic picker and most value sourcing steps not run; the Antonio step now uses Juan; backend lint ran as `lint:ci`, not the `--fix` script)
-- [ ] Test it: `/test user management refresh`
+- [ ] Test it: `/test user management refresh` (deferred 2026-11-02: the UI may be redone, so tests wait until it settles)
 - [ ] Polish it (optional, ask first): `impeccable` or `emil-design-eng` (one taste skill per change; motion: create, edit and account action dialogs) · `web-design-guidelines` · `break-ui` (long names, unbreakable emails, many users). Feature 52's milestone 3 has landed (the permissions section now lives in Settings), so this is no longer blocked
 
 ### 15. Knowledge base page · in-progress · Facade
@@ -112,7 +112,7 @@ spec [0007](../specs/0007-knowledge-base-fix-library/index.md) · code in `welin
 - Note (2026-10-25): built on `feat/knowledge-base-refresh` in welinc-auth, welinc-backend-vrms and welinc-web-vrms (not pushed). 73 backend tests pass (29 new); lint, typecheck and build are green in the touched files and repos; axe finds nothing at 375px and 1280px for admin, chief mechanic and mechanic. The local auth database has no migration history (built with `db push`), so its `CHIEF_MECHANIC` migration was applied with `prisma db execute`. One call made during the build: issues linked from a suggestion group are linked even when the new entry is saved as a draft (history), while the picker and the ticket link stay Active only. Verify steps in the spec's `verify.md`.
 - Note (2026-10-25): follow up, not part of spec 0007. The ticket's Known fix checklist can only be ticked today. You want it to stay a helper, so each ticket should let you add, remove and reword its own copied steps without changing the knowledge base entry. Needs a small spec (`/architect per ticket checklist edits`) once feature 15 is verified.
 - [x] Verify it: `/check verify knowledge base refresh`
-- [ ] Test it: `/test knowledge base refresh`
+- [ ] Test it: `/test knowledge base refresh` (deferred 2026-11-02: the UI may be redone, so tests wait until it settles)
 - [ ] Polish it (optional, ask first): `impeccable` · `web-design-guidelines` · `break-ui` (long entry names and steps, empty library, many suggestions)
 
 ### 50. Portal on the design system · planned · needs a decision · from spec 0001
