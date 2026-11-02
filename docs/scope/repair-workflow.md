@@ -57,7 +57,7 @@ WL-201, WL-202, and the ordering half of WL-401. Create a ticket with pickers an
 - [x] Test it: `/test new repair ticket & assignment` (2026-11-01: 18 tests added in backend-vrms; 812 backend and 159 web tests pass)
 - [ ] Polish it (optional, ask first): `impeccable` · `web-design-guidelines` · `break-ui` (long plates and names, no free mechanics, many issues)
 
-### 53. Admin ticket editing · in-progress
+### 53. Admin ticket editing · done
 No Jira ticket yet. After a ticket is created, Admin can fix its driver, assigned mechanics and issues (add, remove, edit). Today nothing on a ticket can change except status, costs, the known fix link and step ticks. Design it together with feature 18, after feature 16.
 **Done when:** Admin can edit the driver, mechanics and issues on an open ticket, each change writes an audit row with before and after, a mechanic sees a reassignment within 3 seconds (VR-RL-12), and a stale edit is rejected with the existing 409 reload.
 - Note (2026-11-01, replan): from spec 0015. When this adds its permission key, default the Chief Mechanic to reassign **on**.
@@ -73,7 +73,7 @@ spec [0019](../specs/0019-admin-ticket-editing/index.md)
   - [x] Mechanics: PUT assignments with M1/M2, verifier block, audit rows, "No mechanic" attention item (AC-8b to AC-13)
   - [x] Issues and sweep: add, edit, remove, audit labels, tests, axe at 375px and 1280px (AC-14 to AC-17, AC-19b, AC-20)
 - [x] Verify it: `/check verify admin ticket editing` (2026-11-03: all 40 steps passed. Fixed on the way: axe `button-name` on dropdowns and step checkboxes, and a duplicate license 409 shown as a stale ticket. Spec change: no odometer floor for a truck's oldest ticket)
-- [ ] Test it: `/test admin ticket editing`
+- [x] Test it: `/test admin ticket editing` (2026-11-03: 367 backend and 264 web tests pass; added the list row test for `mechanicCount` and the edit stamp, AC-13 and AC-19; UI only criteria stay with the verify steps)
 - [ ] Polish it (optional, ask first): `emil-design-eng` (edit dialogs) · `web-design-guidelines` · `break-ui` (long issue text, many mechanics)
 
 ### 19. Mechanic status updates · done

@@ -60,7 +60,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 16 | Ticket status lifecycle | Slice 1 | done |
 | 17 | Chief Mechanic role | Slice 1 | done |
 | 18 | New repair ticket & assignment | Slice 1 | done |
-| 53 | Admin ticket editing | Slice 1 | in-progress |
+| 53 | Admin ticket editing | Slice 1 | done |
 | 19 | Mechanic status updates | Slice 1 | done |
 | 20 | File upload & storage | Slice 1 | done |
 | 21 | Vehicle photos | Slice 1 | dropped |
