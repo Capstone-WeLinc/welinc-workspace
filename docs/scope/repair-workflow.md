@@ -108,8 +108,8 @@ WL-211. No ticket is marked done without evidence. Spec: [0018](../specs/0018-be
   - [x] Move and protect: the PATCH move, Before protection, `canMove` and `canRemove`, the audit event and Before and After wording (AC-9 to AC-11, AC-18)
   - [x] Evidence signals: exifr `takenAt`, the "Taken before work started" flag for verifiers, "Added after return", and the "Return to mechanic" wording (AC-12 to AC-15)
   - [x] Hardening: axe at 375px and 1280px, the race and release tests, and the unit tests (AC-7, AC-19)
-- [ ] Verify it: `/check verify proof of completion`
-- [ ] Test it: `/test proof of completion`
+- [x] Verify it: `/check verify proof of completion`
+- [x] Test it: `/test proof of completion`
 - [ ] Polish it (optional, ask first): `emil-design-eng` (photo viewer menu) · `web-design-guidelines` · `break-ui` (missing photos, full groups, many photos, long uploader names)
 
 ### 23. Chief Mechanic verification · planned
