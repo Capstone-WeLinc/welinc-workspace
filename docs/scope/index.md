@@ -64,7 +64,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 19 | Mechanic status updates | Slice 1 | done |
 | 20 | File upload & storage | Slice 1 | done |
 | 21 | Vehicle photos | Slice 1 | dropped |
-| 22 | Proof of completion | Slice 1 | in-progress |
+| 22 | Proof of completion | Slice 1 | done |
 | 23 | Chief Mechanic verification | Slice 1 | planned |
 | 24 | Full ticket audit trail | Slice 1 | planned |
 | 25 | Vehicle availability | Slice 1 | planned |

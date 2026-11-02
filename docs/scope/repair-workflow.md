@@ -96,7 +96,7 @@ WL-218, plus WL-209 and WL-210 (feature 21 folded in). One private upload servic
 ### 21. Vehicle photos · dropped
 WL-209 and WL-210. Folded into feature 20 on 2026-11-01 (spec 0017 builds the photo screens with the upload service). Kept for history.
 
-### 22. Proof of completion · in-progress
+### 22. Proof of completion · done
 WL-211. No ticket is marked done without evidence. Spec: [0018](../specs/0018-before-after-photos/index.md) · code in `welinc-backend-vrms/src/modules/attachments/`, `welinc-web-vrms/src/features/repair/`
 **Done when:** Mark as Complete stays disabled without a proof file, the server rejects completion without one, and proof shows on the verification screen.
 - Note (2026-11-01, replan): from spec 0014. Add `proof` to the needs of move M4 (to For verification) in the transition table.
