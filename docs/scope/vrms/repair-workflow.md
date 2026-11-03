@@ -144,15 +144,26 @@ WL-219. Every ticket event logged in one consistent shape, so history and report
 - Note (2026-11-03, replan): from spec 0019. Mechanic assignments and the new edit actions (driver, odometer, priority, account, issues) already write audit rows and join the timeline. Remarks are the main gap left.
 - [ ] Design it (spec): `/architect full ticket audit trail`
 
-### 25. Vehicle availability · planned
+### 25. Vehicle availability · in-progress
 WL-501, built on Jira's proposed rules. A truck under repair can't be dispatched.
 **Done when:** a vehicle turns Under Repair when its ticket is created, returns to Available when it closes, Admin can toggle it with a reason, and the history is kept per vehicle.
 - Note (2026-10-29): safe to build before the integration meeting, but feature 56 (integration contract) may change it: vehicle status is shared with VMMS (`UNDER_REPAIR` and `UNDER_MAINTENANCE` on the same vehicle).
 - Note (2026-10-29): spec 0010 adds `DISABLED` to the vehicle statuses and designs the `VehicleStatusChange` history table for this feature to create. Also fix the vehicle status change on close or cancel, which runs outside the status transaction today, so a failed write can leave the truck marked Available.
 - Note (2026-11-01, replan): that close and cancel fix shipped in spec 0014 (the truck release now runs inside the status transaction). What is left is the history table, the Admin toggle and Under Repair on create.
 - Note (2026-11-01, replan): from spec 0016. Under Repair on create now ships in feature 18, with `VehicleChange` (`field: 'status'`) as the history table. What is left: the Admin status toggle in the Settings Vehicles section, behind `vehicle.manage`. A ticket's release restores the stored `priorVehicleStatus`, so the toggle must not be overwritten by it while a ticket is open.
-- [ ] Build it: `/develop vehicle availability`
-- [ ] Polish it (optional, ask first): `web-design-guidelines`
+spec [0020](../../specs/vrms/0020-vehicle-availability/index.md)
+- Note (2026-11-03): spec 0020 decided the Admin toggles Available and Disabled only, with a reason (5 to 500); the toggle is blocked while the truck has an open ticket; create and release also write `VehicleChange` status rows, linked by a new `repairTicketId` column; Settings, Vehicles gets a row menu, status filter chips in `?status=` and a History dialog.
+- [x] Design it (spec): `/architect vehicle availability`
+- [x] Build it: `/develop vehicle availability`
+  - [x] Thin thread: migration, `POST /vrms/vehicles/:id/status` with lock, check order and history row, row menu and reason dialog (AC-1 to AC-5a, AC-10, AC-11, AC-14)
+  - [x] Automatic history: create and release rows through `vehicleStatusChange` (AC-6, AC-7, AC-15)
+  - [x] List hints and filter: `openTicket` on every row, disabled action hints, status chips (AC-8, AC-10, AC-12)
+  - [x] History dialog: keyset paged changes endpoint and dialog with Load more (AC-9, AC-13)
+  - [x] Sweep: lint, typecheck, build, tests, 375px and 1280px with axe (AC-16)
+  - code in `welinc-backend-vrms/src/modules/vrms/vehicles/` (`vehicle-status.ts` is the one status writer), `welinc-web-vrms/src/features/settings/` (`VehiclesSection.tsx`, `VehicleHistoryDialog.tsx`, `lib/vehicleStatus.ts`)
+- [ ] Verify it: `/check verify vehicle availability`
+- [ ] Test it: `/test vehicle availability`
+- [ ] Polish it (optional, ask first): `web-design-guidelines` · `break-ui` (long plates and reasons, many history entries)
 
 ### 57. Mechanic workload on the Users page · planned · from spec 0010
 See who is busy before assigning. Build after features 18 and 53, since it reuses their counts and the unassign endpoint.
