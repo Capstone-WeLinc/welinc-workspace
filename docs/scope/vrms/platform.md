@@ -61,6 +61,7 @@ One spec for everything VRMS shares with VMMS and BMS, written after the meeting
 **Done when:** the spec records each shared contract, all three systems run together on staging behind one login, and every scope note that says feature 56 may change it is resolved.
 - Note (2026-10-29): spec 0010 dropped the copied `Booking`, `MaintenanceSchedule`, `ChecklistTemplate` and `ChecklistItem` models from VRMS. Bring them back only if the meeting decides VRMS owns them. Vehicle status now also has `DISABLED`, which VMMS shares.
 - Note (2026-11-01, replan): from spec 0016. Decide who owns vehicle type once VMMS shares vehicle records.
+- Note (2026-11-03, replan): from spec 0020. Agree with VMMS who writes `UNDER_MAINTENANCE` (read only in VRMS today) and whether a VMMS status change writes `VehicleChange` rows through a VRMS API.
 - [ ] Design it (spec): `/architect cross group integration`
 
 ### 61. Suite admin model · planned · needs a decision · GA

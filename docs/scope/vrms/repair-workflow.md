@@ -153,6 +153,7 @@ WL-501, built on Jira's proposed rules. A truck under repair can't be dispatched
 - Note (2026-11-01, replan): from spec 0016. Under Repair on create now ships in feature 18, with `VehicleChange` (`field: 'status'`) as the history table. What is left: the Admin status toggle in the Settings Vehicles section, behind `vehicle.manage`. A ticket's release restores the stored `priorVehicleStatus`, so the toggle must not be overwritten by it while a ticket is open.
 spec [0020](../../specs/vrms/0020-vehicle-availability/index.md)
 - Note (2026-11-03): spec 0020 decided the Admin toggles Available and Disabled only, with a reason (5 to 500); the toggle is blocked while the truck has an open ticket; create and release also write `VehicleChange` status rows, linked by a new `repairTicketId` column; Settings, Vehicles gets a row menu, status filter chips in `?status=` and a History dialog.
+- Note (2026-11-03, replan): open follow-up from spec 0020, only if needed: "Disable after repair" (the toggle on an open ticket saves the choice to `priorVehicleStatus`), for the gap between close and the Admin's Disable click. Not enrolled as a row until it bites.
 - [x] Design it (spec): `/architect vehicle availability`
 - [x] Build it: `/develop vehicle availability`
   - [x] Thin thread: migration, `POST /vrms/vehicles/:id/status` with lock, check order and history row, row menu and reason dialog (AC-1 to AC-5a, AC-10, AC-11, AC-14)
@@ -165,12 +166,21 @@ spec [0020](../../specs/vrms/0020-vehicle-availability/index.md)
 - [x] Test it: `/test vehicle availability` (2026-11-03: 5 backend spec files added or extended, 1170 backend tests pass; the dialog counter is a component and web-vrms has no component tests)
 - [ ] Polish it (optional, ask first): `web-design-guidelines` · `break-ui` (long plates and reasons, many history entries)
 
-### 57. Mechanic workload on the Users page · planned · from spec 0010
+### 57. Mechanic workload on the Users page · done · from spec 0010
 See who is busy before assigning. Build after features 18 and 53, since it reuses their counts and the unassign endpoint.
 **Done when:** mechanic rows show an Occupied badge (at least one In Progress ticket) and open counts by status, an Occupied or Free filter stays in the address, the user dialog lists the mechanic's open tickets with links and Unassign or Reassign (each audit logged, with the 409 stale check), the assignment picker shows the same counts, and the Chief Mechanic sees it read only under the name Mechanics (a feature 5 permission). No new page.
 - Note (2026-11-01, replan): from spec 0016. Reuse `openCount` and `busy` from the assignment picker, and `ticket.assign` for Unassign and Reassign.
 - Note (2026-11-03, replan): from spec 0019. Unassign and Reassign should call `PUT /repairs/:id/assignments` (it already runs M1 and M2, the verifier block and the audit rows), not a new endpoint.
-- [ ] Build it: `/develop mechanic workload`
+- Note (2026-11-03, develop): built the Admin side only, no spec (no decision owed). The Chief Mechanic's read only "Mechanics" view is held back: the Users page reads `GET /auth/users` from welinc-auth, which only Admin may call, so the Chief view needs a new permission key and its own VRMS data source. That is a decision for `/architect` (or `/scope` can split it into its own row). The picker's "Busy" badge now reads "Occupied", the same rule (`isOccupied` in `mechanic-workload.ts`).
+- [x] Build it: `/develop mechanic workload` (2026-11-03: branch `feat/mechanic-workload` in backend-vrms and web-vrms; lint, typecheck, build and tests green, 417 backend vrms module tests and 290 web tests)
+  - code in `welinc-backend-vrms/src/modules/vrms/mechanic-workload.ts`, `mechanic-work.service.ts` (`workload`, `openTickets`); `welinc-web-vrms/src/features/user-management/` (`lib/workload.ts`, `hooks/useWorkload.ts`, `components/UserWorkCell.tsx`, `components/MechanicOpenTickets.tsx`, `components/ReassignDialog.tsx`)
+  - [x] Server reads: `GET /vrms/mechanics/workload` and `GET /vrms/mechanics/:authUserId/open-tickets` behind `users.manage`, one Occupied rule shared with the picker
+  - [x] Users page: Work column (Occupied or Free plus counts by status), Work filter in `?work=`
+  - [x] User dialog: open tickets with links, Unassign and Reassign through `PUT /repairs/:id/assignments` (audit rows, M1 and M2, 409 stale check)
+    - Note (2026-11-03): the first `/check verify` found the Reassign prompt ran off the screen (67 radios, buttons out of view on desktop and phone). Fixed: Reassign is now a searchable dialog (a sheet on phones) in the Assign dialog's order. Steps 1 to 8 were rechecked live after the fix.
+  - [~] Chief Mechanic read only "Mechanics" view (held back 2026-11-03, needs a decision; to be enrolled as its own row with `/scope`)
+- [x] Verify it: `/check verify mechanic workload` (2026-11-03: passed on the second run. The first run failed on the Reassign prompt running off the screen; fixed in `96ec6cc`. Server reads, guards, Work column, filter, dialog, Unassign, Reassign, stale 409, Occupied wording and 375px all shown live. Chief Mechanic view and an axe scan not run)
+- [x] Test it: `/test mechanic workload` (2026-11-03: extended `mechanic-workload.spec.ts` and `workload.test.ts`; backend 1191 and web 307 tests pass. The dialogs have no component tests, since web-vrms tests pure logic only)
 - [ ] Polish it (optional, ask first): `web-design-guidelines` · `break-ui` (busy and idle mechanics, huge counts)
 
 ### 58. Per ticket checklist edits · planned · needs a decision · from spec 0007
