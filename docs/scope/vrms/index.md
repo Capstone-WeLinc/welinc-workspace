@@ -16,8 +16,8 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | Epic | File | Status |
 |---|---|---|
 | Foundations | [foundations.md](foundations.md) | 8 existing, 7 done, 1 planned |
-| UI refresh | [ui-refresh.md](ui-refresh.md) | 3 done, 5 in-progress, 2 planned |
-| Repair workflow | [repair-workflow.md](repair-workflow.md) | 10 done, 10 planned, 1 dropped |
+| UI refresh | [ui-refresh.md](ui-refresh.md) | 3 done, 5 in-progress, 3 planned |
+| Repair workflow | [repair-workflow.md](repair-workflow.md) | 11 done, 9 planned, 1 dropped |
 | Platform | [platform.md](platform.md) | 2 in-progress, 8 planned |
 | Outsourcing | [outsourcing.md](outsourcing.md) | 4 planned |
 | Operations | [operations.md](operations.md) | 5 planned, 1 dropped |
@@ -57,6 +57,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 15 | Knowledge base page | UI refresh | in-progress |
 | 50 | Portal on the design system | UI refresh | planned |
 | 51 | Analytics page | UI refresh | planned |
+| 64 | Audit log page redesign | UI refresh | planned |
 | 16 | Ticket status lifecycle | Slice 1 | done |
 | 17 | Chief Mechanic role | Slice 1 | done |
 | 18 | New repair ticket & assignment | Slice 1 | done |
@@ -66,7 +67,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 21 | Vehicle photos | Slice 1 | dropped |
 | 22 | Proof of completion | Slice 1 | done |
 | 23 | Chief Mechanic verification | Slice 1 | done |
-| 24 | Full ticket audit trail | Slice 1 | planned |
+| 24 | Full ticket audit trail | Slice 1 | done |
 | 25 | Vehicle availability | Slice 1 | done |
 | 57 | Mechanic workload on the Users page | Slice 1 | done |
 | 58 | Per ticket checklist edits | Slice 1 | planned |
