@@ -4,4 +4,7 @@ Everything the three systems share and agree on together: the setup guide for th
 
 Big decisions become suite specs in `docs/specs/_root/`. This folder holds the working material around them.
 
-Nothing here yet. The first files come from the integration kickoff prep (VRMS scope feature 55).
+| File | What it is |
+|---|---|
+| [setup-guide.md](setup-guide.md) | How to run the shared stack and plug your system into it |
+| [shared-repo-changes.md](shared-repo-changes.md) | What changed in welinc-auth and welinc-web-portal this term, and what is planned |

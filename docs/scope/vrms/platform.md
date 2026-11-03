@@ -25,7 +25,7 @@ spec [0008](../../specs/vrms/0008-hosting-and-ci-cd/index.md) · code in `infra/
 - Note (2026-10-29): safe to build before the integration meeting, but feature 56 (integration contract) may change it: the Azure milestones host the shared gateway, auth and database, so the other groups' services must fit the same setup.
 - Note (2026-10-31): from spec 0013. The Bicep must set the flexible server configuration `azure.extensions` to include `VECTOR` before the migration job runs, because the VRMS database now stores AI embeddings with pgvector. Before go live, move `GEMINI_API_KEY` to a paid tier (the free tier caps at 500 and 1K requests a day).
 - Note (2026-11-03, replan): from spec 0019. Once every deployed web build uses `PUT /repairs/:id/assignments`, remove the old `POST` alias in backend-vrms.
-- Note (2026-11-03, replan): the gateway change from spec 0017 (26 MB uploads and a 120 second read timeout on the VRMS routes, commit `1803092`) sits on `feat/file-upload-storage` in welinc-auth, not pushed and not on `development`. The staging gateway will reject large uploads until it merges.
+- Note (2026-11-03, replan): the gateway change from spec 0017 (26 MB uploads and a 120 second read timeout on the VRMS routes, commit `1803092`) was pushed straight to welinc-auth `development` on 2026-11-03. Add it to the feature 55 list of changes you made to the shared repos.
 
 ### 27. Error monitoring · planned · needs a decision
 Catch errors in production before users report them.
@@ -36,12 +36,12 @@ Catch errors in production before users report them.
 
 The VMMS and BMS groups went separate ways after Capstone 1. The integration meeting is planned for after the first week of November 2026; these two features prepare it and then settle what the three systems share.
 
-### 55. Integration kickoff prep · planned
+### 55. Integration kickoff prep · in-progress
 Get ready for the first integration meeting: know what the other groups changed, what you need to ask them, and how the shared setup works now.
 **Done when:** a question list covers their repos, mobile app repo, services, auth, environments and CI; every change they made to the shared repos (welinc-auth, welinc-web-portal) is listed from a read only check; and a setup guide for the shared stack (auth, portal, gateway, docker network, CI, environments, dependency updates) is ready to hand over.
-- [ ] Question list for VMMS and BMS
-- [ ] Shared repo drift check (read only)
-- [ ] Setup guide for the shared stack
+- [x] Question list for VMMS and BMS (2026-11-03: 28 questions, kept in `docs/_private/vrms/` outside git)
+- [x] Shared repo drift check (read only) (2026-11-03: flipped to what you changed, [shared-repo-changes.md](../../integration/shared-repo-changes.md))
+- [x] Setup guide for the shared stack (2026-11-03: [setup-guide.md](../../integration/setup-guide.md))
 - [ ] Meeting held, answers recorded for feature 56
 - Note (2026-10-29): add to the question list that `CHIEF_MECHANIC` now exists in the shared auth role list (spec 0007), and that the VMMS and BMS backends likely carry the same copied login module and `users` table that spec 0009 removed here.
 - Note (2026-10-30): also ask which roles BMS has now (operations, customer service?), and tell them about feature 60 (the portal picker changes where their shared users land). Today admin is one separate grant per system; if the groups want a single suite wide superadmin instead, decide it in feature 56 (your Capstone 1 panel called one insecure).
