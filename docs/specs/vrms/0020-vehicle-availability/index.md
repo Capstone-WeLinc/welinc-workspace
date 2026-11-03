@@ -1,7 +1,7 @@
 # 0020. Vehicle availability: Admin status toggle and a full truck history
 
 **Date**: 2026-11-03
-**Status**: In Progress
+**Status**: Accepted
 
 ## Summary
 
@@ -20,7 +20,7 @@ An Admin can now take a truck out of service (Disabled) or put it back (Availabl
 - **AC-3**: The only target statuses are `AVAILABLE` and `DISABLED`; any other value is a 400. A truck whose status is `UNDER_MAINTENANCE` can't be toggled (409 `{ statusCode: 409, code: 'VEHICLE_STATUS_LOCKED', message: "This truck's status is set by maintenance." }`). A target equal to the current status is a 409 `{ code: 'STALE_VEHICLE', message: 'This truck changed. Reload and try again.' }` (the screen was out of date).
 - **AC-4**: A truck with an open ticket (any status in `OPEN_STATUSES`) can't be toggled: 409 in the same body shape ticket create uses, `{ statusCode: 409, code: 'OPEN_TICKET_EXISTS', message, ticket: { id, repairNumber } }`, with the message built on the server: "This truck has an open repair, R-0123. Change its status after the repair is closed or cancelled." The check runs after taking the same vehicle row lock (`SELECT … FOR UPDATE`) that ticket create takes, so a toggle and a new ticket on the same truck can't both win.
 - **AC-5**: The request carries the row's `updatedAt`. It is compared before the transaction (fast fail) and again after the row lock, against `updated_at` read under the lock (not only through an `updateMany` guard). A mismatch answers 409 `{ code: 'STALE_VEHICLE', message: 'This truck changed. Reload and try again.' }` (a new status message; the type edit keeps its own). The screen then shows the toast and reloads the list.
-- **AC-5a**: The toggle checks run in this order, and the first failure answers: truck not found or inactive (404), invalid body (400), then inside the transaction: take the row lock, stale (AC-5), `UNDER_MAINTENANCE` (AC-3), open ticket (AC-4), target equal to current (AC-3).
+- **AC-5a**: The toggle checks run in this order, and the first failure answers: invalid body (400, from the global `ValidationPipe`, which runs before the handler on every route, so a bad body gets a 400 even for an unknown truck), truck not found or inactive (404), stale `updatedAt` as a fast fail (409, AC-5), then inside the transaction: take the row lock, stale again (AC-5), `UNDER_MAINTENANCE` (AC-3), open ticket (AC-4), target equal to current (AC-3).
 - **AC-6**: Ticket create writes a status history row in its transaction, after the ticket insert: `before` = the status read under the lock (`priorVehicleStatus`), `after: "UNDER_REPAIR"`, `repairTicketId` = the new ticket, the creator as actor, `note` null. No row when the truck was already `UNDER_REPAIR` (a stuck truck).
 - **AC-7**: The release in `applyStatusMove` (a move into Closed or Cancelled) writes a status history row in the same transaction when the status actually changes: `before` = the truck's status just before the release, `after` = `DISABLED` or `AVAILABLE` (unchanged rule from spec 0016), `repairTicketId` = the ticket, the user making the move as actor, `note` null. No row when before and after are equal.
 - **AC-8**: Every vehicle row the API returns (the list, the type `PATCH` and the toggle, all through one shared `present()`) carries `openTicket: { id, repairNumber } | null`, the truck's newest open ticket. After a successful toggle it is always null.

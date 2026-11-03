@@ -144,7 +144,7 @@ WL-219. Every ticket event logged in one consistent shape, so history and report
 - Note (2026-11-03, replan): from spec 0019. Mechanic assignments and the new edit actions (driver, odometer, priority, account, issues) already write audit rows and join the timeline. Remarks are the main gap left.
 - [ ] Design it (spec): `/architect full ticket audit trail`
 
-### 25. Vehicle availability · in-progress
+### 25. Vehicle availability · done
 WL-501, built on Jira's proposed rules. A truck under repair can't be dispatched.
 **Done when:** a vehicle turns Under Repair when its ticket is created, returns to Available when it closes, Admin can toggle it with a reason, and the history is kept per vehicle.
 - Note (2026-10-29): safe to build before the integration meeting, but feature 56 (integration contract) may change it: vehicle status is shared with VMMS (`UNDER_REPAIR` and `UNDER_MAINTENANCE` on the same vehicle).
@@ -161,8 +161,8 @@ spec [0020](../../specs/vrms/0020-vehicle-availability/index.md)
   - [x] History dialog: keyset paged changes endpoint and dialog with Load more (AC-9, AC-13)
   - [x] Sweep: lint, typecheck, build, tests, 375px and 1280px with axe (AC-16)
   - code in `welinc-backend-vrms/src/modules/vrms/vehicles/` (`vehicle-status.ts` is the one status writer), `welinc-web-vrms/src/features/settings/` (`VehiclesSection.tsx`, `VehicleHistoryDialog.tsx`, `lib/vehicleStatus.ts`)
-- [ ] Verify it: `/check verify vehicle availability`
-- [ ] Test it: `/test vehicle availability`
+- [x] Verify it: `/check verify vehicle availability` (2026-11-03: passed; AC-11 counter fixed during the run, two verify steps reworded)
+- [x] Test it: `/test vehicle availability` (2026-11-03: 5 backend spec files added or extended, 1170 backend tests pass; the dialog counter is a component and web-vrms has no component tests)
 - [ ] Polish it (optional, ask first): `web-design-guidelines` · `break-ui` (long plates and reasons, many history entries)
 
 ### 57. Mechanic workload on the Users page · planned · from spec 0010
