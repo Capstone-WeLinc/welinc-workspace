@@ -54,7 +54,7 @@ services:
       JWT_REFRESH_SECRET: dev_refresh_secret_key_change_in_production
       JWT_ACCESS_EXPIRY: 15m
       JWT_REFRESH_EXPIRY: 7d
-      CORS_ORIGINS: http://localhost:8000,http://localhost:8001
+      CORS_ORIGINS: http://localhost:8000,http://localhost:8001,http://localhost:8002,http://localhost:8003
       # Public portal address for the links in setup and reset emails (spec 0009)
       PORTAL_URL: http://localhost:8000
       NODE_ENV: development

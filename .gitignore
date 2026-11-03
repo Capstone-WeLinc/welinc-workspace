@@ -9,6 +9,9 @@
 # Raw source exports (Google Docs, Jira CSV)
 docs/_source/
 
+# Private notes a group keeps out of git (docs/_private/<system>/)
+docs/_private/
+
 # Playwright MCP screenshots, snapshots and downloads
 .playwright-mcp/
 
@@ -22,3 +25,12 @@ Thumbs.db
 
 # Impeccable critique snapshots
 .impeccable/
+
+# Per group AI setup: installed locally from agents/<system>/ by scripts/use-agents.mjs, never committed
+/.claude/skills/
+/.claude/agents-installed.json
+/.agents/
+/.mcp.json
+/CLAUDE.local.md
+/skills-lock.json
+/test-preferences.json

@@ -18,7 +18,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | Foundations | [foundations.md](foundations.md) | 8 existing, 7 done, 1 planned |
 | UI refresh | [ui-refresh.md](ui-refresh.md) | 3 done, 5 in-progress, 2 planned |
 | Repair workflow | [repair-workflow.md](repair-workflow.md) | 8 done, 11 planned, 1 dropped |
-| Platform | [platform.md](platform.md) | 1 in-progress, 9 planned |
+| Platform | [platform.md](platform.md) | 2 in-progress, 8 planned |
 | Outsourcing | [outsourcing.md](outsourcing.md) | 4 planned |
 | Operations | [operations.md](operations.md) | 5 planned, 1 dropped |
 | Reports & AI | [reports-ai.md](reports-ai.md) | 4 planned |
@@ -43,7 +43,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 6 | Design system & UI foundation | Foundation | done |
 | 7 | Language support (English + Filipino) | Foundation | planned |
 | 52 | Configurable settings & modules | Foundation | done |
-| 55 | Integration kickoff prep | Integration | planned |
+| 55 | Integration kickoff prep | Integration | in-progress |
 | 60 | Portal system picker for shared accounts | Integration | planned |
 | 56 | Cross group integration contract | Integration | planned |
 | 61 | Suite admin model | Integration | planned |
