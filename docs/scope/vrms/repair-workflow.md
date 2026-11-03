@@ -137,12 +137,24 @@ WL-212. Verify or reject finished work, with the verifier recorded.
 Code in `welinc-backend-vrms/src/modules/vrms/repairs.service.ts` (`findHistory`), `welinc-web-vrms/src/features/repair/` (History page and filters, `TicketSidePanel`)
 - Note (2026-10-25): Reject is the first backward move. Follow feature 16's rule for the spec 0007 checklist and "What fixed it" notes when a ticket goes back to In Progress.
 
-### 24. Full ticket audit trail · planned · needs a decision
+### 24. Full ticket audit trail · done
 WL-219. Every ticket event logged in one consistent shape, so history and reports can trust it.
 **Done when:** every event type in WL-219 writes actor, role, time, before and after, and note, and no entry can be edited or deleted from the UI.
 - Note (2026-10-29): spec 0010 gives the audit log one shape (one row per event, its changes as a JSON list). Remarks and mechanic assignments are still not audited; decide whether they join the timeline.
 - Note (2026-11-03, replan): from spec 0019. Mechanic assignments and the new edit actions (driver, odometer, priority, account, issues) already write audit rows and join the timeline. Remarks are the main gap left.
-- [ ] Design it (spec): `/architect full ticket audit trail`
+spec [0021](../../specs/vrms/0021-full-ticket-audit-trail/index.md)
+- Note (2026-11-04): spec 0021 decided it. It closes four gaps: relocking saves (costs, remarks and cancel reason after an unlock, plus a `LOCKED` row), step ticks (`STEP_CHECKED`, `STEP_UNCHECKED`), and `MECHANIC_ASSIGNED` on create. Every type gets one of seven categories, and the API filters by categories, types and role, with a `catalog` endpoint. Cost rows are hidden without `ticket.costs.view`. A trigger makes `audit_logs` append only, and grants follow with feature 26. `STATUS_OVERRIDE` and `TRANSFER_*` are reserved for features 33 and 30. The Audit log page redesign is feature 64.
+- [x] Design it (spec): `/architect full ticket audit trail`
+- [x] Build it: `/develop full ticket audit trail`
+  - [x] Thin thread, relocking saves: catalog and categories, `COST_UPDATE`, `TICKET_EDITED` and `LOCKED` with the unlock reason, write order stamps, `category` on events, `MECHANIC_ASSIGNED` on create, web sentences (AC-1 to AC-3b, AC-5b, AC-7, AC-8, AC-15)
+  - [x] Step ticks: one transaction with the checks, conditional update, `STEP_CHECKED` and `STEP_UNCHECKED`, `lastActivityAt` (AC-4, AC-5, AC-15)
+  - [x] Filters and catalog: `categories`, `types`, `actorRole`, the `type` alias, 400s, `GET audit-logs/catalog`, cost rows hidden (AC-9 to AC-12)
+  - [x] Append only: trigger migration, seed disable and enable, guard test (AC-13, AC-14)
+  - [x] Coverage and sweep: coverage test over every ticket action, lint, build, tests, live check of the new rows (AC-6, AC-15)
+Code in `welinc-backend-vrms/src/modules/vrms/audit-events.ts` (catalog, builders, filters), `repairs.service.ts` (`saveUnlocked`, `updateCosts`, `checkStep`, `findAuditEvents`, `findAuditCatalog`), `prisma/migrations/20261104120000_audit_logs_append_only/`, `welinc-web-vrms/src/features/audit-logs/` (sentences and lines)
+- Note (2026-11-04, verify): the mechanics save (spec 0019) shared one time for its removed and added rows; fixed so they are stamped in write order like the other multi row actions. Two wording gaps in spec 0021 (AC-6 actor of the deactivation unassign, AC-9 unknown stored actions) were fixed by `/architect` on 2026-11-04. `attachments/AGENTS.md` still names `hideDocumentEvents`, now `hiddenAuditEvents` (`/sync`).
+- [x] Verify it: `/check verify full ticket audit trail`
+- [x] Test it: `/test full ticket audit trail`
 
 ### 25. Vehicle availability · done
 WL-501, built on Jira's proposed rules. A truck under repair can't be dispatched.
