@@ -178,10 +178,10 @@ See who is busy before assigning. Build after features 18 and 53, since it reuse
   - [x] Users page: Work column (Occupied or Free plus counts by status), Work filter in `?work=`
   - [x] User dialog: open tickets with links, Unassign and Reassign through `PUT /repairs/:id/assignments` (audit rows, M1 and M2, 409 stale check)
     - Note (2026-11-03): the first `/check verify` found the Reassign prompt ran off the screen (67 radios, buttons out of view on desktop and phone). Fixed: Reassign is now a searchable dialog (a sheet on phones) in the Assign dialog's order. Steps 1 to 8 were rechecked live after the fix.
-  - [~] Chief Mechanic read only "Mechanics" view (held back 2026-11-03, needs a decision; to be enrolled as its own row with `/scope`)
+  - [~] Chief Mechanic read only "Mechanics" view (moved to feature 63 on 2026-11-03)
 - [x] Verify it: `/check verify mechanic workload` (2026-11-03: passed on the second run. The first run failed on the Reassign prompt running off the screen; fixed in `96ec6cc`. Server reads, guards, Work column, filter, dialog, Unassign, Reassign, stale 409, Occupied wording and 375px all shown live. Chief Mechanic view and an axe scan not run)
 - [x] Test it: `/test mechanic workload` (2026-11-03: extended `mechanic-workload.spec.ts` and `workload.test.ts`; backend 1191 and web 307 tests pass. The dialogs have no component tests, since web-vrms tests pure logic only)
-- [ ] Polish it (optional, ask first): `web-design-guidelines` · `break-ui` (busy and idle mechanics, huge counts)
+- [x] Polish it (optional, ask first): `web-design-guidelines` (not run) · `break-ui` (2026-11-03: ran, 8 of 9 findings fixed. Left on purpose: the 1,284 option Reassign picker is not virtualized, since a real roster is about 70. Fixture in `welinc-web-vrms/src/features/dev-ui/worst-case/usersData.ts`, `?data=worst` on `/users`)
 
 ### 58. Per ticket checklist edits · planned · needs a decision · from spec 0007
 The Known fix checklist on a ticket can only be ticked today. You want it to stay a helper, so each ticket lets you add, remove and reword its own copied steps without changing the knowledge base entry.
@@ -189,6 +189,13 @@ The Known fix checklist on a ticket can only be ticked today. You want it to sta
 - Note (2026-10-29): held back until feature 15 was verified, which it now is. A small spec: the copied steps already exist (`RepairIssueStep`), so the open points are who may edit them and what happens to ticked steps when one is removed.
 - [ ] Design it (spec): `/architect per ticket checklist edits`
 - [ ] Polish it (optional, ask first): `web-design-guidelines` · `break-ui` (long step text, many steps, empty checklist)
+
+### 63. Chief Mechanic Mechanics view · planned · needs a decision · from feature 57
+Split from feature 57 on 2026-11-03. The Chief Mechanic sees the same workload Admin sees on the Users page (Occupied or Free, open counts by status, each mechanic's open tickets), read only and under the name Mechanics, so they can balance work before handing out tickets. No new page.
+**Done when:** the Chief Mechanic can open Mechanics and see every mechanic's Occupied or Free state, counts by status and open tickets with links, nothing there lets them change an account or an assignment, a mechanic gets 403 on it, and Admin's Users page stays as it is.
+- Note (2026-11-03): the open decision is the permission key (its name and defaults, Chief on and Mechanic off) and where the list comes from. The Users page reads `GET /auth/users` from welinc-auth, which only Admin may call, so the Chief's list needs a VRMS source (the mechanic roster in backend-vrms, plus `GET /vrms/mechanics/workload` and `.../open-tickets`, today behind `users.manage`). Also decide whether Unassign and Reassign show for a Chief who holds `ticket.assign`.
+- [ ] Design it (spec): `/architect chief mechanic mechanics view`
+- [ ] Polish it (optional, ask first): `web-design-guidelines` · `break-ui` (many mechanics, long names, huge counts)
 
 ## Slice 2: Mechanic workflow & notifications
 

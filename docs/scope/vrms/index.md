@@ -17,7 +17,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 |---|---|---|
 | Foundations | [foundations.md](foundations.md) | 8 existing, 7 done, 1 planned |
 | UI refresh | [ui-refresh.md](ui-refresh.md) | 3 done, 5 in-progress, 2 planned |
-| Repair workflow | [repair-workflow.md](repair-workflow.md) | 10 done, 9 planned, 1 dropped |
+| Repair workflow | [repair-workflow.md](repair-workflow.md) | 10 done, 10 planned, 1 dropped |
 | Platform | [platform.md](platform.md) | 2 in-progress, 8 planned |
 | Outsourcing | [outsourcing.md](outsourcing.md) | 4 planned |
 | Operations | [operations.md](operations.md) | 5 planned, 1 dropped |
@@ -70,6 +70,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 25 | Vehicle availability | Slice 1 | done |
 | 57 | Mechanic workload on the Users page | Slice 1 | done |
 | 58 | Per ticket checklist edits | Slice 1 | planned |
+| 63 | Chief Mechanic Mechanics view | Slice 1 | planned |
 | 26 | Hosting, CI/CD & environments | Release | in-progress |
 | 27 | Error monitoring | Release | planned |
 | 28 | In-app notifications | Slice 2 | planned |
