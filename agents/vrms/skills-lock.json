@@ -192,6 +192,12 @@
       "sourceType": "github",
       "skillPath": "skills/web-design-guidelines/SKILL.md",
       "computedHash": "f3bc47f890f42a44db1007ab390709ec368e4b8c089baee6b0007182236ac474"
+    },
+    "web-dnd-dnd-kit": {
+      "source": "agents-inc/skills",
+      "sourceType": "github",
+      "skillPath": "src/skills/web-dnd-dnd-kit/SKILL.md",
+      "computedHash": "1af4b437326af871def05917603505b11075f510a0ce4d2e452f1e41369c4011"
     }
   }
 }

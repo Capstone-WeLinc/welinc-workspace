@@ -12,6 +12,8 @@ welinc-web-vrms
 welinc-backend-vrms
 welinc-web-vmms
 welinc-backend-vmms
+welinc-backend-vmms-analytics-ai
+welinc-mobile-vrms_vmms
 welinc-web-bms
 welinc-backend-bms
 "
