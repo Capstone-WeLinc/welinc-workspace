@@ -86,3 +86,17 @@ _These replace the older photos line and summary steps above where they disagree
 - [ ] 375px order: status line, Notes, Issues, Photos, AI, Costs, People, Details, Activity → AC-18
 - [ ] `npm run test` includes the check that no `·` is left in the ticket page code → AC-19
 - [ ] axe at 375px and 1280px with the Photos card full, empty and loading → AC-20
+
+## Task 6 build notes (2026-11-07, /develop)
+_Added by the build. The side by side rule changed during the build (your call): the groups sit side by side only when the card is wide enough, so the "Before always left" step above holds only on a wide card._
+- [ ] Card width rule: at 1280px with the app sidebar open, Before and After stack (Before on top); at about 1400px and wider, or 1280px with the sidebar collapsed, they sit side by side; a group's 4 slots never wrap at any width, 375px included → AC-13 (container query `@2xl`, 672px inside the card)
+- [ ] On a mouse device, drag files over the card → the whole card shows the ring; drop → they upload into the tile's group; a full group shows no ring and no drop hint → AC-13
+- [ ] On a pointer device the card says "Or drop {before|after} photos anywhere on this card"; on a phone that line is gone → AC-13
+- [ ] Viewer walk: open the first Before thumbnail and press the right arrow through every photo → Before then After, also on an In progress ticket (the order no longer flips once work starts) → AC-13, value sourcing: Photos card
+- [ ] Group with exactly 3 photos → 3 thumbnails, no "+N more"; with 4 → 2 thumbnails and "+2 more"; Before has 4 and After has 4, "+2 more" in After opens on After's third photo (index 6 in the walk) → AC-13, value sourcing: "+N more" and viewer index
+- [ ] Tile label tracks `workStartedAt`: press Start work on an Assigned ticket → the tile moves from Before to After without a reload → AC-13, value sourcing: which group gets the tile
+- [ ] Blocked link with After full → focus lands on the card's "Photos" heading, not a tile → AC-13
+- [ ] Block the attachments call (devtools) and reload → the card shows the error with Try again; Try again reloads the file list only, the issues stay as they were → AC-13
+- [ ] A viewer who can't add sees no "2 of 5" counts on the group headings → AC-13
+- [ ] Row line 2 at 375px with a long known fix name → the name ends in an ellipsis, while the category, the Draft or Inactive badge and "Safety" stay whole → AC-2
+- [ ] AI run line reads "Ran 2 hours ago with {model}, high confidence" → AC-19
