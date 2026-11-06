@@ -23,6 +23,8 @@ _Steps derived from spec 0023 acceptance criteria. `/check verify` runs these; `
 - [ ] By keyboard, Tab to a handle, Space, Down, Down, Space → the step moved two places, focus stays on its handle; Space, Down, Escape → back in place and the sheet is still open; a screen reader hears the instructions and each sentence → AC-4a, AC-18
 - [ ] At 375px with 20 steps, drag the last step to the top → the sheet scrolls while dragging; the preview shows the number and text at the row's width → AC-4a
 - [ ] In step 2 press Enter → an empty step 3 appears with the cursor in it; Enter again → nothing; Backspace → it is gone and the cursor is at the end of step 2; hold Backspace in step 2 → its text is deleted but the step stays; at 20 rows Enter does nothing; type 301 characters → the field stops at 300 → AC-4b
+- [ ] With a Japanese or Chinese input method, type in a step and press Enter to commit the text → no new step is added → AC-4b
+- [ ] Start a mouse drag on a handle, press Escape mid drag → the step goes back to its place, the sheet stays open, focus is on that handle → AC-4a, AC-18
 - [ ] Approve a knowledge suggestion that links an issue which already has its own steps → its steps stay, an open Edit steps dialog on it still saves; one that links an issue with no steps → the entry's steps appear → AC-14
 - [ ] At 375px the dialog is a bottom sheet; remove a step by keyboard → focus lands on the row that took its place; remove the last one → focus on Add step; axe clean at 375px and 1280px with the dialog and the prompt open → AC-4, AC-18
 
