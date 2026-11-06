@@ -174,5 +174,5 @@ Facade: the UI is the whole change, so each slice is a working page on real data
 - [ ] **Knowledge entry page**: check that typical parts and hours are easy to find there, since the ticket no longer shows them.
 - [ ] **Feature 64**: group a checklist save's step rows in Activity when the Audit log page is redesigned.
 - [ ] **AI per issue** (later, its own spec): a diagnosis per issue would need new AI endpoints.
-- [ ] **`/sync`**: record in `welinc-web-vrms/AGENTS.md` that the issue state is derived only by `issueState` and that the ticket view lives in `sessionStorage` as `{ open: string[], hideDone: boolean }`.
+- [x] **`/sync`**: record in `welinc-web-vrms/AGENTS.md` that the issue state is derived only by `issueState` and that the ticket view lives in `sessionStorage` as `{ open: string[], hideDone: boolean }`.
 - [ ] **For the PM (Jira)**: "Ticket detail redesign: foldable issues with progress and state, no typical parts or hours on tickets, title and phone order fixes, Cancel in a menu" (feature 65).
