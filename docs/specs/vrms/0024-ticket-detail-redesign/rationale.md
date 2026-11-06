@@ -78,3 +78,15 @@ Seen on the built page at 1280px, the open issue still carried two lines of cont
 - The photos line stays folded until a photo exists and names what is missing instead. The Status card's reason link still opens it, so nothing is lost.
 - Priority and due date are urgency, so they sit with the status in the Status card; the rest of Details splits into Vehicle and Record, so each group reads at a glance.
 - Hierarchy: the issue title one step larger and semibold leads the row; step rows go to 36px on desktop and keep 44px for thumbs on phones.
+
+## Update 2026-11-07: second refinements after the refinements build
+
+Seen on the built page by the engineer: the photos area offered two add buttons (Add photos on the line, Choose photos under the groups) and neither said which group a photo lands in; the summary line carried three controls; and text joined by a dot read as generated, not designed. Decided in conversation, recommended picks taken:
+
+- **Rows stay foldable, no popup.** A popup (Option 2 above) hides the other issues while you work, adds an open and a close per issue, and breaks `#issue-N` links and the per issue progress you scan down the list. Popups suit short focused edits, which is why Edit steps is already a dialog. Shop work order tools keep jobs inline for the same reason. Option 1 holds.
+- **Photos become their own card after Issues** (chosen over keeping them inside Issues always open, and over a folded line whose hint is the button). One add tile sits in the group photos land in, so the control itself says where the photo goes, and there is never a second add button. Placing it after Issues follows the work: steps first, then the after photo, and on phones the issues stay first. One row per group with "+N more" keeps the card a fixed height however many photos there are. The tile drops `capture`, so one control reaches both the camera and the gallery through the phone's own picker; this replaces spec 0017's separate Take photo button on this page.
+- **Only Hide done steps stays on the summary line** (chosen over moving Expand all and Collapse all into a menu). Each row's header already opens and closes it, the page remembers what was opened, and most tickets carry 1 to 3 issues; a menu would hide two rarely used actions behind an extra tap.
+- **No dot separators.** Counts read as sentences with commas, the parts of a row's line 2 are split by space with the known fix labelled ("Known fix: name"), and the overdue text gets its own line. Words and layout carry the structure instead of a symbol.
+- **Hover labels** on the status and priority badges and on both `⋮` menus, so a badge or an icon button says what it is. Built during the refinements run (`6e19286`) and recorded here.
+
+Root cause found on the way: the local seed never set `workStartedAt`, so seeded started tickets uploaded every photo into Before. Fixed in the seed (`9e28684` in welinc-backend-vrms), outside this spec.

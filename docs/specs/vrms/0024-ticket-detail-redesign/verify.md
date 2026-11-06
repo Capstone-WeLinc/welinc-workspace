@@ -68,3 +68,21 @@ _These replace the older steps above where they disagree._
 - [ ] Closed row with a saved resolution shows only What fixed it and hours on line 2 → AC-2
 - [ ] Both ⋮ menus: Enter or Space opens, arrows move, Escape closes with focus back on the trigger → AC-20
 - [ ] axe at 375px and 1280px with a row menu open and closed → AC-20
+
+## Second refinements (2026-11-07, task 6)
+_These replace the older photos line and summary steps above where they disagree._
+- [ ] A Photos card sits right after Issues and before AI; there is no photos line inside Issues and no fold → AC-13, AC-14
+- [ ] Before is always left (top on phones) and After right (below); start work on a ticket and the columns do not swap → AC-13
+- [ ] Assigned ticket: "+ Add before photo" tile only in Before; In progress ticket: "+ Add after photo" only in After; the other group says "None yet" when empty → AC-13
+- [ ] Click the tile → the file picker opens in the same click; on a phone it offers camera or gallery; the photo lands in the tile's group → AC-13
+- [ ] A group with 5 photos shows 2 thumbnails and "+3 more"; clicking it opens the viewer on that group's third photo; closing returns focus to the tile → AC-13
+- [ ] Fill After to its limit (count queued uploads) → the tile becomes "After photos full (10 of 10)" → AC-13
+- [ ] Blocked Send for verification with no after photo → "After photo needed" at the card's top right; the Status card reason link scrolls to the card (not under the sticky header) and focuses the tile → AC-13, AC-17
+- [ ] Closed ticket, or a viewer who can't add: no tile, no limit text; no card at all when there are no photos → AC-13
+- [ ] Reload the page: skeleton squares only on the first load; the 3 second refresh never flashes skeletons → AC-13
+- [ ] The summary line reads "0 of 2 issues done, 2 of 6 steps ticked"; only Hide done steps on its right; no Expand all or Collapse all → AC-6
+- [ ] No `·` anywhere on the ticket page, its dialogs or the photo viewer: row line 2 ("Cooling   Known fix: …   Safety"), title metadata, due line with overdue on its own line, account "Corporate, …", step tooltip "Ticked by … on …", Documents rows, AI run line, viewer caption on three lines → AC-2, AC-11, AC-16, AC-17, AC-19
+- [ ] Hover the status badge, priority badge and both ⋮ buttons → "Ticket status", "Priority", "More actions" → AC-7, AC-17
+- [ ] 375px order: status line, Notes, Issues, Photos, AI, Costs, People, Details, Activity → AC-18
+- [ ] `npm run test` includes the check that no `·` is left in the ticket page code → AC-19
+- [ ] axe at 375px and 1280px with the Photos card full, empty and loading → AC-20

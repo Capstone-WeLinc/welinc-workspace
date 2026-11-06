@@ -147,12 +147,14 @@ spec [0024](../../specs/vrms/0024-ticket-detail-redesign/index.md) · code in `w
 - Note (2026-11-06): spec 0024 decided it. Issues become foldable rows (shadcn Accordion) with a state derived from ticks (Not started, In progress, Done, No checklist, Returned); rows open by ticket status (first unfinished while work is ongoing, all closed for the verifier and finished tickets), remembered per tab, with `#issue-N` links. Safety is one line above the checklist, photos and AI fold to one line each, Activity shows the 5 newest, Notes and Vehicle move to the sidebar, the title becomes plate, model and first issue, and Cancel goes into a `⋮` menu. Web only, plus one backend test that locks the issue order.
 - [x] Design it (spec): `/architect ticket detail redesign`
 - Note (2026-11-06): spec 0024 updated after the first build with six refinements (build task 5), cross checked and accepted.
-- [x] Build it: `/develop ticket detail redesign`
+- Note (2026-11-07): spec 0024 updated again (build task 6), cross checked and accepted: photos become their own card after Issues with one add tile in the group photos land in (this replaces "photos fold to one line" above), the summary line keeps only Hide done steps, no dot separators anywhere on the page, hover labels on the badges and menus, rows stay foldable.
+- [ ] Build it: `/develop ticket detail redesign`
   - [x] Pure rules: `issueRow.ts` (state, open rule, counts, prefix strip), `useTicketView` and `useTickOverrides`, their tests, the issue order test (AC-3 to AC-6, AC-12)
   - [x] Issue rows: the Accordion, closed and open rows, summary line, Hide done steps, parts and hours removed (AC-1 to AC-10, AC-12)
   - [x] Page frame: title, sidebar Notes and Vehicle, the `⋮` menu, phone order, photos line and blocked link, AI card, Activity (AC-11, AC-13 to AC-18)
   - [x] Sweep: skeleton, axe at 375px and 1280px, keyboard, reduced motion, lint, typecheck, build, tests (AC-19, AC-20)
   - [x] Refinements: row ⋮ menu, one Hide done steps switch, folded photos line with the needed hint, Status card with priority and due, Details in Vehicle and Record, title and step row sizes (AC-2, AC-5 to AC-7, AC-9, AC-10, AC-13, AC-16 to AC-18)
+  - [ ] Second refinements: Photos card after Issues with the add tile and "+N more", only Hide done steps on the summary line, no dot separators (AC-2, AC-6, AC-11, AC-13, AC-14, AC-16 to AC-19)
 - [ ] Verify it: `/check verify ticket detail redesign`
 - [ ] Test it: `/test ticket detail redesign`
 - [ ] Polish it (optional, ask first): `impeccable` · `web-design-guidelines` · `break-ui` (10 issues with 20 steps each, long issue text, no known fix, returned issues)
