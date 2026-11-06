@@ -17,6 +17,13 @@ _Steps derived from spec 0023 acceptance criteria. `/check verify` runs these; `
 - [ ] As the Chief on a ticket they are not assigned to → Edit steps shows and saves; as a Mechanic not assigned to it → no button; turn the key off for Mechanic in the matrix → the assigned mechanic loses the button → AC-1, AC-2
 - [ ] Switch the knowledge module off → Edit steps still shows and saves → AC-16
 - [ ] On a For verification ticket → no Edit steps button → AC-2
+- [ ] Rows show handle, number, a borderless field (border on hover or focus), a tick mark on ticked steps and Remove; no Move up or Move down buttons → AC-4
+- [ ] Drag step 6 above step 5 with the mouse, save → the Activity shows one moved row, "Step 6 → step 5"; swap steps 1 and 2 → "Step 2 → step 1" → AC-4a, AC-10
+- [ ] At 375px, touch drag a step by its handle → it reorders, with a preview under the finger; swipe on the text → the sheet scrolls, no drag starts → AC-4a
+- [ ] By keyboard, Tab to a handle, Space, Down, Down, Space → the step moved two places, focus stays on its handle; Space, Down, Escape → back in place and the sheet is still open; a screen reader hears the instructions and each sentence → AC-4a, AC-18
+- [ ] At 375px with 20 steps, drag the last step to the top → the sheet scrolls while dragging; the preview shows the number and text at the row's width → AC-4a
+- [ ] In step 2 press Enter → an empty step 3 appears with the cursor in it; Enter again → nothing; Backspace → it is gone and the cursor is at the end of step 2; hold Backspace in step 2 → its text is deleted but the step stays; at 20 rows Enter does nothing; type 301 characters → the field stops at 300 → AC-4b
+- [ ] Approve a knowledge suggestion that links an issue which already has its own steps → its steps stay, an open Edit steps dialog on it still saves; one that links an issue with no steps → the entry's steps appear → AC-14
 - [ ] At 375px the dialog is a bottom sheet; remove a step by keyboard → focus lands on the row that took its place; remove the last one → focus on Add step; axe clean at 375px and 1280px with the dialog and the prompt open → AC-4, AC-18
 
 ## Commands

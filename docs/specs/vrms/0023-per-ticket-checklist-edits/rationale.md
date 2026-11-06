@@ -62,3 +62,20 @@ The checklist is the part of a ticket people touch most while the work happens, 
 Between Options 1 and 2, the phone and the audit trail decide it. A mechanic on mobile data is better served by one save that succeeds or fails as a whole than by a run of small requests that can stop halfway. One save also gives one place to warn before ticked steps are removed or lose their tick, which is what keeps the spec 0021 trail honest. The cost is the diff on the server; it is a small pure function and easy to test, and computing the moved set as the steps outside the longest kept run keeps the log to one row per real move.
 
 The new key follows spec 0011 instead of riding on `ticket.work`. Scoping it by `ticket.view_all` gives you what you asked for (all roles on, the mechanic limited to their own tickets) within a matrix whose keys cannot carry a different scope per role. The Chief can therefore adjust the plan on any ticket they can see, which fits their supervising role, while ticking keeps its current rules.
+
+## Update 2026-11-06: a lighter sheet with drag
+
+The first build worked, but each row carried a bordered field plus three buttons (Move up, Move down, Remove). At 375px that is a wall of controls, and moving step 6 to the top took five taps. You chose a lighter row (handle, number, a field that shows its border only on hover or focus, a tick mark, Remove) and dragging instead of the buttons.
+
+Drag options weighed:
+
+- **`@dnd-kit/sortable` (chosen)**: keyboard dragging and screen reader announcements are built in, touch works through pointer events, and a handle only drag keeps the sheet scrollable on a phone. Con: four packages and one more library to keep current.
+- **Native HTML drag and drop**: no dependency. Con: no touch support on phones and no keyboard path, so the buttons would have to stay, which defeats the point.
+- **`@dnd-kit/react` (the newer API)**: the library's future. Con: still settling, fewer examples, and the installed skill covers the classic API.
+- **Keep Move up and Move down only**: nothing new to learn. Con: the crowded rows and the many taps this update exists to fix.
+
+The Move buttons go away because the handle gives keyboard users the same power (Space, arrows, Space), with spoken instructions. Keeping both would bring the clutter back.
+
+**The tie rule.** When several runs of kept steps are equally long, the first build kept the run that ends earliest in the new order. That logs "Step 5 → step 6" when someone drags step 6 above step 5, which is not what they did. Keeping the run through the lowest old positions logs "Step 6 → step 5" instead, which matches the usual drag of a later step upward, and it gives one clear answer on every tie. The rule stays on the server, worked out from the old and new order, so the web never has to report what it moved and the audit row cannot be faked by a client.
+
+**Approved suggestions and own steps** (decided during the build). An approved knowledge suggestion links the entry to matching issues. If an issue already has steps (its own, or ones edited on the ticket), replacing them silently would throw away work, with no one there to answer a prompt. So those steps stay, and only an issue with no steps gets the entry's steps and the `checklistVersion` bump.
