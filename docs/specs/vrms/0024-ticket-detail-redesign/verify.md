@@ -24,7 +24,6 @@ _Steps derived from spec 0024 acceptance criteria. `/check verify` runs these; `
 - [ ] AI card closed reads "AI suggests {category}, High priority" or "No AI diagnosis yet" with Run; make the latest diagnosis fail → one line with Retry; module off → no card → AC-14
 - [ ] Activity shows the 5 newest; Show all replaces them with 50 and pages on; no audit.view → no card → AC-15
 - [ ] Notes card is in the sidebar with a 3 line preview and Show more only when cut off; Vehicle and driver sits in Details with its Edit → AC-16
-- [ ] Cancel ticket lives only in the ⋮ menu beside the status badge, in red, opening the cancel dialog; no cancel move → no ⋮ → AC-17
 - [ ] At 375px: status line (badge, ⋮, blocked reason), Notes, Issues, AI, Costs, People, Details, Activity; the main button only in the bottom bar, never covering Activity → AC-18
 - [ ] At 1280px the sidebar sits on the right; resize across 1024px → open rows and pending ticks stay → AC-18
 - [ ] Keyboard: Tab to a row header, Enter and Space fold it, focus stays put; reduced motion → no fold animation → AC-1, AC-20
@@ -48,11 +47,11 @@ _Steps derived from spec 0024 acceptance criteria. `/check verify` runs these; `
 - [ ] sessionStorage holds `vrms.ticket.<id>.view` as `{ open, hideDone }`; a 21st ticket drops the oldest; private mode still works from memory → `useTicketView`
 
 ## Commands
-- [ ] `cd welinc-web-vrms && npm run lint && npm run typecheck && npm run build && npm run test` → all green (402 tests) → AC-19
+- [ ] `cd welinc-web-vrms && npm run lint && npm run typecheck && npm run build && npm run test` → all green (430 tests) → AC-19
 - [ ] `cd welinc-backend-vrms && npm run build && npm test -- ticket-knowledge` → the issue order test passes → AC-4
 
 ## Acceptance-criteria coverage
-- AC-1 keyboard step · AC-2 verifier, no known fix, safety, Draft steps · AC-3 tick, Returned, offline steps · AC-4 5 issue, 3 issue, verifier, hash steps · AC-5 reload, refresh, Hide done steps · AC-6 summary, Expand all · AC-7 to AC-10 open row steps · AC-11, AC-12 title and dialog steps · AC-13 photos and blocked link · AC-14 AI · AC-15 Activity · AC-16 Notes and Details · AC-17 ⋮ menu · AC-18 375px and 1280px · AC-19, AC-20 axe, keyboard, commands
+- AC-1 keyboard step · AC-2 verifier, no known fix, safety, Draft steps · AC-3 tick, Returned, offline steps · AC-4 5 issue, 3 issue, verifier, hash steps · AC-5 reload, refresh, Hide done steps · AC-6 summary, Expand all · AC-7 to AC-10 open row steps · AC-11, AC-12 title and dialog steps · AC-13 photos and blocked link · AC-14 AI · AC-15 Activity · AC-16 Notes and Details · AC-17 ⋮ menu · AC-18 375px · the fifth refinements section covers AC-7, AC-13, AC-17, AC-18, AC-19 and AC-20 again and 1280px · AC-19, AC-20 axe, keyboard, commands
 
 ## Refinements (build task 5) · added 2026-11-06
 _These replace the older steps above where they disagree._
@@ -61,7 +60,6 @@ _These replace the older steps above where they disagree._
 - [ ] Hide done steps sits beside Expand all, hidden until a step is ticked; turning it on shows "{k} done steps hidden" in every open row ("1 done step hidden" singular); reload keeps it → AC-5, AC-6, AC-9
 - [ ] A saved view from before the update (hideDone as a list) loads with the switch off → AC-5
 - [ ] No photos and an after photo blocks Send for verification → the line stays folded and ends "· After photo needed"; open it → one "No photos yet" line with the add controls → AC-13
-- [ ] Status card: no heading; badge, priority and ⋮ on the first row; the due line under it (no overdue text on a Closed ticket); the reason under the primary button → AC-17
 - [ ] 375px: the status line carries priority and the due line; the bottom bar still shows the reason → AC-13, AC-18
 - [ ] Details: no Plate, Model, Priority or Due; Vehicle and Record headings with a divider; Closed only once set → AC-16
 - [ ] Issue title semibold and a step larger from 768px; step rows 36px from 768px and 44px on phones → AC-2, AC-9
@@ -82,7 +80,6 @@ _These replace the older photos line and summary steps above where they disagree
 - [ ] Reload the page: skeleton squares only on the first load; the 3 second refresh never flashes skeletons → AC-13
 - [ ] The summary line reads "0 of 2 issues done, 2 of 6 steps ticked"; only Hide done steps on its right; no Expand all or Collapse all → AC-6
 - [ ] No `·` anywhere on the ticket page, its dialogs or the photo viewer: row line 2 ("Cooling   Known fix: …   Safety"), title metadata, due line with overdue on its own line, account "Corporate, …", step tooltip "Ticked by … on …", Documents rows, AI run line, viewer caption on three lines → AC-2, AC-11, AC-16, AC-17, AC-19
-- [ ] Hover the status badge, priority badge and both ⋮ buttons → "Ticket status", "Priority", "More actions" → AC-7, AC-17
 - [ ] 375px order: status line, Notes, Issues, Photos, AI, Costs, People, Details, Activity → AC-18
 - [ ] `npm run test` includes the check that no `·` is left in the ticket page code → AC-19
 - [ ] axe at 375px and 1280px with the Photos card full, empty and loading → AC-20
@@ -108,10 +105,8 @@ _These replace the older Hide done steps, drop hint, Activity, due line and titl
 - [ ] No drop hint text on the Photos card at rest. Drag an image file over the card → ring plus "Drop to add as after photos" (on an In progress ticket); moving over thumbnails does not flicker; leave the card, or press Escape to cancel the drag → it goes; drop → it uploads into After → AC-13
 - [ ] Drag selected text or a link over the card → no overlay → AC-13
 - [ ] Group full, drag a file over → "After photos full (10 of 10)"; drop adds nothing → AC-13
-- [ ] Hover or focus the add tile → "Add after photo, or drop files on this card"; its accessible name stays "Add after photo" → AC-13
+- [ ] Hover or focus the target group's add tile → "Add after photo, or drop files on this card"; its accessible name stays "Add after photo" → AC-13
 - [ ] Activity starts closed with the newest entry and its time on one line (no ticket ID); open → 5 entries grouped by day and no new network request; Show all → 50 → AC-15
-- [ ] Status card on an overdue ticket: one line "Overdue by 2 days, due Nov 4" in red with its icon; a ticket due later reads "Due Nov 9, in 2 days"; a Closed ticket reads "Due Nov 4" only; Return to mechanic has no border → AC-17
-- [ ] 375px slim status line shows the same one due line → AC-18
 - [ ] Header: the line under the title shows the ticket ID only, no garage; the garage still shows in Details under Record → AC-11, AC-16
 - [ ] axe at 375px and 1280px with Activity closed and open, and with the drop overlay showing → AC-20
 
@@ -123,7 +118,6 @@ _Added by the build: two calls made in the build, so you can disagree._
 
 ## Fourth refinements (2026-11-07, task 8)
 _These replace the single drop overlay, the borderless Return and the open row's line 2 steps above where they disagree._
-- [ ] Status card at 1280px, For verification: status, priority and the due line on one row with the `⋮` at the right; Return to mechanic (outlined, left) and Verify and close (right) side by side, equal width (card at least 280px); narrower, they stack with Verify and close on top → AC-17
 - [ ] A ticket with only one action shows it full width → AC-17
 - [ ] Issue row with no steps: the `⋮` sits on the header line next to the chevron, not on its own line; it opens with Enter and does not fold the row → AC-7, AC-20
 - [ ] Open a resolved row: line 2 shows the category and known fix; below, "What fixed it" with "3.5 h" on the right and the note under it; an issue with no hours shows no hours and no dash → AC-2, AC-7
@@ -148,3 +142,45 @@ _Added by the build: calls made in the build, so you can disagree._
 - [ ] AC-12 whole word rule (example settled 2026-11-07): "Aircon: Aircon cooling weak" reads "Aircon: cooling weak"; "Air: Aircon cooling weak" stays unchanged → AC-12
 - [ ] A row with no menu keeps an empty space where the `⋮` would be, so its state words line up with rows that have one → AC-3
 - [ ] Open a resolved row that has both a note and "followed the known fix": only the note shows under What fixed it (the extra "Followed the known fix" line is gone, as AC-7 words it) → AC-7
+
+## Fifth refinements (2026-11-07, task 9)
+_These replace the Status card, due line, `⋮` menu and pill steps above where they disagree._
+- [ ] Status card on an overdue For verification ticket: rows Status, Priority and Due, the `⋮` at the top right; Due reads "Nov 2" with "4 days overdue" in red under it, no icon, nothing trailing to the right of the date → AC-17
+- [ ] Due later reads the date with "in 2 days" in muted text under it; within the same 24 hours it reads "Today"; a few hours late reads "Today" with "Past due" in red; a Closed ticket shows the date alone → AC-17
+- [ ] No priority means no Priority row; no due date means no Due row → AC-17
+- [ ] Status card `⋮`: Copy ticket link, a divider, Cancel ticket in red, each with an icon. Copy shows "Ticket link copied" and the clipboard holds the page address; a read only view, or a ticket with no cancel action, shows only Copy ticket link and no divider → AC-17
+- [ ] After a menu closes (Escape, or after choosing Copy) the "More actions" tooltip stays hidden until the pointer moves over the button again, or focus leaves it and comes back; same on an issue row's `⋮` → AC-7, AC-20
+- [ ] Issue row menu: icons on every item, a divider before Remove issue only when another item shows, Open known fix in normal text colour → AC-7
+- [ ] 375px: the slim status line shows the same Status, Priority and Due rows, and every `⋮` is a 44px target → AC-18
+- [ ] Pills: the status, priority, lock and mechanic badges, Returned and Unlocked read in sentence case with a thin ring; High is a soft gold tint, Critical stays solid red. Same look on the repair list, dashboard, Users page, History and the top bar role pill → AC-19
+- [ ] Started ticket, Before empty, as someone who can add: Before shows a dashed add tile with the tooltip "Add before photo (work already started)" → AC-13
+- [ ] Tap Before's tile: the dialog "Work has already started" with a soft amber icon, Cancel and "Add anyway". Cancel and Escape open no picker and focus returns to the tile; "Add anyway" opens the picker, the photo lands in Before with the "Added after work started" badge, and the next tap on the same page view opens the picker at once; a reload asks again → AC-13, AC-21, AC-22, AC-20
+- [ ] Before work starts: Before has the tile and After shows "None yet" with no tile; a viewer who can't add sees "None yet" in a group with no photos → AC-13
+- [ ] Blocked Send for verification: the reason link focuses After's tile when an After photo is needed, and Before's when a Before photo is needed → AC-13
+- [ ] axe at 375px and 1280px with the warning dialog open, and with the Status card menu open → AC-20
+- [ ] `dueValue` unit tests pass (overdue, today a few hours late and not yet late, later, next year, Closed, no due date) → AC-17
+- [ ] Hover a status or priority pill: no tooltip (the row labels say what they are); hover and focus on both `⋮` buttons still show "More actions" → AC-7, AC-17
+- [ ] On a real iPhone (Safari): tap Before's tile on a started ticket, then "Add anyway" → the picker opens. If it does not, the notice moves to a plain line under the tile (AC-13) → AC-13
+- [ ] Open the app on plain http outside localhost (or block clipboard access), then choose Copy ticket link → the error toast "Couldn’t copy the link. Copy it from the address bar.", and no console error → AC-17
+- [ ] A file dropped on the Before zone of a started ticket, and a thumbnail dragged into Before → both skip the notice, and the photo shows the "Added after work started" badge → AC-13, AC-22
+- [ ] Due "Today" within 24 hours of the last fetch in either direction; a Closed ticket never reads "Today" → AC-17
+
+
+### Task 9 follow-up (2026-11-07, `welinc-web-vrms` `2d34f9b`)
+- [ ] Status card `⋮`: Copy ticket link shows the copy icon (two stacked squares), not a chain link → AC-17
+- [ ] A ticket due tomorrow reads its date with "in 1 day" under it; one due yesterday reads "1 day overdue" in red (the `dueValue` singular test covers both) → AC-17
+
+## Sixth refinements (2026-11-07, task 10)
+_Replace the phone progress column of the first verify run. Found by `/check verify` at 375px: the title column was about 62px and line 2 collapsed._
+- [ ] 375px, a 3 issue ticket with a long first issue: the title column is about 170px wide, a closed row's title shows at most 2 lines with an ellipsis, and an open row shows the whole title in a handful of lines, not one word per line → AC-2
+- [ ] 375px, closed row: line 2 starts with the progress ("3 of 4", "Not started", "Done" in green, "Returned" in the gold pill, or "No checklist"), then the category, then "Known fix: {name}" or "No known fix", then Safety when set; no part is cut to nothing, and a part that does not fit moves to a second line whole → AC-2, AC-3
+- [ ] 375px: the 4px bar is a strip under line 2 across the text column (hidden for Returned and No checklist); the right edge of the row holds only the `⋮` and the chevron, both 44px → AC-3, AC-1
+- [ ] 375px open row: the same progress and bar still show on the row header → AC-3
+- [ ] A resolved closed row at 375px: progress first, then "What fixed it" and the hours → AC-2, AC-3
+- [ ] 767px and 768px: below 768px the progress is on line 2; from 768px it is back in the fixed right column with the state words lined up and the bar the column's full width → AC-3
+- [ ] 1280px: the rows look exactly as before this task; the progress text is read once by a screen reader (check the row button's accessible name has the progress once) → AC-3, AC-20
+- [ ] axe at 375px and 1280px again, rows open and closed → AC-20
+- [ ] 375px with a Draft or Inactive known fix, a long note, and a long unbroken category word: each ends in an ellipsis on its own line or stays whole, nothing is clipped without one, the status badge is never cut, and nothing scrolls sideways → AC-2
+- [ ] 375px with a Returned row: the pill sits first on line 2, then the note; the row is a little taller than a plain one and still reads cleanly → AC-2, AC-3
+- [ ] Playwright snapshot of a row at 375px: the button's name reads in order with spaces between the parts ("Issue 1: {title}", then the progress, then the category), and the progress appears once, not twice → AC-3, AC-20
+- [ ] 1280px: an open row still shows its whole title on every line, and a closed row cuts it to 1 line → AC-2
