@@ -25,6 +25,7 @@ spec [0008](../../specs/vrms/0008-hosting-and-ci-cd/index.md) · code in `infra/
 - Note (2026-10-29): safe to build before the integration meeting, but feature 56 (integration contract) may change it: the Azure milestones host the shared gateway, auth and database, so the other groups' services must fit the same setup.
 - Note (2026-10-31): from spec 0013. The Bicep must set the flexible server configuration `azure.extensions` to include `VECTOR` before the migration job runs, because the VRMS database now stores AI embeddings with pgvector. Before go live, move `GEMINI_API_KEY` to a paid tier (the free tier caps at 500 and 1K requests a day).
 - Note (2026-11-03, replan): from spec 0019. Once every deployed web build uses `PUT /repairs/:id/assignments`, remove the old `POST` alias in backend-vrms.
+- Note (2026-11-04, replan): from spec 0021. `audit_logs` is now append only through a trigger, but the app's database user is still the table owner and could drop it. In the database roles milestone, run migrations as the owner role and connect the app as a role with `GRANT SELECT, INSERT ON audit_logs` and no `UPDATE`, `DELETE` or `TRUNCATE`.
 - Note (2026-11-03, replan): the gateway change from spec 0017 (26 MB uploads and a 120 second read timeout on the VRMS routes, commit `1803092`) was pushed straight to welinc-auth `development` on 2026-11-03. Add it to the feature 55 list of changes you made to the shared repos.
 
 ### 27. Error monitoring · planned · needs a decision

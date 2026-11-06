@@ -35,6 +35,7 @@ WL-302 and WL-303, built on proposed defaults. A scheduled check flags tickets s
 **Done when:** the threshold is Admin configurable, stuck tickets get a tag and a filter, and stale ones escalate weekly and show on a report.
 - Note (2026-10-30): spec 0012 follow up. Add the stuck and stale thresholds as entries in the settings catalog, not code constants.
 - Note (2026-11-01, replan): from spec 0015. Measure time in status with `repair_tickets.status_changed_at`, not the audit log.
+- Note (2026-11-05, replan): from spec 0022. The Chief dashboard colours a For verification wait amber at 24 hours and red at 48, fixed in code. Decide here whether those limits become Admin thresholds beside the stuck one, so there is one set of waiting rules.
 - [ ] Design it (spec): `/architect stuck and stale ticket alerts`
 - [ ] Polish it (optional, ask first): `web-design-guidelines`
 
