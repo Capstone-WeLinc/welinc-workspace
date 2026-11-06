@@ -1,0 +1,70 @@
+# Verify: Ticket detail redesign · spec 0024 · updated 2026-11-06
+_Steps derived from spec 0024 acceptance criteria. `/check verify` runs these; `/test` locks the durable ones._
+
+## UI / manual
+- [ ] Open an In progress ticket with 5 issues where issue 1 is Done → issue 2 is open, the rest closed; the summary reads "1 of 5 issues done · t of s steps" → AC-4, AC-6
+- [ ] Tick the last step of the open issue → its row turns "Done" with a full green bar at once and stays open; the summary updates → AC-3, AC-5
+- [ ] Tick a step, then fold the row before the save returns; make the save fail (offline) → the step goes back when you reopen, with the error toast → AC-3
+- [ ] A ticket with 3 issues or fewer, In progress → every row starts open → AC-4
+- [ ] Open a For verification ticket as the verifier → every row closed; each line 2 shows What fixed it (or "Followed the known fix") and the hours as "2.5 h" → AC-2, AC-4
+- [ ] Return a ticket to the mechanic → every issue with notes shows the gold "Returned" pill with no bar → AC-3
+- [ ] Issue with no steps and no known fix → "No checklist", line 2 "No known fix"; inside: the link picker and "Suggest a known fix" → AC-2, AC-3, AC-10
+- [ ] Issue whose known fix has safety notes → closed row says "Safety"; open row shows one amber line above the checklist, with More only when it is cut off → AC-2, AC-8
+- [ ] A known fix in Draft or Inactive → its status badge shows on line 2 and inside the row; with the knowledge module off the name is plain text → AC-2, AC-10
+- [ ] Inside an open row: safety, checklist (done steps dimmed, no strikethrough), the actions line (Edit steps, Hide done steps, Edit issue, Remove issue), the known fix with Change, then What fixed it → AC-7, AC-9, AC-10
+- [ ] Turn on Hide done steps → "k done steps hidden" shows in their place; reload → still on → AC-5, AC-9
+- [ ] Open two rows, reload → the same two are open; open the ticket in a new tab → the default rule applies → AC-5
+- [ ] Visit `/repairs/<id>#issue-3` → issue 3 opens on top of what was open and scrolls into view below the header; `#issue-99` does nothing → AC-4
+- [ ] Wait through several 3 second refreshes → no row opens or closes by itself; add an issue from another tab → it appears closed → AC-5
+- [ ] Expand all and Collapse all work; with one issue they are hidden → AC-6
+- [ ] Title: plate chip, model, then the first issue on one line without "[System]"; the ID and garage below, the ID never breaking → AC-11, AC-12
+- [ ] Edit steps dialog subtitle and the For verification dialog show issue text without "[System]" → AC-12
+- [ ] Photos line reads "Photos · b before · a after"; it starts open with any photo or a photo blocking the next move; Add photos opens the file picker → AC-13
+- [ ] A Send for verification blocked by an after photo → the reason in the Status card is a link; it scrolls to Photos, opens it and focuses the add button. A costs reason stays plain text → AC-13
+- [ ] AI card closed reads "AI suggests {category}, High priority" or "No AI diagnosis yet" with Run; make the latest diagnosis fail → one line with Retry; module off → no card → AC-14
+- [ ] Activity shows the 5 newest; Show all replaces them with 50 and pages on; no audit.view → no card → AC-15
+- [ ] Notes card is in the sidebar with a 3 line preview and Show more only when cut off; Vehicle and driver sits in Details with its Edit → AC-16
+- [ ] Cancel ticket lives only in the ⋮ menu beside the status badge, in red, opening the cancel dialog; no cancel move → no ⋮ → AC-17
+- [ ] At 375px: status line (badge, ⋮, blocked reason), Notes, Issues, AI, Costs, People, Details, Activity; the main button only in the bottom bar, never covering Activity → AC-18
+- [ ] At 1280px the sidebar sits on the right; resize across 1024px → open rows and pending ticks stay → AC-18
+- [ ] Keyboard: Tab to a row header, Enter and Space fold it, focus stays put; reduced motion → no fold animation → AC-1, AC-20
+- [ ] axe at 375px and 1280px, rows open and closed, the loading skeleton and the empty issues state → no violations on the page (the dev only Demo data pill is excluded) → AC-19, AC-20
+
+## Value sourcing
+- [ ] Issue text with a leading `[Engine] ` → shown without it everywhere → `stripSystem`
+- [ ] Category shows once, from `categoryName` → `issue.categoryName`
+- [ ] Safety notes of only spaces → no "Safety" word → `safetyNotes` trimmed
+- [ ] Progress "{x} of {y}" counts a tick made on the page before the refresh → `mergedSteps` with `useTickOverrides`
+- [ ] Saved notes with `resolvedAt` cleared → Returned; with `resolvedAt` set → Done → `hasSavedResolution`, `resolvedAt`
+- [ ] Line 2 note empty and `followedKnownFix` true → "Followed the known fix"; `hoursSpent` 0.25 → "0.25 h" → `resolutionNote`, `followedKnownFix`, `hoursSpent`
+- [ ] Needs what fixed it shows only In progress, never in For verification → `ticket.status`
+- [ ] Open rule changes with status, never with role (same ticket as Admin and as Mechanic) → `initialOpen`
+- [ ] Photo counts match the strip's Before and After groups, before and after Start work → `photoGroups(attachments, workStartedAt)`
+- [ ] Blocked link targets the photo the move waits for, and not while photos upload → `ticketActions().blockedBy`
+- [ ] Title model left out when `vehicleModel` is empty; first issue follows `createdAt` then `id` → `ticket.issues[0]`
+- [ ] AI line priority "CRITICAL" reads "Critical" → `predictedPriority` in sentence case
+- [ ] Notes card shows the cancellation reason on a Cancelled ticket → `ticket.cancellationReason`, `ticket.remarks`
+- [ ] Activity first request carries `limit=5`, Show all `limit=50` → `getAuditEvents`
+- [ ] sessionStorage holds `vrms.ticket.<id>.view` as `{ open, hideDone }`; a 21st ticket drops the oldest; private mode still works from memory → `useTicketView`
+
+## Commands
+- [ ] `cd welinc-web-vrms && npm run lint && npm run typecheck && npm run build && npm run test` → all green (402 tests) → AC-19
+- [ ] `cd welinc-backend-vrms && npm run build && npm test -- ticket-knowledge` → the issue order test passes → AC-4
+
+## Acceptance-criteria coverage
+- AC-1 keyboard step · AC-2 verifier, no known fix, safety, Draft steps · AC-3 tick, Returned, offline steps · AC-4 5 issue, 3 issue, verifier, hash steps · AC-5 reload, refresh, Hide done steps · AC-6 summary, Expand all · AC-7 to AC-10 open row steps · AC-11, AC-12 title and dialog steps · AC-13 photos and blocked link · AC-14 AI · AC-15 Activity · AC-16 Notes and Details · AC-17 ⋮ menu · AC-18 375px and 1280px · AC-19, AC-20 axe, keyboard, commands
+
+## Refinements (build task 5) · added 2026-11-06
+_These replace the older steps above where they disagree._
+- [ ] Open an issue → safety, checklist, one "Edit steps"; the row ⋮ ("More actions for issue N") holds Edit issue, Remove issue (not with one issue), Change known fix (only when relinking is allowed), Open known fix (only with the knowledge module on) → AC-7, AC-10
+- [ ] No separate known fix line in an open row; an issue with no known fix still shows the picker and Suggest a known fix → AC-10
+- [ ] Hide done steps sits beside Expand all, hidden until a step is ticked; turning it on shows "{k} done steps hidden" in every open row ("1 done step hidden" singular); reload keeps it → AC-5, AC-6, AC-9
+- [ ] A saved view from before the update (hideDone as a list) loads with the switch off → AC-5
+- [ ] No photos and an after photo blocks Send for verification → the line stays folded and ends "· After photo needed"; open it → one "No photos yet" line with the add controls → AC-13
+- [ ] Status card: no heading; badge, priority and ⋮ on the first row; the due line under it (no overdue text on a Closed ticket); the reason under the primary button → AC-17
+- [ ] 375px: the status line carries priority and the due line; the bottom bar still shows the reason → AC-13, AC-18
+- [ ] Details: no Plate, Model, Priority or Due; Vehicle and Record headings with a divider; Closed only once set → AC-16
+- [ ] Issue title semibold and a step larger from 768px; step rows 36px from 768px and 44px on phones → AC-2, AC-9
+- [ ] Closed row with a saved resolution shows only What fixed it and hours on line 2 → AC-2
+- [ ] Both ⋮ menus: Enter or Space opens, arrows move, Escape closes with focus back on the trigger → AC-20
+- [ ] axe at 375px and 1280px with a row menu open and closed → AC-20

@@ -68,3 +68,13 @@ The state is derived from ticks (Done means all steps ticked), not a new "mark d
 Small calls made in the spec: the shadcn Accordion in `multiple` mode (keyboard and ARIA built in, matching the shadcn setup; runner up, a hand rolled disclosure per row); Edit issue and Remove issue inside the open row (keeps the closed row for reading; runner up, an icon on the header, which brings back clutter); the refresh never opens or closes a row and a new issue starts closed (the user stays in control; runner up, re-running the open rule on each refresh, which would fold rows under someone's thumb); `sessionStorage` per tab (survives the refresh and a reload without surprising someone next week).
 
 The look follows the engineer's brief and the two design files: hierarchy from type, colour only where it carries meaning, and the plate chip as the signature, which reads as considered rather than generated.
+
+## Update 2026-11-06: refinements after the first build
+
+Seen on the built page at 1280px, the open issue still carried two lines of controls under its checklist, the photos strip opened on its own whenever a photo blocked the next move (two empty groups above the work), and the Details card mixed vehicle, urgency and record fields in one grid of twelve, two of them repeating the title. Agreed with the engineer in chat:
+
+- Issue actions go into a row `⋮` menu, matching the ticket's own `⋮`; the known fix name already sits on the row header, so its separate line goes. One quiet Edit steps stays visible, since editing steps is the common action.
+- Hide done steps becomes one switch for the ticket. Per issue switches repeated the same control on every open row, and people hide done steps for the whole job, not one issue at a time.
+- The photos line stays folded until a photo exists and names what is missing instead. The Status card's reason link still opens it, so nothing is lost.
+- Priority and due date are urgency, so they sit with the status in the Status card; the rest of Details splits into Vehicle and Record, so each group reads at a glance.
+- Hierarchy: the issue title one step larger and semibold leads the row; step rows go to 36px on desktop and keep 44px for thumbs on phones.
