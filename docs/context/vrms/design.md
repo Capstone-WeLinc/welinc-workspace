@@ -10,7 +10,7 @@ On phones the sidebar becomes a bottom tab bar for mechanics and a sheet menu fo
 
 ## Ticket status colors
 
-Every status badge pairs color with its text label (never color alone). Rounded full pill, uppercase `text-xs font-medium`, soft tinted background with darker text. Five color groups cover the nine ticket statuses; the token names are the group names.
+Every status badge pairs color with its text label (never color alone). Rounded full pill, sentence case `text-xs font-medium` (no uppercase, no letter spacing, so it reads like the text around it), soft tinted background with darker text, and a hairline inset ring in the pill's own text colour at 20% (`ring-1 ring-inset ring-current/20`, in `BadgePill`). Five color groups cover the nine ticket statuses; the token names are the group names.
 
 | Group | Ticket statuses | Style (tokens) |
 |---|---|---|
@@ -24,7 +24,7 @@ Every status badge pairs color with its text label (never color alone). Rounded 
 
 ## Priority badges
 
-Critical uses `destructive`, High uses `highlight`, Medium and Low use `secondary` with `muted-strong` text. This is for badges only. A priority picker uses the suite's selected style, with the priority color shown only as a small dot beside the label.
+Critical uses solid `destructive`, High a soft gold tint (`highlight/25`, `highlight-foreground` text), Medium and Low use `secondary` with `muted-strong` text. Solid gold is not used for pills: other gold pills (Returned, Unlocked) take the same soft tint. This is for badges only. A priority picker uses the suite's selected style, with the priority color shown only as a small dot beside the label.
 
 ## Plate chip
 
@@ -35,7 +35,7 @@ Critical uses `destructive`, High uses `highlight`, Medium and Low use `secondar
 People name a truck by its plate ("the Isuzu with NDG 5821"), not by its ticket ID. So the plate leads and the ID is metadata.
 
 - **Order:** plate chip, then make and model, then the status badge. The ticket ID (`REP-20261030-5EBC`) goes on a smaller `muted-foreground` line below, with the garage.
-- **Ticket title** on the detail page: the plate chip and the main issue; the ID sits under the title.
+- **Ticket title** on the detail page: the plate chip and the main issue; the ID sits alone under the title (the garage shows in Details, not the header).
 - **IDs never break mid ID.** Use `whitespace-nowrap` on the ID, and let the line wrap before it.
 
 ## List rows

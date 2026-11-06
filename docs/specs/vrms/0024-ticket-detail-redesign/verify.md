@@ -91,7 +91,7 @@ _These replace the older photos line and summary steps above where they disagree
 _Added by the build. The side by side rule changed during the build (your call): the groups sit side by side only when the card is wide enough, so the "Before always left" step above holds only on a wide card._
 - [ ] Card width rule: at 1280px with the app sidebar open, Before and After stack (Before on top); at about 1400px and wider, or 1280px with the sidebar collapsed, they sit side by side; a group's 4 slots never wrap at any width, 375px included → AC-13 (container query `@2xl`, 672px inside the card)
 - [ ] On a mouse device, drag files over the card → the whole card shows the ring; drop → they upload into the tile's group; a full group shows no ring and no drop hint → AC-13
-- [ ] On a pointer device the card says "Or drop {before|after} photos anywhere on this card"; on a phone that line is gone → AC-13
+- [ ] (Replaced by task 7: no drop hint at rest.) On a pointer device the card says "Or drop {before|after} photos anywhere on this card"; on a phone that line is gone → AC-13
 - [ ] Viewer walk: open the first Before thumbnail and press the right arrow through every photo → Before then After, also on an In progress ticket (the order no longer flips once work starts) → AC-13, value sourcing: Photos card
 - [ ] Group with exactly 3 photos → 3 thumbnails, no "+N more"; with 4 → 2 thumbnails and "+2 more"; Before has 4 and After has 4, "+2 more" in After opens on After's third photo (index 6 in the walk) → AC-13, value sourcing: "+N more" and viewer index
 - [ ] Tile label tracks `workStartedAt`: press Start work on an Assigned ticket → the tile moves from Before to After without a reload → AC-13, value sourcing: which group gets the tile
@@ -100,3 +100,51 @@ _Added by the build. The side by side rule changed during the build (your call):
 - [ ] A viewer who can't add sees no "2 of 5" counts on the group headings → AC-13
 - [ ] Row line 2 at 375px with a long known fix name → the name ends in an ellipsis, while the category, the Draft or Inactive badge and "Safety" stay whole → AC-2
 - [ ] AI run line reads "Ran 2 hours ago with {model}, high confidence" → AC-19
+
+## Third refinements (2026-11-07, task 7)
+_These replace the older Hide done steps, drop hint, Activity, due line and title steps above where they disagree._
+- [ ] No Hide done steps switch anywhere; the summary line has no controls; done steps show dimmed in every open row → AC-6, AC-9
+- [ ] A stored view from before the update (`{ open, hideDone }`) loads with its open rows kept and no error; the next write stores `{ open }` only → AC-5
+- [ ] No drop hint text on the Photos card at rest. Drag an image file over the card → ring plus "Drop to add as after photos" (on an In progress ticket); moving over thumbnails does not flicker; leave the card, or press Escape to cancel the drag → it goes; drop → it uploads into After → AC-13
+- [ ] Drag selected text or a link over the card → no overlay → AC-13
+- [ ] Group full, drag a file over → "After photos full (10 of 10)"; drop adds nothing → AC-13
+- [ ] Hover or focus the add tile → "Add after photo, or drop files on this card"; its accessible name stays "Add after photo" → AC-13
+- [ ] Activity starts closed with the newest entry and its time on one line (no ticket ID); open → 5 entries grouped by day and no new network request; Show all → 50 → AC-15
+- [ ] Status card on an overdue ticket: one line "Overdue by 2 days, due Nov 4" in red with its icon; a ticket due later reads "Due Nov 9, in 2 days"; a Closed ticket reads "Due Nov 4" only; Return to mechanic has no border → AC-17
+- [ ] 375px slim status line shows the same one due line → AC-18
+- [ ] Header: the line under the title shows the ticket ID only, no garage; the garage still shows in Details under Record → AC-11, AC-16
+- [ ] axe at 375px and 1280px with Activity closed and open, and with the drop overlay showing → AC-20
+
+## Task 7 build notes (2026-11-07, /develop)
+_Added by the build: two calls made in the build, so you can disagree._
+- [ ] Activity's closed line reads "{actor} {verb} this ticket, {day}, {time}" (for example "Victor Ramos updated the costs of this ticket, Wed, Nov 4, 2:49 PM"). The audit sentence could not sit inside the fold button as it was (its name is a focusable tooltip, and dropping the ticket ID broke "updated the costs of"), so the wording moved into one table in `auditEvents.ts` (`eventPhrase`, `eventText`) that both the Audit log sentence and this line use → AC-15
+- [ ] The Audit logs page still reads every event the same as before the table move (spot check created, status change, costs, step ticked, an event with no actor) → AC-15
+- [ ] With the Photos group full, dragging files over the card shows "After photos full (10 of 10)" and the cursor shows no drop → AC-13
+
+## Fourth refinements (2026-11-07, task 8)
+_These replace the single drop overlay, the borderless Return and the open row's line 2 steps above where they disagree._
+- [ ] Status card at 1280px, For verification: status, priority and the due line on one row with the `⋮` at the right; Return to mechanic (outlined, left) and Verify and close (right) side by side, equal width (card at least 280px); narrower, they stack with Verify and close on top → AC-17
+- [ ] A ticket with only one action shows it full width → AC-17
+- [ ] Issue row with no steps: the `⋮` sits on the header line next to the chevron, not on its own line; it opens with Enter and does not fold the row → AC-7, AC-20
+- [ ] Open a resolved row: line 2 shows the category and known fix; below, "What fixed it" with "3.5 h" on the right and the note under it; an issue with no hours shows no hours and no dash → AC-2, AC-7
+- [ ] "Aircon not cooling: Aircon not cooling, blows warm air." shows as "Aircon not cooling: blows warm air." in the row and the title; the Edit issue dialog still shows the stored text → AC-12
+- [ ] Rows with No checklist, Not started, 2 of 5 and Done: the state words line up on the right edge → AC-3
+- [ ] Drag an image file over the Photos card on an In progress ticket: two zones (Before, After) with counts; the zone under the pointer rings; drop on Before → the photo lands in Before with the "Added after work started" badge; drop on After → After → AC-13, AC-21, AC-22
+- [ ] The uploader removes that late Before photo with no 403; a Before photo from before Start work still answers 403 for a mechanic → AC-22
+- [ ] A full group's zone reads "Before photos full (5 of 5)" and a drop there adds nothing → AC-13
+- [ ] Drag an After thumbnail onto Before with the mouse → it moves, the audit row says "moved a photo"; a short click on a thumbnail still opens the viewer → AC-13
+- [ ] Keyboard: focus a thumbnail, Space to pick up, arrow to the other group, Space to drop → moved and announced; Escape cancels → AC-13
+- [ ] A thumbnail without `canMove` (someone else's, or protected) does not drag → AC-13
+- [ ] Hover a marked thumbnail → its tooltip lists the marks; the viewer caption shows them on their own lines → AC-13
+- [ ] `cd welinc-backend-vrms && npm run build && npm test -- attachments` → green, including the `group` and protection cases → AC-21, AC-22
+- [ ] axe at 375px and 1280px with the drop zones showing and a thumbnail drag in progress → AC-20
+
+## Task 8 build notes (2026-11-07, /develop)
+_Added by the build: calls made in the build, so you can disagree._
+- [ ] Details card, Vehicle group: Plate and Model show side by side first (Model "—" when unset), even though the title has them (AC-16, updated 2026-11-07) → AC-16, value sourcing: Details card
+- [ ] Keyboard drag: focus a movable thumbnail, Space picks it up, any arrow key jumps it over the other group (a second arrow takes it back), Space drops it, Escape cancels. Enter still opens the viewer, and the Space that drops never opens it → AC-13
+- [ ] After a drag move the moved thumbnail gets focus; if it lands behind "+N more", focus stays where it was → AC-13
+- [ ] A file drop on the gap between the two zones adds nothing → AC-13, AC-21
+- [ ] AC-12 whole word rule (example settled 2026-11-07): "Aircon: Aircon cooling weak" reads "Aircon: cooling weak"; "Air: Aircon cooling weak" stays unchanged → AC-12
+- [ ] A row with no menu keeps an empty space where the `⋮` would be, so its state words line up with rows that have one → AC-3
+- [ ] Open a resolved row that has both a note and "followed the known fix": only the note shows under What fixed it (the extra "Followed the known fix" line is gone, as AC-7 words it) → AC-7

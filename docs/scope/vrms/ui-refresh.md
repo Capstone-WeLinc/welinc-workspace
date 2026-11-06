@@ -148,6 +148,9 @@ spec [0024](../../specs/vrms/0024-ticket-detail-redesign/index.md) · code in `w
 - [x] Design it (spec): `/architect ticket detail redesign`
 - Note (2026-11-06): spec 0024 updated after the first build with six refinements (build task 5), cross checked and accepted.
 - Note (2026-11-07): spec 0024 updated again (build task 6), cross checked and accepted: photos become their own card after Issues with one add tile in the group photos land in (this replaces "photos fold to one line" above), the summary line keeps only Hide done steps, no dot separators anywhere on the page, hover labels on the badges and menus, rows stay foldable.
+- Note (2026-11-07): spec 0024 updated a third time (build task 7), cross checked and accepted: Hide done steps removed, the drop hint shows only during a file drag, Activity folds like AI with the newest entry on its line, one due line in the Status card with Return to mechanic as a plain button, the garage out of the header, and Before and After side by side only when the card fits.
+- Note (2026-11-07): spec 0024 updated a fourth time (build task 8), cross checked and accepted: Status card with badges and due on one row and Return beside the primary, the row menu on the header line, one block resolution, a repeated root cause shown once, photo drop zones per group (a new optional upload `group`), thumbnail drag between groups, and Before protection only for photos uploaded before work started (amends spec 0018).
+- Note (2026-11-07): spec 0024 updated after the task 8 build: Plate and Model stay in Details (AC-16), and the AC-12 whole word example is fixed to match its rule. The code already matched; nothing to rebuild.
 - [x] Build it: `/develop ticket detail redesign`
   - [x] Pure rules: `issueRow.ts` (state, open rule, counts, prefix strip), `useTicketView` and `useTickOverrides`, their tests, the issue order test (AC-3 to AC-6, AC-12)
   - [x] Issue rows: the Accordion, closed and open rows, summary line, Hide done steps, parts and hours removed (AC-1 to AC-10, AC-12)
@@ -155,6 +158,8 @@ spec [0024](../../specs/vrms/0024-ticket-detail-redesign/index.md) · code in `w
   - [x] Sweep: skeleton, axe at 375px and 1280px, keyboard, reduced motion, lint, typecheck, build, tests (AC-19, AC-20)
   - [x] Refinements: row ⋮ menu, one Hide done steps switch, folded photos line with the needed hint, Status card with priority and due, Details in Vehicle and Record, title and step row sizes (AC-2, AC-5 to AC-7, AC-9, AC-10, AC-13, AC-16 to AC-18)
   - [x] Second refinements: Photos card after Issues with the add tile and "+N more", only Hide done steps on the summary line, no dot separators (AC-2, AC-6, AC-11, AC-13, AC-14, AC-16 to AC-19)
+  - [x] Third refinements: no Hide done steps, drop overlay, folded Activity with a shared `FoldCard`, one due line and a plain Return button, no garage in the header (AC-5, AC-6, AC-9, AC-11, AC-13 to AC-15, AC-17, AC-18)
+  - [x] Fourth refinements: upload `group` and narrowed Before protection (backend), drop zones and thumbnail drag, Status card row and side by side buttons, row menu on the header, one block resolution, `issueDisplayText` (AC-2, AC-3, AC-7, AC-12, AC-13, AC-17, AC-21, AC-22)
 - [ ] Verify it: `/check verify ticket detail redesign`
 - [ ] Test it: `/test ticket detail redesign`
 - [ ] Polish it (optional, ask first): `impeccable` · `web-design-guidelines` · `break-ui` (10 issues with 20 steps each, long issue text, no known fix, returned issues)

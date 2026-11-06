@@ -90,3 +90,31 @@ Seen on the built page by the engineer: the photos area offered two add buttons 
 - **Hover labels** on the status and priority badges and on both `⋮` menus, so a badge or an icon button says what it is. Built during the refinements run (`6e19286`) and recorded here.
 
 Root cause found on the way: the local seed never set `workStartedAt`, so seeded started tickets uploaded every photo into Before. Fixed in the seed (`9e28684` in welinc-backend-vrms), outside this spec.
+
+## Update 2026-11-07: third refinements after seeing task 6
+
+Seen by the engineer on the built page: the Hide done steps switch would not be used, the "Or drop ... anywhere on this card" line was noise, Activity sat open at the bottom, the Status card stacked two due lines and two full buttons, and the garage sat oddly beside the ticket ID under the title. Decided in conversation, recommended picks taken unless noted:
+
+- **Hide done steps goes.** Rows already fold, so a finished issue gets out of the way by itself; dimmed done steps are enough inside an open row. This reverses the 2026-11-06 call above.
+- **The drop hint shows only during a file drag.** Dropping is a shortcut; an overlay that names the target group ("Drop to add as after photos") appears when it matters and costs nothing at rest. The tile's tooltip teaches it. A wider "Add or drop photos" tile was rejected: it breaks the fixed 72px row.
+- **Activity folds like AI**, its closed line showing the newest entry. It still fetches on page load: fetching on first open would leave the closed line with nothing to show, and it is one small request.
+- **One due line** ("Overdue by 2 days, due Nov 4") and **Return to mechanic as a ghost button**, so the card has one heavy control. Return stays visible rather than going into the `⋮` menu, because at verification it is a real choice, not a rare one.
+- **The header stays as built, without the garage.** A shorter three row title was considered and set aside for now (the engineer prefers the current one); the garage under the title read as random next to the ID, and it already shows in Details under Record.
+- **AC-13 now matches the build**: Before and After sit side by side only when the card fits both rows (a container query at 672px), since the app sidebar makes a screen breakpoint wrong.
+
+## Update 2026-11-07: fourth refinements after seeing task 7
+
+Seen by the engineer on the built page: the Status card still looked untidy and the borderless Return to mechanic blended into the card; the "Taken before work started" mark wrapped into a tall block under a 72px thumbnail; the viewer's Move button sat out of line with the zoom icons; the fold chevrons on AI and Activity sat mid line; and the Issues card did not feel right (a lone `⋮` on its own line, the note shown twice, a title that repeated its root cause, a two column resolution with an empty "Hours spent", progress words that did not line up). They also asked to drop photos into either group, and to drag a photo between groups. Recommended picks taken:
+
+- **Return to mechanic goes back to an outlined button, beside the primary.** Borderless read as text, not as the second real choice at verification. Side by side when the card fits, stacked when it does not.
+- **The row `⋮` moves to the header line**, as a sibling of the fold button, so it never floats alone and the header stays one button.
+- **A repeated root cause shows once** on the page, by a display rule only; stored text is untouched, since the edit dialog and the AI read it.
+- **Drop zones per group, with the group sent to the server.** Two calls (upload, then move) would leave a half done state and two audit rows on a failure; one optional field checked under the same lock is atomic and reuses the add and cap checks. Allowed for either group, because Move already lets the uploader put a photo in Before.
+- **Before protection covers only real before photos** (the engineer's call, chosen over protecting every Before photo and over refusing late Before uploads). A Before photo added after work started cannot prove the state before work, so locking it only traps a mistaken drop; it is marked instead so a verifier can tell.
+- **Thumbnails drag between groups with `@dnd-kit/core`**, the project's drag library, with the keyboard sensor and spoken announcements the project rules ask for; the viewer's Move stays for anyone who prefers it.
+- Built outside the spec before this update (`606f458`): chevrons at the far right, marks as a corner badge, the Move button aligned. They change no decision.
+
+## Update 2026-11-07: two fixes after the task 8 build
+
+- **Plate and Model stay in Details** (the engineer's call during the task 8 build). The title shows them, but Details is where people read the whole vehicle record, and a card that leaves out the plate looks incomplete. Repeating two short values costs little. This reverses the 2026-11-06 call that dropped them.
+- **AC-12's example is fixed, its rule kept.** The rule (a match ends where a word ends, so a space counts) contradicted its own example ("Aircon" does not match "Aircon cooling"). The rule is the intent: it is what removes "Aircon not cooling" from "Aircon not cooling, blows warm air". Treating only punctuation as a word end was considered and rejected, since a repeat followed by a space would then stay. The example now shows the real case the rule guards against: "Air" does not match "Aircon".
