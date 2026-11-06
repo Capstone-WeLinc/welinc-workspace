@@ -16,7 +16,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | Epic | File | Status |
 |---|---|---|
 | Foundations | [foundations.md](foundations.md) | 8 existing, 7 done, 1 planned |
-| UI refresh | [ui-refresh.md](ui-refresh.md) | 3 done, 5 in-progress, 3 planned |
+| UI refresh | [ui-refresh.md](ui-refresh.md) | 3 done, 6 in-progress, 3 planned |
 | Repair workflow | [repair-workflow.md](repair-workflow.md) | 12 done, 1 in-progress, 7 planned, 1 dropped |
 | Platform | [platform.md](platform.md) | 2 in-progress, 8 planned |
 | Outsourcing | [outsourcing.md](outsourcing.md) | 4 planned |
@@ -58,6 +58,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 50 | Portal on the design system | UI refresh | planned |
 | 51 | Analytics page | UI refresh | planned |
 | 64 | Audit log page redesign | UI refresh | planned |
+| 65 | Ticket detail redesign | UI refresh | in-progress |
 | 16 | Ticket status lifecycle | Slice 1 | done |
 | 17 | Chief Mechanic role | Slice 1 | done |
 | 18 | New repair ticket & assignment | Slice 1 | done |

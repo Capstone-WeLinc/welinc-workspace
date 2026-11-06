@@ -47,6 +47,7 @@ spec [0004](../../specs/vrms/0004-repair-list-detail-refresh/index.md) · code i
   - [x] Sweep: lint, typecheck, build, tests, 375px and 1280px with axe for both roles (AC-30)
 - [x] Verify it: `/check verify repair list & detail refresh` (2026-10-25: passed; a few value sourcing steps not run)
 - [ ] Test it: `/test repair list & detail refresh` (deferred 2026-11-02: the UI may be redone, so tests wait until it settles)
+- Note (2026-11-06): the detail page redesign is now feature 65; this Test it waits for it.
 - [ ] Polish it (optional, ask first): `impeccable` or `emil-design-eng` (one taste skill per change; motion: status, cancel and unlock dialogs, next action bar) · `web-design-guidelines` · `break-ui` (long plates and notes, 1 and 500 tickets, empty filters)
 
 ### 12. Repair form · in-progress · Facade
@@ -137,3 +138,19 @@ You find the current Audit log page ugly, and want it redone. It should be redes
 - Note (2026-11-04): build after feature 24 (spec 0021) ships its categories, filters and catalog. Decide the design source in the spec. Consider sharing the event renderer with feature 32 (the per ticket timeline).
 - [ ] Design it (spec): `/architect audit log page redesign`
 - [ ] Polish it (optional, ask first): `impeccable` · `web-design-guidelines` · `break-ui` (long actor names, many step ticks, long remarks, empty filters)
+
+### 65. Ticket detail redesign · in-progress · Facade · from feature 11
+A ticket can carry 10 issues with up to 20 steps each, and today every issue shows fully open, so one issue fills a laptop screen. Redesign the detail page around the work: issues as rows that open and close, the checklist first, and less reference clutter. It should look plain and dense like a shop work order, not generated. No new page: it replaces the layout of `/repairs/:id`.
+**Done when:** each issue is a row that opens and closes, showing its progress and a state (Not started, In progress, Done, Returned) when closed; the checklist comes first inside a row; typical parts and typical hours are gone from the ticket; the safety note is one line and never hidden; photos fold to one line; vehicle and notes sit in the sidebar; AI diagnosis sits inside its issue; Activity shows the latest 5 with Show all; the category shows once; Cancel ticket is no longer beside the main action; on phones the issues come first, as `docs/context/vrms/design.md` orders; and it reads well at 375px and 1280px.
+- Note (2026-11-06): asked for while building feature 58. Decide in the spec which rows start open per role and status, the issue states, where photos and the safety note go, and the look (no boxes inside boxes, no icon labels, colour only for status, overdue, safety and destructive actions). No API or data change is expected: progress and state come from fields the ticket already sends.
+spec [0024](../../specs/vrms/0024-ticket-detail-redesign/index.md) · code in `welinc-web-vrms/src/features/repair/`
+- Note (2026-11-06): spec 0024 decided it. Issues become foldable rows (shadcn Accordion) with a state derived from ticks (Not started, In progress, Done, No checklist, Returned); rows open by ticket status (first unfinished while work is ongoing, all closed for the verifier and finished tickets), remembered per tab, with `#issue-N` links. Safety is one line above the checklist, photos and AI fold to one line each, Activity shows the 5 newest, Notes and Vehicle move to the sidebar, the title becomes plate, model and first issue, and Cancel goes into a `⋮` menu. Web only, plus one backend test that locks the issue order.
+- [x] Design it (spec): `/architect ticket detail redesign`
+- [ ] Build it: `/develop ticket detail redesign`
+  - [ ] Pure rules: `issueRow.ts` (state, open rule, counts, prefix strip), `useTicketView` and `useTickOverrides`, their tests, the issue order test (AC-3 to AC-6, AC-12)
+  - [ ] Issue rows: the Accordion, closed and open rows, summary line, Hide done steps, parts and hours removed (AC-1 to AC-10, AC-12)
+  - [ ] Page frame: title, sidebar Notes and Vehicle, the `⋮` menu, phone order, photos line and blocked link, AI card, Activity (AC-11, AC-13 to AC-18)
+  - [ ] Sweep: skeleton, axe at 375px and 1280px, keyboard, reduced motion, lint, typecheck, build, tests (AC-19, AC-20)
+- [ ] Verify it: `/check verify ticket detail redesign`
+- [ ] Test it: `/test ticket detail redesign`
+- [ ] Polish it (optional, ask first): `impeccable` · `web-design-guidelines` · `break-ui` (10 issues with 20 steps each, long issue text, no known fix, returned issues)
