@@ -61,9 +61,9 @@ Today every service holds the one `JWT_SECRET`, so any of about eight services c
   - [x] ES256 end to end, the hard switch (keys loader, login `aud`, JWKS and metadata, both guards, portal redirect, compose and env) · AC-1 to AC-12, AC-22, AC-23, AC-25
   - [x] Clients and service identity (registry migration and seed, `/auth/token`, replay, rate limit, `/auth/users` for service tokens, VRMS roster on its own token) · AC-13 to AC-22, AC-27
   - [x] Rotation and handover (`keys:rotate`, `keys:client`, the rotation test, the folder README, `docs/keys.md`) · AC-24 to AC-26
-- [ ] Verify it: `/check verify signing keys and service identity`
+- [x] Verify it: `/check verify signing keys and service identity` (2026-11-08, local stack; the staging rotation, AC-24 and AC-26, is owed until spec 0008 exists)
 - [ ] Test it: `/test signing keys and service identity`
-- [ ] Review it (fresh model): `/check review signing keys and service identity`
+- [x] Review it (fresh model): `/check review signing keys and service identity` (skipped by choice, 2026-11-08; not run)
 - [ ] Document it: `/document signing keys and service identity`
 
 ### S3. Sessions: refresh and logout, web and mobile · planned · needs a decision
