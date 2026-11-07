@@ -30,8 +30,8 @@ Each group owns its own system's folders and repos. The shared parts (the root f
 | `welinc-web-portal` | shared | SSO portal | 8000 |
 | `welinc-web-vrms` | VRMS group | React, Vite and Tailwind app | 8001 |
 | `welinc-backend-vrms` | VRMS group | NestJS, Prisma and PostgreSQL API | 3002 |
-| `welinc-web-vmms`, `welinc-backend-vmms` | VMMS group | | |
-| `welinc-web-bms`, `welinc-backend-bms` | BMS group | | |
+| `welinc-web-vmms`, `welinc-backend-vmms`, `welinc-backend-vmms-analytics-ai`, `welinc-mobile-vrms_vmms` | VMMS group | | |
+| `welinc-web-bms`, `welinc-backend-bms`, `welinc-backend-bms-analytics-ai` | BMS group | | |
 
 An Nginx gateway on port 3000 routes each path to its service (today `/auth`, `/vrms`, `/repairs`). Pick free ports for a new system and add them to this table.
 

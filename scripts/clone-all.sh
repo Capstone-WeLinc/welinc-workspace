@@ -12,8 +12,11 @@ welinc-web-vrms
 welinc-backend-vrms
 welinc-web-vmms
 welinc-backend-vmms
+welinc-backend-vmms-analytics-ai
+welinc-mobile-vrms_vmms
 welinc-web-bms
 welinc-backend-bms
+welinc-backend-bms-analytics-ai
 "
 
 for repo in $REPOS; do
