@@ -64,7 +64,7 @@ Today every service holds the one `JWT_SECRET`, so any of about eight services c
 - [x] Verify it: `/check verify signing keys and service identity` (2026-11-08, local stack; the staging rotation, AC-24 and AC-26, is owed until spec 0008 exists)
 - [x] Test it: `/test signing keys and service identity` (2026-11-08; welinc-auth 230, backend-vrms 1400, portal 33 passing; UI look and cross origin redirect stay with verify)
 - [x] Review it (fresh model): `/check review signing keys and service identity` (skipped by choice, 2026-11-08; not run)
-- [ ] Document it: `/document signing keys and service identity`
+- [x] Document it: `/document signing keys and service identity` (2026-11-08, PR bodies: auth #15, backend-vrms #45, portal #12, workspace #12)
 
 ### S3. Sessions: refresh and logout, web and mobile · planned · needs a decision
 Short lived access tokens with refresh and logout in welinc-auth, for web and for the mobile app, so VMMS can drop its own copy. Covers web vs mobile bound sessions, the way VMMS has them today.
