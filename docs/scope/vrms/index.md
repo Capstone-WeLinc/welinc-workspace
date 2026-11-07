@@ -19,7 +19,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 |---|---|---|
 | Foundations | [foundations.md](foundations.md) | 8 existing, 7 done, 1 planned |
 | UI refresh | [ui-refresh.md](ui-refresh.md) | 3 done, 6 in-progress, 3 planned |
-| Repair workflow | [repair-workflow.md](repair-workflow.md) | 12 done, 1 in-progress, 7 planned, 1 dropped |
+| Repair workflow | [repair-workflow.md](repair-workflow.md) | 12 done, 1 in-progress, 9 planned, 1 dropped |
 | Platform | [platform.md](platform.md) | 2 in-progress, 6 planned, 2 dropped |
 | Outsourcing | [outsourcing.md](outsourcing.md) | 4 planned |
 | Operations | [operations.md](operations.md) | 5 planned, 1 dropped |
@@ -77,6 +77,8 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 63 | Chief dashboard rework with a Team section | Slice 1 | done |
 | 26 | Hosting, CI/CD & environments | Release | in-progress |
 | 27 | Error monitoring | Release | planned |
+| 66 | Workflow review against real shops | Slice 2 | planned |
+| 67 | Describe first issue picker | Slice 2 | planned |
 | 28 | In-app notifications | Slice 2 | planned |
 | 29 | Notification badge & queue counts | Slice 2 | planned |
 | 30 | Transfer requests | Slice 2 | planned |

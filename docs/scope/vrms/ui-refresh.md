@@ -136,6 +136,7 @@ Analytics charts on the new tokens. Split from feature 15.
 You find the current Audit log page ugly, and want it redone. It should be redesigned on top of the trail from feature 24, not just restyled. No new page: it replaces `/audit-logs`.
 **Done when:** the page has a new layout you signed off on, its filters come from `GET /vrms/repairs/audit-logs/catalog` (category chips, not 14 flat type chips), the busy step tick and photo rows don't bury status and cost changes, and it reads well at 375px and 1280px in its empty, loading and error states.
 - Note (2026-11-04): build after feature 24 (spec 0021) ships its categories, filters and catalog. Decide the design source in the spec. Consider sharing the event renderer with feature 32 (the per ticket timeline).
+- Note (2026-11-08, replan): from spec 0024. Group one checklist save's step rows in Activity (a save can write up to about 40 rows, spec 0023).
 - [ ] Design it (spec): `/architect audit log page redesign`
 - [ ] Polish it (optional, ask first): `impeccable` · `web-design-guidelines` · `break-ui` (long actor names, many step ticks, long remarks, empty filters)
 
