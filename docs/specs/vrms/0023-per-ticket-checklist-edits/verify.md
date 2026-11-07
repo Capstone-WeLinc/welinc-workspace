@@ -2,10 +2,10 @@
 _Steps derived from spec 0023 acceptance criteria. `/check verify` runs these; `/test` locks the durable ones._
 
 ## UI / manual
-- [ ] As the assigned Mechanic on an Assigned ticket with a linked known fix, open Edit steps, reword step 2, move step 4 up to the top, add a step, save → the checklist shows the new order, "Edited" on step 2's new place, "Added" on the new step; the Activity shows one reworded, one moved and one added row, 1 ms apart → AC-4, AC-6, AC-8, AC-10, AC-13
-- [ ] Same ticket: the ticket's "updated" time did not move; an Admin edit opened before the save still saves → AC-6
-- [ ] Open Edit steps and save with nothing changed → no new Activity rows → AC-11
-- [ ] On an In progress ticket, tick steps 1 and 3; open Edit steps, remove step 1, reword step 3, save → the prompt says "1 ticked step will be removed. 1 ticked step will lose its tick."; after save step 3 is unticked, and the removed row shows who ticked step 1 and when → AC-8, AC-9, AC-10
+- [x] As the assigned Mechanic on an Assigned ticket with a linked known fix, open Edit steps, reword step 2, move step 4 up to the top, add a step, save → the checklist shows the new order, "Edited" on step 2's new place, "Added" on the new step; the Activity shows one reworded, one moved and one added row, 1 ms apart → AC-4, AC-6, AC-8, AC-10, AC-13
+- [x] Same ticket: the ticket's "updated" time did not move; an Admin edit opened before the save still saves → AC-6
+- [x] Open Edit steps and save with nothing changed → no new Activity rows → AC-11
+- [x] On an In progress ticket, tick steps 1 and 3; open Edit steps, remove step 1, reword step 3, save → the prompt says "1 ticked step will be removed. 1 ticked step will lose its tick."; after save step 3 is unticked, and the removed row shows who ticked step 1 and when → AC-8, AC-9, AC-10
 - [ ] Open Edit steps in two tabs, save in one, save in the other → 409, the dialog closes, the ticket reloads and the stale toast shows → AC-6, AC-17
 - [ ] Open Edit steps, tick a step in a second tab, then save the dialog without touching that step → the tick is still there → AC-8, AC-15
 - [ ] Open Edit steps, then in a second tab relink the known fix → saving the dialog gives 409 → AC-6, AC-14
@@ -29,12 +29,12 @@ _Steps derived from spec 0023 acceptance criteria. `/check verify` runs these; `
 - [ ] At 375px the dialog is a bottom sheet; remove a step by keyboard → focus lands on the row that took its place; remove the last one → focus on Add step; axe clean at 375px and 1280px with the dialog and the prompt open → AC-4, AC-18
 
 ## Commands
-- [ ] `PUT /vrms/repairs/:id/issues/:issueId/steps` on a Closed ticket → 400 with the status message → AC-3
-- [ ] Same call as a Mechanic not assigned → 403; with an issue id from another ticket → 404 → AC-3
-- [ ] Same call with a step id from another issue, or one id twice → 400 → AC-7
-- [ ] Same call with an old `checklistVersion` → 409 `STALE_CHECKLIST` → AC-6
-- [ ] Same call with a 2 character step at index 3 → 400 with `fieldErrors: [{ index: 3, … }]` → AC-5
-- [ ] Same call with "  Torque   the bolts " for a step stored as "Torque the bolts" → no change, no row → AC-8, AC-11
+- [x] `PUT /vrms/repairs/:id/issues/:issueId/steps` on a Closed ticket → 400 with the status message → AC-3
+- [x] Same call as a Mechanic not assigned → 403; with an issue id from another ticket → 404 → AC-3
+- [x] Same call with a step id from another issue, or one id twice → 400 → AC-7
+- [x] Same call with an old `checklistVersion` → 409 `STALE_CHECKLIST` → AC-6
+- [x] Same call with a 2 character step at index 3 → 400 with `fieldErrors: [{ index: 3, … }]` → AC-5
+- [x] Same call with "  Torque   the bolts " for a step stored as "Torque the bolts" → no change, no row → AC-8, AC-11
 - [ ] `GET /vrms/repairs/:id` and the repair list → issues carry `checklistVersion`, steps carry `origin` and `editedAt`, `can.editChecklist` is set → AC-2, AC-12
 - [ ] `GET /vrms/repairs/audit-logs/catalog` → `STEP_ADDED`, `STEP_REMOVED`, `STEP_EDITED`, `STEP_MOVED` under `CHECKLIST` → AC-10
 - [ ] Move step 5 of 5 to the top and save → exactly one `STEP_MOVED` row; swap steps 1 and 2 → one row; reword and move one step → a `STEP_EDITED` and a `STEP_MOVED` row → AC-10

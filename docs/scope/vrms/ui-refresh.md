@@ -153,7 +153,7 @@ spec [0024](../../specs/vrms/0024-ticket-detail-redesign/index.md) · code in `w
 - Note (2026-11-07): spec 0024 updated after the task 8 build: Plate and Model stay in Details (AC-16), and the AC-12 whole word example is fixed to match its rule. The code already matched; nothing to rebuild.
 - Note (2026-11-07): spec 0024 updated a fifth time (build task 9, already built in `welinc-web-vrms` `1ddf82f`): the Status card as Status, Priority and Due rows with the overdue count under the date and no icon, Copy ticket link in its `⋮` menu, a shared `MoreMenu` that stops the tooltip reopening, icons in the issue row menu, a late Before photo tile with a warning notice, and sentence case pills with a hairline ring on every VRMS screen. Verify it is still open.
 - Note (2026-11-07): spec 0024 updated a sixth time (build task 10), cross checked and accepted, after `/check verify` measured the phone rows at 375px (title column about 62px, line 2 cut to nothing): below 768px the fixed progress column goes, the progress becomes the first part of line 2 with its bar as a strip under it, and line 2 may wrap. Nothing changes from 768px. Build it is open again for this one task.
-- [ ] Build it: `/develop ticket detail redesign`
+- [x] Build it: `/develop ticket detail redesign`
   - [x] Pure rules: `issueRow.ts` (state, open rule, counts, prefix strip), `useTicketView` and `useTickOverrides`, their tests, the issue order test (AC-3 to AC-6, AC-12)
   - [x] Issue rows: the Accordion, closed and open rows, summary line, Hide done steps, parts and hours removed (AC-1 to AC-10, AC-12)
   - [x] Page frame: title, sidebar Notes and Vehicle, the `⋮` menu, phone order, photos line and blocked link, AI card, Activity (AC-11, AC-13 to AC-18)
@@ -163,7 +163,7 @@ spec [0024](../../specs/vrms/0024-ticket-detail-redesign/index.md) · code in `w
   - [x] Third refinements: no Hide done steps, drop overlay, folded Activity with a shared `FoldCard`, one due line and a plain Return button, no garage in the header (AC-5, AC-6, AC-9, AC-11, AC-13 to AC-15, AC-17, AC-18)
   - [x] Fourth refinements: upload `group` and narrowed Before protection (backend), drop zones and thumbnail drag, Status card row and side by side buttons, row menu on the header, one block resolution, `issueDisplayText` (AC-2, AC-3, AC-7, AC-12, AC-13, AC-17, AC-21, AC-22)
   - [x] Fifth refinements: Status card rows and `dueValue`, shared `MoreMenu` with Copy ticket link, late Before tile with the warning notice, softer pills everywhere (AC-7, AC-13, AC-17 to AC-20)
-  - [ ] Sixth refinements: progress as the first part of line 2 with a bar strip below 768px, wrapping line 2, no change from 768px (AC-2, AC-3, AC-20)
+  - [x] Sixth refinements: progress as the first part of line 2 with a bar strip below 768px, wrapping line 2, no change from 768px (AC-2, AC-3, AC-20)
 - [ ] Verify it: `/check verify ticket detail redesign`
 - [ ] Test it: `/test ticket detail redesign`
 - [ ] Polish it (optional, ask first): `impeccable` · `web-design-guidelines` · `break-ui` (10 issues with 20 steps each, long issue text, no known fix, returned issues)
