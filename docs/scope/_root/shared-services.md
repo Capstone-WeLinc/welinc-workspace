@@ -58,7 +58,7 @@ Today every service holds the one `JWT_SECRET`, so any of about eight services c
 - Note (2026-11-08): spec 0002 decided `jose` everywhere, ES256 keys in `AUTH_SIGNING_KEYS` with a rotation script that refuses unsafe steps, a seeded `OAuthClient` registry, the client credentials grant with a `jti` replay table, an interim login token whose `aud` welinc-auth picks until S4, and a copyable token check in backend-vrms (`src/auth/verify/`). Hard switch: auth, backend-vrms, portal and compose merge together.
 - [x] Design it (spec): `/architect signing keys and service identity`
 - [ ] Build it: `/develop signing keys and service identity`
-  - [ ] ES256 end to end, the hard switch (keys loader, login `aud`, JWKS and metadata, both guards, portal redirect, compose and env) · AC-1 to AC-12, AC-22, AC-23, AC-25
+  - [x] ES256 end to end, the hard switch (keys loader, login `aud`, JWKS and metadata, both guards, portal redirect, compose and env) · AC-1 to AC-12, AC-22, AC-23, AC-25
   - [ ] Clients and service identity (registry migration and seed, `/auth/token`, replay, rate limit, `/auth/users` for service tokens, VRMS roster on its own token) · AC-13 to AC-22, AC-27
   - [ ] Rotation and handover (`keys:rotate`, `keys:client`, the rotation test, the folder README, `docs/keys.md`) · AC-24 to AC-26
 - [ ] Verify it: `/check verify signing keys and service identity`

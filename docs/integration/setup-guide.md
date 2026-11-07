@@ -60,7 +60,7 @@ Create `docker-compose.<system>.yml` at the workspace root. `docker-compose.vrms
   ```
 
 - Use your own database container, never the auth database. Pick host ports nobody uses yet and add them to the repos table in `README.md`. Taken today: 3000, 3001, 3002, 5432, 5433, 6379, 8000, 8001, 10000. The portal already expects VMMS on 8002 and BMS on 8003.
-- Give your backend the same `JWT_SECRET` as auth (`dev_secret_key_change_in_production` locally), or no token will verify.
+- Tokens are ES256 now, and `JWT_SECRET` is gone (spec 0002). Check them with welinc-auth's published keys (`/auth/.well-known/jwks.json`), never a shared secret. Copy VRMS's `src/auth/verify/` folder when your group moves over (suite row S11); until then a check built on HS256 no longer matches.
 - Point your backend at auth on the internal network: `http://auth-service:3001`.
 - Give your web app `VITE_API_BASE_URL: http://localhost:3000`, so every API call goes through the gateway.
 
@@ -88,7 +88,7 @@ Auth only accepts browser calls from the origins in `CORS_ORIGINS` (in `docker-c
 2. welinc-auth answers with a JWT that lists the user's roles per system: `roles: [{ role, system }]`, with `system` one of `VRMS`, `VMMS`, `BMS`. It expires after 15 minutes.
 3. The portal sends the user to their system's app as `<app URL>/login?token=...`. The app stores it in `localStorage` under `welinc_token` (keep that key: the portal and every app share it).
 4. The app sends `Authorization: Bearer <token>` on every API call.
-5. The system's backend verifies the token with `JWT_SECRET` and checks the user's role **for that system** on the server. A backend can also call `GET /auth/me?system=<SYSTEM>` on each request, so a deactivated or locked account stops working at once (VRMS does this).
+5. The system's backend verifies the token with welinc-auth's published keys, refuses a token whose `aud` isn't its own system, and checks the user's role **for that system** on the server. A backend can also call `GET /auth/me?system=<SYSTEM>` on each request, so a deactivated or locked account stops working at once (VRMS does this).
 
 The portal reads each app's URL from `VITE_VRMS_URL`, `VITE_VMMS_URL` and `VITE_BMS_URL`. Update your system's value in the portal's `.env.example` through a pull request.
 
@@ -113,7 +113,7 @@ After a pull, run `npm install` where `package.json` changed, `npx prisma migrat
 
 ## Troubleshooting
 
-- **Every request is 401:** your `JWT_SECRET` doesn't match auth's.
+- **Every request is 401:** the token's `aud` isn't your system, or your `AUTH_ISSUER` isn't the identical string welinc-auth uses.
 - **Your backend can't reach `auth-service`:** your container isn't on `welinc-network`, or the shared stack isn't running.
 - **The gateway answers 502 for your path:** your backend's service name or port in `nginx.conf` doesn't match your compose file.
 - **The browser blocks a call with a CORS error:** your app's origin is missing from `CORS_ORIGINS`.

@@ -1,7 +1,7 @@
 # 0002. Signing keys and service identity
 
 **Date**: 2026-11-08
-**Status**: Proposed
+**Status**: In Progress
 **Scope row**: [S2. Signing keys and service identity](../../../scope/_root/shared-services.md#s2-signing-keys-and-service-identity--in-progress)
 **Builds contract sections**: [0001](../0001-shared-services-contract/index.md) section 4 (clients), section 5 (tokens, keys, `POST /auth/token` client credentials grant), section 10 (`.well-known` routes, `/auth/login`), section 12 (`/auth/token` limit), section 15 (configuration)
 
