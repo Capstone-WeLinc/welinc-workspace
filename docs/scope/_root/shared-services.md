@@ -24,7 +24,7 @@ _These are recommendations to keep the build orderly, not requirements. Skip any
 | # | Feature | Phase | Status |
 |---|---------|-------|--------|
 | S1 | Shared services contract | Contract | done |
-| S2 | Signing keys and service identity | Core | in-progress |
+| S2 | Signing keys and service identity | Core | done |
 | S3 | Sessions: refresh and logout, web and mobile | Core | planned |
 | S5 | Roles per system | Core | planned |
 | S6 | User directory for systems | Core | planned |
@@ -50,7 +50,7 @@ One suite spec that every group can build against: the auth API surface, the log
 
 ## Core
 
-### S2. Signing keys and service identity · in-progress
+### S2. Signing keys and service identity · done
 spec [0002](../../specs/_root/0002-signing-keys-service-identity/index.md) · code in `welinc-auth/src/auth/` (keys, tokens, clients), `welinc-auth/scripts/`, `welinc-backend-vrms/src/auth/verify/`
 
 Today every service holds the one `JWT_SECRET`, so any of about eight services could mint a token for any system. Move to keys only welinc-auth can sign with, published so services verify without a secret, plus a way for services to call each other (BMS's internal key, analytics checking callers).
@@ -62,7 +62,7 @@ Today every service holds the one `JWT_SECRET`, so any of about eight services c
   - [x] Clients and service identity (registry migration and seed, `/auth/token`, replay, rate limit, `/auth/users` for service tokens, VRMS roster on its own token) · AC-13 to AC-22, AC-27
   - [x] Rotation and handover (`keys:rotate`, `keys:client`, the rotation test, the folder README, `docs/keys.md`) · AC-24 to AC-26
 - [x] Verify it: `/check verify signing keys and service identity` (2026-11-08, local stack; the staging rotation, AC-24 and AC-26, is owed until spec 0008 exists)
-- [ ] Test it: `/test signing keys and service identity`
+- [x] Test it: `/test signing keys and service identity` (2026-11-08; welinc-auth 230, backend-vrms 1400, portal 33 passing; UI look and cross origin redirect stay with verify)
 - [x] Review it (fresh model): `/check review signing keys and service identity` (skipped by choice, 2026-11-08; not run)
 - [ ] Document it: `/document signing keys and service identity`
 
