@@ -54,6 +54,8 @@ services:
       DATABASE_URL: postgresql://welinc_auth_user:welinc_auth_pass@auth-db:5432/welinc_auth_db?schema=public
       # The token issuer (spec 0001 section 1). Every service sets this identical string.
       AUTH_ISSUER: http://localhost:3000/auth
+      # nginx sits in front, so the rate limit on /auth/token reads the real caller (spec 0002)
+      TRUST_PROXY_HOPS: 1
       CORS_ORIGINS: http://localhost:8000,http://localhost:8001,http://localhost:8002,http://localhost:8003
       # Public portal address for the links in setup and reset emails (spec 0009)
       PORTAL_URL: http://localhost:8000
