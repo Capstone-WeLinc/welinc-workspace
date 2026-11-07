@@ -178,7 +178,7 @@ Sent as `client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-b
 | SSO handle (portal cookie) | the web session's lifetime | belongs to one `sid`; ending the `sid` kills it even while the cookie is still in the browser |
 | Reauth token (S8) | 5 minutes | used once, only for the deletion request |
 
-**Keys:** `GET /auth/.well-known/jwks.json` lists the public keys (`Cache-Control: max-age=300`). Each private key in `AUTH_SIGNING_KEYS` carries a `status`: `current` (signs everything, exactly one), `next` (published, signs nothing yet) or `retired` (published, signs nothing, removed later). A rotation: add the new key as `next` and wait at least one hour; swap it to `current` and the old one to `retired`; remove the retired key once 30 minutes have passed after its last token expired. So a rotation needs no downtime. Verifiers cache the list and fetch it again when they meet an unknown `kid` (at most once a minute). In Node, `passport-jwt` or `@nestjs/jwt` with the `jwks-rsa` key provider (it handles EC keys too) is enough. No library change.
+**Keys:** `GET /auth/.well-known/jwks.json` lists the public keys (`Cache-Control: max-age=300`). Each private key in `AUTH_SIGNING_KEYS` carries a `status`: `current` (signs everything, exactly one), `next` (published, signs nothing yet) or `retired` (published, signs nothing, removed later). A rotation: add the new key as `next` and wait at least one hour; swap it to `current` and the old one to `retired`; remove the retired key once 30 minutes have passed after its last token expired. So a rotation needs no downtime. Verifiers cache the list and fetch it again when they meet an unknown `kid` (at most once a minute). In Node, use `jose` (its remote key set, wrapped to keep the last good set during an outage) for checking tokens and signing client assertions; VRMS's `src/auth/verify/` folder is the reference to copy (spec 0002).
 
 **`POST /auth/token`** (form encoded, per RFC 6749):
 
@@ -186,7 +186,7 @@ Sent as `client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-b
 |---|---|---|
 | `authorization_code` | `code`, `redirect_uri`, `code_verifier` | client assertion |
 | `refresh_token` | `refresh_token`, optional `audience` (mobile only) | client assertion, or `client_id=vmms-mobile` |
-| `client_credentials` | `audience`, `scope` (space separated) | client assertion |
+| `client_credentials` | `audience`, `scope` (space separated, required) | client assertion |
 
 User grants answer:
 
@@ -349,7 +349,7 @@ Existing routes stay unless marked. "System" means the token's `aud`; the old `?
 | `/auth/.well-known/oauth-authorization-server` | GET | anyone; issuer and endpoint addresses (RFC 8414) | new | S2 |
 | `/auth/authorize`, `/auth/authorize/resume` | GET | browser | new | S4 |
 | `/auth/token` | POST | clients | new | S2, S3, S4 |
-| `/auth/login` | POST | portal only: sets the SSO cookie, no token in the body | changed | S3, S4 |
+| `/auth/login` | POST | portal only: sets the SSO cookie, no token in the body. Until S4 (spec 0002): returns an access token with an optional `system` input, `system` in the answer, and 403 `NO_SYSTEM_ACCESS`; tokens carry no `sid` until S3 | changed | S2, S3, S4 |
 | `/auth/login/otp` | POST | portal | reserved | feature 34 |
 | `/auth/mobile/login`, `/auth/mobile/login/otp` | POST | `vmms-mobile` (tokens in the body, section 8) | new (OTP reserved) | S3 |
 | `/auth/logout` | POST | SSO cookie, a client with assertion and refresh token, or `vmms-mobile` with refresh token | new | S3 |
@@ -390,7 +390,7 @@ Existing routes stay unless marked. "System" means the token's `aud`; the old `?
 |---|---|---|
 | `/auth/login` | 10 a minute per address and 5 failures per account (the existing lockout) | 429 `RATE_LIMITED` with `Retry-After`, or 423 locked |
 | `/auth/mobile/login` | 5 a minute per address, sharing the per account lockout | as above |
-| `/auth/token` | 60 a minute per client (`vmms-mobile` also 30 a minute per address) | 429 |
+| `/auth/token` | 60 a minute per client, and 120 a minute per address before any check (S2) (`vmms-mobile` also 30 a minute per address) | 429 with `Retry-After` and `{ "error": "rate_limited" }` |
 | `/auth/session/activity` | 2 a minute per `sid` (extra pings are accepted and ignored) | none |
 | `/auth/session` | none beyond the gateway; systems cache 30 s | none |
 | `/auth/directory/*` | 120 a minute per client | 429 |
@@ -420,6 +420,7 @@ S rows may tighten these and must note it here.
 **welinc-auth** (new or changed; values in `.env.example` only):
 - `AUTH_ISSUER`: the issuer from section 1.
 - `AUTH_SIGNING_KEYS`: the private signing keys as a JWK set, each with its `status` (section 5); a Container Apps secret when hosted. Replaces `JWT_SECRET`.
+- `TRUST_PROXY_HOPS`: proxy hops in front of welinc-auth (1 locally, 2 hosted), for the per address limits (spec 0002).
 - `ACCESS_TOKEN_MINUTES` (15), `SERVICE_TOKEN_MINUTES` (5), `WEB_SESSION_IDLE_MINUTES` (30), `WEB_SESSION_MAX_HOURS` (12), `MOBILE_SESSION_IDLE_DAYS` (7), `REFRESH_REUSE_GRACE_SECONDS` (10). Replace `JWT_ACCESS_EXPIRY` and `JWT_REFRESH_EXPIRY`.
 - `PORTAL_URL` (kept), `SSO_COOKIE_SECURE` (true when hosted).
 - The client registry (section 4) comes from the seed per environment, with each client's public keys and redirect address read from environment values.

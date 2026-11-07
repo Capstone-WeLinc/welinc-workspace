@@ -24,7 +24,7 @@ _These are recommendations to keep the build orderly, not requirements. Skip any
 | # | Feature | Phase | Status |
 |---|---------|-------|--------|
 | S1 | Shared services contract | Contract | done |
-| S2 | Signing keys and service identity | Core | planned |
+| S2 | Signing keys and service identity | Core | in-progress |
 | S3 | Sessions: refresh and logout, web and mobile | Core | planned |
 | S5 | Roles per system | Core | planned |
 | S6 | User directory for systems | Core | planned |
@@ -50,10 +50,21 @@ One suite spec that every group can build against: the auth API surface, the log
 
 ## Core
 
-### S2. Signing keys and service identity · planned · needs a decision
+### S2. Signing keys and service identity · in-progress
+spec [0002](../../specs/_root/0002-signing-keys-service-identity/index.md)
+
 Today every service holds the one `JWT_SECRET`, so any of about eight services could mint a token for any system. Move to keys only welinc-auth can sign with, published so services verify without a secret, plus a way for services to call each other (BMS's internal key, analytics checking callers).
 **Done when:** only welinc-auth can sign tokens, every service verifies with the published keys, a key can be rotated without downtime, service to service calls carry their own identity, and no service needs `JWT_SECRET`.
-- [ ] Design it (spec): `/architect signing keys and service identity`
+- Note (2026-11-08): spec 0002 decided `jose` everywhere, ES256 keys in `AUTH_SIGNING_KEYS` with a rotation script that refuses unsafe steps, a seeded `OAuthClient` registry, the client credentials grant with a `jti` replay table, an interim login token whose `aud` welinc-auth picks until S4, and a copyable token check in backend-vrms (`src/auth/verify/`). Hard switch: auth, backend-vrms, portal and compose merge together.
+- [x] Design it (spec): `/architect signing keys and service identity`
+- [ ] Build it: `/develop signing keys and service identity`
+  - [ ] ES256 end to end, the hard switch (keys loader, login `aud`, JWKS and metadata, both guards, portal redirect, compose and env) · AC-1 to AC-12, AC-22, AC-23, AC-25
+  - [ ] Clients and service identity (registry migration and seed, `/auth/token`, replay, rate limit, `/auth/users` for service tokens, VRMS roster on its own token) · AC-13 to AC-22, AC-27
+  - [ ] Rotation and handover (`keys:rotate`, `keys:client`, the rotation test, the folder README, `docs/keys.md`) · AC-24 to AC-26
+- [ ] Verify it: `/check verify signing keys and service identity`
+- [ ] Test it: `/test signing keys and service identity`
+- [ ] Review it (fresh model): `/check review signing keys and service identity`
+- [ ] Document it: `/document signing keys and service identity`
 
 ### S3. Sessions: refresh and logout, web and mobile · planned · needs a decision
 Short lived access tokens with refresh and logout in welinc-auth, for web and for the mobile app, so VMMS can drop its own copy. Covers web vs mobile bound sessions, the way VMMS has them today.
