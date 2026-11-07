@@ -23,7 +23,7 @@ _These are recommendations to keep the build orderly, not requirements. Skip any
 
 | # | Feature | Phase | Status |
 |---|---------|-------|--------|
-| S1 | Shared services contract | Contract | planned |
+| S1 | Shared services contract | Contract | done |
 | S2 | Signing keys and service identity | Core | planned |
 | S3 | Sessions: refresh and logout, web and mobile | Core | planned |
 | S5 | Roles per system | Core | planned |
@@ -38,11 +38,15 @@ _These are recommendations to keep the build orderly, not requirements. Skip any
 
 ## Contract
 
-### S1. Shared services contract · planned · needs a decision
+### S1. Shared services contract · done
+spec [0001](../../specs/_root/0001-shared-services-contract/index.md)
+
 One suite spec that every group can build against: the auth API surface, the login handoff, token format and signing, per system roles, the user directory, gateway routes and the port map, and the order the other groups move over in. It replaces the auth and gateway part of VRMS feature 56.
-**Done when:** `docs/specs/_root/` holds the contract with every route, claim and port; each gap listed above maps to a row here; and the VMMS and BMS groups have read it through a pull request.
+**Done when:** `docs/specs/_root/` holds the contract with every route, claim and port, and each gap listed above maps to a row here.
+- Note (2026-11-08): you decided the other groups don't review the spec; you tell them what changes as each piece lands.
 - Note (2026-11-07): two questions for BMS are in `docs/_private/vrms/shared-services-questions.md` (outside git): whether their auth copy runs anywhere online, and whether `welinc-mobile-bms` is still used. Hosting is settled here instead of asked: the shared services run with VRMS's hosting (feature 26) behind one public gateway address, and each system adds its deployed web addresses to the CORS list and the login return allow list. Everything else is read from their code or decided by the team in this spec: the auth routes they need (listed above), which of their records point to user ids (their schemas), deep links surviving login, a code exchange on their backends, logout from one system ending the shared session, published keys instead of `JWT_SECRET` (the BMS tracking token gets its own secret), keeping VMMS's one role rule and web vs mobile sessions as their per system rules, phone numbers owned by welinc-auth (VMMS sends SMS with Semaphore), verify password only guarding the BMS deletion request, and a deletion request that an admin reviews before deactivating (history kept).
-- [ ] Design it (spec): `/architect shared services contract`
+- Note (2026-11-08): spec 0001 is the contract (version 1). Decided: a token per system, ES256 published keys, a code exchange on each system's backend with an HttpOnly refresh cookie on a custom domain (working name `welinc.tech`), a native mobile login on its own route, 30 minutes idle (tracked on the server) and 12 hours for web, 7 days rolling for mobile, a 30 s session check, `private_key_jwt` for backends, a cursor change feed for users, prefixes owned by each service, gateway config in `infra/gateway/`, a port block per system, a hard switch with no dual run, and BMS moving before VMMS. Its gap map ties every gap above to a row.
+- [x] Design it (spec): `/architect shared services contract`
 
 ## Core
 
@@ -59,6 +63,7 @@ Short lived access tokens with refresh and logout in welinc-auth, for web and fo
 ### S5. Roles per system · planned · needs a decision
 Each system declares its roles and rules (VMMS: exactly one role per account; BMS: Admin, Customer Support, Operations; VRMS: Admin, Chief Mechanic, Mechanic), and welinc-auth enforces them, instead of one shared enum and rules copied into each system.
 **Done when:** each system's allowed roles and rules live in one place in welinc-auth, user admin rejects a role a system does not have, and adding a role to one system needs no change in the others.
+- Note (2026-11-08, from a look at a friend's company suite (SBSI User & Access Management) on 2026-11-08, ideas to weigh in the spec, nothing decided): let each system publish its own permission catalog (VRMS already has its matrix and `/permissions/me`, spec 0011) and show them read only through `/auth/systems`, named `system.resource.action` (VRMS keys get a `vrms.` prefix there, e.g. `vrms.ticket.view_all`). Each system still decides and enforces its permissions; welinc-auth only shows them, so the S10 access report can answer "who can approve costs anywhere in the suite". Don't copy their model of one central catalog where the access service owns every permission (it drifts: empty systems, undescribed permissions, old and new slugs mixed), nor global roles shared across systems.
 - [ ] Design it (spec): `/architect roles per system`
 
 ### S6. User directory for systems · planned · needs a decision
@@ -94,6 +99,7 @@ One gateway that routes every system and analytics service, with a port map that
 ### S7. Account activity and audit · planned · needs a decision
 Login activity and account change history from welinc-auth, so VMMS (`me/login-activity`, `users/:id/login-activity`, `audit-logs`) and BMS (`profile/activity`, its activity log page) stop keeping or reading their own.
 **Done when:** each login, failed login, lockout, logout and refresh is recorded with device and address; a user sees their own; a system admin sees their system's users and account changes; and nothing outside welinc-auth reads those tables.
+- Note (2026-11-08, from a look at a friend's company suite (SBSI User & Access Management) on 2026-11-08, ideas to weigh in the spec, nothing decided): one activity page with login events and account changes (`UserChange`) in a single timeline, filtered by category, actor, date and address, like their Security & Activity Audit Trail. Lessons from their bugs: log the real client address from `X-Forwarded-For` (they log the Docker gateway `172.19.0.1` for everyone), record a logout once (they log the same one twice in the same second), and keep emails out of the event text since the log is kept forever.
 - [ ] Design it (spec): `/architect account activity and audit`
 
 ### S8. Profile extras · planned · needs a decision · Beta
@@ -118,6 +124,7 @@ Replaces VRMS feature 61 with the same scope (the full model, chosen 2026-11-07)
 - Note (2026-11-07, reopened, to discuss before `/architect`): two inputs to weigh against the model above.
   - Claude's suggestion: a real Super admin role in welinc-auth (at most 3 holders, MFA, the last one can't be removed); no hidden bypass, so using a system still needs that system's role; giving yourself a system role is allowed but expires (about 8 hours), needs a reason and alerts that system's admins; keep the access report and admin change alerts; break glass dropped for now.
   - A healthcare suite you heard about: an auth level admin with access to all four of their systems; inside each system a superadmin who can do everything across all branches and holds the system's configuration; and a branch admin (the manager) per branch, with branches and departments as scopes. Only an idea from their own system, not a model to copy. Decided 2026-11-07: no branch or garage level admin for WeLinc, since staff are few; each system keeps one Admin level that covers all garages and holds its settings (VRMS feature 52). Still open: whether the suite admin can open a system's data.
+- Note (2026-11-08, from a look at a friend's company suite (SBSI User & Access Management) on 2026-11-08, ideas to weigh in the spec, nothing decided): make the admin access report the landing page of suite admin, like their governance dashboard: who holds admin in each system, locked accounts, recent role grants and removals, deletion requests waiting, the last account events. Add a "who has this permission" view (their Assign to Roles from the permission side) using the S5 catalog. Their split of IT Admin (accounts and roles) from Admin (business work) supports the platform admin idea; their everyday Super Admin role is the thing to avoid.
 - [ ] Design it (spec): `/architect suite admin model`
 - [ ] Polish it (optional, ask first): `web-design-guidelines` (access report)
 
