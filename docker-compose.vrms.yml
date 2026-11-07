@@ -51,16 +51,22 @@ services:
     volumes:
       - ./welinc-backend-vrms:/app
       - /app/node_modules
-    # Optional: lets the container pick up extra variables from welinc-backend-vrms/.env. The environment block below wins on any overlap.
+    # Lets the container pick up extra variables from welinc-backend-vrms/.env, including the VRMS client
+    # key (AUTH_CLIENT_PRIVATE_KEY) that `npm run keys:dev` in welinc-auth writes (spec 0002).
+    # The environment block below wins on any overlap, so it holds no secrets.
     env_file:
       - path: ./welinc-backend-vrms/.env
         required: false
     environment:
       PORT: 3002
       DATABASE_URL: postgresql://welinc_vrms_user:welinc_vrms_pass@vrms-db:5432/welinc_vrms_db?schema=public
-      JWT_SECRET: dev_secret_key_change_in_production
+      # Tokens are checked with welinc-auth's published keys (spec 0002)
+      AUTH_ISSUER: http://localhost:3000/auth
+      AUTH_JWKS_URL: http://auth-service:3001/auth/.well-known/jwks.json
       # welinc-auth on the internal network; every request's account check calls it (spec 0009)
-      AUTH_SERVICE_URL: http://auth-service:3001
+      AUTH_INTERNAL_URL: http://auth-service:3001
+      # VRMS's client id at welinc-auth; its private key comes from the .env file
+      AUTH_CLIENT_ID: vrms
       CORS_ORIGINS: http://localhost:8000,http://localhost:8001
       NODE_ENV: development
       # Spec 0017: Azurite's public development account key (not a secret). The backend talks to

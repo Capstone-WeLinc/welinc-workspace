@@ -23,6 +23,7 @@ Jira WL-E7 says optional local AI (Ollama); the code uses Gemini. Decide the pro
 **Done when:** the provider is recorded, suggestions appear on the ticket from the chosen provider, and the app still works when AI is down.
 - Note (2026-10-25): the AI is being rebuilt inside welinc-backend-vrms (see feature 3), so this builds on that rework and grounds its suggestions on the spec 0007 knowledge base, not on feature G. Design feature 3 first.
 - Note (2026-10-31): spec 0013 moves the AI as is and leaves these ideas here. This feature owns the knowledge base grounding, triage while typing, search by meaning, note cleanup, drafted entries, duplicate warnings and the AI panel and feedback redesign. When grounding lands, declare `module.ai` as requiring `module.knowledge`.
+- Note (2026-11-08, replan): from spec 0024. The AI card stays per ticket next to the issues; a diagnosis per issue would need new AI endpoints. Decide it here or in its own spec.
 - [ ] Design it (spec): `/architect AI repair suggestions`
 - [ ] Polish it (optional, ask first): `web-design-guidelines`
 

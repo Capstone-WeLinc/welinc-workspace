@@ -69,7 +69,7 @@ cp welinc-auth/.env.example welinc-auth/.env
 |---|---|---|
 | `welinc-auth/.env` | `SMTP_HOST`, `SMTP_USER`, `SMTP_PASS` (optional) | Sending OTP and reset emails. Left blank, emails are logged instead. |
 
-The containers take their settings from the compose files, so the stack starts without these. If `welinc-auth/.env` exists, the auth container also reads it, which is how it gets `SMTP_*`. The compose values win on any overlap. The backend `.env` files are also used for running migrations, seeds or a service outside Docker. If you run a backend outside Docker, keep `JWT_SECRET` equal to the value in the compose files, or its tokens will not verify.
+The containers take their settings from the compose files, so the stack starts without these. If `welinc-auth/.env` exists, the auth container also reads it, which is how it gets `SMTP_*`. The compose values win on any overlap. The backend `.env` files are also used for running migrations, seeds or a service outside Docker. Before the first start, run `npm run keys:dev` in `welinc-auth`: it writes the signing keys into `welinc-auth/.env` and the VRMS client key into `welinc-backend-vrms/.env` (spec 0002). No service shares a secret any more: backends check tokens with welinc-auth's published keys.
 
 | File | Purpose | Committed? |
 |---|---|---|

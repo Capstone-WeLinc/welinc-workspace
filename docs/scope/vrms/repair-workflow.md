@@ -246,6 +246,19 @@ spec [0022](../../specs/vrms/0022-chief-mechanic-mechanics-view/index.md)
 
 Adds the alerts and hand offs around the core loop.
 
+### 66. Workflow review against real shops · planned · needs a decision · from the 2026-11-06 workflow topics
+Check the repair loop against how real truck shops work (write up, inspect and diagnose, estimate and approval, waiting on parts, labor, a quality check by someone else, close out) and decide which changes VRMS takes on. Do it before feature 67, since the write up shape feeds that picker.
+**Done when:** a spec records which candidates are in, later or out, each one in is a scope row (or a change to an existing row), and the ticket flow change is clear enough to build.
+- Note (2026-11-08, replan): candidates, none decided yet. The 3 Cs (Complaint at write up, Cause after diagnosis, Correction at send for verification; the strongest one). A reason on On hold (parts, approval, tech away) shown on the dashboard, which reshapes feature 31. Start and Pause per issue so labor hours are recorded, not typed. Let the Chief create tickets (today `ticket.create` is Admin only by default). An approval step above a cost limit (maybe later). Prefill "What fixed it" from the checklist, and a "Suggest these steps for the entry" button at verification. Per issue verification (sign off or return one issue, close when all are signed off; spec 0024's closed row leaves room for an Approved mark). Preventive maintenance stays with VMMS; VRMS takes in their tickets.
+- [ ] Design it (spec): `/architect workflow review against real shops`
+
+### 67. Describe first issue picker · planned · needs a decision · from the 2026-11-06 workflow topics
+On the repair form, you type what is wrong first and known fixes are suggested from it, with a shorter list to pick from. It must work with the AI module off. Builds on the spec 0007 fix library (feature 15), the old feature 41 picker, and the `issue_embeddings` already linked to known fixes.
+**Done when:** typing a description shows suggested known fixes, picking one fills the issue, a browse path still reaches every fix, and it works the same with the AI module off (text match only) or on.
+- Note (2026-11-08, replan): open questions with the recommended pick first. Write up shape: describe, then confirm (system filled from the pick, root cause Unknown) · full 3 Cs now · only add suggestions. AI on: hybrid (past issue embeddings ranked by fix plus a text match on fix name and symptoms) · embed the fixes · ask the model to pick. AI off: `pg_trgm` text match · browse only · hide it. Display: top 3 fix cards plus "Browse known fixes" · a ranked dropdown · chips only. Settle the write up shape in feature 66 first.
+- [ ] Design it (spec): `/architect describe first issue picker`
+- [ ] Polish it (optional, ask first): `web-design-guidelines` · `break-ui` (long descriptions, no matches, many matches)
+
 ### 28. In-app notifications · planned · needs a decision
 WL-304. The shared notification service every alert uses, across in app, email and push to the mobile app.
 **Done when:** assignments, transfers, holds, verifications and deadline alerts create notifications, clicking one opens the ticket, new ones appear without a reload, and each alert also goes out by email or push where its rule says so.
@@ -277,6 +290,7 @@ WL-208, built on proposed defaults. Pause a ticket for missing parts with the re
 - Note (2026-10-29): `TicketHold` is designed in spec 0010 with a partial unique index (raw SQL) for one open hold per ticket. Same Prisma drift risk as feature 30: check the `prisma-cli` skill and make sure later generated migrations do not drop it.
 - Note (2026-11-01, replan): from spec 0014. The hold moves (M7 to M13 in its table) are written but off; switch them on through `applyStatusMove` with this feature's trigger. Same for features 37, 38 and 39.
 - Note (2026-11-01, replan): from spec 0015. Default the Chief Mechanic's "approve a parts hold" key to **on**.
+- Note (2026-11-08, replan): feature 66 may widen this to a hold with a reason (parts, approval, tech away) shown on the dashboard. Design it after feature 66.
 - [ ] Design it (spec): `/architect on hold for parts`
 - [ ] Polish it (optional, ask first): `web-design-guidelines`
 
