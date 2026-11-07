@@ -29,6 +29,7 @@ WL-104. A role that sees all tickets and owns verification, following the permis
 - Note (2026-10-29): spec 0002 asks for a Chief Mechanic dashboard (Jira VRMS-41) that reuses the dashboard tiles, with Waiting as the verification queue. Cover it here or with feature 23.
 - Note (2026-11-01, replan): spec 0014 gave the Chief Mechanic the Verify and Send back moves (`ticket.verify`), without cancel or override. What is left here is the every ticket view and the dashboard.
 - Note (2026-11-01): spec 0015 decided the Chief's dashboard (queue first, oldest waiting, then own work, attention, pipeline, no spend), read only costs by default, and an Admin setting to require costs before closing (off by default). The verification queue moved here from feature 23. No new page or sidebar item.
+- Note (2026-11-05, replan): spec 0022 (feature 63) replaced the Chief view this built: the tiles, Needs attention and the pipeline are gone, and the dashboard is now a summary band, For verification, My work and Team. The sign off queue rules and the costs rules from spec 0015 stay.
 - [x] Design it (spec): `/architect chief mechanic role`
 - [x] Build it: `/develop chief mechanic role`
   - [x] Thin thread: `status_changed_at` migration and backfill, the For verification sort, the Chief view with the queue section (AC-7 to AC-11, AC-14 to AC-16)
@@ -195,19 +196,51 @@ See who is busy before assigning. Build after features 18 and 53, since it reuse
 - [x] Test it: `/test mechanic workload` (2026-11-03: extended `mechanic-workload.spec.ts` and `workload.test.ts`; backend 1191 and web 307 tests pass. The dialogs have no component tests, since web-vrms tests pure logic only)
 - [x] Polish it (optional, ask first): `web-design-guidelines` (2026-11-03: ran, 7 findings fixed: live regions, focus after Unassign and Reassign, a real disclosure for co-workers and Show all, the ellipsis, the dash text. Left: the filter result count) · `break-ui` (2026-11-03: ran, 8 of 9 findings fixed. Left on purpose: the 1,284 option Reassign picker is not virtualized, since a real roster is about 70. Fixture in `welinc-web-vrms/src/features/dev-ui/worst-case/usersData.ts`, `?data=worst` on `/users`)
 
-### 58. Per ticket checklist edits · planned · needs a decision · from spec 0007
+### 58. Per ticket checklist edits · in-progress · from spec 0007
 The Known fix checklist on a ticket can only be ticked today. You want it to stay a helper, so each ticket lets you add, remove and reword its own copied steps without changing the knowledge base entry.
 **Done when:** on a ticket, a user working it can add, remove and reword its copied steps, the knowledge base entry stays unchanged, and the edits survive a reload.
 - Note (2026-10-29): held back until feature 15 was verified, which it now is. A small spec: the copied steps already exist (`RepairIssueStep`), so the open points are who may edit them and what happens to ticked steps when one is removed.
-- [ ] Design it (spec): `/architect per ticket checklist edits`
-- [ ] Polish it (optional, ask first): `web-design-guidelines` · `break-ui` (long step text, many steps, empty checklist)
+spec [0023](../../specs/vrms/0023-per-ticket-checklist-edits/index.md) · code in `welinc-backend-vrms/src/modules/vrms/checklist-edits*.ts`, `welinc-web-vrms/src/features/repair/components/edit/ChecklistEditDialog.tsx`, `welinc-web-vrms/src/features/repair/lib/checklist.ts`
+- Note (2026-11-06): spec 0023 decided it. An Edit steps dialog per issue (Add steps on an issue with none, linked or not) saves the full ordered list while the ticket is Assigned or In progress, behind a new `ticket.checklist.edit` key (all three roles on; without `ticket.view_all`, only on assigned tickets). The lock is a new `checklistVersion` on the issue, so checklist saves never make other ticket edits stale; relink, the `clearsFix` issue edit and approved suggestions raise it too. Removing a ticked step asks first, rewording one clears its tick, steps carry Added and Edited tags, and each changed step writes `STEP_ADDED`, `STEP_REMOVED`, `STEP_EDITED` or `STEP_MOVED`. The knowledge base entry never changes; feeding edits back to it is a later follow up.
+- Note (2026-11-06, update): spec 0023 updated in place. The Edit steps sheet becomes inline borderless rows with a drag handle (`@dnd-kit/sortable`, handle only, keyboard Space, arrows, Space, spoken sentences); Move up and Move down go; Enter adds a step below and Backspace removes an empty one. The moved set tie rule changes to the run through the lowest old positions ("Step 6 → step 5" when dragging 6 above 5), and an approved suggestion keeps an issue's own steps. Build slice 5 holds the rework.
+- [x] Design it (spec): `/architect per ticket checklist edits` (updated 2026-11-06)
+- [x] Build it: `/develop per ticket checklist edits` (2026-11-06: built in backend `e54eebe` and web `719a9a3` on `feat/per-ticket-checklist-edits`; one live pass shown: reword, move, add, the ticked step prompt, tags, audit rows, ticket `updatedAt` unchanged. Slice 5 in backend `143993a` and web `e7bb119`; no live pass yet, since Playwright did not connect)
+  - [x] Thin thread, reword and add: migration, key and `can.editChecklist`, the `PUT` with `checklistVersion` lock and write order, `STEP_EDITED` and `STEP_ADDED`, the dialog, the tags (AC-1 to AC-6, AC-8, AC-10 to AC-13, AC-17)
+  - [x] Remove and reorder: offset reorder, the moved set, `STEP_REMOVED` and `STEP_MOVED`, the ticked step prompt, focus rules (AC-7 to AC-10, AC-18)
+  - [x] Own checklists and the shared lock: Add steps, the 0 step save, the version bump on relink, issue edit and approved suggestions, the relink prompt, knowledge switch (AC-4, AC-5, AC-7, AC-14, AC-16)
+  - [x] Sweep: diff and service tests, catalog tests, web logic tests, axe at 375px and 1280px, lint, typecheck, build (AC-3, AC-6 to AC-11, AC-14, AC-15, AC-18) (axe at 375px and 1280px not run yet; left for `/check verify`)
+  - [x] Lighter sheet with drag: the `longestRun` tie rule and its tests, the suggestion keeps own steps test, the four `@dnd-kit` packages, inline rows with handle, `DragOverlay`, announcements, Enter and Backspace, Move up and Move down removed (AC-4, AC-4a, AC-4b, AC-10, AC-14, AC-18) (2026-11-06: the suggestion test already existed from slice 3; the packages add about 18 KB gzipped; axe with a drag in progress and the touch checks left for `/check verify`)
+- [ ] Verify it: `/check verify per ticket checklist edits`
+- [ ] Test it: `/test per ticket checklist edits`
+- [ ] Polish it (optional, ask first): `emil-design-eng` (the edit sheet) · `web-design-guidelines` · `break-ui` (long step text, 20 steps, empty checklist)
 
-### 63. Chief Mechanic Mechanics view · planned · needs a decision · from feature 57
-Split from feature 57 on 2026-11-03. The Chief Mechanic sees the same workload Admin sees on the Users page (Occupied or Free, open counts by status, each mechanic's open tickets), read only and under the name Mechanics, so they can balance work before handing out tickets. No new page.
-**Done when:** the Chief Mechanic can open Mechanics and see every mechanic's Occupied or Free state, counts by status and open tickets with links, nothing there lets them change an account or an assignment, a mechanic gets 403 on it, and Admin's Users page stays as it is.
+### 63. Chief dashboard rework with a Team section · done · from feature 57
+Split from feature 57 on 2026-11-03; reworked on 2026-11-05 after a design review. The Chief's dashboard becomes three sections (Sign off, My work, Team) in one ticket row style. Team shows each mechanic's trucks, time in status and overdue work for the morning lineup, covering an absent mechanic (Reassign and Unassign from a person's list) and spotting stuck work. Tiles, Needs attention and the pipeline go; no new page.
+**Done when:** the Chief's dashboard shows Sign off, My work and Team (two columns from 1280px), Team lists people with their plates, time in status and overdue marks with free people collapsed, the Chief can Reassign or Unassign from a person's list, `/mechanics` and its nav changes are gone, a mechanic gets 403 on the roster, and the Admin and Mechanic dashboards and the Users page stay as they are.
 - Note (2026-11-03): the open decision is the permission key (its name and defaults, Chief on and Mechanic off) and where the list comes from. The Users page reads `GET /auth/users` from welinc-auth, which only Admin may call, so the Chief's list needs a VRMS source (the mechanic roster in backend-vrms, plus `GET /vrms/mechanics/workload` and `.../open-tickets`, today behind `users.manage`). Also decide whether Unassign and Reassign show for a Chief who holds `ticket.assign`.
-- [ ] Design it (spec): `/architect chief mechanic mechanics view`
-- [ ] Polish it (optional, ask first): `web-design-guidelines` · `break-ui` (many mechanics, long names, huge counts)
+spec [0022](../../specs/vrms/0022-chief-mechanic-mechanics-view/index.md)
+- Note (2026-11-04): spec 0022 decided a read only `/mechanics` route (sidebar item for `mechanics.view` without `users.manage`) on a new `GET /vrms/mechanics/roster`, a new `mechanics.view` key (Admin and Chief on), `open-tickets` widened to it, a nullable `role` column on `mechanics` for a Chief badge, links only (no Unassign or Reassign), a load order fixed at load with "Sort again", a 3 second poll, and Mechanics replacing Knowledge base in the Chief's phone tab bar.
+- Note (2026-11-04, build): the first version (`/mechanics` page) was built on branch `feat/chief-mechanic-mechanics-view`. Kept from it: the `mechanics.view` key, `GET /vrms/mechanics/roster`, the `mechanics.role` column (migration `20261104150000_mechanic_role`, applied) and `open-tickets` widened. The page, filters, Sort again and phone nav changes are removed by the rework.
+- Note (2026-11-05, design review): spec 0022 rewritten in place. The page did not serve the Chief's real moments (lineup, absent mechanic, stuck work) and the Chief dashboard itself was confusing (tiles repeating lists, three tables, a mixed pipeline). It also replaces spec 0015's Chief view AC-13, AC-14 (table form), AC-18 and AC-19 (history). The old `verify.md` steps describe the removed page and need replacing at the next `/develop`.
+- [x] Design it (spec): `/architect chief mechanic mechanics view` (reworked 2026-11-05)
+- [x] Build it: `/develop chief dashboard team` (2026-11-05: branch `feat/chief-mechanic-mechanics-view` in backend-vrms and web-vrms; lint, typecheck, build and tests green, 917 backend vrms and auth tests and 347 web tests)
+  - code in `welinc-web-vrms/src/features/dashboard/` (`components/ChiefDashboard.tsx`, `components/DashboardTicketRow.tsx`, `components/TeamSection.tsx`, `lib/team.ts`, `hooks/useMechanicRoster.ts`, `timeInStatus` in `lib/attention.ts`); `welinc-backend-vrms/src/modules/vrms/mechanic-work.service.ts` (`listRoster` gains `mechanicId`)
+  - [x] Clear the ground: remove `/mechanics` and its nav changes, `mechanicId` on the roster, key label (AC-1, AC-2, AC-16)
+  - [x] New layout: shared ticket row, Sign off and My work with counts, two columns, no tiles, Needs attention or pipeline (AC-5 to AC-9)
+  - [x] Team section: `timeInStatus`, `lib/team.ts`, person rows with chips, No mechanic group, Free line, states (AC-7, AC-10 to AC-13, AC-15)
+  - [x] Act from the list: person dialog with Reassign and Unassign, refresh after a change (AC-14)
+  - [x] Sweep: dashboard tests, Admin and Mechanic dashboards and Users page unchanged, axe at 375px and 1280px (AC-17, AC-18)
+    - Note (2026-11-05, develop): axe ran clean on the loaded Chief dashboard at 375px and 1280px and with the person dialog open (the only finding was the dev only Dataset toggle). The every section empty and roster failing states were not reached on seed data; `/check verify` should cover them. Choices made in the build: an inactive person shows the Inactive tag without Occupied or Free (Free would say they can take work); the No mechanic group's rows show the due label; the person dialog reuses the Users page list as is, so its rows keep their own layout rather than `DashboardTicketRow`.
+  - Note (2026-11-05, impeccable): restyled after the first look read too plain. Each section is now a panel with an icon header and its count, the Team summary is a strip of three counts, and each person has an initials avatar and a workload bar by status (the Admin pipeline's chart colors, scaled to the busiest person) with matching dots on the chips. No tiles, Needs attention or pipeline came back.
+  - Note (2026-11-05, design review with the engineer): the build now differs from spec 0022 on purpose, and `/architect chief mechanic mechanics view: record the design review` should bring the spec in line before `/check verify`. (1) A band of four numbers at the top (Ready to verify, Mechanics working, Work waiting, Free mechanics), each said only there, so the Sign off heading count and the Team summary line are gone (AC-7). (2) "Waiting for your sign off" is now "Ready to verify", empty "Nothing to verify." (AC-5, AC-8, AC-9). (3) Team is a grid of person cards instead of rows (AC-12). (4) A person card shows Occupied or Waiting; Free is used only for people with no tickets (AC-12). (5) Second pass: the numbers are one scoreboard strip with no icons, panel headers have no icon squares, person cards are job sheets (state in words, trucks as a ledger with the time right aligned, no avatars or pills), and Ready to verify rows show the mechanic's name on line 1 instead of the For verification badge every row shared (AC-8). `verify.md` needs the same wording changes.
+  - Note (2026-11-05, architect): spec 0022 and its `verify.md` now record the design review and a second pass the same day: a verification summary on top, For verification rows with the issue and a wait colour, and a Team roster with workload bars and a Busy and Free switch. `/check verify` can run against them. Open follow ups: axe again on the new layout, and whether the 24 and 48 hour wait limits move into the Admin thresholds.
+  - Note (2026-11-05, seed): the VRMS seed now has a 70 truck fleet, about half the working fleet in the shop today, mechanics holding up to 4 open jobs with one In progress at a time (the Chief and demo logins at least 2), and due dates from priority, so overdue work shows.
+  - Note (2026-11-05, replan): open follow ups from spec 0022, none blocking `done`: record `DashboardTicketRow`, `lib/team.ts` and the `mechanics.view` gate in `welinc-web-vrms/AGENTS.md` and `mechanics.role` in `welinc-backend-vrms/AGENTS.md` (`/sync`), and give the PM a Jira line, since there is no ticket for the Chief dashboard rework. The 24 and 48 hour wait colours are fixed in code: feature 43 decides whether they join the Admin thresholds.
+- [x] Verify it: `/check verify chief dashboard team`
+  - Note (2026-11-05, verify): ran against the live stack. Passed with evidence: roster 403 and 200, layout at 375px and 1280px, summary, For verification, My work, Team rows, dialog Reassign (moved a ticket and back), `mechanics.view` and `ticket.assign` toggles, roster failure, `/mechanics` gone, Admin and Mechanic dashboards and Users page unchanged, backend and web lint, build and tests green. One failure found and fixed: the Team tab counts had 4.34 contrast (now `text-muted-strong`, axe clean). Not reached in the browser (logic covered by Vitest only): red wait colour, same name emails, No mechanic panel, fallback row, empty sections, phone nav comparison.
+- [x] Test it: `/test chief dashboard team`
+  - Note (2026-11-05, test): no new tests; `team.test.ts` and `attention.test.ts` already cover the Team logic (351 web and 1275 backend tests green). Contrast and layout stay manual checks.
+- [ ] Polish it (optional, ask first): `web-design-guidelines` · `break-ui` (many people, long names, a person with 20 tickets, no free people)
 
 ## Slice 2: Mechanic workflow & notifications
 
@@ -226,7 +259,7 @@ WL-304. The shared notification service every alert uses, across in app, email a
 ### 29. Notification badge & queue counts · planned
 WL-301. Unread count on the bell and counts on queue menus.
 **Done when:** the bell shows the unread count (99+ above 99) updating without a refresh, and sidebar queues show their pending counts.
-- Note (2026-11-01, replan): from spec 0015. The verification queue has no sidebar item, so its count lives on the Waiting for you tile of the Chief's dashboard. Reconsider a badge there.
+- Note (2026-11-01, replan): from spec 0015. The verification queue has no sidebar item, so its count lives in the summary band and the For verification section of the Chief's dashboard (the tiles are gone, spec 0022). Reconsider a badge there.
 - [ ] Build it: `/develop notification badge`
 - [ ] Polish it (optional, ask first): `emil-design-eng` (badge changes) · `web-design-guidelines` · `break-ui` (0, 99 and 1000+ counts)
 
@@ -234,6 +267,7 @@ WL-301. Unread count on the bell and counts on queue menus.
 WL-204. A mechanic asks to hand off a ticket; Admin approves or rejects.
 **Done when:** a mechanic can request with a reason, only one request is pending per ticket, Admin approves with a new mechanic or rejects with a reason, and everyone involved is notified.
 - Note (2026-10-29): the `TransferRequest` table is designed in spec 0010, including a partial unique index (raw SQL) for one pending request per mechanic per ticket. Prisma may not model it, so check the `prisma-cli` skill first and make sure later generated migrations do not drop it.
+- Note (2026-11-04, replan): from spec 0021. Write the `TRANSFER_*` audit types per its contract (builders and categories are reserved), and decide whether a requester may withdraw (`TRANSFER_CANCELLED`).
 - [ ] Build it: `/develop transfer requests`
 - [ ] Polish it (optional, ask first): `web-design-guidelines` · `break-ui` (long reasons, many pending requests)
 
@@ -250,6 +284,7 @@ WL-208, built on proposed defaults. Pause a ticket for missing parts with the re
 WL-205. A clickable timeline inside the ticket view, linked from My Repairs.
 **Done when:** the timeline is built from the audit trail, entries expand to show details and files, it filters by event type, and mechanics see only their own tickets' history.
 - Note (2026-10-29): filter `COST_UPDATE` events out of the mechanic view, since mechanics must never see costs (spec 0010).
+- Note (2026-11-04, replan): from spec 0021. Filter by the seven categories from `GET audit-logs/catalog`. Cost events are already hidden for anyone without `ticket.costs.view` (`hiddenAuditEvents`), so the mechanic rule above is covered. Share the event renderer with feature 64.
 - [ ] Build it: `/develop repair history timeline`
 - [ ] Polish it (optional, ask first): `impeccable` · `web-design-guidelines` · `break-ui` (long timelines, events with long notes)
 
@@ -258,6 +293,7 @@ WL-108, built on Jira's proposed rules. Admin fixes a wrong status with a reason
 **Done when:** Admin can set any valid status with a required reason, the entry is marked Override in the timeline, and the mechanic is notified.
 - Note (2026-11-01, replan): from spec 0014. Build this as the one bypass of the transition table, reusing the `applyStatusMove` effects and its finished field clearing. Until it ships, a ticket closed by mistake can't be reopened in the app.
 - Note (2026-11-03, replan): from spec 0019. A ticket can now be In progress with no mechanic. Today only `ticket.administer` can move such an ownerless ticket; keep that path working here.
+- Note (2026-11-04, replan): from spec 0021. Write `STATUS_OVERRIDE` per its contract and set `statusChangedAt` yourself. Readers of status history (`lastRejectionFrom`, `lastReturnAt`, analytics) must decide on purpose whether to include it.
 - [ ] Build it: `/develop admin status override`
 - [ ] Polish it (optional, ask first): `web-design-guidelines`
 - Note (2026-10-25): this is how you move a ticket back. Follow feature 16's rule for the spec 0007 checklist and "What fixed it" notes on any backward move.
@@ -266,5 +302,6 @@ WL-108, built on Jira's proposed rules. Admin fixes a wrong status with a reason
 Let an Admin add or fix costs on a closed ticket without unlocking it, the way shops post parts invoices and receipts after the truck has left (a separate financial close).
 **Done when:** an Admin can add or change costs on a closed ticket with no unlock, each change writes an audit row with before and after, the ticket stays closed, and reports pick up the new totals.
 - Note (2026-11-01): from spec 0015. Today a ticket closed without costs needs an Admin unlock to fix. This changes the closed ticket lock from specs 0004 and 0014, so it needs a spec.
+- Note (2026-11-04, replan): from spec 0021. A cost change on a closed ticket writes `COST_UPDATE` with no unlock, so its own note is the reason, not an unlock reason.
 - [ ] Design it (spec): `/architect costs after close`
 - [ ] Polish it (optional, ask first): `web-design-guidelines`

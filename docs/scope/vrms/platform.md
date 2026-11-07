@@ -25,6 +25,7 @@ spec [0008](../../specs/vrms/0008-hosting-and-ci-cd/index.md) · code in `infra/
 - Note (2026-10-29): safe to build before the integration meeting, but feature 56 (integration contract) may change it: the Azure milestones host the shared gateway, auth and database, so the other groups' services must fit the same setup.
 - Note (2026-10-31): from spec 0013. The Bicep must set the flexible server configuration `azure.extensions` to include `VECTOR` before the migration job runs, because the VRMS database now stores AI embeddings with pgvector. Before go live, move `GEMINI_API_KEY` to a paid tier (the free tier caps at 500 and 1K requests a day).
 - Note (2026-11-03, replan): from spec 0019. Once every deployed web build uses `PUT /repairs/:id/assignments`, remove the old `POST` alias in backend-vrms.
+- Note (2026-11-04, replan): from spec 0021. `audit_logs` is now append only through a trigger, but the app's database user is still the table owner and could drop it. In the database roles milestone, run migrations as the owner role and connect the app as a role with `GRANT SELECT, INSERT ON audit_logs` and no `UPDATE`, `DELETE` or `TRUNCATE`.
 - Note (2026-11-03, replan): the gateway change from spec 0017 (26 MB uploads and a 120 second read timeout on the VRMS routes, commit `1803092`) was pushed straight to welinc-auth `development` on 2026-11-03. Add it to the feature 55 list of changes you made to the shared repos.
 
 ### 27. Error monitoring · planned · needs a decision
@@ -49,11 +50,11 @@ Get ready for the first integration meeting: know what the other groups changed,
 - Note (2026-11-03): the other groups work in their own repos, so the `welinc-web-vmms`, `welinc-backend-vmms`, `welinc-web-bms` and `welinc-backend-bms` clones here are stale and say nothing about their current systems. You asked them not to connect to the shared repos (or their `development` branch) or use the workspace repo until you tell them, so nobody else has changed welinc-auth or welinc-web-portal (a fetch on 2026-11-03 showed only your commits and dependabot). The drift check therefore flips: list what **you** changed in the shared repos since Capstone 1, so they know what to expect. Agreed vocabulary for all three papers: microservices **between** systems (each system its own containers, database and deployment, talking over APIs), and each system a modular monolith inside; auth, portal and gateway are the shared services. The meeting (after the first week of November) is about real integration on the shared services.
 - Note (2026-11-03): the VMMS mobile app lives in another GitHub org for now and moves into the Capstone-WeLinc org once it is polished and tested (Eliab is testing). Still missing on their side: polish, testing, and forgot password for mechanics and chief mechanics. Ask them to build that forgot password on welinc-auth rather than their own. VRMS joins their app as a tab (feature 48); you don't need it yet. Their web app has two read only modules left with no integration needs, planned for next week.
 
-### 60. Portal system picker for shared accounts · planned · needs a decision · GA
+### 60. Portal system picker for shared accounts · dropped · replaced by suite S4
 People with roles in more than one system (for example a mechanic in both VRMS and VMMS) can't reach anything but VRMS today, because the shared portal always sends them there. Send single system users straight in, and let shared accounts choose.
 **Done when:** someone with roles in one system lands in it with no extra screen; someone with roles in several sees a picker listing only their systems; each app's shell has a "Switch system" link back to the portal; no new role or permission is created (each system still checks its own roles on the server); and the change is agreed with the VMMS and BMS groups.
 - Note (2026-10-30): you chose to build this before the integration meeting, VRMS side first, but feature 56 (integration contract) may change it: the portal and token handoff are shared, so the picker also changes the landing for VMMS and BMS users who hold several systems. Changing the redirect or handoff needs a spec first (welinc-web-portal `AGENTS.md`).
-- [ ] Design it (spec): `/architect portal system picker`
+- Note (2026-11-07, replan): moved to the suite epic and reshaped as [S4. App initiated login and launcher](../_root/shared-services.md#s4-app-initiated-login-and-launcher--planned--needs-a-decision): the app sends people to the portal and gets them back by a one time code, and the portal shows a launcher only when opened directly. Kept here for history.
 - [ ] Polish it (optional, ask first): `web-design-guidelines` · `break-ui` (one, two and three systems, long names)
 
 ### 56. Cross group integration contract · planned · needs a decision · GA
@@ -62,14 +63,14 @@ One spec for everything VRMS shares with VMMS and BMS, written after the meeting
 - Note (2026-10-29): spec 0010 dropped the copied `Booking`, `MaintenanceSchedule`, `ChecklistTemplate` and `ChecklistItem` models from VRMS. Bring them back only if the meeting decides VRMS owns them. Vehicle status now also has `DISABLED`, which VMMS shares.
 - Note (2026-11-01, replan): from spec 0016. Decide who owns vehicle type once VMMS shares vehicle records.
 - Note (2026-11-03, replan): from spec 0020. Agree with VMMS who writes `UNDER_MAINTENANCE` (read only in VRMS today) and whether a VMMS status change writes `VehicleChange` rows through a VRMS API.
+- Note (2026-11-07, replan): the auth, roles, login handoff, gateway routes, ports and environment parts move to the suite epic ([S1. Shared services contract](../_root/shared-services.md#s1-shared-services-contract--planned--needs-a-decision) and its rows). This feature keeps the domain contracts: vehicle status and who writes it, `VehicleChange` from VMMS, vehicle type ownership, the notification service, the one mobile app, and the copied Booking and maintenance models. Design it after S1.
 - [ ] Design it (spec): `/architect cross group integration`
 
-### 61. Suite admin model · planned · needs a decision · GA
+### 61. Suite admin model · dropped · replaced by suite S10
 A safe way to have "someone who can do everything" across VRMS, VMMS and BMS, the way industry does it, instead of one superadmin role that skips every check (which your Capstone 1 panel called insecure).
 **Done when:** a platform admin in the shared auth can manage accounts and give or remove each system's roles but can't see any system's data without that system's own role; one or two break glass emergency accounts exist that need MFA, log a reason, and alert every admin on each login; an admin access report shows who holds admin in which system and since when; every admin role given or removed raises an alert and a log entry; nobody can raise their own access; and the VMMS and BMS groups agree.
 - Note (2026-10-30): you chose these three pieces. Temporary elevation (time limited extra rights with a reason) was left out as future work, and a single everyday `SUPERADMIN` role that bypasses checks is out on purpose. It builds on what exists: spec 0009's change record, spec 0011's system scoping in welinc-auth, and feature 34's OTP for the MFA step. It lives in the shared welinc-auth and portal, so it follows feature 56; the picker (feature 60) shows a suite admin every system they hold.
-- [ ] Design it (spec): `/architect suite admin model`
-- [ ] Polish it (optional, ask first): `web-design-guidelines` (access report)
+- Note (2026-11-07, replan): moved unchanged (the full model) to the suite epic as [S10. Suite admin model](../_root/shared-services.md#s10-suite-admin-model--planned--needs-a-decision--ga). Kept here for history.
 
 ## Slice 3: Login hardening
 

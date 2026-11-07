@@ -218,5 +218,5 @@ Tracer Bullet: the first slice runs one new event from the service through the r
 - [ ] **Feature 30 (transfer requests)**: write the `TRANSFER_*` types per the contract; decide whether requesters may withdraw (`TRANSFER_CANCELLED`).
 - [ ] **Feature 32 (repair history timeline)**: filter by category, and hide cost events from mechanics through `hiddenAuditEvents` (already true for anyone without `ticket.costs.view`).
 - [ ] **Feature 62 (costs after close)**: its cost changes on a closed ticket write `COST_UPDATE` without an unlock, so its note is its own reason, not an unlock reason.
-- [ ] **`/sync`**: record in `welinc-backend-vrms/AGENTS.md` that `audit_logs` is append only (trigger), that every type needs a category, and that a migration touching the table must switch the trigger off inside itself.
+- [x] **`/sync`**: record in `welinc-backend-vrms/AGENTS.md` that `audit_logs` is append only (trigger), that every type needs a category, and that a migration touching the table must switch the trigger off inside itself. Checked 2026-11-04: already recorded at `welinc-backend-vrms/AGENTS.md` line 60, and `attachments/AGENTS.md` already names `hiddenAuditEvents`.
 - [ ] **For the PM (Jira)**: this spec covers VRMS-89 (hook every action) and VRMS-90 (verify every event is logged) under WL-219. The Audit log page redesign has no Jira ticket yet.

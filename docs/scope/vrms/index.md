@@ -9,6 +9,8 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 
 **Deadline:** deployed by the end of November 2026, about 5 weeks from this plan. The whole plan is in scope; nothing is set aside for trimming. Documentation and QA tasks (WL-E10, WL-E11) stay in Jira, not here.
 
+**Shared services:** the auth, portal and gateway rework the other groups need lives in the suite epic [_root/shared-services.md](../_root/shared-services.md) (rows S1 to S11, from 2026-11-07). It replaces features 60 and 61 and takes the auth and gateway half of feature 56. Start it after feature 65 task 10 and the verify runs for 58 and 65.
+
 **Integration:** the meeting with VMMS and BMS is planned for after the first week of November 2026 (features 55 and 56). Work tagged "feature 56 may change it" is safe to build before then, but expect changes after.
 
 ## Epics
@@ -16,9 +18,9 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | Epic | File | Status |
 |---|---|---|
 | Foundations | [foundations.md](foundations.md) | 8 existing, 7 done, 1 planned |
-| UI refresh | [ui-refresh.md](ui-refresh.md) | 3 done, 5 in-progress, 3 planned |
-| Repair workflow | [repair-workflow.md](repair-workflow.md) | 11 done, 9 planned, 1 dropped |
-| Platform | [platform.md](platform.md) | 2 in-progress, 8 planned |
+| UI refresh | [ui-refresh.md](ui-refresh.md) | 3 done, 6 in-progress, 3 planned |
+| Repair workflow | [repair-workflow.md](repair-workflow.md) | 12 done, 1 in-progress, 7 planned, 1 dropped |
+| Platform | [platform.md](platform.md) | 2 in-progress, 6 planned, 2 dropped |
 | Outsourcing | [outsourcing.md](outsourcing.md) | 4 planned |
 | Operations | [operations.md](operations.md) | 5 planned, 1 dropped |
 | Reports & AI | [reports-ai.md](reports-ai.md) | 4 planned |
@@ -44,9 +46,9 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 7 | Language support (English + Filipino) | Foundation | planned |
 | 52 | Configurable settings & modules | Foundation | done |
 | 55 | Integration kickoff prep | Integration | in-progress |
-| 60 | Portal system picker for shared accounts | Integration | planned |
+| 60 | Portal system picker for shared accounts | Integration | dropped |
 | 56 | Cross group integration contract | Integration | planned |
-| 61 | Suite admin model | Integration | planned |
+| 61 | Suite admin model | Integration | dropped |
 | 8 | App shell & role badge | UI refresh | done |
 | 9 | Login & profile pages | UI refresh | done |
 | 10 | Dashboard | UI refresh | in-progress |
@@ -58,6 +60,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 50 | Portal on the design system | UI refresh | planned |
 | 51 | Analytics page | UI refresh | planned |
 | 64 | Audit log page redesign | UI refresh | planned |
+| 65 | Ticket detail redesign | UI refresh | in-progress |
 | 16 | Ticket status lifecycle | Slice 1 | done |
 | 17 | Chief Mechanic role | Slice 1 | done |
 | 18 | New repair ticket & assignment | Slice 1 | done |
@@ -70,8 +73,8 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 24 | Full ticket audit trail | Slice 1 | done |
 | 25 | Vehicle availability | Slice 1 | done |
 | 57 | Mechanic workload on the Users page | Slice 1 | done |
-| 58 | Per ticket checklist edits | Slice 1 | planned |
-| 63 | Chief Mechanic Mechanics view | Slice 1 | planned |
+| 58 | Per ticket checklist edits | Slice 1 | in-progress |
+| 63 | Chief dashboard rework with a Team section | Slice 1 | done |
 | 26 | Hosting, CI/CD & environments | Release | in-progress |
 | 27 | Error monitoring | Release | planned |
 | 28 | In-app notifications | Slice 2 | planned |

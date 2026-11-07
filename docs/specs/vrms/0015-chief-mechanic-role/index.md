@@ -2,6 +2,7 @@
 
 **Date**: 2026-11-01
 **Status**: Accepted
+**Updated**: 2026-11-05. For the Chief view, AC-13 (tiles), AC-14's table form, AC-18 (Needs attention and pipeline) and AC-19's history fetch are replaced by [spec 0022](../0022-chief-mechanic-mechanics-view/index.md). The view choice, the sign off queue rules and costs are unchanged.
 
 ## Summary
 

@@ -2,6 +2,7 @@
 
 **Date**: 2026-11-02
 **Status**: Accepted
+**Amended by**: [0024](../0024-ticket-detail-redesign/index.md), AC-21 (an upload may name its photo group) and AC-22 (Before protection covers only photos added before work started).
 
 ## Summary
 

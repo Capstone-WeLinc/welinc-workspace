@@ -4,9 +4,9 @@ The WeLinc fleet suite is three systems (VRMS, VMMS, BMS) on shared services (au
 
 | Workspace | Scope | Status |
 |---|---|---|
-| VRMS (Vehicle Repair Management System) | [vrms/index.md](vrms/index.md) | 8 existing, 18 done, 8 in-progress, 34 planned, 2 dropped |
+| VRMS (Vehicle Repair Management System) | [vrms/index.md](vrms/index.md) | 8 existing, 22 done, 9 in-progress, 30 planned, 4 dropped |
 | VMMS | not added yet | |
 | BMS | not added yet | |
-| Suite wide (`_root`) | not added yet | |
+| Suite wide (`_root`): shared services | [_root/shared-services.md](_root/shared-services.md) | 12 planned |
 
-Suite wide work for now still sits in the VRMS scope: integration (features 55, 56, 60, 61) and hosting (feature 26) in [vrms/platform.md](vrms/platform.md). It can move to `_root/` once the other groups join.
+The shared services rework (auth, portal, gateway, and moving VMMS and BMS onto them) lives in [_root/shared-services.md](_root/shared-services.md) since 2026-11-07. VRMS feature 56 keeps the domain contracts between systems, and hosting (feature 26) stays in [vrms/platform.md](vrms/platform.md).
