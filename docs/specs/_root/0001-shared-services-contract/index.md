@@ -501,6 +501,6 @@ The detailed per group guide, import script and test plan belong to S11.
 - [ ] VRMS feature 56 (domain contracts) uses section 5's service tokens for calls between systems and lists each system's scopes there.
 - [ ] S12 (suite seed accounts) gets its own spec, not this one; it must create the clients of section 4 alongside the people.
 - [ ] Later hardening (not scheduled): app attestation on `/auth/mobile/login` (Apple App Attest, Google Play Integrity).
-- [ ] Still open from the questions file: whether `welinc-mobile-bms` is still used. If yes, it becomes a `bms-mobile` client like `vmms-mobile`.
+- [ ] `welinc-mobile-bms` is still used (BMS, 2026-11-08), but for different users than the BMS web app. Still open: who they are. WeLinc staff: it becomes a `bms-mobile` client like `vmms-mobile`, with any new role through S5. Customers or other outside people: their login is outside this contract (welinc-auth holds staff accounts only) and needs its own suite decision before S11.
 - [ ] After S9, update the README repos table with section 2's ports and the root `AGENTS.md` shared services table (gateway config home). That is `/sync`'s job, through a PR.
 - [ ] Run `/architect` for each S row in the epic's order (S2 first); each spec links back to the sections it builds.

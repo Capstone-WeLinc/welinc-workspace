@@ -25,7 +25,7 @@ _These are recommendations to keep the build orderly, not requirements. Skip any
 |---|---------|-------|--------|
 | S1 | Shared services contract | Contract | done |
 | S2 | Signing keys and service identity | Core | done |
-| S3 | Sessions: refresh and logout, web and mobile | Core | planned |
+| S3 | Sessions: refresh and logout, web and mobile | Core | in-progress |
 | S5 | Roles per system | Core | planned |
 | S6 | User directory for systems | Core | planned |
 | S12 | Suite seed accounts | Core | planned |
@@ -66,10 +66,22 @@ Today every service holds the one `JWT_SECRET`, so any of about eight services c
 - [x] Review it (fresh model): `/check review signing keys and service identity` (skipped by choice, 2026-11-08; not run)
 - [x] Document it: `/document signing keys and service identity` (2026-11-08, PR bodies: auth #15, backend-vrms #45, portal #12, workspace #12)
 
-### S3. Sessions: refresh and logout, web and mobile · planned · needs a decision
+### S3. Sessions: refresh and logout, web and mobile · in-progress
+spec [0003](../../specs/_root/0003-sessions-refresh-logout/index.md) · code in `welinc-auth/src/auth/` (sessions, token endpoint), `welinc-backend-vrms` (session routes, account check), `welinc-web-vrms` (boot, refresh, idle), `welinc-web-portal` (login)
+
 Short lived access tokens with refresh and logout in welinc-auth, for web and for the mobile app, so VMMS can drop its own copy. Covers web vs mobile bound sessions, the way VMMS has them today.
 **Done when:** web and mobile sessions refresh without a new login, refresh tokens rotate and a reused one ends the session, logout ends it on the server, an admin can end all of a user's sessions, and VRMS, VMMS web and the mobile app all use it.
-- [ ] Design it (spec): `/architect sessions refresh and logout`
+- Note (2026-11-08): spec 0003 also builds the web code exchange (authorize, SSO cookie, VRMS's session routes) that 0001 had put in S4, since a web app only gets its refresh cookie through it. It also decides chained refresh token rows with the grace token encrypted under the old one, web refresh not counting as activity, a cap of 10 sessions, an automatic lock that blocks logins but ends no live session, and a hard switch of auth, backend-vrms, web-vrms and the portal together.
+- [x] Design it (spec): `/architect sessions refresh and logout`
+- [ ] Build it: `/develop sessions refresh and logout`
+  - [ ] The web thread end to end (migration, login with the SSO cookie, authorize and code exchange, rotation, `/auth/session`, VRMS session routes, in memory token, portal login, gateway CORS, contract amendments) · AC-1, AC-5, AC-7 to AC-21, AC-26, AC-27, AC-36, AC-40, AC-41, AC-43
+  - [ ] Session endings and idle (logout, activity pings, ending events, cap, hourly job, idle warning, Reconnecting banner) · AC-2 to AC-4, AC-6, AC-22 to AC-25, AC-37 to AC-39, AC-42
+  - [ ] Mobile routes, tested by API (`/auth/mobile/login`, mobile refresh with `audience`, logout) · AC-28 to AC-30, AC-38
+  - [ ] Seeing and ending sessions (your sessions, admin end all, Signed in devices card, Sessions dialog on Users) · AC-31 to AC-35
+- [ ] Verify it: `/check verify sessions refresh and logout`
+- [ ] Test it: `/test sessions refresh and logout`
+- [ ] Review it (fresh model): `/check review sessions refresh and logout`
+- [ ] Document it: `/document sessions refresh and logout`
 
 ### S5. Roles per system · planned · needs a decision
 Each system declares its roles and rules (VMMS: exactly one role per account; BMS: Admin, Customer Support, Operations; VRMS: Admin, Chief Mechanic, Mechanic), and welinc-auth enforces them, instead of one shared enum and rules copied into each system.
@@ -85,6 +97,7 @@ Systems need names, emails and roles for people their records point to (VMMS sch
 ### S12. Suite seed accounts · planned · needs a decision · Beta
 One seed in welinc-auth for all three systems instead of three drifting copies: fixed ids every system links its own rows to (as VRMS already does with `SEED_IDS`), one person per email, and people chosen to test the shared login.
 **Done when:** each system's roles have at least one seed person; there are accounts holding one, two and three systems for the launcher; a locked, a deactivated and a never verified account exist for testing; the platform admin from S10 has a seed account once S10 is built; no email means two different people across systems; and each system's own seed links to the shared ids instead of creating users.
+- Note (2026-11-08, replan): from specs 0001 and 0002. This row gets its own spec, and it must keep and extend spec 0002's `OAuthClient` seed, creating the section 4 clients alongside the people.
 - Note (2026-11-07): fixes the drift listed above (`ops.user` and the VMMS chief mechanics). Keep `@welinc.com` addresses, since welinc-auth checks the email domain on account creation.
 - [ ] Design it (spec): `/architect suite seed accounts` (or inside the S1 spec)
 
@@ -124,6 +137,8 @@ The profile routes the other apps already call: phone verification (VMMS), verif
 The move itself: their users merged into welinc-auth by email, their auth copies and direct database reads removed, their apps on the portal login. Their groups change their own repos; this row gives them the migration guide, a user import script and a test plan, and tracks it to the end.
 **Done when:** every VMMS and BMS account logs in through welinc-auth with no duplicates, neither system has its own users or tokens tables or reads the auth database, all three systems run together behind one login on staging, and each group signs off.
 - Note (2026-11-07): the old `welinc-backend` repo where BMS pushed an auth copy is part of this cleanup.
+- Note (2026-11-08, replan): from spec 0002. The migration guide tells each group to copy `welinc-backend-vrms/src/auth/verify/`, make their client key with `keys:client`, and move to Node 24 (`welinc-backend-vmms-analytics-ai` pins Node 20, end of life since April 2026). From spec 0001: if `welinc-mobile-bms` is still in use, it becomes a `bms-mobile` client like `vmms-mobile`.
+- Note (2026-11-08): BMS keeps the mobile app, but for different users than its web app. They likely haven't started building it, and you asked them on 2026-11-08 who will use it. If they are staff, it's a `bms-mobile` client plus a role in S5. If they are customers, their login is a separate suite decision that has to be made before this row's guide. The question is in `docs/_private/vrms/shared-services-questions.md`.
 - [ ] Design it (spec): `/architect move VMMS and BMS onto the shared services`
 
 ## Admin
