@@ -80,8 +80,8 @@ Short lived access tokens with refresh and logout in welinc-auth, for web and fo
   - [x] Mobile routes, tested by API (2026-11-08; `/auth/mobile/login`, mobile refresh with `audience`, logout by refresh token, 7 day rolling idle, limits; any public native client row works, so a later `bms-mobile` needs only a seed row) · AC-28 to AC-30, AC-38
   - [x] Seeing and ending sessions (2026-11-08; `/auth/me/sessions`, `/auth/users/:id/sessions` with end all and its change record, the device label parser, Signed in devices card, Sessions dialog on Users) · AC-31 to AC-35
 - [ ] Verify it: `/check verify sessions refresh and logout`
-- [ ] Test it: `/test sessions refresh and logout`
-- [ ] Review it (fresh model): `/check review sessions refresh and logout`
+- [x] Test it: `/test sessions refresh and logout` (2026-11-08; welinc-auth 272, backend-vrms 1447, web-vrms 448, portal 10 passing; database, component and browser flows stay with verify)
+- [x] Review it (fresh model): `/check review sessions refresh and logout` (skipped by choice, 2026-11-08; not run)
 - [ ] Document it: `/document sessions refresh and logout`
 
 ### S5. Roles per system · planned · needs a decision
