@@ -9,7 +9,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 
 **Deadline:** deployed by the end of November 2026, about 5 weeks from this plan. The whole plan is in scope; nothing is set aside for trimming. Documentation and QA tasks (WL-E10, WL-E11) stay in Jira, not here.
 
-**Shared services:** the auth, portal and gateway rework the other groups need lives in the suite epic [_root/shared-services.md](../_root/shared-services.md) (rows S1 to S11, from 2026-11-07). It replaces features 60 and 61 and takes the auth and gateway half of feature 56. Start it after feature 65 task 10 and the verify runs for 58 and 65.
+**Shared services:** the auth, portal and gateway rework the other groups need lives in the suite epic [_root/shared-services.md](../_root/shared-services.md) (rows S1 to S13, from 2026-11-07; S1 to S3 done on 2026-11-08). It replaces features 60 and 61 and takes the auth and gateway half of feature 56. It started after feature 65 task 10; the verify runs for 58 and 65 are still open.
 
 **Integration:** the meeting with VMMS and BMS is planned for after the first week of November 2026 (features 55 and 56). Work tagged "feature 56 may change it" is safe to build before then, but expect changes after.
 
