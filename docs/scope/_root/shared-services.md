@@ -98,8 +98,8 @@ Each system declares its roles and rules (VMMS: exactly one role per account; BM
   - [x] Admin flag and `/auth/me`: `@SystemAdmin()`, every `UserRole` use moved (the raw SQL in `assertAnotherAdmin` included), the grep gate, own role tests · AC-12, AC-14, AC-15, AC-17
   - [x] Allowed apps: `allowed_roles`, `vmms-mobile` and `bms-mobile` seed, the grant filter and `APP_NOT_ALLOWED` · AC-18, AC-19
   - [x] Seed, docs and contract 0001 amendments, tests · AC-5, AC-21
-- [ ] Verify it: `/check verify roles per system`
-- [ ] Test it: `/test roles per system`
+- [x] Verify it: `/check verify roles per system`
+- [x] Test it: `/test roles per system` (2026-11-09; welinc-auth 322, web-vrms 464 passing; role picker, `useVrmsRoles` and database flows stay with verify)
 - [ ] Review it (fresh model): `/check review roles per system`
 - [ ] Document it: `/document roles per system`
 

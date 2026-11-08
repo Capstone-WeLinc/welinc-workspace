@@ -1,7 +1,7 @@
 # 0004. Roles per system: a role catalog in welinc-auth
 
 **Date**: 2026-11-08
-**Status**: In Progress
+**Status**: Accepted
 **Scope row**: [S5. Roles per system](../../../scope/_root/shared-services.md#s5-roles-per-system--planned--needs-a-decision)
 **Builds contract sections**: [0001](../0001-shared-services-contract/index.md) sections 4 (clients gain allowed roles), 10 (`/auth/systems`, `/auth/me`), 11 (three new error codes), 13 rule 5
 
