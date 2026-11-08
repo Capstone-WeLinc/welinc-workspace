@@ -1,4 +1,4 @@
-# Verify: sessions, refresh and logout · spec 0003 · updated 2026-11-08 (milestone 3)
+# Verify: sessions, refresh and logout · spec 0003 · updated 2026-11-08 (milestone 4)
 _Steps derived from spec 0003 acceptance criteria. `/check verify` runs these; `/test` locks the durable ones. Ticked steps passed during `/develop` on the local stack (curl or one Playwright pass), 2026-11-08._
 
 ## Milestone 1: the web thread
@@ -100,3 +100,27 @@ _Ticked steps passed during `/develop` on the local stack (curl through the gate
 
 ## Acceptance criteria coverage (milestone 3)
 - AC-28 · login, no access, client, lockout, row values · AC-29 · refresh, audience steps, idle roll, grace, reuse · AC-30 · logout steps · AC-38 · both limit steps · AC-2 (mobile) · idle roll and cutoff
+
+## Milestone 4: seeing and ending sessions
+_Ticked steps passed during `/develop` on the local stack (curl through the gateway, `psql`, one Playwright pass at desktop width), 2026-11-08. Make sessions to look at with a few web logins under different `User-Agent` values and one mobile login._
+
+### UI / manual
+- [x] Profile page → **Signed in devices** lists each live session: device label, systems, "active <relative time>", **This device** on the current one, **End** on every other row → AC-34
+- [x] **End** on another device → a `destructive` confirm naming the device → the row goes, a toast says it signed out, and that session's token answers 401 → AC-31, AC-34
+- [ ] Only this device signed in → "No other devices are signed in." under its row; the list failing → the error state with Try again; loading → two skeleton rows → AC-34
+- [x] Users page, a user's ⋮ menu → **Sessions** opens a dialog listing their sessions (a mobile one shows the reported name and `VMMS`) → AC-35
+- [x] **End all sessions** → a `destructive` confirm with the count → ended `ADMIN_ENDED`, one `SESSIONS_ENDED` change holding the count, a toast "signed out of 3 devices", and the dialog shows "Not signed in anywhere right now." with the button off → AC-32, AC-35
+- [ ] Your own row on the Users page has no **Sessions** item → AC-35
+- [ ] At 375px the card rows and the dialog (a bottom sheet) don't overflow with a long device name → AC-34, AC-35
+
+### Commands
+- [x] `GET /auth/me/sessions` → newest activity first, `current: true` only on the caller's `sid`, labels `Chrome on Windows` and `Firefox on macOS` from their `User-Agent` → AC-31, AC-33
+- [x] `DELETE /auth/me/sessions/<another user's sid>` → 404; your other session → 204, `USER_ENDED`; the same again → 204 → AC-31
+- [x] A mechanic on `GET /auth/users/:id/sessions` → 403; a VMMS admin on a VRMS only user → 404; a bad id → 400 → AC-32
+- [x] `DELETE /auth/users/<your own id>/sessions` → 403 with the "Use Signed in devices" message → AC-32
+- [x] `DELETE /auth/users/:id/sessions` → `{ ended: 1 }`, the row `ADMIN_ENDED` with the admin as `ended_by_id`, one `SESSIONS_ENDED` change (`new_value` the count, the admin as actor); the user's token then answers 401 → AC-32
+- [ ] A list right after a session's idle cutoff passed (before the sweep) leaves that session out → AC-31
+- [ ] The parser labels Edge, Opera, Samsung Internet and Safari on iPad, and an empty `User-Agent` reads "Unknown browser on Unknown OS" → AC-33 (a `/test` unit test fits best)
+
+## Acceptance criteria coverage (milestone 4)
+- AC-31 · list, end one, foreign sid, cutoff · AC-32 · refusals, own id, end all · AC-33 · labels in the list, parser cases · AC-34 · card, End, states, 375px · AC-35 · dialog, End all, own row, 375px
