@@ -82,7 +82,7 @@ Short lived access tokens with refresh and logout in welinc-auth, for web and fo
 - [ ] Verify it: `/check verify sessions refresh and logout`
 - [x] Test it: `/test sessions refresh and logout` (2026-11-08; welinc-auth 272, backend-vrms 1447, web-vrms 448, portal 10 passing; database, component and browser flows stay with verify)
 - [x] Review it (fresh model): `/check review sessions refresh and logout` (skipped by choice, 2026-11-08; not run)
-- [ ] Document it: `/document sessions refresh and logout`
+- [x] Document it: `/document sessions refresh and logout` (2026-11-08; PRs auth #16, backend-vrms #46, web-vrms #48, portal #13, workspace #13)
 
 ### S5. Roles per system · planned · needs a decision
 Each system declares its roles and rules (VMMS: exactly one role per account; BMS: Admin, Customer Support, Operations; VRMS: Admin, Chief Mechanic, Mechanic), and welinc-auth enforces them, instead of one shared enum and rules copied into each system.
