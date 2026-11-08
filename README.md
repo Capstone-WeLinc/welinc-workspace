@@ -95,7 +95,7 @@ docker compose -f docker-compose.shared.yml up -d
 The containers do not run database migrations or seeds on start. The first time, run them for auth from your machine:
 
 ```bash
-cd welinc-auth && npm install && npx prisma migrate deploy && npm run seed
+cd welinc-auth && npm install && npm run db:deploy && npm run seed
 ```
 
 Seed logins are in `welinc-auth/prisma/seeds/users.seed.ts`, for example `vrms.admin@welinc.com`, `vmms.admin@welinc.com`, `bms.admin@welinc.com`.
@@ -126,7 +126,8 @@ Then refresh only what changed:
 | What changed | Run |
 |---|---|
 | `package.json` or `package-lock.json` | `npm install` in that repo |
-| `prisma/migrations/` | `npx prisma migrate deploy` in that backend |
+| `prisma/migrations/` | `npx prisma migrate deploy` in that backend; in `welinc-auth`, `npm run db:deploy` (migrations, then the role catalog sync) |
+| `welinc-auth/prisma/catalog/` | `npm run catalog:sync` in `welinc-auth` (or `npm run db:deploy`) |
 | Seed files | `npm run seed` in that backend |
 | A new variable in `.env.example` | Add it to your own `.env` or `.env.local` |
 | `Dockerfile` or compose files | `docker compose -f docker-compose.<name>.yml up -d --build` |

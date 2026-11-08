@@ -85,7 +85,7 @@ Short lived access tokens with refresh and logout in welinc-auth, for web and fo
 - [x] Document it: `/document sessions refresh and logout` (2026-11-08; PRs auth #16, backend-vrms #46, web-vrms #48, portal #13, workspace #13)
 
 ### S5. Roles per system · in-progress
-spec [0004](../../specs/_root/0004-roles-per-system/index.md)
+spec [0004](../../specs/_root/0004-roles-per-system/index.md) · code in `welinc-auth/prisma/catalog/`, `welinc-auth/src/auth/roles/`, `welinc-web-vrms/src/features/user-management/`
 
 Each system declares its roles and rules (VMMS: exactly one role per account; BMS: Admin, Customer Support, Operations; VRMS: Admin, Chief Mechanic, Mechanic), and welinc-auth enforces them, instead of one shared enum and rules copied into each system.
 **Done when:** each system's allowed roles and rules live in one place in welinc-auth, user admin rejects a role a system does not have, and adding a role to one system needs no change in the others.
@@ -94,9 +94,9 @@ Each system declares its roles and rules (VMMS: exactly one role per account; BM
 - Note (2026-11-08): spec 0004 decided a role catalog in welinc-auth: `systems` and `system_roles` tables synced by `catalog:sync` from one file per system (`prisma/catalog/`), a foreign key from `user_roles`, one role per person in each system (`maxRolesPerUser`, a per system number), an `isSystemAdmin` flag replacing `@Roles(ADMIN)`, allowed roles per app per system (`vmms-mobile`: Mechanic and Chief Mechanic; a new `bms-mobile`: Driver and Helper) checked on every grant, a public `GET /auth/systems`, and the VRMS role picker reading it. The `SystemType` enum stays; the `UserRole` enum goes. The sync refuses dropping a role people hold; the migration fixes bad rows keeping the most powerful role. Deploys stop welinc-auth, run `npm run db:deploy`, then start it. Permissions stay for S10.
 - [x] Design it (spec): `/architect roles per system`
 - [ ] Build it: `/develop roles per system`
-  - [ ] Thin thread: migration, catalog files and sync, `db:deploy`, role checks under the account lock, `GET /auth/systems`, VRMS picker on it · AC-1 to AC-11, AC-13, AC-16, AC-20
-  - [ ] Admin flag and `/auth/me`: `@SystemAdmin()`, every `UserRole` use moved (the raw SQL in `assertAnotherAdmin` included), the grep gate, own role tests · AC-12, AC-14, AC-15, AC-17
-  - [ ] Allowed apps: `allowed_roles`, `vmms-mobile` and `bms-mobile` seed, the grant filter and `APP_NOT_ALLOWED` · AC-18, AC-19
+  - [x] Thin thread: migration, catalog files and sync, `db:deploy`, role checks under the account lock, `GET /auth/systems`, VRMS picker on it · AC-1 to AC-11, AC-13, AC-16, AC-20
+  - [x] Admin flag and `/auth/me`: `@SystemAdmin()`, every `UserRole` use moved (the raw SQL in `assertAnotherAdmin` included), the grep gate, own role tests · AC-12, AC-14, AC-15, AC-17
+  - [x] Allowed apps: `allowed_roles`, `vmms-mobile` and `bms-mobile` seed, the grant filter and `APP_NOT_ALLOWED` · AC-18, AC-19
   - [ ] Seed, docs and contract 0001 amendments, tests · AC-5, AC-21
 - [ ] Verify it: `/check verify roles per system`
 - [ ] Test it: `/test roles per system`
