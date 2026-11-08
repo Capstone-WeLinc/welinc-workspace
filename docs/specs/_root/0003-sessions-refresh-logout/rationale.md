@@ -71,3 +71,7 @@ The contract's idle rule was corrected rather than worked around. If a backgroun
 A hosted provider (Option 4) would be the right default for a team starting from zero, since rolling your own auth is a known failure pattern. Here the decision was already made in 0001 and S2 is built on it. The risk is managed instead by the GA workflow (fresh model review), standard building blocks (the OAuth code flow with PKCE, rotation with reuse detection as in the OAuth security best current practice), `jose` for every signature, and the e2e scenarios in the build plan.
 
 The smaller calls follow the same forces. Lazy cutoffs mean correctness never depends on the job running. The advisory lock avoids a second scheduler. The cap of 10 sessions bounds the damage of a leaked password without bothering real users. The 90 day retention gives S7 and incident questions some history while keeping personal data bounded.
+
+### Update (2026-11-08): the absolute end in the token answer
+
+The build found that AC-16's cookie max age had no source: `session_expires_at` is the earlier of the two cutoffs, so backend-vrms couldn't learn the absolute end. The `/auth/token` user grants now also answer `session_absolute_expires_at` for web sessions (an additive field, contract 0001 stays version 1). The runner up was a cookie that lives 12 hours from each set, which outlives the session and breaks AC-16's wording. Decided by Samuel during `/develop`.
