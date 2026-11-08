@@ -25,7 +25,7 @@ _These are recommendations to keep the build orderly, not requirements. Skip any
 |---|---------|-------|--------|
 | S1 | Shared services contract | Contract | done |
 | S2 | Signing keys and service identity | Core | done |
-| S3 | Sessions: refresh and logout, web and mobile | Core | in-progress |
+| S3 | Sessions: refresh and logout, web and mobile | Core | done |
 | S5 | Roles per system | Core | planned |
 | S6 | User directory for systems | Core | planned |
 | S12 | Suite seed accounts | Core | planned |
@@ -67,7 +67,7 @@ Today every service holds the one `JWT_SECRET`, so any of about eight services c
 - [x] Review it (fresh model): `/check review signing keys and service identity` (skipped by choice, 2026-11-08; not run)
 - [x] Document it: `/document signing keys and service identity` (2026-11-08, PR bodies: auth #15, backend-vrms #45, portal #12, workspace #12)
 
-### S3. Sessions: refresh and logout, web and mobile · in-progress
+### S3. Sessions: refresh and logout, web and mobile · done
 spec [0003](../../specs/_root/0003-sessions-refresh-logout/index.md) · code in `welinc-auth/src/auth/` (sessions, token endpoint), `welinc-backend-vrms` (session routes, account check), `welinc-web-vrms` (boot, refresh, idle), `welinc-web-portal` (login)
 
 Short lived access tokens with refresh and logout in welinc-auth, for web and for the mobile app, so VMMS can drop its own copy. Covers web vs mobile bound sessions, the way VMMS has them today.
@@ -79,7 +79,7 @@ Short lived access tokens with refresh and logout in welinc-auth, for web and fo
   - [x] Session endings and idle (2026-11-08; logout, activity pings, ending events, cap, hourly job, idle warning, Reconnecting banner) · AC-2 to AC-4, AC-6, AC-22 to AC-25, AC-37 to AC-39, AC-42
   - [x] Mobile routes, tested by API (2026-11-08; `/auth/mobile/login`, mobile refresh with `audience`, logout by refresh token, 7 day rolling idle, limits; any public native client row works, so a later `bms-mobile` needs only a seed row) · AC-28 to AC-30, AC-38
   - [x] Seeing and ending sessions (2026-11-08; `/auth/me/sessions`, `/auth/users/:id/sessions` with end all and its change record, the device label parser, Signed in devices card, Sessions dialog on Users) · AC-31 to AC-35
-- [ ] Verify it: `/check verify sessions refresh and logout`
+- [x] Verify it: `/check verify sessions refresh and logout` (2026-11-08, local stack; every verify.md step passed, the 12 hour follow up included)
 - [x] Test it: `/test sessions refresh and logout` (2026-11-08; welinc-auth 272, backend-vrms 1447, web-vrms 448, portal 10 passing; database, component and browser flows stay with verify)
 - [x] Review it (fresh model): `/check review sessions refresh and logout` (skipped by choice, 2026-11-08; not run)
 - [x] Document it: `/document sessions refresh and logout` (2026-11-08; PRs auth #16, backend-vrms #46, web-vrms #48, portal #13, workspace #13)
