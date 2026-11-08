@@ -47,7 +47,7 @@ _Ticked steps passed during `/develop` on the local stack (curl, `psql` in the c
 - [x] The warning opens with focus on **Stay signed in**, so Enter keeps the session (fixed after the pass) → AC-23
 - [x] Two VRMS tabs, Sign out in one → both land on `<portal>/login?reason=logout` at once → AC-24
 - [x] Type in tab A, leave tab B alone past 29 minutes → B's status check finds the later cutoff and reschedules, no dialog → AC-2, AC-23
-- [ ] A tab left alone (refreshing in the background every 14 minutes) is still warned and signed out at 30 minutes → AC-2
+- [x] A tab left alone (refreshing in the background every 14 minutes) is still warned and signed out at 30 minutes → AC-2 (real clock, headless, 2026-11-08: no activity ping, warning at 29:00, `reason=idle` at 30:00, row `IDLE`; two dev server reloads mid run reset the refresh schedule, so the 14 minute rhythm was proven under the fake clock instead)
 - [x] `docker stop welinc_auth_service` until a background refresh fails → the "Reconnecting" banner, retries at 5, 15, 30 s then every 30 s, the page keeps working; start it again → the banner clears → AC-25
 - [x] Keep it stopped past the access token's expiry → the tab leaves for the portal → AC-25
 - [x] Sign out while welinc-auth is stopped → "Couldn't sign out" with **Try again**; start it, **Try again** → the session ends through the bearer's `sid` → AC-24
