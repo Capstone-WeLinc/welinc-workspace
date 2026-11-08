@@ -124,3 +124,16 @@ _Ticked steps passed during `/develop` on the local stack (curl through the gate
 
 ## Acceptance criteria coverage (milestone 4)
 - AC-31 · list, end one, foreign sid, cutoff · AC-32 · refusals, own id, end all · AC-33 · labels in the list, parser cases · AC-34 · card, End, states, 375px · AC-35 · dialog, End all, own row, 375px
+
+## Follow up: the 12 hour limit (after verify, 2026-11-08)
+_The verify run found the 12 hour dialog offered only Log out while saying "Save your work", and the max age end said "30 minutes without activity" on the portal. AC-23 and AC-36 now cover both. Set `absolute_expires_at` to `now() + 80 s` on the live row and reload the tab (the refresh answer carries the new end)._
+
+### UI / manual
+- [x] The warning opens with "Your session is ending", **Keep working** focused and **Sign out now**; no Stay signed in → AC-23
+- [x] **Keep working** (or Escape) closes it, and a banner "reaches its 12 hour limit at <time>" counts down above the page → AC-23
+- [x] At the cutoff the tab goes to `<portal>/login?reason=maxage`, and the portal says "Your session reached its 12 hour limit" (not "30 minutes") → AC-23, AC-36
+- [x] A plain idle cutoff still goes to `?reason=idle` with the 30 minute message → AC-23
+- [x] `http://localhost:8000/login?reason=maxage` with a live session shows the form and makes no `/auth/sso` call → AC-36
+
+### Commands
+- [x] `POST /vrms/session/refresh` answers `sessionAbsoluteExpiresAt`, equal to `absolute_expires_at` of the row → AC-23

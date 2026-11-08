@@ -269,7 +269,7 @@ Host only cookies keep staging and production apart: `staging-api.<domain>` neve
 |---|---|---|---|---|
 | `/<sys>/session/start` | GET | `return` (path) | sets `<sys>_login`, 302 to `/auth/authorize` | none |
 | `/<sys>/session/callback` | GET | `code` and `state`, or `error` and `state` | sets `<sys>_rt`, 302 to the app | 302 to the portal with an error code (above) |
-| `/<sys>/session/refresh` | POST | the `<sys>_rt` cookie | `{ accessToken, expiresIn, sessionExpiresAt, user: { id, name, email, roles } }` from the `/auth/token` answer; rotates the cookie | 401 `SESSION_ENDED` |
+| `/<sys>/session/refresh` | POST | the `<sys>_rt` cookie | `{ accessToken, expiresIn, sessionExpiresAt, sessionAbsoluteExpiresAt, user: { id, name, email, roles } }` from the `/auth/token` answer (`sessionAbsoluteExpiresAt` is the 12 hour end, so the app can tell it from the idle cutoff; spec 0003 AC-23); rotates the cookie | 401 `SESSION_ENDED` |
 | `/<sys>/session/activity` | POST | the `<sys>_rt` cookie | 204; passes the ping to `POST /auth/session/activity` | 401 `SESSION_ENDED` |
 | `/<sys>/session/logout` | POST | the `<sys>_rt` cookie | 204, clears the cookie, ends the `sid` at welinc-auth (which kills the SSO handle too) | none (always clears) |
 | `/<sys>/session/status` | GET | bearer user token | `{ sessionExpiresAt }`, asked fresh at welinc-auth, for the idle warning (spec 0003) | 401, 503 |
