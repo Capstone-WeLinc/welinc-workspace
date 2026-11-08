@@ -4,6 +4,7 @@
 **Status**: Accepted
 **Scope row**: [S1. Shared services contract](../../../scope/_root/shared-services.md#s1-shared-services-contract--planned--needs-a-decision)
 **Contract version**: 1
+**Amended**: 2026-11-09, additive, from spec [0004](../0004-roles-per-system/index.md) (sections 4, 8, 10, 11, 12, 13)
 
 ## Summary
 
@@ -110,6 +111,7 @@ welinc-auth keeps a registry of clients, one per environment, set by its seed.
 | `vmms` | confidential backend | `VMMS` | authorization code, refresh, client credentials | `VMMS` | `AUTH` (`directory.read`, `directory.contact`); other systems per feature 56 | `<api>/vmms/session/callback` |
 | `bms` | confidential backend (`bms-gateway`) | `BMS` | authorization code, refresh, client credentials | `BMS` | `AUTH` (`directory.read`, `directory.contact`); other systems per feature 56 | `<api>/bms/session/callback` |
 | `vmms-mobile` | first party native, public (holds no secret) | `VMMS` | mobile login, refresh | `VMMS` (default), later `VRMS` (scope feature 48) | none | none |
+| `bms-mobile` | first party native, public (holds no secret) | `BMS` | mobile login, refresh | `BMS` | none | none |
 | `vmms-analytics` | service | `VMMS` | client credentials | none | `AUTH` (`directory.read`) | none |
 | `bms-analytics` | service | `BMS` | client credentials | none | `AUTH` (`directory.read`) | none |
 
@@ -118,6 +120,7 @@ welinc-auth keeps a registry of clients, one per environment, set by its seed.
 - A confidential client registers one or two ES256 public keys as inline JWKs (two during a key change), each with its own `kid`. The keys come from the seed per environment; changing one means running the seed again. welinc-auth never holds a client's private key.
 - Redirect addresses match exactly, character for character. No wildcards.
 - Each client's registry row also holds its system's web address (section 1), where users land after login.
+- **Allowed roles** (spec 0004): a client may limit the roles it serves, per audience, in `allowed_roles` (`{ "<SYSTEM>": ["<role code>", ...] }`). A system left out of it lets every role of that system through, so a web client needs nothing. Seeded today: `vmms-mobile` allows Mechanic and Chief Mechanic for both `VMMS` and `VRMS`; `bms-mobile` allows Driver and Helper for `BMS`. Every user grant (code exchange, refresh, mobile login) puts only allowed roles in the token. Someone who holds roles in the audience but none the client allows gets 403 `APP_NOT_ALLOWED` before anything is written; a role change reaches a signed in phone at its next refresh. The portal's password login (`/auth/login`) has no client and is never filtered. The seed is the only writer and refuses a code the catalog doesn't have.
 - Calls inside one system (the BMS services calling each other, for example) are that group's own business. A client identity is needed only for calls to welinc-auth or to another system.
 
 ### 5. Tokens
@@ -290,9 +293,9 @@ The app keeps its own native screens and talks to welinc-auth directly. The logi
 
 | Step | Call | Notes |
 |---|---|---|
-| Log in | `POST /auth/mobile/login` with `{ email, password, clientId: "vmms-mobile", deviceName }` | Answers like the `/auth/token` user grants (section 5), in camel case: `{ accessToken, refreshToken, expiresIn, sid, sessionExpiresAt, user }`, with `aud` set to the client's default system (`VMMS`). No cookie. A user with no role in that system gets 403 `NO_SYSTEM_ACCESS`. |
+| Log in | `POST /auth/mobile/login` with `{ email, password, clientId: "vmms-mobile", deviceName }` | Answers like the `/auth/token` user grants (section 5), in camel case: `{ accessToken, refreshToken, expiresIn, sid, sessionExpiresAt, user }`, with `aud` set to the client's default system (`VMMS`). No cookie. A user with no role in that system gets 403 `NO_SYSTEM_ACCESS`; one whose roles there aren't allowed on this app (section 4) gets 403 `APP_NOT_ALLOWED`. The password is checked first, so `APP_NOT_ALLOWED` only follows a correct password, and a wrong one still counts toward the lockout. `bms-mobile` logs in the same way, with `clientId: "bms-mobile"` and `aud` `BMS`. |
 | Admin OTP (feature 34, later) | `POST /auth/mobile/login/otp` with `{ challengeId, code }` | Reserved: the login may answer `{ status: "OTP_REQUIRED", challengeId }`. The portal gets the same step on `/auth/login/otp`. |
-| Refresh | `POST /auth/token` with `grant_type=refresh_token`, `refresh_token`, `client_id=vmms-mobile`, optional `audience` (`VMMS` or later `VRMS`) | Rotates the refresh token, with the same 10 s grace for a retry after a lost answer. One mobile session can get an access token for each system the user holds; an audience the user holds no role in gets 403 `NO_SYSTEM_ACCESS`. |
+| Refresh | `POST /auth/token` with `grant_type=refresh_token`, `refresh_token`, `client_id=vmms-mobile`, optional `audience` (`VMMS` or later `VRMS`) | Rotates the refresh token, with the same 10 s grace for a retry after a lost answer. One mobile session can get an access token for each system the user holds; an audience the user holds no role in gets 403 `NO_SYSTEM_ACCESS`, and one where none of their roles is allowed on the app gets 403 `APP_NOT_ALLOWED`. |
 | Log out | `POST /auth/logout` with `{ refreshToken }` | Ends the `sid`. |
 | Forgot password, OTP, reset | the existing `/auth/forgot-password`, `/auth/verify-otp`, `/auth/reset-password` | Unchanged. |
 
@@ -355,13 +358,13 @@ Existing routes stay unless marked. "System" means the token's `aud`; the old `?
 | `/auth/token` | POST | clients | new | S2, S3, S4 |
 | `/auth/login` | POST | portal only: sets the SSO cookie, no token in the body. Until S4 adds the launcher it answers `{ user: { id, name, email }, system, url }`: the system welinc-auth picks (spec 0002) and that client's web address; 403 `NO_SYSTEM_ACCESS` with no role anywhere | changed | S2, S3, S4 |
 | `/auth/login/otp` | POST | portal | reserved | feature 34 |
-| `/auth/mobile/login`, `/auth/mobile/login/otp` | POST | `vmms-mobile` (tokens in the body, section 8) | new (OTP reserved) | S3 |
+| `/auth/mobile/login`, `/auth/mobile/login/otp` | POST | `vmms-mobile`, `bms-mobile` (tokens in the body, section 8) | new (OTP reserved) | S3 |
 | `/auth/logout` | POST | SSO cookie, a client with assertion and refresh token, or `vmms-mobile` with refresh token | new | S3 |
 | `/auth/sso` | GET | SSO cookie (portal) | new: until S4, `{ user: { id, name, email }, system, url }` like `/auth/login`; S4 makes it `{ user: { id, name, email, picture }, systems: [{ system, name, url, roles }] }` | S3, S4 |
 | `/auth/session` | GET | user token | new: `{ active: true, sid, expiresAt, user: { id, name, email } }` (`expiresAt` is the earlier of the idle and absolute cutoffs; systems take the caller's name from `user`) or 401 with `SESSION_ENDED`, `ACCOUNT_INACTIVE` or `TOKEN_EXPIRED`. A locked account's live session still answers 200 | S3 |
 | `/auth/session/activity` | POST | a confidential client with its assertion and the user's refresh token, or the SSO cookie | new: 204, marks the `sid` active | S3 |
-| `/auth/systems` | GET | anyone | new: each system's code, name, web address, roles and rules (e.g. VMMS: exactly one role) | S5 |
-| `/auth/me` | GET | user token | changed: roles for `aud` only, no `?system=` | S5 |
+| `/auth/systems` | GET | anyone, no token | new: `{ systems: [{ code, name, webAddress, maxRolesPerUser, roles: [{ code, name, description, isSystemAdmin }] }] }`, systems in `SystemType` order, roles in display order (also power order, most powerful first). `webAddress` is the web address of the system's active confidential client, or `null`; `maxRolesPerUser` is a whole number or `null` (no limit). Sends `Cache-Control: public, max-age=60` and an `ETag`, and answers 304 to a matching `If-None-Match`, so a catalog change can take up to 60 seconds to show. Reached through the gateway's existing `/auth` route, with its CORS list and rate limit, so browsers may call it. No user data and no permissions (S10 may add permissions as an optional field) | S5 |
+| `/auth/me` | GET | user token | changed: `roles` holds the account's roles in the token's `aud` only, not narrowed by the client's `allowed_roles` (the token's `roles` claim is). This narrows what the route returns; its only caller is VRMS, with VRMS tokens, so nothing it sees changes. A `?system=` that differs from `aud` answers 403 `WRONG_AUDIENCE` | S5 |
 | `/auth/me/sessions` | GET | user token | new: `{ sessions: SessionView[] }` (spec 0003: `sid`, kind, device, client, systems, created, last active, `current`) | S3 |
 | `/auth/me/sessions/:sid` | DELETE | user token | new: end one of your sessions | S3 |
 | `/auth/forgot-password`, `/auth/verify-otp`, `/auth/reset-password` | POST | anyone | kept | none |
@@ -371,7 +374,7 @@ Existing routes stay unless marked. "System" means the token's `aud`; the old `?
 | `/auth/profile/phone/verify` | POST | user token | new: `{ code }` | S8 |
 | `/auth/profile/verify-password` | POST | user token | new: `{ password }` gives `{ reauthToken }` | S8 |
 | `/auth/profile/deletion-request` | POST | user token | new: `{ reauthToken, reason? }`; an admin reviews it | S8 |
-| `/auth/users`, `/auth/users/lookup`, `/auth/users/:id`, `/auth/users/:id/status`, `/auth/users/:id/password`, `/auth/users/:id/unlock`, `/auth/users/:id/changes` | as today | that system's admin | kept, with the spec 0011 scoping | none |
+| `/auth/users`, `/auth/users/lookup`, `/auth/users/:id`, `/auth/users/:id/status`, `/auth/users/:id/password`, `/auth/users/:id/unlock`, `/auth/users/:id/changes` | as today | that system's admin | kept, with the spec 0011 scoping. Changed by S5: a role in `roleAssignments` must be one of the system's catalog roles (400 `UNKNOWN_ROLE`, naming its roles) and an account may hold at most `maxRolesPerUser` roles in one system (409 `ROLE_LIMIT`; a request is refused, never trimmed). `GET /auth/users` takes an optional `role` filter, checked the same way against the token's `aud`, for an admin and a `directory.read` service token alike | S5 |
 | `/auth/users/:id/sessions` | GET, DELETE | that system's admin | new: list or end all of a user's sessions | S3 |
 | `/auth/users/:id/activity` | GET | that system's admin | new | S7 |
 | `/auth/activity` | GET | that system's admin | new: login activity of that system's users (BMS's activity page) | S7 |
@@ -380,21 +383,23 @@ Existing routes stay unless marked. "System" means the token's `aud`; the old `?
 
 - VMMS's `me/login-activity` maps to `/auth/profile/activity`, its `users/:id/login-activity` to `/auth/users/:id/activity`, and its `audit-logs` for accounts to `/auth/users/:id/changes` plus `/auth/activity`.
 - welinc-auth owns phone numbers and their verified flag (S8 picks the SMS provider; VMMS uses Semaphore today).
+- "That system's admin" means the holder of the role its catalog marks `isSystemAdmin` (S5), checked against the token's `aud` on every request. Today that is `ADMIN` in every system. A service token is never a system admin; it passes only routes that name its scope (`directory.read`).
 - S10 (suite admin) may add routes and roles. It must not change any claim above.
 
 ### 11. Errors
 
 - welinc-auth and the system session routes answer with Nest's usual body plus a stable `code`: `{ "statusCode": 409, "message": "…", "error": "Conflict", "code": "ACCOUNT_EXISTS" }`. Clients branch on `code`, never on `message`.
 - `/auth/token` answers in the OAuth format so standard libraries understand it: `{ "error": "invalid_grant", "error_description": "…" }` (400), `invalid_client` (401), or `invalid_target` and `invalid_scope` (400) for an audience or scope the client may not have.
-- Codes this contract introduces: `SESSION_ENDED`, `ACCOUNT_INACTIVE`, `ACCOUNT_LOCKED`, `TOKEN_EXPIRED` (a good token past its `exp`: refresh and retry once), `CSRF_REJECTED`, `AUTH_UNAVAILABLE`, `NO_SYSTEM_ACCESS`, `WRONG_AUDIENCE`, `WRONG_TOKEN_USE`, `REAUTH_REQUIRED`, `RATE_LIMITED`, and the portal error codes `LOGIN_REQUEST_EXPIRED`, `LOGIN_STATE_INVALID`, `LOGIN_FAILED`.
+- Codes this contract introduces: `SESSION_ENDED`, `ACCOUNT_INACTIVE`, `ACCOUNT_LOCKED`, `TOKEN_EXPIRED` (a good token past its `exp`: refresh and retry once), `CSRF_REJECTED`, `AUTH_UNAVAILABLE`, `NO_SYSTEM_ACCESS`, `WRONG_AUDIENCE`, `WRONG_TOKEN_USE`, `REAUTH_REQUIRED`, `RATE_LIMITED`, `UNKNOWN_ROLE` (400, a role the system's catalog doesn't have), `ROLE_LIMIT` (409, more roles in one system than it allows), `APP_NOT_ALLOWED` (403, the account's roles aren't allowed on this app, section 4; its message names the allowed roles and is safe to show), and the portal error codes `LOGIN_REQUEST_EXPIRED`, `LOGIN_STATE_INVALID`, `LOGIN_FAILED`.
+- `NO_SYSTEM_ACCESS` and `APP_NOT_ALLOWED` are about the account, not the client's request, so they use the coded body above on every route, `/auth/token` included (403), not the OAuth format.
 
 ### 12. Limits
 
 | Route | Limit | Answer when over |
 |---|---|---|
 | `/auth/login` | 10 a minute per address and 5 failures per account (the existing lockout) | 429 `RATE_LIMITED` with `Retry-After`, or 423 locked |
-| `/auth/mobile/login` | 5 a minute per address, sharing the per account lockout | as above |
-| `/auth/token` | 600 a minute per client for calls with a valid assertion, which skip the per address count; 120 a minute per address for every other call and every refused assertion (spec 0003). `vmms-mobile` 30 a minute per address | 429 with `Retry-After` and `{ "error": "rate_limited" }` |
+| `/auth/mobile/login` | 5 a minute per address for every mobile client together, sharing the per account lockout | as above |
+| `/auth/token` | 600 a minute per client for calls with a valid assertion, which skip the per address count; 120 a minute per address for every other call and every refused assertion (spec 0003). public mobile clients (`vmms-mobile`, `bms-mobile`) 30 a minute per address, counted together | 429 with `Retry-After` and `{ "error": "rate_limited" }` |
 | `/auth/authorize` | 30 a minute per address | 429 error page |
 | `/auth/session/activity` | 2 a minute per `sid` (extra pings are accepted and ignored) | none |
 | `/auth/session` | none beyond the gateway; systems cache 30 s | none |
@@ -411,7 +416,7 @@ S rows may tighten these and must note it here.
 2. Accept only tokens whose `iss` is the issuer, whose `aud` is your system, and whose `token_use` fits the route.
 3. Run the session check (section 6) on every user request.
 4. Keep no password, code, refresh token or role assignment of your own. Your own permission rules on top of the token's roles are fine (VRMS's matrix).
-5. Your system's own rules about roles (VMMS: exactly one role per account) live in welinc-auth's system catalog (S5), not copied into your code.
+5. Your system's own rules about roles (VMMS: exactly one role per account) live in welinc-auth's system catalog (S5), not copied into your code. Your roles are your file `welinc-auth/prisma/catalog/<system>.ts` (file order is display order and power order, most powerful first; a code never changes once synced, add a new one instead), changed by a pull request to `welinc-auth` and a deploy (`npm run db:deploy` runs the sync); read role names and order from `/auth/systems` instead of a list of your own.
 6. Web apps keep the access token in memory only; no `localStorage`, no token in a URL.
 7. Secrets (your client private key) live in your Container Apps secrets and your git ignored `.env`, documented in `.env.example` only.
 8. BMS's public tracking links keep their own secret inside BMS and never use welinc-auth's keys or tokens.
