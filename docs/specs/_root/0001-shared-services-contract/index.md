@@ -27,17 +27,17 @@ welinc-auth stays the only owner of accounts and the only service that can sign 
 |---|---|---|
 | Token audience | One token per system: `aud` is that system, `roles` holds only that system's roles | S2, S5 |
 | Signing | ES256 (elliptic curve), keys published at a JWKS address (a public list of the keys that verify tokens) | S2 |
-| Web login | Code exchange on each system's backend (OAuth authorization code with PKCE), refresh token in an HttpOnly cookie on the shared domain, access token in memory only | S3, S4 |
+| Web login | Code exchange on each system's backend (OAuth authorization code with PKCE), refresh token in an HttpOnly cookie on the shared domain, access token in memory only | S3 (spec 0003; S4 adds the launcher) |
 | Web session | 30 minutes without user input in any app, or 12 hours since login, whichever comes first; idle is tracked on the server through a light activity ping | S3 |
 | Mobile login | Native login screen in the app, calling its own welinc-auth route (`/auth/mobile/login`) as a first party mobile client | S3 |
 | Mobile session | 7 days rolling (each refresh extends it) | S3 |
-| Revocation | Each backend checks the session at most 30 s stale; deactivation, lock and logout also revoke refresh tokens, so a backend that skipped the check still loses access when the 15 minute access token runs out | S3 |
+| Revocation | Each backend checks the session at most 30 s stale; deactivation and logout also revoke refresh tokens, so a backend that skipped the check still loses access when the 15 minute access token runs out. The automatic lock blocks new logins only (spec 0003) | S3 |
 | Service identity | Signed client assertion (`private_key_jwt`): each backend proves itself with its own ES256 key | S2 |
 | User directory | Batch lookup by id plus a cursor change feed; a thin webhook nudge is reserved for later | S6 |
 | Gateway paths | Each service serves under its own prefix; the gateway forwards without rewriting | S9 |
 | Gateway config | Workspace repo `infra/gateway/`, for local and hosted (as spec 0008 planned), out of `welinc-auth` | S9 |
 | Ports | One block per system (below) | S9 |
-| Old login | Hard switch: VRMS and the portal move straight to the new flow; `JWT_SECRET` and `?token=` are removed, no dual run | S2, S4 |
+| Old login | Hard switch: VRMS and the portal move straight to the new flow; `JWT_SECRET` and `?token=` are removed, no dual run | S2, S3 |
 | Move order | VRMS and the portal first (tracer bullet), then BMS, then VMMS | S11 |
 
 ## Contract
@@ -194,7 +194,8 @@ User grants answer:
 {
   "access_token": "…", "token_type": "Bearer", "expires_in": 900,
   "refresh_token": "…", "sid": "uuid",
-  "session_expires_at": "ISO 8601, the absolute end (web) or idle end (mobile)",
+  "session_expires_at": "ISO 8601, the earlier of the idle and absolute cutoffs",
+  "session_absolute_expires_at": "ISO 8601, web sessions only: login + 12 hours, the refresh cookie's max age (spec 0003)",
   "user": { "id": "uuid", "name": "…", "email": "…", "roles": [{ "role": "ADMIN", "system": "VRMS" }] }
 }
 ```
@@ -207,14 +208,16 @@ A session (`sid`) starts at login and ends at logout, timeout or revocation. Eve
 
 | Kind | Ends after | Enforced by |
 |---|---|---|
-| Web | 30 minutes without user input in any app on that session, or 12 hours after login | welinc-auth, from activity pings. Each web app, while there is real user input (keys, clicks, touches; background polling doesn't count), calls `POST /<sys>/session/activity` at most once a minute, and its backend passes it to `POST /auth/session/activity`. Working in BMS keeps your VRMS tab's session alive, because it is the same `sid`. Logins, refreshes and code exchanges also count as activity. |
+| Web | 30 minutes without user input in any app on that session, or 12 hours after login | welinc-auth, from activity pings. Each web app, while there is real user input (keys, clicks, touches; background polling doesn't count), calls `POST /<sys>/session/activity` at most once a minute, and its backend passes it to `POST /auth/session/activity`. Working in BMS keeps your VRMS tab's session alive, because it is the same `sid`. Logins and code exchanges also count as activity. A web refresh never does, so a tab refreshing in the background still reaches the idle cutoff (spec 0003). |
 | Mobile | 7 days without a refresh | welinc-auth; each refresh extends it 7 days. No absolute limit. |
+
+- A user holds at most `MAX_SESSIONS_PER_USER` (10) live sessions. An 11th login ends the one with the oldest activity (`MAX_SESSIONS`).
 
 - The session's expiry, as `/auth/session` and `session_expires_at` report it, is the earlier of the idle cutoff and the absolute cutoff.
 
 - **One web login covers every system.** The portal's SSO cookie means opening a second system needs no password. Each system gets its own refresh token under the same `sid`.
 - **Logout anywhere ends the session everywhere.** Logout from VRMS ends the `sid`, so VMMS and BMS lose it at their next session check (30 s at most).
-- **What ends a session at once:** logout, an admin ending a user's sessions, deactivation, deletion, a lock (5 failed logins), a password change (every other session of that user), and reuse of an old refresh token.
+- **What ends a session at once:** logout, the user or an admin ending it, deactivation, deletion, a password change on the profile (every other session of that user), an OTP reset or an admin password set (every session), reuse of an old refresh token or login code, and an 11th session. The automatic lock (5 failed logins) blocks new logins only and ends no live session, so a stranger who knows an email can't sign someone out mid shift (spec 0003).
 
 **Session check** (each system backend, on every request with a user token):
 
@@ -232,7 +235,7 @@ Each system backend owns four routes under its prefix, and the web app never see
 
 1. The web app has no access token (fresh load) and calls `POST /<sys>/session/refresh`. With no valid cookie it gets 401.
 2. The web app navigates the whole page to `GET /<sys>/session/start?return=<path>`.
-3. The backend checks `return` by resolving it against the system's web address and keeping it only if the result has the same origin; anything else becomes `/`. It makes a `state` and a PKCE verifier (a random secret it will show again at the exchange), keeps all three in a short lived HttpOnly cookie (`<sys>_login`, 10 minutes, path `/<sys>/session`), and redirects to `GET /auth/authorize?client_id=<sys>&redirect_uri=<api>/<sys>/session/callback&state=…&code_challenge=…&code_challenge_method=S256`.
+3. The backend checks `return` by resolving it against the system's web address and keeping it only if the result has the same origin; anything else becomes `/`. It makes a `state` and a PKCE verifier (a random secret it will show again at the exchange), keeps all three in a short lived HttpOnly cookie (`<sys>_login_<first 8 characters of state>`, so several tabs logging in at once don't overwrite each other; 10 minutes, path `/<sys>/session`), and redirects to `GET /auth/authorize?client_id=<sys>&redirect_uri=<api>/<sys>/session/callback&state=…&code_challenge=…&code_challenge_method=S256`.
 4. welinc-auth checks the client and the exact redirect address (on mismatch it shows an error page and never redirects).
    - Valid SSO cookie and the user holds a role in the system: redirect to the callback with `code` and `state`.
    - Valid SSO cookie but no role in the system: redirect to the callback with `error=access_denied` and `state`.
@@ -255,7 +258,7 @@ Each system backend owns four routes under its prefix, and the web app never see
 | Cookie | Set by | Name | Path | Flags | Max age |
 |---|---|---|---|---|---|
 | Refresh | each system backend | `<sys>_rt` (e.g. `vrms_rt`), `__Secure-<sys>_rt` when hosted | `/<sys>/session` | `HttpOnly`, `Secure` (hosted), `SameSite=Lax`, host only (no `Domain`) | the session's remaining 12 hours |
-| Login state | each system backend | `<sys>_login`, `__Secure-<sys>_login` when hosted | `/<sys>/session` | as above | 10 minutes |
+| Login state | each system backend | `<sys>_login_<state prefix>`, `__Secure-` prefixed when hosted | `/<sys>/session` | as above | 10 minutes |
 | SSO | welinc-auth | `welinc_sso`, `__Secure-welinc_sso` when hosted | `/auth` | as above | the session's remaining 12 hours |
 
 Host only cookies keep staging and production apart: `staging-api.<domain>` never sees `api.<domain>`'s cookies. Locally, cookies are shared across `localhost` ports, but the names differ.
@@ -269,9 +272,10 @@ Host only cookies keep staging and production apart: `staging-api.<domain>` neve
 | `/<sys>/session/refresh` | POST | the `<sys>_rt` cookie | `{ accessToken, expiresIn, sessionExpiresAt, user: { id, name, email, roles } }` from the `/auth/token` answer; rotates the cookie | 401 `SESSION_ENDED` |
 | `/<sys>/session/activity` | POST | the `<sys>_rt` cookie | 204; passes the ping to `POST /auth/session/activity` | 401 `SESSION_ENDED` |
 | `/<sys>/session/logout` | POST | the `<sys>_rt` cookie | 204, clears the cookie, ends the `sid` at welinc-auth (which kills the SSO handle too) | none (always clears) |
+| `/<sys>/session/status` | GET | bearer user token | `{ sessionExpiresAt }`, asked fresh at welinc-auth, for the idle warning (spec 0003) | 401, 503 |
 
-**CSRF guard** (stops another page from making calls with your cookie). It applies to every route that a cookie authenticates: the system's `refresh`, `activity` and `logout`, and welinc-auth's `/auth/login`, `/auth/logout`, `/auth/sso` and `/auth/session/activity` when called with the SSO cookie.
-1. POST only (except `/auth/sso`, a GET that changes nothing), with `Content-Type: application/json`.
+**CSRF guard** (stops another page from making calls with your cookie). It applies to every POST route that a cookie authenticates: the system's `refresh`, `activity` and `logout`, and welinc-auth's `/auth/login`, `/auth/logout` and `/auth/session/activity` when called with the SSO cookie. The GET routes a page navigation reaches (`/auth/sso`, `/auth/authorize`, `/auth/authorize/resume`, `/<sys>/session/start`, `/<sys>/session/callback`) change no state a third party can use and skip it, since a navigation sends `Sec-Fetch-Site: none` or `cross-site` (spec 0003).
+1. POST only, with `Content-Type: application/json`. A refused request gets 403 `CSRF_REJECTED`.
 2. The `Origin` header must equal exactly one allowed web address: the system's own for its routes, the portal's for welinc-auth's. Browsers set this header themselves, so a sibling subdomain can't fake it.
 3. `Sec-Fetch-Site` must be `same-origin` or `same-site` when the browser sends it.
 4. The gateway's CORS list is the outer layer.
@@ -347,18 +351,18 @@ Existing routes stay unless marked. "System" means the token's `aud`; the old `?
 |---|---|---|---|---|
 | `/auth/.well-known/jwks.json` | GET | anyone | new | S2 |
 | `/auth/.well-known/oauth-authorization-server` | GET | anyone; issuer and endpoint addresses (RFC 8414) | new | S2 |
-| `/auth/authorize`, `/auth/authorize/resume` | GET | browser | new | S4 |
+| `/auth/authorize`, `/auth/authorize/resume` | GET | browser | new | S3 |
 | `/auth/token` | POST | clients | new | S2, S3, S4 |
-| `/auth/login` | POST | portal only: sets the SSO cookie, no token in the body. Until S4 (spec 0002): returns an access token with an optional `system` input, `system` in the answer, and 403 `NO_SYSTEM_ACCESS`; tokens carry no `sid` until S3 | changed | S2, S3, S4 |
+| `/auth/login` | POST | portal only: sets the SSO cookie, no token in the body. Until S4 adds the launcher it answers `{ user: { id, name, email }, system, url }`: the system welinc-auth picks (spec 0002) and that client's web address; 403 `NO_SYSTEM_ACCESS` with no role anywhere | changed | S2, S3, S4 |
 | `/auth/login/otp` | POST | portal | reserved | feature 34 |
 | `/auth/mobile/login`, `/auth/mobile/login/otp` | POST | `vmms-mobile` (tokens in the body, section 8) | new (OTP reserved) | S3 |
 | `/auth/logout` | POST | SSO cookie, a client with assertion and refresh token, or `vmms-mobile` with refresh token | new | S3 |
-| `/auth/sso` | GET | SSO cookie (portal) | new: `{ user: { id, name, email, picture }, systems: [{ system, name, url, roles }] }` | S4 |
-| `/auth/session` | GET | user token | new: `{ active: true, sid, expiresAt }` (the earlier of the idle and absolute cutoffs) or 401 with `SESSION_ENDED`, `ACCOUNT_INACTIVE` or `ACCOUNT_LOCKED` | S3 |
+| `/auth/sso` | GET | SSO cookie (portal) | new: until S4, `{ user: { id, name, email }, system, url }` like `/auth/login`; S4 makes it `{ user: { id, name, email, picture }, systems: [{ system, name, url, roles }] }` | S3, S4 |
+| `/auth/session` | GET | user token | new: `{ active: true, sid, expiresAt, user: { id, name, email } }` (`expiresAt` is the earlier of the idle and absolute cutoffs; systems take the caller's name from `user`) or 401 with `SESSION_ENDED`, `ACCOUNT_INACTIVE` or `TOKEN_EXPIRED`. A locked account's live session still answers 200 | S3 |
 | `/auth/session/activity` | POST | a confidential client with its assertion and the user's refresh token, or the SSO cookie | new: 204, marks the `sid` active | S3 |
 | `/auth/systems` | GET | anyone | new: each system's code, name, web address, roles and rules (e.g. VMMS: exactly one role) | S5 |
 | `/auth/me` | GET | user token | changed: roles for `aud` only, no `?system=` | S5 |
-| `/auth/me/sessions` | GET | user token | new: your sessions (device, client, last seen) | S3 |
+| `/auth/me/sessions` | GET | user token | new: `{ sessions: SessionView[] }` (spec 0003: `sid`, kind, device, client, systems, created, last active, `current`) | S3 |
 | `/auth/me/sessions/:sid` | DELETE | user token | new: end one of your sessions | S3 |
 | `/auth/forgot-password`, `/auth/verify-otp`, `/auth/reset-password` | POST | anyone | kept | none |
 | `/auth/profile`, `/auth/profile/password`, `/auth/profile/picture`, `/auth/profile/summary` | PATCH, POST, GET | user token | kept | none |
@@ -382,7 +386,7 @@ Existing routes stay unless marked. "System" means the token's `aud`; the old `?
 
 - welinc-auth and the system session routes answer with Nest's usual body plus a stable `code`: `{ "statusCode": 409, "message": "…", "error": "Conflict", "code": "ACCOUNT_EXISTS" }`. Clients branch on `code`, never on `message`.
 - `/auth/token` answers in the OAuth format so standard libraries understand it: `{ "error": "invalid_grant", "error_description": "…" }` (400), `invalid_client` (401), or `invalid_target` and `invalid_scope` (400) for an audience or scope the client may not have.
-- Codes this contract introduces: `SESSION_ENDED`, `ACCOUNT_INACTIVE`, `ACCOUNT_LOCKED`, `AUTH_UNAVAILABLE`, `NO_SYSTEM_ACCESS`, `WRONG_AUDIENCE`, `WRONG_TOKEN_USE`, `REAUTH_REQUIRED`, `RATE_LIMITED`, and the portal error codes `LOGIN_REQUEST_EXPIRED`, `LOGIN_STATE_INVALID`, `LOGIN_FAILED`.
+- Codes this contract introduces: `SESSION_ENDED`, `ACCOUNT_INACTIVE`, `ACCOUNT_LOCKED`, `TOKEN_EXPIRED` (a good token past its `exp`: refresh and retry once), `CSRF_REJECTED`, `AUTH_UNAVAILABLE`, `NO_SYSTEM_ACCESS`, `WRONG_AUDIENCE`, `WRONG_TOKEN_USE`, `REAUTH_REQUIRED`, `RATE_LIMITED`, and the portal error codes `LOGIN_REQUEST_EXPIRED`, `LOGIN_STATE_INVALID`, `LOGIN_FAILED`.
 
 ### 12. Limits
 
@@ -390,11 +394,14 @@ Existing routes stay unless marked. "System" means the token's `aud`; the old `?
 |---|---|---|
 | `/auth/login` | 10 a minute per address and 5 failures per account (the existing lockout) | 429 `RATE_LIMITED` with `Retry-After`, or 423 locked |
 | `/auth/mobile/login` | 5 a minute per address, sharing the per account lockout | as above |
-| `/auth/token` | 60 a minute per client, and 120 a minute per address before any check (S2) (`vmms-mobile` also 30 a minute per address) | 429 with `Retry-After` and `{ "error": "rate_limited" }` |
+| `/auth/token` | 600 a minute per client for calls with a valid assertion, which skip the per address count; 120 a minute per address for every other call and every refused assertion (spec 0003). `vmms-mobile` 30 a minute per address | 429 with `Retry-After` and `{ "error": "rate_limited" }` |
+| `/auth/authorize` | 30 a minute per address | 429 error page |
 | `/auth/session/activity` | 2 a minute per `sid` (extra pings are accepted and ignored) | none |
 | `/auth/session` | none beyond the gateway; systems cache 30 s | none |
 | `/auth/directory/*` | 120 a minute per client | 429 |
 | `/auth/users/lookup` | 30 a minute (kept) | 429 |
+
+- A confidential client's call with a valid assertion may carry `X-WeLinc-User-Address`, the user's address as the system backend saw it (its own `X-Forwarded-For` through `TRUST_PROXY_HOPS`). welinc-auth stores it as the session's last seen address and ignores the header on any call without a valid assertion (spec 0003).
 
 S rows may tighten these and must note it here.
 
@@ -421,14 +428,16 @@ S rows may tighten these and must note it here.
 - `AUTH_ISSUER`: the issuer from section 1.
 - `AUTH_SIGNING_KEYS`: the private signing keys as a JWK set, each with its `status` (section 5); a Container Apps secret when hosted. Replaces `JWT_SECRET`.
 - `TRUST_PROXY_HOPS`: proxy hops in front of welinc-auth (1 locally, 2 hosted), for the per address limits (spec 0002).
-- `ACCESS_TOKEN_MINUTES` (15), `SERVICE_TOKEN_MINUTES` (5), `WEB_SESSION_IDLE_MINUTES` (30), `WEB_SESSION_MAX_HOURS` (12), `MOBILE_SESSION_IDLE_DAYS` (7), `REFRESH_REUSE_GRACE_SECONDS` (10). Replace `JWT_ACCESS_EXPIRY` and `JWT_REFRESH_EXPIRY`.
+- `ACCESS_TOKEN_MINUTES` (15), `SERVICE_TOKEN_MINUTES` (5), `WEB_SESSION_IDLE_MINUTES` (30), `WEB_SESSION_MAX_HOURS` (12), `MOBILE_SESSION_IDLE_DAYS` (7), `REFRESH_REUSE_GRACE_SECONDS` (10), `MAX_SESSIONS_PER_USER` (10), `SESSION_RETENTION_DAYS` (90). Replace `JWT_ACCESS_EXPIRY` and `JWT_REFRESH_EXPIRY`.
+- `API_PUBLIC_URL`: the gateway address the browser sees; the seed builds each system's redirect address from it. `CLIENT_<ID>_WEB_ADDRESS` per system client (spec 0003).
 - `PORTAL_URL` (kept), `SSO_COOKIE_SECURE` (true when hosted).
 - The client registry (section 4) comes from the seed per environment, with each client's public keys and redirect address read from environment values.
 
 **Each system backend:**
 - `AUTH_ISSUER`, `AUTH_INTERNAL_URL` (welinc-auth's internal address for server calls), `AUTH_JWKS_URL`.
 - `AUTH_CLIENT_ID`, `AUTH_CLIENT_PRIVATE_KEY` (secret; its own ES256 key).
-- `WEB_APP_URL` (where users land), `PORTAL_URL`.
+- `WEB_APP_URL` (where users land, and the one `Origin` its cookie routes accept), `PORTAL_URL`.
+- `AUTH_PUBLIC_URL` (welinc-auth as the browser sees it, for `/auth/authorize`), `API_PUBLIC_URL` (its callback is `<API_PUBLIC_URL>/<sys>/session/callback`), `SESSION_COOKIE_SECURE`, `TRUST_PROXY_HOPS` (spec 0003).
 
 **Each web app:** `VITE_API_BASE_URL` and `VITE_PORTAL_URL` only. No secret, no token setting.
 

@@ -1,7 +1,7 @@
 # 0003. Sessions, refresh and logout for web and mobile
 
 **Date**: 2026-11-08
-**Status**: Proposed
+**Status**: In Progress
 **Scope row**: [S3. Sessions: refresh and logout, web and mobile](../../../scope/_root/shared-services.md#s3-sessions-refresh-and-logout-web-and-mobile--planned--needs-a-decision)
 **Builds contract sections**: [0001](../0001-shared-services-contract/index.md) sections 5 (refresh grant, opaque values), 6 (sessions, session check), 7 (web login flow, cookies, CSRF guard), 8 (mobile login), 10 (session routes), 12 (limits)
 
