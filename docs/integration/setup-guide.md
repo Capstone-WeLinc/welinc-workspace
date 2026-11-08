@@ -40,7 +40,7 @@ It also creates the `welinc-network` Docker network. Always start this file firs
 The first time, create the auth tables and seed users from your machine:
 
 ```bash
-cd welinc-auth && npm install && npx prisma migrate deploy && npm run seed
+cd welinc-auth && npm install && npm run db:deploy && npm run seed
 ```
 
 Seed logins are in `welinc-auth/prisma/seeds/users.seed.ts`: one admin per system (`vrms.admin@welinc.com`, `vmms.admin@welinc.com`, `bms.admin@welinc.com`) and more.
@@ -109,7 +109,7 @@ git pull --ff-only
 for d in welinc-*; do git -C "$d" pull --ff-only; done
 ```
 
-After a pull, run `npm install` where `package.json` changed, `npx prisma migrate deploy` where migrations changed, and `docker compose -f <file> up -d --build` where a Dockerfile or compose file changed. Dependabot opens update pull requests in the shared repos; review them like any other pull request.
+After a pull, run `npm install` where `package.json` changed, `npx prisma migrate deploy` where migrations changed (in `welinc-auth`, `npm run db:deploy`, which also syncs the role catalog in `prisma/catalog/`), and `docker compose -f <file> up -d --build` where a Dockerfile or compose file changed. Dependabot opens update pull requests in the shared repos; review them like any other pull request.
 
 ## Troubleshooting
 
