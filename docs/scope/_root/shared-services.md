@@ -75,7 +75,7 @@ Short lived access tokens with refresh and logout in welinc-auth, for web and fo
 - [x] Design it (spec): `/architect sessions refresh and logout`
 - [ ] Build it: `/develop sessions refresh and logout`
   - [x] The web thread end to end (2026-11-08; migration, login with the SSO cookie, authorize and code exchange, rotation, `/auth/session`, VRMS session routes, in memory token, portal login, gateway CORS, contract amendments) · AC-1, AC-5, AC-7 to AC-21, AC-26, AC-27, AC-36, AC-40, AC-41, AC-43
-  - [ ] Session endings and idle (logout, activity pings, ending events, cap, hourly job, idle warning, Reconnecting banner) · AC-2 to AC-4, AC-6, AC-22 to AC-25, AC-37 to AC-39, AC-42
+  - [x] Session endings and idle (2026-11-08; logout, activity pings, ending events, cap, hourly job, idle warning, Reconnecting banner) · AC-2 to AC-4, AC-6, AC-22 to AC-25, AC-37 to AC-39, AC-42
   - [ ] Mobile routes, tested by API (`/auth/mobile/login`, mobile refresh with `audience`, logout) · AC-28 to AC-30, AC-38
   - [ ] Seeing and ending sessions (your sessions, admin end all, Signed in devices card, Sessions dialog on Users) · AC-31 to AC-35
 - [ ] Verify it: `/check verify sessions refresh and logout`
