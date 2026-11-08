@@ -68,6 +68,13 @@ services:
       # VRMS's client id at welinc-auth; its private key comes from the .env file
       AUTH_CLIENT_ID: vrms
       CORS_ORIGINS: http://localhost:8000,http://localhost:8001
+      # Spec 0003: the session routes (src/session/)
+      WEB_APP_URL: http://localhost:8001
+      PORTAL_URL: http://localhost:8000
+      AUTH_PUBLIC_URL: http://localhost:3000/auth
+      API_PUBLIC_URL: http://localhost:3000
+      SESSION_COOKIE_SECURE: "false"
+      TRUST_PROXY_HOPS: "1"
       NODE_ENV: development
       # Spec 0017: Azurite's public development account key (not a secret). The backend talks to
       # azurite:10000; links handed to the browser use localhost:10000.

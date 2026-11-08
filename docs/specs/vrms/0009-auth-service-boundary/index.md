@@ -2,6 +2,7 @@
 
 **Date**: 2026-10-27
 **Status**: Accepted
+**Partly superseded** (2026-11-08) by suite spec [0003](../../_root/0003-sessions-refresh-logout/index.md): AC-4's `/auth/me?system=VRMS` check and AC-15's `?token=` handoff no longer hold. The rest of this spec stands.
 
 ## Summary
 
@@ -30,7 +31,7 @@ Reasoning, options and the current state inventory: see [rationale.md](rationale
 
 *Account check on every VRMS request*
 
-- **AC-4**: After `JwtAuthGuard` verifies the token's signature, every protected VRMS route confirms the account by calling welinc-auth `GET {AUTH_SERVICE_URL}/auth/me?system=VRMS`. The call sends only the caller's own `Authorization` header (no `Origin`, no `Referer`), using the built in `fetch` with `AbortSignal.timeout(3000)`. A 200 is cached per token for 30 seconds, or until the token's own `exp` if that comes sooner. Checks for the same token that are already in flight share one call. `req.user` is then built from that response, not from the token's claims: `sub` = `id`, `email`, `name`, `system` = `VRMS`, `roles` = the response's roles where `system` is `VRMS`. The check runs inside `JwtAuthGuard`, so it runs before `RolesGuard` and never runs on routes without `JwtAuthGuard`. backend-vrms refuses to start when `AUTH_SERVICE_URL` is missing.
+- **AC-4** (superseded by suite spec [0003](../../_root/0003-sessions-refresh-logout/index.md) AC-26: the check now calls `GET /auth/session`, cached by `sid` for 30 s with ended answers cached too; the name comes from its answer and the roles from the token): After `JwtAuthGuard` verifies the token's signature, every protected VRMS route confirms the account by calling welinc-auth `GET {AUTH_SERVICE_URL}/auth/me?system=VRMS`. The call sends only the caller's own `Authorization` header (no `Origin`, no `Referer`), using the built in `fetch` with `AbortSignal.timeout(3000)`. A 200 is cached per token for 30 seconds, or until the token's own `exp` if that comes sooner. Checks for the same token that are already in flight share one call. `req.user` is then built from that response, not from the token's claims: `sub` = `id`, `email`, `name`, `system` = `VRMS`, `roles` = the response's roles where `system` is `VRMS`. The check runs inside `JwtAuthGuard`, so it runs before `RolesGuard` and never runs on routes without `JwtAuthGuard`. backend-vrms refuses to start when `AUTH_SERVICE_URL` is missing.
 - **AC-24**: In welinc-auth's JWT strategy, a valid `?system=` query value takes priority over a `system` claim in the token, `Origin`, `Referer` and the path. Every other caller behaves as today (additive).
 - **AC-25**: VRMS maps welinc-auth's answer like this, and nothing else:
 
@@ -66,7 +67,7 @@ Reasoning, options and the current state inventory: see [rationale.md](rationale
 
 *One sign in door*
 
-- **AC-15**: web-vrms's `StandaloneLoginForm` is deleted. `/login?token=…` runs the existing `SsoHandoff`. `/login` with no token redirects to `{VITE_PORTAL_URL}/login`. The axios interceptor no longer special cases `/auth/login`.
+- **AC-15** (superseded by suite spec [0003](../../_root/0003-sessions-refresh-logout/index.md) AC-19 and AC-20: `/login`, `SsoHandoff` and `?token=` are gone; the app boots through `/vrms/session/refresh` and `/vrms/session/start`, with the access token in memory only): web-vrms's `StandaloneLoginForm` is deleted. `/login?token=…` runs the existing `SsoHandoff`. `/login` with no token redirects to `{VITE_PORTAL_URL}/login`. The axios interceptor no longer special cases `/auth/login`.
 
 *welinc-auth hardening (from spec 0006's Follow-up)*
 
@@ -141,7 +142,7 @@ Links across databases (no foreign keys, by design): `Mechanic.authUserId` → w
 | `/vrms/mechanics/available` | backend-vrms | GET | | `{ id, name, isAvailable, email, authUserId }[]` | ADMIN or MECHANIC (unchanged) | 401, 403 |
 | `/vrms/repairs/audit-logs?actorId=` | backend-vrms | GET | `actorId` = welinc-auth id | as today, names from `actorName` | unchanged | 401, 403 |
 | `/vrms/repairs/audit-logs/actors` | backend-vrms | GET | | `{ id, name, email }[]` from audit rows | unchanged | 401, 403 |
-| `/auth/me?system=VRMS` | welinc-auth | GET | bearer | `ManagedUser` (existing) | JWT | 401, 403 |
+| `/auth/me?system=VRMS` | welinc-auth | GET | bearer | `ManagedUser` (existing); no longer the per request check, superseded by `/auth/session` (suite spec 0003) | JWT | 401, 403 |
 | `/auth/users?system=VRMS` | welinc-auth | GET | bearer | `ManagedUser[]` (existing) | ADMIN | 401, 403 |
 | `/auth/users` | welinc-auth | POST | as today | `ManagedUser` + `setupEmailSent` | ADMIN | 400, 409 |
 | `/auth/users/:id`, `/:id/status`, `DELETE /:id` | welinc-auth | PATCH, DELETE | as today | as today | ADMIN | 404, 409 (AC-19) |
@@ -152,10 +153,10 @@ Links across databases (no foreign keys, by design): `Mechanic.authUserId` → w
 
 | Action | Value | Source |
 |---|---|---|
-| account check | is the caller active, with which roles | welinc-auth `/auth/me?system=VRMS` answer (its strategy rejects inactive, locked, deleted and no VRMS role) |
+| account check | is the caller active, with which roles | superseded by suite spec 0003: active from `/auth/session`, roles from the token. Was: welinc-auth `/auth/me?system=VRMS` answer (its strategy rejects inactive, locked, deleted and no VRMS role) |
 | account check | the system welinc-auth checks | the `?system=VRMS` query, which wins over claims and headers (AC-24) |
 | account check | VRMS status code and message | the AC-25 table |
-| account check | cache entry lifetime | the smaller of 30 seconds and the token's `exp` claim |
+| account check | cache entry lifetime | the smaller of 30 seconds and the token's `exp` claim, now keyed by `sid` instead of the token (suite spec 0003) |
 | sync, just in time | `Mechanic.isActive` | `user.isActive && !user.isLocked` from the welinc-auth user |
 | repair create | in house mechanic | the picker's `Mechanic.id` (AC-27) |
 | audit actors list | name and email per person | the newest audit row per non null `userId` |
