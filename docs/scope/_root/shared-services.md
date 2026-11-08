@@ -25,7 +25,7 @@ _These are recommendations to keep the build orderly, not requirements. Skip any
 |---|---------|-------|--------|
 | S1 | Shared services contract | Contract | done |
 | S2 | Signing keys and service identity | Core | done |
-| S3 | Sessions: refresh and logout, web and mobile | Core | in-progress |
+| S3 | Sessions: refresh and logout, web and mobile | Core | done |
 | S5 | Roles per system | Core | planned |
 | S6 | User directory for systems | Core | planned |
 | S12 | Suite seed accounts | Core | planned |
@@ -67,7 +67,7 @@ Today every service holds the one `JWT_SECRET`, so any of about eight services c
 - [x] Review it (fresh model): `/check review signing keys and service identity` (skipped by choice, 2026-11-08; not run)
 - [x] Document it: `/document signing keys and service identity` (2026-11-08, PR bodies: auth #15, backend-vrms #45, portal #12, workspace #12)
 
-### S3. Sessions: refresh and logout, web and mobile · in-progress
+### S3. Sessions: refresh and logout, web and mobile · done
 spec [0003](../../specs/_root/0003-sessions-refresh-logout/index.md) · code in `welinc-auth/src/auth/` (sessions, token endpoint), `welinc-backend-vrms` (session routes, account check), `welinc-web-vrms` (boot, refresh, idle), `welinc-web-portal` (login)
 
 Short lived access tokens with refresh and logout in welinc-auth, for web and for the mobile app, so VMMS can drop its own copy. Covers web vs mobile bound sessions, the way VMMS has them today.
