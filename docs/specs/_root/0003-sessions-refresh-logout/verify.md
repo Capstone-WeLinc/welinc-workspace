@@ -1,4 +1,4 @@
-# Verify: sessions, refresh and logout · spec 0003 · updated 2026-11-08 (milestone 2)
+# Verify: sessions, refresh and logout · spec 0003 · updated 2026-11-08 (milestone 3)
 _Steps derived from spec 0003 acceptance criteria. `/check verify` runs these; `/test` locks the durable ones. Ticked steps passed during `/develop` on the local stack (curl or one Playwright pass), 2026-11-08._
 
 ## Milestone 1: the web thread
@@ -75,3 +75,28 @@ _Ticked steps passed during `/develop` on the local stack (curl, `psql` in the c
 
 ## Acceptance criteria coverage (milestone 2)
 - AC-2 · idle tab, tab A and B, value sourcing · AC-3 · unanswered warning, sweep · AC-4 · logout, password change, deactivate, admin set, lock and OTP, delete · AC-6 · built in milestone 1 (cap in `createWeb`), its 11 logins step above · AC-22 · three pings · AC-23 · warning, Stay signed in, unanswered, focus, 12 hour limit · AC-24 · two tabs, logout steps, logout while down · AC-25 · Reconnecting steps · AC-37 · sweep steps · AC-38 · three pings · AC-39 · log grep, sweep log · AC-42 · bearer only logout, grace activity, foreign sid
+
+## Milestone 3: mobile routes
+_Ticked steps passed during `/develop` on the local stack (curl through the gateway, `psql` in the container), 2026-11-08. Users: `vmms.admin` (VMMS only), `mech.carl` (VMMS and VRMS), `vrms.admin` (no VMMS). The login limit is 5 a minute per address, so space the logins out._
+
+### Commands
+- [x] `POST /auth/mobile/login` with `clientId: "vmms-mobile"` and `deviceName: "  Pixel 8 (Android 15)  "` → 200 `{ accessToken, refreshToken, expiresIn, sid, sessionExpiresAt, user }`, no `Set-Cookie`, `Cache-Control: no-store`; the row is `MOBILE`, `vmms-mobile`, device `Pixel 8 (Android 15)`, audiences `{VMMS}`, no absolute limit, no SSO handle, idle cutoff 7 days out; the token's `aud` is `VMMS` → AC-28
+- [x] Mobile login for `vrms.admin` → 403 `NO_SYSTEM_ACCESS`; with `clientId: "vrms"` → 400 `INVALID_CLIENT`; a wrong password counts toward the shared lockout (`remainingAttempts: 4`) → AC-28
+- [x] Refresh with `client_id=vmms-mobile` and no assertion → 200, rotated, `aud` `VMMS`, no `session_absolute_expires_at` → AC-29
+- [x] `audience=VRMS` for `vmms.admin` → 403 `NO_SYSTEM_ACCESS`; `audience=BMS` → `invalid_target`; the same token still refreshes after both (nothing rotated) → AC-29, AC-41
+- [x] `audience=VRMS` for `mech.carl` → a VRMS token with only VRMS roles, `audiences` `{VMMS,VRMS}`; backend-vrms answers 200 on `/vrms/permissions/me` with it → AC-29
+- [x] Refresh with `client_id=vrms` and no assertion → `invalid_client` → AC-29
+- [x] Last activity 3 days ago, then a refresh → the idle cutoff is back at 7 days; past the cutoff → `invalid_grant` and the row ends `IDLE` → AC-2, AC-29
+- [x] Two refreshes with one mobile token inside 10 s → the same new token → AC-8, AC-29
+- [x] The old mobile token after its grace → `invalid_grant`, the session ends `REFRESH_REUSE` → AC-9, AC-29
+- [x] `POST /auth/logout` with `{ refreshToken, clientId: "vmms-mobile" }` (even an already used token of the session) → 204, the row ends `LOGOUT`, no unused tokens; again → 204; an unknown token, or the right token with `clientId: "vrms"` → 204 and nothing ends → AC-30
+- [x] 6 or more mobile logins in a minute from one address → 429 `rate_limited` with `Retry-After` → AC-38
+- [x] More than 30 `vmms-mobile` refreshes in a minute from one address → 429 → AC-38
+- [x] The log lines for these runs carry `sid`, user, reason, client and `aud`, never a token → AC-39
+
+### Value sourcing
+- [x] `created_ip` is the request address through `TRUST_PROXY_HOPS` (locally the Docker bridge, `172.21.0.1`) → AC-28
+- [x] A mobile refresh sets `last_seen_ip` from the request address, and an `X-WeLinc-User-Address` header on it is ignored → AC-43
+
+## Acceptance criteria coverage (milestone 3)
+- AC-28 · login, no access, client, lockout, row values · AC-29 · refresh, audience steps, idle roll, grace, reuse · AC-30 · logout steps · AC-38 · both limit steps · AC-2 (mobile) · idle roll and cutoff

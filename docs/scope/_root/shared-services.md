@@ -76,7 +76,7 @@ Short lived access tokens with refresh and logout in welinc-auth, for web and fo
 - [ ] Build it: `/develop sessions refresh and logout`
   - [x] The web thread end to end (2026-11-08; migration, login with the SSO cookie, authorize and code exchange, rotation, `/auth/session`, VRMS session routes, in memory token, portal login, gateway CORS, contract amendments) · AC-1, AC-5, AC-7 to AC-21, AC-26, AC-27, AC-36, AC-40, AC-41, AC-43
   - [x] Session endings and idle (2026-11-08; logout, activity pings, ending events, cap, hourly job, idle warning, Reconnecting banner) · AC-2 to AC-4, AC-6, AC-22 to AC-25, AC-37 to AC-39, AC-42
-  - [ ] Mobile routes, tested by API (`/auth/mobile/login`, mobile refresh with `audience`, logout) · AC-28 to AC-30, AC-38
+  - [x] Mobile routes, tested by API (2026-11-08; `/auth/mobile/login`, mobile refresh with `audience`, logout by refresh token, 7 day rolling idle, limits; any public native client row works, so a later `bms-mobile` needs only a seed row) · AC-28 to AC-30, AC-38
   - [ ] Seeing and ending sessions (your sessions, admin end all, Signed in devices card, Sessions dialog on Users) · AC-31 to AC-35
 - [ ] Verify it: `/check verify sessions refresh and logout`
 - [ ] Test it: `/test sessions refresh and logout`
@@ -87,6 +87,7 @@ Short lived access tokens with refresh and logout in welinc-auth, for web and fo
 Each system declares its roles and rules (VMMS: exactly one role per account; BMS: Admin, Customer Support, Operations; VRMS: Admin, Chief Mechanic, Mechanic), and welinc-auth enforces them, instead of one shared enum and rules copied into each system.
 **Done when:** each system's allowed roles and rules live in one place in welinc-auth, user admin rejects a role a system does not have, and adding a role to one system needs no change in the others.
 - Note (2026-11-08, from a look at a friend's company suite (SBSI User & Access Management) on 2026-11-08, ideas to weigh in the spec, nothing decided): let each system publish its own permission catalog (VRMS already has its matrix and `/permissions/me`, spec 0011) and show them read only through `/auth/systems`, named `system.resource.action` (VRMS keys get a `vrms.` prefix there, e.g. `vrms.ticket.view_all`). Each system still decides and enforces its permissions; welinc-auth only shows them, so the S10 access report can answer "who can approve costs anywhere in the suite". Don't copy their model of one central catalog where the access service owns every permission (it drifts: empty systems, undescribed permissions, old and new slugs mixed), nor global roles shared across systems.
+- Note (2026-11-08): BMS says `welinc-mobile-bms` is for drivers and helpers (WeLinc staff in the field), so BMS needs Driver and Helper roles here, and a `bms-mobile` client row like `vmms-mobile`. Open: whether drivers and helpers already have `@welinc.com` addresses.
 - [ ] Design it (spec): `/architect roles per system`
 
 ### S6. User directory for systems · planned · needs a decision
