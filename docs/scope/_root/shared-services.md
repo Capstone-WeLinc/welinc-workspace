@@ -33,6 +33,7 @@ _These are recommendations to keep the build orderly, not requirements. Skip any
 | S9 | Gateway for the whole suite | Gateway | planned |
 | S7 | Account activity and audit | Account | planned |
 | S8 | Profile extras | Account | planned |
+| S13 | Email verification | Account | planned |
 | S11 | Move VMMS and BMS onto the shared services | Cutover | planned |
 | S10 | Suite admin model | Admin | planned |
 
@@ -87,7 +88,7 @@ Short lived access tokens with refresh and logout in welinc-auth, for web and fo
 Each system declares its roles and rules (VMMS: exactly one role per account; BMS: Admin, Customer Support, Operations; VRMS: Admin, Chief Mechanic, Mechanic), and welinc-auth enforces them, instead of one shared enum and rules copied into each system.
 **Done when:** each system's allowed roles and rules live in one place in welinc-auth, user admin rejects a role a system does not have, and adding a role to one system needs no change in the others.
 - Note (2026-11-08, from a look at a friend's company suite (SBSI User & Access Management) on 2026-11-08, ideas to weigh in the spec, nothing decided): let each system publish its own permission catalog (VRMS already has its matrix and `/permissions/me`, spec 0011) and show them read only through `/auth/systems`, named `system.resource.action` (VRMS keys get a `vrms.` prefix there, e.g. `vrms.ticket.view_all`). Each system still decides and enforces its permissions; welinc-auth only shows them, so the S10 access report can answer "who can approve costs anywhere in the suite". Don't copy their model of one central catalog where the access service owns every permission (it drifts: empty systems, undescribed permissions, old and new slugs mixed), nor global roles shared across systems.
-- Note (2026-11-08): BMS says `welinc-mobile-bms` is for drivers and helpers (WeLinc staff in the field), so BMS needs Driver and Helper roles here, and a `bms-mobile` client row like `vmms-mobile`. Open: whether drivers and helpers already have `@welinc.com` addresses.
+- Note (2026-11-08): BMS says `welinc-mobile-bms` is for drivers and helpers (WeLinc staff in the field), so BMS needs Driver and Helper roles here, and a `bms-mobile` client row like `vmms-mobile`. They log in with their own email like everyone else (any real email domain works).
 - [ ] Design it (spec): `/architect roles per system`
 
 ### S6. User directory for systems · planned · needs a decision
@@ -99,7 +100,7 @@ Systems need names, emails and roles for people their records point to (VMMS sch
 One seed in welinc-auth for all three systems instead of three drifting copies: fixed ids every system links its own rows to (as VRMS already does with `SEED_IDS`), one person per email, and people chosen to test the shared login.
 **Done when:** each system's roles have at least one seed person; there are accounts holding one, two and three systems for the launcher; a locked, a deactivated and a never verified account exist for testing; the platform admin from S10 has a seed account once S10 is built; no email means two different people across systems; and each system's own seed links to the shared ids instead of creating users.
 - Note (2026-11-08, replan): from specs 0001 and 0002. This row gets its own spec, and it must keep and extend spec 0002's `OAuthClient` seed, creating the section 4 clients alongside the people.
-- Note (2026-11-07): fixes the drift listed above (`ops.user` and the VMMS chief mechanics). Keep `@welinc.com` addresses, since welinc-auth checks the email domain on account creation.
+- Note (2026-11-07): fixes the drift listed above (`ops.user` and the VMMS chief mechanics). Keep `@welinc.com` addresses for seeds. The seed writes users straight to the database, so no email check applies to them. Real users may use any email whose domain can receive mail, such as Gmail.
 - [ ] Design it (spec): `/architect suite seed accounts` (or inside the S1 spec)
 
 ## Login
@@ -131,6 +132,12 @@ Login activity and account change history from welinc-auth, so VMMS (`me/login-a
 The profile routes the other apps already call: phone verification (VMMS), verify password before a sensitive action and an account deletion request (BMS).
 **Done when:** phone numbers can be verified by code, a sensitive action can ask for the password again, a user can request deletion and an admin of each of their systems sees it, and every one of these events is logged.
 - [ ] Design it (spec): `/architect profile extras`
+
+### S13. Email verification · planned · needs a decision
+Prove a person owns their email before the suite relies on it, instead of only checking that the domain can receive mail. Today `emailVerified` turns true only when someone uses a setup or reset code; an account an admin creates with a typed password, and any email change by an admin or on the profile, is never checked.
+**Done when:** every new account and every email change sends a code or link to that address; `emailVerified` is true only after it is used; admins and the user can see whether an email is verified and send the code again; the rule for an unverified account (sign in allowed or not, which emails it gets) is decided and enforced.
+- Note (2026-11-08): found while checking the email domain rule. The domain check accepts any real domain (Gmail works); the test domain skip list now applies only outside production. Setup and reset codes used `Math.random()`; fixed the same day with `crypto.randomInt` (`newOtp()` in `auth.service.ts`). Questions for the spec: code or link; whether an unverified account may sign in; what happens to the old email on a change (keep it until the new one is verified, and tell the old address); and how this fits drivers and helpers on BMS mobile (S5).
+- [ ] Design it (spec): `/architect email verification`
 
 ## Cutover
 
