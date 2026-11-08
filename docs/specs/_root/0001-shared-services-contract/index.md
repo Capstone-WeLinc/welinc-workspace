@@ -3,8 +3,8 @@
 **Date**: 2026-11-08
 **Status**: Accepted
 **Scope row**: [S1. Shared services contract](../../../scope/_root/shared-services.md#s1-shared-services-contract--planned--needs-a-decision)
-**Contract version**: 1
-**Amended**: 2026-11-09, additive, from spec [0004](../0004-roles-per-system/index.md) (sections 4, 8, 10, 11, 12, 13)
+**Contract version**: 2
+**Amended**: 2026-11-09, additive, from spec [0004](../0004-roles-per-system/index.md) (sections 4, 8, 10, 11, 12, 13) · 2026-11-09, version 2 (breaking), from spec [0005](../0005-user-directory/index.md) (sections 5, 9, 10, 11, 12, 14, 15 and the gap map)
 
 ## Summary
 
@@ -157,7 +157,7 @@ All signed tokens use ES256 with a `kid` header (the id of the key that signed i
 | `scope` | space separated, e.g. `directory.read` |
 
 - A service token has no `roles` and no `sid`. Routes meant for people reject it, and routes meant for services reject user tokens (403).
-- welinc-auth defines the `directory.read` scope. Each system defines and documents the scopes for its own service routes (VRMS feature 56 lists the ones between systems).
+- welinc-auth defines the `directory.read` scope, and `directory.contact` (phones in the directory, section 9). Each system defines and documents the scopes for its own service routes (VRMS feature 56 lists the ones between systems).
 
 **Client assertion** (what a confidential backend signs to prove itself, `private_key_jwt`):
 
@@ -312,7 +312,7 @@ The caller's system is its client's **System** (section 4), so `vmms-analytics` 
 
 | Route | Method | In | Out |
 |---|---|---|---|
-| `/auth/directory/users/lookup` | POST | `{ ids: uuid[] }` (at most 200) | `{ users: DirectoryUser[], missing: uuid[] }` |
+| `/auth/directory/users/lookup` | POST | `{ ids: uuid[] }` (1 to 200 distinct uuids; the body holds nothing else) | `{ users: DirectoryUser[], missing: uuid[] }` |
 | `/auth/directory/users` | GET | `cursor?`, `limit?` (100, at most 500) | every user who holds a role in the caller's system: `{ users: DirectoryUser[], next, changesCursor }` (for the first sync) |
 | `/auth/directory/changes` | GET | `after?` (cursor), `limit?` (100, at most 500) | `{ changes: DirectoryChange[], next, hasMore }` in order |
 
@@ -322,7 +322,7 @@ type DirectoryUser = {
   name: string;
   email: string;
   phone: string | null;   // null unless the token also holds directory.contact
-  phoneVerified: boolean;
+  phoneVerified: boolean; // false for everyone until S8 adds phone verification
   picture: string | null; // an /uploads address
   isActive: boolean;
   deleted: boolean;       // soft deleted; name and email kept for history
@@ -338,12 +338,21 @@ type DirectoryChange = {
 };
 ```
 
-- **Which users a system sees:** only users who hold, or once held, a role in the caller's system. Lookup returns them with `roles` for that system (empty if they lost it, since a record may point to someone who has since left); every other id comes back in `missing`, deleted users included. Soft deleted users of the system come back with `deleted: true`.
+- **Which users a system sees:** only users who hold, or once held, a role in the caller's system. Lookup returns them with `roles` for that system (empty if they lost it, since a record may point to someone who has since left), in the order the ids were asked. Soft deleted users of the system come back with `deleted: true`. Every other id, unknown or hard deleted, comes back in `missing`, exactly as it was sent. A hard deleted person still has a `deleted` change in the feed.
 - **What the feed carries:** every change to a user who holds a role in the caller's system at the time of the change. When a user loses their last role there, the system gets one `roles_changed` with `roles: []`, then no more changes about them until they get a role back (which arrives as `roles_changed`).
-- **Cursors:** a cursor is an opaque wrapper around a sequence number welinc-auth assigns to each change. The feed only serves changes older than 5 s, so a slow transaction that commits late is never skipped. Leaving `after` out starts from the very first change. Cursors never expire, so a system that was down catches up from its last one.
-- **First sync:** page through `/auth/directory/users`, then start the feed from the `changesCursor` of the first page. It is taken before the scan, so nothing that changes during the scan is lost (a change may arrive twice, which is harmless).
+- **One change per save:** a save that touches a person (their fields, their roles, or both) gives at most one change for them, carrying their state after the save. A save that changes nothing a system can see gives none: a password change or reset, a lock or unlock, a failed login, or saving the same values.
+- **What `type` means:** it compares the person with their previous change across the whole suite, and the first match wins: `created` (no earlier change, so new to the suite, not only to your system), `deleted` (soft deleted, or hard deleted), `deactivated`, `activated`, `roles_changed` (roles in any system), else `updated`. A change reaches every system the person held a role in before or after it, so you may get one with nothing new for you (a role changed in another system). Apply the `user` snapshot every time and treat `type` as information only.
+- **`updatedAt`:** information only. The lookup and users routes read the account's current value; the feed carries the value at the person's last visible change, which can be older (a password change moves the column but writes no change). Don't compare it across routes.
+- **Where the feed starts:** when the feed is created in an environment (its migration), it records one `created` change for everyone who then holds a role, soft deleted people included. So leaving `after` out gives the whole history, and lookup knows who "once held" a role from day one.
+- **Cursors:** a cursor is opaque. It marks a place in the feed's order (the order the changes committed in) and the feed's epoch (an id the auth database gets when the feed is created). The feed serves only changes from transactions older than every transaction still running (the safe point), so a slow transaction that commits late is never skipped, however long it ran. When a page holds fewer than `limit` changes, `next` is the safe point, so asking again from it skips changes for other systems you have already passed. Cursors never expire, so a system that was down catches up from its last one.
+- **After a restore:** a database restored from a backup or rebuilt gets a new epoch, and a cursor from before answers 400 `INVALID_CURSOR`. That means "read everything again": drop the cursor, do the first sync again, and apply it as usual (applying is harmless when nothing changed).
+- **Paging:** the two kinds of cursor don't mix. `/auth/directory/users` answers a page cursor in `next` (`null` on the last page), only for its own `cursor`. `/auth/directory/changes` answers a feed cursor in `next`, never `null`: on a full page it is the last change's cursor and `hasMore: true` means call again at once; on a short page it is the safe point. An empty `cursor` or `after`, or one kind used for the other, is 400 `INVALID_CURSOR`, not "from the start" (leave the parameter out for that).
+- **First sync:** page through `/auth/directory/users`, then start the feed from the `changesCursor` of the first page (only the first; later pages carry their own, ignore them). It is taken before the scan, so nothing that changes during the scan is lost (a change may arrive twice, which is harmless).
+- **Who may call:** only a system backend's own service token (`aud: AUTH`) holding `directory.read`. No token, a bad one, or a token from a switched off client gives 401; an expired one gives 401 `TOKEN_EXPIRED` (get a new token and retry once). A person's token, an admin's included, gets 403 `FORBIDDEN`, as do a service token without `directory.read` and a client with no system. A bad cursor gives 400 `INVALID_CURSOR`; a `limit` outside 1 to 500 or a bad lookup body (not 1 to 200 distinct uuids) gives 400 `VALIDATION_FAILED`.
 - **How systems use it:** keep a local copy of only what you show (name, email, roles, active), keyed by `sub`. Poll the feed every 30 to 60 s from the stored cursor and apply changes in order. Applying the same change twice must be harmless.
 - **Reserved for later (not built):** an optional webhook nudge. welinc-auth would POST `{ "type": "directory.changed" }`, with no user data, to an address a system registers, and the system polls the feed at once. Adding it changes nothing above.
+- **Lag:** a change usually reaches the feed as soon as it commits. Any long open transaction on the auth database's Postgres server holds the safe point back for every system until it ends, so a feed that stops moving means an open transaction, not lost changes. welinc-auth's database role closes transactions left idle for 60 s (section 15).
+- **Retention:** the feed keeps every change forever, with the names, emails and phones in its snapshots, including for deleted people, behind these routes only. A real erasure of personal data (a later privacy row) must clear them too.
 - No system reads the auth database. Security never rides on the feed: deactivation is caught by the session check (section 6).
 
 ### 10. welinc-auth routes for people
@@ -374,7 +383,7 @@ Existing routes stay unless marked. "System" means the token's `aud`; the old `?
 | `/auth/profile/phone/verify` | POST | user token | new: `{ code }` | S8 |
 | `/auth/profile/verify-password` | POST | user token | new: `{ password }` gives `{ reauthToken }` | S8 |
 | `/auth/profile/deletion-request` | POST | user token | new: `{ reauthToken, reason? }`; an admin reviews it | S8 |
-| `/auth/users`, `/auth/users/lookup`, `/auth/users/:id`, `/auth/users/:id/status`, `/auth/users/:id/password`, `/auth/users/:id/unlock`, `/auth/users/:id/changes` | as today | that system's admin | kept, with the spec 0011 scoping. Changed by S5: a role in `roleAssignments` must be one of the system's catalog roles (400 `UNKNOWN_ROLE`, naming its roles) and an account may hold at most `maxRolesPerUser` roles in one system (409 `ROLE_LIMIT`; a request is refused, never trimmed). `GET /auth/users` takes an optional `role` filter, checked the same way against the token's `aud`, for an admin and a `directory.read` service token alike | S5 |
+| `/auth/users`, `/auth/users/lookup`, `/auth/users/:id`, `/auth/users/:id/status`, `/auth/users/:id/password`, `/auth/users/:id/unlock`, `/auth/users/:id/changes` | as today | that system's admin | kept, with the spec 0011 scoping. Changed by S5: a role in `roleAssignments` must be one of the system's catalog roles (400 `UNKNOWN_ROLE`, naming its roles) and an account may hold at most `maxRolesPerUser` roles in one system (409 `ROLE_LIMIT`; a request is refused, never trimmed). `GET /auth/users` takes an optional `role` filter, checked the same way against the token's `aud`. Changed by S6 (version 2): admins only. A service token, with `directory.read` or not, gets 403 `WRONG_TOKEN_USE`; systems read people through the directory (section 9) | S5, S6 |
 | `/auth/users/:id/sessions` | GET, DELETE | that system's admin | new: list or end all of a user's sessions | S3 |
 | `/auth/users/:id/activity` | GET | that system's admin | new | S7 |
 | `/auth/activity` | GET | that system's admin | new: login activity of that system's users (BMS's activity page) | S7 |
@@ -383,14 +392,14 @@ Existing routes stay unless marked. "System" means the token's `aud`; the old `?
 
 - VMMS's `me/login-activity` maps to `/auth/profile/activity`, its `users/:id/login-activity` to `/auth/users/:id/activity`, and its `audit-logs` for accounts to `/auth/users/:id/changes` plus `/auth/activity`.
 - welinc-auth owns phone numbers and their verified flag (S8 picks the SMS provider; VMMS uses Semaphore today).
-- "That system's admin" means the holder of the role its catalog marks `isSystemAdmin` (S5), checked against the token's `aud` on every request. Today that is `ADMIN` in every system. A service token is never a system admin; it passes only routes that name its scope (`directory.read`).
+- "That system's admin" means the holder of the role its catalog marks `isSystemAdmin` (S5), checked against the token's `aud` on every request. Today that is `ADMIN` in every system. A service token is never a system admin, and no route in this table takes one; system backends use the directory routes of section 9.
 - S10 (suite admin) may add routes and roles. It must not change any claim above.
 
 ### 11. Errors
 
 - welinc-auth and the system session routes answer with Nest's usual body plus a stable `code`: `{ "statusCode": 409, "message": "…", "error": "Conflict", "code": "ACCOUNT_EXISTS" }`. Clients branch on `code`, never on `message`.
 - `/auth/token` answers in the OAuth format so standard libraries understand it: `{ "error": "invalid_grant", "error_description": "…" }` (400), `invalid_client` (401), or `invalid_target` and `invalid_scope` (400) for an audience or scope the client may not have.
-- Codes this contract introduces: `SESSION_ENDED`, `ACCOUNT_INACTIVE`, `ACCOUNT_LOCKED`, `TOKEN_EXPIRED` (a good token past its `exp`: refresh and retry once), `CSRF_REJECTED`, `AUTH_UNAVAILABLE`, `NO_SYSTEM_ACCESS`, `WRONG_AUDIENCE`, `WRONG_TOKEN_USE`, `REAUTH_REQUIRED`, `RATE_LIMITED`, `UNKNOWN_ROLE` (400, a role the system's catalog doesn't have), `ROLE_LIMIT` (409, more roles in one system than it allows), `APP_NOT_ALLOWED` (403, the account's roles aren't allowed on this app, section 4; its message names the allowed roles and is safe to show), and the portal error codes `LOGIN_REQUEST_EXPIRED`, `LOGIN_STATE_INVALID`, `LOGIN_FAILED`.
+- Codes this contract introduces: `SESSION_ENDED`, `ACCOUNT_INACTIVE`, `ACCOUNT_LOCKED`, `TOKEN_EXPIRED` (a good token past its `exp`: refresh and retry once), `CSRF_REJECTED`, `AUTH_UNAVAILABLE`, `NO_SYSTEM_ACCESS`, `WRONG_AUDIENCE`, `WRONG_TOKEN_USE`, `REAUTH_REQUIRED`, `RATE_LIMITED`, `UNKNOWN_ROLE` (400, a role the system's catalog doesn't have), `ROLE_LIMIT` (409, more roles in one system than it allows), `APP_NOT_ALLOWED` (403, the account's roles aren't allowed on this app, section 4; its message names the allowed roles and is safe to show), the directory codes `INVALID_CURSOR` (400, a cursor welinc-auth did not issue or one from before a restore: read everything again), `VALIDATION_FAILED` (400, a bad `limit` or lookup body) and `FORBIDDEN` (403, a caller the directory doesn't serve, section 9), and the portal error codes `LOGIN_REQUEST_EXPIRED`, `LOGIN_STATE_INVALID`, `LOGIN_FAILED`.
 - `NO_SYSTEM_ACCESS` and `APP_NOT_ALLOWED` are about the account, not the client's request, so they use the coded body above on every route, `/auth/token` included (403), not the OAuth format.
 
 ### 12. Limits
@@ -403,7 +412,7 @@ Existing routes stay unless marked. "System" means the token's `aud`; the old `?
 | `/auth/authorize` | 30 a minute per address | 429 error page |
 | `/auth/session/activity` | 2 a minute per `sid` (extra pings are accepted and ignored) | none |
 | `/auth/session` | none beyond the gateway; systems cache 30 s | none |
-| `/auth/directory/*` | 120 a minute per client | 429 |
+| `/auth/directory/*` | 120 a minute per client, one count shared by all three routes, counted after the token check (calls answered 401 or 403 don't count). A first sync plus a poll every 30 to 60 s stays far below it | 429 `RATE_LIMITED` with `Retry-After`: wait that many seconds |
 | `/auth/users/lookup` | 30 a minute (kept) | 429 |
 
 - A confidential client's call with a valid assertion may carry `X-WeLinc-User-Address`, the user's address as the system backend saw it (its own `X-Forwarded-For` through `TRUST_PROXY_HOPS`). welinc-auth stores it as the session's last seen address and ignores the header on any call without a valid assertion (spec 0003).
@@ -427,6 +436,14 @@ S rows may tighten these and must note it here.
 - **Breaking** (removing or renaming a route, claim or field, or changing what one means): bump the contract version, list each system's change here, and tell the affected groups before it lands. The shared services owner decides; the other groups don't review this spec.
 - Each S row spec links back here and states which sections it builds.
 
+**Versions:**
+- **2** (2026-11-09, spec 0005, S6).
+  - Breaking: `GET /auth/users` no longer takes service tokens; it is for admins only (section 10).
+  - Behaviour a reader may notice: the directory feed (section 9) writes at most one change per person per save, and none for a save nothing visible changed (a password change, a lock, the same values). Version 1 said "every change". No version 1 cursor was ever issued (the feed didn't exist yet), so none can break.
+  - Additive: the feed serves up to the safe point instead of "older than 5 s" (a stronger guarantee, no reader change), the feed epoch and `INVALID_CURSOR` after a restore, the backfill, `phoneVerified` false until S8, and the directory codes `INVALID_CURSOR`, `VALIDATION_FAILED`, `FORBIDDEN` and `RATE_LIMITED` with `Retry-After` (sections 11, 12).
+  - Changes per system: **VRMS** stops calling `/auth/users` with its service token and reads people through the directory, in the same release as welinc-auth. **VMMS** and **BMS**: none known. Their admin web apps call `/auth/users` with admins' user tokens, which still works, and their backends move onto the directory with S11.
+- **1** (2026-11-08): the first contract.
+
 ### 15. Configuration
 
 **welinc-auth** (new or changed; values in `.env.example` only):
@@ -436,6 +453,7 @@ S rows may tighten these and must note it here.
 - `ACCESS_TOKEN_MINUTES` (15), `SERVICE_TOKEN_MINUTES` (5), `WEB_SESSION_IDLE_MINUTES` (30), `WEB_SESSION_MAX_HOURS` (12), `MOBILE_SESSION_IDLE_DAYS` (7), `REFRESH_REUSE_GRACE_SECONDS` (10), `MAX_SESSIONS_PER_USER` (10), `SESSION_RETENTION_DAYS` (90). Replace `JWT_ACCESS_EXPIRY` and `JWT_REFRESH_EXPIRY`.
 - `API_PUBLIC_URL`: the gateway address the browser sees; the seed builds each system's redirect address from it. `CLIENT_<ID>_WEB_ADDRESS` per system client (spec 0003).
 - `PORTAL_URL` (kept), `SSO_COOKIE_SECURE` (true when hosted).
+- Its database role runs with `idle_in_transaction_session_timeout = 60s` (set by the directory feed migration locally; spec 0008 sets it on the hosted database), so a forgotten open transaction can't hold the directory feed back for long (section 9).
 - The client registry (section 4) comes from the seed per environment, with each client's public keys and redirect address read from environment values.
 
 **Each system backend:**
@@ -458,6 +476,7 @@ Every gap from the 2026-11-07 check, mapped to the row that closes it.
 | VMMS mobile logs in against the VMMS copy (`X-VMMS-Client`) | S3 (mobile client), S11 |
 | VMMS analytics checks callers through `GET auth/me?system=VMMS` on the VMMS backend | S2 (verify with JWKS), S3 (session check) |
 | The BMS gateway reads `users`, `user_roles` and `user_activity_logs` straight from the auth database | S6, S7, then S11 |
+| VRMS's mechanic sync downloads every user through `GET /auth/users` on page loads and after each save | S6 |
 | BMS calls `profile/activity`, `profile/verify-password` and `profile/deletion-request`, which don't exist | S7, S8 |
 | BMS has no portal handoff | S4 |
 | BMS runs auth from the old `welinc-backend` repo with admin checks removed and no refresh | S11 retires it |

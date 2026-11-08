@@ -110,11 +110,11 @@ Systems need names, emails and roles for people their records point to (VMMS sch
 **Done when:** a system can look up many users by id in one call, learns about created, changed and deactivated users without polling every user, keeps only a local copy of what it needs, and no system reads the auth database.
 - Note (2026-11-09): spec 0005 decided a `directory_changes` feed written by deferred Postgres triggers (one row per person per save, only when something a system can see changed, a snapshot of the person after it), read in transaction order with an epoch in the cursor, three service only routes, and `/auth/users` back to admins only. VRMS polls every 30 s with a leased job, refreshes one person after its own Users page saves, keeps the just in time update, and drops the full downloads on page loads. Contract 0001 sections 9 and 10 get amended. Hard switch: auth, backend-vrms and web-vrms merge together.
 - [x] Design it (spec): `/architect user directory for systems`
-- [ ] Build it: `/develop user directory for systems`
+- [x] Build it: `/develop user directory for systems`
   - [x] Thin thread: feed migration and triggers, backfill, seed in one save, `/directory/changes` and `/directory/users`, VRMS sync state and the leased poll job · AC-1, AC-2, AC-4, AC-5, AC-7, AC-8, AC-11 to AC-13, AC-16
   - [x] Lookup and instant refresh: `/directory/users/lookup`, `refreshOne` and the refresh route, web-vrms drops page open syncs · AC-6, AC-18 to AC-20
   - [x] Hardening and the switch: apply failure, auth down, `INVALID_CURSOR`, recovery sync, `/auth/users` admin only, every write path tests · AC-3, AC-9, AC-14, AC-15, AC-17, AC-21
-  - [ ] Contract 0001 amendments and docs · AC-10
+  - [x] Contract 0001 amendments and docs · AC-10
 - [ ] Verify it: `/check verify user directory for systems`
 - [ ] Test it: `/test user directory for systems`
 - [ ] Review it (fresh model): `/check review user directory for systems`
