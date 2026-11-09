@@ -8,6 +8,7 @@ Set up right after Slice 1 so every later slice demos from staging.
 
 ### 26. Hosting, CI/CD & environments · in-progress
 - Note (2026-11-09, replan, from suite spec 0005): set `idle_in_transaction_session_timeout` on the hosted auth database too. A transaction left open on the Postgres server holds back the directory feed for every system.
+- Note (2026-11-09, replan, from suite spec 0006): decide whether staging seed passwords differ from the public ones in `docs/integration/seed-accounts.md`, and set `SEED_ALLOW=staging` only on staging (the seed refuses production otherwise).
 - Note (2026-11-02, replan): from spec 0017. When the SPA host gets a Content Security Policy, `img-src` must allow the storage account host. Auth's profile pictures still sit on an Azure Files mount; moving them onto the blob store is a separate decision in welinc-auth (a shared repo), so raise it at the integration meeting (feature 55) rather than building it here.
 WL-902 and WL-903. Staging and production with their own settings and databases, an automatic pipeline, and the go live. Decided in spec 0008: Azure (Static Web Apps, Container Apps, one shared PostgreSQL server) on free credit, GitHub Actions for CI and CD. This replaces the earlier Vercel and Render plan (Jira not yet updated).
 **Done when:** pushing to `development` deploys to staging, production deploys only from a manual run on the `release` branch, builds fail when tests fail, production has HTTPS and scheduled database backups, and a smoke test passes after deploy.
