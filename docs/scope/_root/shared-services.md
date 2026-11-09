@@ -27,7 +27,7 @@ _These are recommendations to keep the build orderly, not requirements. Skip any
 | S2 | Signing keys and service identity | Core | done |
 | S3 | Sessions: refresh and logout, web and mobile | Core | done |
 | S5 | Roles per system | Core | done |
-| S6 | User directory for systems | Core | in-progress |
+| S6 | User directory for systems | Core | done |
 | S12 | Suite seed accounts | Core | planned |
 | S4 | App initiated login and launcher | Login | planned |
 | S9 | Gateway for the whole suite | Gateway | planned |
@@ -103,7 +103,7 @@ Each system declares its roles and rules (VMMS: exactly one role per account; BM
 - [x] Review it (fresh model): `/check review roles per system` (skipped by choice, 2026-11-09; not run)
 - [x] Document it: `/document roles per system` (2026-11-09; PRs welinc-auth #18, welinc-web-vrms #50, welinc-workspace #15)
 
-### S6. User directory for systems · in-progress
+### S6. User directory for systems · done
 spec [0005](../../specs/_root/0005-user-directory/index.md) · code in `welinc-auth/prisma/migrations/` (feed trigger), `welinc-auth/src/auth/` (directory routes), `welinc-backend-vrms/src/modules/vrms/` (poll job, roster), `welinc-web-vrms/src/features/user-management/`
 
 Systems need names, emails and roles for people their records point to (VMMS schedules, BMS activity, VRMS mechanics) without their own users table or reading the auth database. Give them a lookup API and a change feed, generalizing VRMS's mechanic sync.
@@ -117,8 +117,8 @@ Systems need names, emails and roles for people their records point to (VMMS sch
   - [x] Contract 0001 amendments and docs · AC-10
 - [x] Verify it: `/check verify user directory for systems`
 - [x] Test it: `/test user directory for systems`
-- [ ] Review it (fresh model): `/check review user directory for systems`
-- [ ] Document it: `/document user directory for systems`
+- [x] Review it (fresh model): `/check review user directory for systems` (skipped by choice, 2026-11-09; not run)
+- [x] Document it: `/document user directory for systems` (2026-11-09; PRs welinc-auth #19, welinc-backend-vrms #48, welinc-web-vrms #51, welinc-workspace #16)
 
 ### S12. Suite seed accounts · planned · needs a decision · Beta
 One seed in welinc-auth for all three systems instead of three drifting copies: fixed ids every system links its own rows to (as VRMS already does with `SEED_IDS`), one person per email, and people chosen to test the shared login.

@@ -1,7 +1,7 @@
 # 0005. User directory for systems: a change feed written by Postgres
 
 **Date**: 2026-11-09
-**Status**: In Progress
+**Status**: Accepted
 **Scope row**: [S6. User directory for systems](../../../scope/_root/shared-services.md#s6-user-directory-for-systems--in-progress)
 **Builds contract sections**: [0001](../0001-shared-services-contract/index.md) section 9 (the directory), 10 (`/auth/users` back to admins only), 12 (the directory limit)
 
