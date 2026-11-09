@@ -104,20 +104,21 @@ Reasoning and options: see [rationale.md](rationale.md).
 
 People are listed in id order and written out in full (no generator), so any language can read the file and a diff shows exactly who changed. The 60 bulk mechanics are written out from today's generator output, unchanged.
 
-**Id ranges** (the number at the end of the id):
+**Ids** (the number at the end of the id). One scheme for every system, no exceptions (changed 2026-11-09 from the first draft, which kept the old VRMS ids). First digit is the system (1 VRMS, 2 VMMS, 3 BMS), second digit is the role in the catalog order, the last two count the people.
 
 | Range | Who |
 |---|---|
-| 1 to 5, 11 to 15, 20 | Today's people, kept (VRMS ticket data points at them) |
-| 101 to 199 | VRMS office |
-| 201 to 299 | VMMS office |
-| 301 to 399 | BMS office |
-| 401 to 499 | Multi system accounts |
-| 501 to 599 | Broken state accounts |
-| 900 | Reserved: S10 platform admin |
-| 1001 to 1999 | Bulk mechanics (1001 to 1060 today) |
-| 2001 to 2999 | BMS drivers |
-| 3001 to 3999 | BMS helpers |
+| 1101 to 1199, 1201 to 1299 | VRMS Admin, VRMS Chief Mechanic |
+| 2101 to 2199, 2201 to 2299, 2301 to 2399 | VMMS Admin, Operations, Chief Mechanic |
+| 3101 to 3199, 3201 to 3299, 3301 to 3399 | BMS Admin, Operations, Customer Support |
+| 3401 to 3499, 3501 to 3599 | BMS drivers, BMS helpers |
+| 4001 to 4099 | Multi system accounts |
+| 4101 to 4199 | Named mechanics |
+| 4201 to 4299 | Bulk mechanics |
+| 5001 to 5099 | Broken state accounts |
+| 9001 | Reserved: S10 platform admin |
+
+Seeds link to people by email or role, never by a typed id (see the guide, *Adding your own seeded data*). Every id changed in this revision, so an earlier database needs `seed -- --reset` once.
 
 ### Roster
 
@@ -125,78 +126,78 @@ Office accounts (`group: office`, `state: active`):
 
 | Id | Email | Name | Roles | Password |
 |---|---|---|---|---|
-| 2 | vrms.admin@ | Victor Ramos | VRMS Admin | admin1234 |
-| 101 | vrms.admin2@ | Teresita Aquino | VRMS Admin | admin1234 |
-| 102 | vrms.admin3@ | Gilbert Navarro | VRMS Admin | admin1234 |
-| 103 | vrms.admin4@ | Marissa Domingo | VRMS Admin | admin1234 |
-| 104 | vrms.admin5@ | Rodrigo Salazar | VRMS Admin | admin1234 |
-| 20 | vrms.chief@ | Ramon Villanueva | VRMS Chief Mechanic | chief1234 |
-| 111 | vrms.chief2@ | Alfredo Bautista | VRMS Chief Mechanic | chief1234 |
-| 112 | vrms.chief3@ | Nestor Pineda | VRMS Chief Mechanic | chief1234 |
-| 113 | vrms.chief4@ | Lorna Galang | VRMS Chief Mechanic | chief1234 |
-| 114 | vrms.chief5@ | Efren Lacson | VRMS Chief Mechanic | chief1234 |
-| 3 | vmms.admin@ | Valerio Mercado | VMMS Admin | admin1234 |
-| 201 | vmms.admin2@ | Cristina Velasco | VMMS Admin | admin1234 |
-| 202 | vmms.admin3@ | Dominic Sison | VMMS Admin | admin1234 |
-| 203 | vmms.admin4@ | Rowena Manalo | VMMS Admin | admin1234 |
-| 204 | vmms.admin5@ | Leonardo Abad | VMMS Admin | admin1234 |
-| 210 | vmms.ops@ | Oscar Ramos | VMMS Operations | ops1234 |
-| 211 | vmms.ops2@ | Imelda Fajardo | VMMS Operations | ops1234 |
-| 212 | vmms.ops3@ | Rafael Ilagan | VMMS Operations | ops1234 |
-| 213 | vmms.ops4@ | Josefina Dela Paz | VMMS Operations | ops1234 |
-| 214 | vmms.ops5@ | Noel Samonte | VMMS Operations | ops1234 |
-| 220 | vmms.chief@ | Ramon Garcia | VMMS Chief Mechanic | chief1234 |
-| 221 | vmms.chief2@ | Diego Martinez | VMMS Chief Mechanic | chief1234 |
-| 222 | vmms.chief3@ | Ariel Macaraeg | VMMS Chief Mechanic | chief1234 |
-| 223 | vmms.chief4@ | Benigno Tuazon | VMMS Chief Mechanic | chief1234 |
-| 224 | vmms.chief5@ | Celso Ramirez | VMMS Chief Mechanic | chief1234 |
-| 1 | bms.admin@ | Bernardo Mendoza | BMS Admin | admin1234 |
-| 301 | bms.admin2@ | Evangeline Cortez | BMS Admin | admin1234 |
-| 302 | bms.admin3@ | Patrick Yap | BMS Admin | admin1234 |
-| 303 | bms.admin4@ | Gemma Lualhati | BMS Admin | admin1234 |
-| 304 | bms.admin5@ | Raul Tan | BMS Admin | admin1234 |
-| 5 | bms.ops@ | Oscar Santos | BMS Operations | ops1234 |
-| 311 | bms.ops2@ | Melchor Agustin | BMS Operations | ops1234 |
-| 312 | bms.ops3@ | Liza Montemayor | BMS Operations | ops1234 |
-| 313 | bms.ops4@ | Hernani Cabral | BMS Operations | ops1234 |
-| 314 | bms.ops5@ | Susana Ventura | BMS Operations | ops1234 |
-| 4 | bms.cs@ | Clara Reyes | BMS Customer Support | cs1234 |
-| 321 | bms.cs2@ | Angelica Ong | BMS Customer Support | cs1234 |
-| 322 | bms.cs3@ | Mylene Serrano | BMS Customer Support | cs1234 |
-| 323 | bms.cs4@ | Jonathan Lim | BMS Customer Support | cs1234 |
-| 324 | bms.cs5@ | Kristine Valencia | BMS Customer Support | cs1234 |
+| 1101 | vrms.admin@ | Victor Ramos | VRMS Admin | admin1234 |
+| 1102 | vrms.admin2@ | Teresita Aquino | VRMS Admin | admin1234 |
+| 1103 | vrms.admin3@ | Gilbert Navarro | VRMS Admin | admin1234 |
+| 1104 | vrms.admin4@ | Marissa Domingo | VRMS Admin | admin1234 |
+| 1105 | vrms.admin5@ | Rodrigo Salazar | VRMS Admin | admin1234 |
+| 1201 | vrms.chief@ | Ramon Villanueva | VRMS Chief Mechanic | chief1234 |
+| 1202 | vrms.chief2@ | Alfredo Bautista | VRMS Chief Mechanic | chief1234 |
+| 1203 | vrms.chief3@ | Nestor Pineda | VRMS Chief Mechanic | chief1234 |
+| 1204 | vrms.chief4@ | Lorna Galang | VRMS Chief Mechanic | chief1234 |
+| 1205 | vrms.chief5@ | Efren Lacson | VRMS Chief Mechanic | chief1234 |
+| 2101 | vmms.admin@ | Valerio Mercado | VMMS Admin | admin1234 |
+| 2102 | vmms.admin2@ | Cristina Velasco | VMMS Admin | admin1234 |
+| 2103 | vmms.admin3@ | Dominic Sison | VMMS Admin | admin1234 |
+| 2104 | vmms.admin4@ | Rowena Manalo | VMMS Admin | admin1234 |
+| 2105 | vmms.admin5@ | Leonardo Abad | VMMS Admin | admin1234 |
+| 2201 | vmms.ops@ | Oscar Ramos | VMMS Operations | ops1234 |
+| 2202 | vmms.ops2@ | Imelda Fajardo | VMMS Operations | ops1234 |
+| 2203 | vmms.ops3@ | Rafael Ilagan | VMMS Operations | ops1234 |
+| 2204 | vmms.ops4@ | Josefina Dela Paz | VMMS Operations | ops1234 |
+| 2205 | vmms.ops5@ | Noel Samonte | VMMS Operations | ops1234 |
+| 2301 | vmms.chief@ | Ramon Garcia | VMMS Chief Mechanic | chief1234 |
+| 2302 | vmms.chief2@ | Diego Martinez | VMMS Chief Mechanic | chief1234 |
+| 2303 | vmms.chief3@ | Ariel Macaraeg | VMMS Chief Mechanic | chief1234 |
+| 2304 | vmms.chief4@ | Benigno Tuazon | VMMS Chief Mechanic | chief1234 |
+| 2305 | vmms.chief5@ | Celso Ramirez | VMMS Chief Mechanic | chief1234 |
+| 3101 | bms.admin@ | Bernardo Mendoza | BMS Admin | admin1234 |
+| 3102 | bms.admin2@ | Evangeline Cortez | BMS Admin | admin1234 |
+| 3103 | bms.admin3@ | Patrick Yap | BMS Admin | admin1234 |
+| 3104 | bms.admin4@ | Gemma Lualhati | BMS Admin | admin1234 |
+| 3105 | bms.admin5@ | Raul Tan | BMS Admin | admin1234 |
+| 3201 | bms.ops@ | Oscar Santos | BMS Operations | ops1234 |
+| 3202 | bms.ops2@ | Melchor Agustin | BMS Operations | ops1234 |
+| 3203 | bms.ops3@ | Liza Montemayor | BMS Operations | ops1234 |
+| 3204 | bms.ops4@ | Hernani Cabral | BMS Operations | ops1234 |
+| 3205 | bms.ops5@ | Susana Ventura | BMS Operations | ops1234 |
+| 3301 | bms.cs@ | Clara Reyes | BMS Customer Support | cs1234 |
+| 3302 | bms.cs2@ | Angelica Ong | BMS Customer Support | cs1234 |
+| 3303 | bms.cs3@ | Mylene Serrano | BMS Customer Support | cs1234 |
+| 3304 | bms.cs4@ | Jonathan Lim | BMS Customer Support | cs1234 |
+| 3305 | bms.cs5@ | Kristine Valencia | BMS Customer Support | cs1234 |
 
-Id 5 changes email from `ops.user@` to `bms.ops@`, and id 4 from `cs.user@` to `bms.cs@`. `ops.user@` and `cs.user@` no longer exist. VMMS's Oscar Ramos becomes `vmms.ops@`, and its chief mechanics `vmms.chiefmech@` and `vmms.chiefmech2@` become `vmms.chief@` and `vmms.chief2@`.
+The person `ops.user@` is now `bms.ops@`, and `cs.user@` is now `bms.cs@`. `ops.user@` and `cs.user@` no longer exist. VMMS's Oscar Ramos becomes `vmms.ops@`, and its chief mechanics `vmms.chiefmech@` and `vmms.chiefmech2@` become `vmms.chief@` and `vmms.chief2@`.
 
 Mechanics (`state: active`, password `mechanic1234`, roles VRMS Mechanic and VMMS Mechanic):
-- `group: mechanic`, ids 11 to 15: `mech.juan@` Juan dela Cruz, `mech.pedro@` Pedro Santos, `mech.rommel@` Rommel Cruz, `mech.isabel@` Isabel Reyes, `mech.carl@` Carl Santos (unchanged).
-- `group: bulk`, ids 1001 to 1060: today's 60, same names and emails.
+- `group: mechanic`, ids 4101 to 4105: `mech.juan@` Juan dela Cruz, `mech.pedro@` Pedro Santos, `mech.rommel@` Rommel Cruz, `mech.isabel@` Isabel Reyes, `mech.carl@` Carl Santos (unchanged).
+- `group: bulk`, ids 4201 to 4260: today's 60, same names and emails.
 
 Multi system accounts (`group: multi`, `state: active`):
 
 | Id | Email | Name | Roles | Password | Tests |
 |---|---|---|---|---|---|
-| 401 | multi.chief@ | Teodoro Manalastas | VRMS Chief Mechanic, VMMS Chief Mechanic | chief1234 | Same role in two systems |
-| 402 | multi.admin@ | Felicidad Roxas | VRMS Admin, VMMS Admin | admin1234 | The admin elsewhere protection in `user-scope.ts`; an S10 case |
-| 403 | multi.mixed@ | Arturo Pangilinan | VRMS Chief Mechanic, VMMS Operations | chief1234 | Different screens per system for one login |
-| 404 | multi.lead@ | Corazon Villareal | VRMS Chief Mechanic, VMMS Operations, BMS Operations | chief1234 | Launcher with three systems |
+| 4001 | multi.chief@ | Teodoro Manalastas | VRMS Chief Mechanic, VMMS Chief Mechanic | chief1234 | Same role in two systems |
+| 4002 | multi.admin@ | Felicidad Roxas | VRMS Admin, VMMS Admin | admin1234 | The admin elsewhere protection in `user-scope.ts`; an S10 case |
+| 4003 | multi.mixed@ | Arturo Pangilinan | VRMS Chief Mechanic, VMMS Operations | chief1234 | Different screens per system for one login |
+| 4004 | multi.lead@ | Corazon Villareal | VRMS Chief Mechanic, VMMS Operations, BMS Operations | chief1234 | Launcher with three systems |
 
 With the mechanics (two systems) and everyone else (one system), the S4 launcher has one, two and three system accounts. A portal login that names no system picks one in the fixed order of `PICK_ORDER` in `welinc-auth/src/auth/tokens/login-system.ts` (unchanged), so these accounts always land on the same system until S4 adds the launcher.
 
-The five VMMS chiefs (ids 220 to 224) replace VMMS's own `vmms.chiefmech@` and `vmms.chiefmech2@`. Today's welinc-auth seed has no VMMS chief at all.
+The five VMMS chiefs (ids 2301 to 2305) replace VMMS's own `vmms.chiefmech@` and `vmms.chiefmech2@`. Today's welinc-auth seed has no VMMS chief at all.
 
 Broken state accounts (`group: state`, password `mechanic1234`, roles VRMS Mechanic and VMMS Mechanic, so VRMS can test them now and VMMS after S11):
 
 | Id | Email | Name | State |
 |---|---|---|---|
-| 501 | state.locked@ | Lito Concepcion | locked |
-| 502 | state.deactivated@ | Nonoy Evangelista | deactivated |
-| 503 | state.unverified@ | Bong Rivera | unverified |
-| 504 | state.deleted@ | Junjun Marquez | deleted |
+| 5001 | state.locked@ | Lito Concepcion | locked |
+| 5002 | state.deactivated@ | Nonoy Evangelista | deactivated |
+| 5003 | state.unverified@ | Bong Rivera | unverified |
+| 5004 | state.deleted@ | Junjun Marquez | deleted |
 
 BMS crew (`state: active`): the 12 drivers and 20 helpers of `welinc-backend-bms/bms-dispatch-service/scripts/seed-crew.mjs` (branch `latest-bms-backend`, read 2026-11-09), in that file's order, with the same names and the same `contact` phones.
-- Drivers: `group: driver`, ids 2001 to 2012, BMS Driver, `driver1234`, emails `driver.<first>@` (`driver.ramon@` for Ramon Dela Cruz up to `driver.antonio@` for Antonio Flores).
-- Helpers: `group: helper`, ids 3001 to 3020, BMS Helper, `helper1234`, emails `helper.<first>@` (`helper.markanthony@` for Mark Anthony Cruz up to `helper.bryan@` for Bryan Galang). Helper n matches BMS `emp_id` `HLP-00n`, and driver n matches `DRV-00n`. The 32 first names are all different today; a later clash adds the last name (`helper.mark.cruz@`), and AC-2 refuses a duplicate email anyway.
+- Drivers: `group: driver`, ids 3401 to 3412, BMS Driver, `driver1234`, emails `driver.<first>@` (`driver.ramon@` for Ramon Dela Cruz up to `driver.antonio@` for Antonio Flores).
+- Helpers: `group: helper`, ids 3501 to 3520, BMS Helper, `helper1234`, emails `helper.<first>@` (`helper.markanthony@` for Mark Anthony Cruz up to `helper.bryan@` for Bryan Galang). Helper n matches BMS `emp_id` `HLP-00n`, and driver n matches `DRV-00n`. The 32 first names are all different today; a later clash adds the last name (`helper.mark.cruz@`), and AC-2 refuses a duplicate email anyway.
 
 Totals: 40 office, 5 named and 60 bulk mechanics, 4 multi, 4 state, 12 drivers and 20 helpers: 145 people.
 
@@ -270,7 +271,7 @@ Totals: 40 office, 5 named and 60 bulk mechanics, 4 multi, 4 state, 12 drivers a
 - Happy path: fresh database, `db:deploy`, `seed`. 145 users with the roster's roles; `vrms.chief@` signs in with `chief1234`; `seed:check` passes on the VRMS copy; the VRMS seed then runs and makes 77 `Mechanic` rows, none of the 2 inactive ones on a ticket. Verifies **AC-1**, **AC-3**, **AC-6**, **AC-13**, **AC-14**, **AC-15**
 - Rerun: `seed` twice; the second writes no `directory_changes` rows, keeps a hand made portal user and its sessions. Then activate `state.deactivated@` by hand and `seed` again: one `deactivated` row. Then `--reset`: no rows for seed ids, one `deleted` row for the hand made user. Verifies **AC-7**, **AC-8**, **AC-9**
 - Repair: lock `mech.juan@` with five wrong passwords and add a stray role by hand, then `seed`; Juan is unlocked with only his two Mechanic roles. Verifies **AC-5**, **AC-7**
-- Old database: a database seeded by today's seed, then `seed`; id 5 is now `bms.ops@` with one `updated` feed row; no duplicates. Verifies **AC-7**, **AC-8**
+- Old database: a database seeded before the id change (2026-11-09), then `seed`; it stops on an email conflict and writes nothing; `seed -- --reset` then gives 145 people on the new ids. Verifies **AC-7**, **AC-8**
 - Email conflict: create a user `bms.cs2@welinc.com` in the portal first, then `seed`; exits 1 naming that email, nothing written; `--reset` then succeeds. Swap the emails of ids 321 and 322 in the manifest; the seed refuses. Verifies **AC-7**, **AC-9**
 - States: `state.locked@` gets 403 with `isLocked`, `state.deactivated@` and `state.deleted@` get 401 "Invalid credentials", `state.unverified@` signs in; VRMS shows Lito active and Nonoy and Junjun inactive. Verifies **AC-5**, **AC-15**
 - Bad manifest: a duplicate email, a role `VRMS DRIVER`, two VRMS roles on one person, and an admin in three systems in one edit; the seed lists all four problems and writes nothing. Verifies **AC-2**
@@ -283,7 +284,7 @@ Totals: 40 office, 5 named and 60 bulk mechanics, 4 multi, 4 state, 12 drivers a
 Tracer Bullet: the first slice runs the whole path (manifest, checks, upsert, VRMS copy and loader, copy check) with today's people only, so the pipeline is proven before the roster grows.
 
 1. **Thin thread.** welinc-auth: `people.json` with today's 71 people exactly as seeded now (same ids, emails, names, roles, passwords, all `active`), a typed loader and the AC-2 checks (pure functions with unit tests), the environment guard first in `main()` with the pool moved inside it, the upsert by id with exact role rows and the email conflict check in one transaction, `seedClients` after it, delete `shared-ids.ts`, `seed:check` script, `SEED_ALLOW` in `.env.example`, the `.gitattributes` line. backend-vrms: copy `people.json` and its `.gitattributes` line, rewrite `shared-ids.ts` as the loader with the AC-14 mapping, the mechanics seed derived from roles and state with the `role` column, and the active only filter in `repairs.seed.ts`. Run both seeds twice on a local database and confirm no feed rows on the second. Satisfies **AC-1**, **AC-2**, **AC-7**, **AC-8**, **AC-10**, **AC-11**, **AC-13**, **AC-14**, **AC-15**
-2. **The full roster.** Add every person in *Roster*, rename ids 4 and 5, the per role passwords (VRMS chief to `chief1234`), the four state accounts with their field values, the crew with phones. Copy the new file into backend-vrms (`seed:check` passes); update the VRMS printed login lines. Satisfies **AC-3**, **AC-4**, **AC-5**, **AC-6**, **AC-15**
+2. **The full roster.** Add every person in *Roster*, rename `ops.user@` and `cs.user@`, the per role passwords (VRMS chief to `chief1234`), the four state accounts with their field values, the crew with phones. Copy the new file into backend-vrms (`seed:check` passes); update the VRMS printed login lines. Satisfies **AC-3**, **AC-4**, **AC-5**, **AC-6**, **AC-15**
 3. **Reset, staging and output.** `--reset` with its ordered wipe and both guards; skipping state accounts under `SEED_ALLOW=staging`; the printed table and counts. Satisfies **AC-9**, **AC-10**, **AC-12**
 4. **The guide.** Write `docs/integration/seed-accounts.md` per *Guide content*; point the README and setup guide at it. Lint, build and test in welinc-auth and backend-vrms. Satisfies **AC-16**
 
@@ -292,7 +293,7 @@ Tracer Bullet: the first slice runs the whole path (manifest, checks, upsert, VR
 **Strategy**: no schema migration. A data change applied by rerunning the seed.
 **Phases**:
 1. Merge welinc-auth and backend-vrms together (the VRMS loader needs its copy of the new file).
-2. Each developer runs `npm run seed` in welinc-auth (upsert renames ids 4 and 5 in place), then reseeds VRMS. If the email conflict check refuses (a hand made account took a new seed email), run `--reset`.
+2. Each developer runs `npm run seed` in welinc-auth then reseeds VRMS. Because every id changed on 2026-11-09, an older local database stops on an email conflict: run `npm run seed -- --reset` there once.
 **Rollback**: revert both merges, then `npm run seed -- --reset` with the old seed restores today's people.
 **Risks**: VRMS seed data refers to ids, so it survives, but anyone used to `ops.user@`, `cs.user@` or the VRMS chief's `mechanic1234` will fail to sign in until they read the guide. The other groups' own seeds keep the old emails until S11, which is accepted: they don't use welinc-auth's accounts yet.
 
@@ -318,7 +319,7 @@ Tracer Bullet: the first slice runs the whole path (manifest, checks, upsert, VR
 ## Follow-up
 
 - [ ] S11: the migration guide links to `docs/integration/seed-accounts.md` step 6, and each group's move includes switching its seed.
-- [ ] S10: add `suite.admin@welinc.com` (id 900) to the manifest when the platform admin exists.
+- [ ] S10: add `suite.admin@welinc.com` (id 9001) to the manifest when the platform admin exists.
 - [ ] S13: decide the sign in rule for unverified accounts; `state.unverified@` is the test account.
 - [ ] Hosting (spec 0008): decide whether staging seed passwords differ from the public ones, and set `SEED_ALLOW=staging` only there.
 - [ ] `/sync`: update `welinc-auth/AGENTS.md` (`prisma/seeds/` row, `seed:check`, `--reset`, `SEED_ALLOW`) and `welinc-backend-vrms/AGENTS.md` (the seed reads its manifest copy).

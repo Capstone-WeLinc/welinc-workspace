@@ -6,11 +6,11 @@ Run the database steps on a throwaway database so your real accounts stay as the
 ## Commands
 - [x] `npm run seed` on a fresh database → 145 users, the roster's roles, printed table grouped by system → AC-1, AC-3, AC-12 (done 2026-11-09)
 - [x] `npm run seed` again → 0 new `directory_changes` rows → AC-8 (done 2026-11-09)
-- [x] A database seeded by the old seed (71 people), then the new `seed` → id 4 is `bms.cs@` and id 5 `bms.ops@`, one `updated` row each, 74 `created`, 145 users, no duplicates → AC-7, AC-8 (done 2026-11-09)
+- [x] A database seeded by the old seed (71 people), then the new `seed` → `bms.cs@` and `bms.ops@` are renamed in place, one `updated` row each, 74 `created`, 145 users, no duplicates → AC-7, AC-8 (done 2026-11-09 on the first ids; since the id change an older database stops on an email conflict and needs `seed -- --reset`, which the reset step covers)
 - [x] Add a hand made user with a role and a live session, then `seed` → user and session still there, 0 feed rows → AC-7 (done 2026-11-09)
 - [x] Lock `mech.juan@` and add a stray `BMS HELPER` role by hand, then `seed` → Juan has 0 attempts, no lock, only VRMS and VMMS Mechanic → AC-5, AC-7 (done 2026-11-09)
 - [x] Set `state.deactivated@` active by hand, then `seed` → one `deactivated` row for that person → AC-8 (done 2026-11-09)
-- [x] Delete id 321 and give a hand made user `bms.cs2@welinc.com`, then `seed` → exits 1 naming that email and both ids, nothing written → AC-7 (done 2026-11-09)
+- [x] Delete the id of `bms.cs2@` and give a hand made user `bms.cs2@welinc.com`, then `seed` → exits 1 naming that email and both ids, nothing written → AC-7 (done 2026-11-09)
 - [x] `seed -- --reset` with a hand made user present → one `deleted` row for that user, none for the 145 seed people, sessions gone → AC-8, AC-9 (done 2026-11-09, after the fix in `a0ef7f7`)
 - [x] `NODE_ENV=production npm run seed` and with `SEED_ALLOW=yes` → the production refusal, before any connection → AC-10 (done 2026-11-09)
 - [x] `NODE_ENV=production SEED_ALLOW=staging npm run seed` → 141 people applied, "Broken state accounts: skipped" → AC-10 (done 2026-11-09)
