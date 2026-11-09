@@ -156,6 +156,7 @@ Login activity and account change history from welinc-auth, so VMMS (`me/login-a
 ### S8. Profile extras · planned · needs a decision · Beta
 The profile routes the other apps already call: phone verification (VMMS), verify password before a sensitive action and an account deletion request (BMS).
 **Done when:** phone numbers can be verified by code, a sensitive action can ask for the password again, a user can request deletion and an admin of each of their systems sees it, and every one of these events is logged.
+- Note (2026-11-09, replan, from spec 0005 follow-up): add a phone verified column in welinc-auth, put it in the `directory_changes` snapshot (a migration that changes the trigger) and map it to `phoneVerified`. If a deletion request erases personal data, it must also clear that person's feed snapshots, which otherwise keep names, emails and phones forever.
 - [ ] Design it (spec): `/architect profile extras`
 
 ### S13. Email verification · planned · needs a decision
@@ -173,6 +174,7 @@ The move itself: their users merged into welinc-auth by email, their auth copies
 - Note (2026-11-08, replan): from spec 0002. The migration guide tells each group to copy `welinc-backend-vrms/src/auth/verify/`, make their client key with `keys:client`, and move to Node 24 (`welinc-backend-vmms-analytics-ai` pins Node 20, end of life since April 2026). From spec 0001: if `welinc-mobile-bms` is still in use, it becomes a `bms-mobile` client like `vmms-mobile`.
 - Note (2026-11-08): BMS keeps the mobile app, but for different users than its web app. They likely haven't started building it, and you asked them on 2026-11-08 who will use it. If they are staff, it's a `bms-mobile` client plus a role in S5. If they are customers, their login is a separate suite decision that has to be made before this row's guide. The question is in `docs/_private/vrms/shared-services-questions.md`.
 - Note (2026-11-09, from spec 0004 follow-up): the migration guide tells VMMS to drop its client side `getMobileAccessRole` check once `vmms-mobile` moves (welinc-auth now refuses it with `APP_NOT_ALLOWED`), and BMS to read role names from `GET /auth/systems`. Still to confirm with VMMS and BMS: BMS Driver and Helper, one role per person, any role they plan before the deadline, and whether the VMMS Admin still manages VMMS users.
+- Note (2026-11-09, replan, from spec 0005 follow-up): the migration guide points VMMS and BMS at the VRMS directory reader as the one to copy (`welinc-backend-vrms/src/modules/vrms/directory/`: `directory_sync_state`, the lease, stop on failure), and the BMS gateway moves off `users`, `user_roles` and `user_activity_logs` onto `/auth/directory/*`.
 - [ ] Design it (spec): `/architect move VMMS and BMS onto the shared services`
 
 ## Admin
