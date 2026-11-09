@@ -28,7 +28,7 @@ _These are recommendations to keep the build orderly, not requirements. Skip any
 | S3 | Sessions: refresh and logout, web and mobile | Core | done |
 | S5 | Roles per system | Core | done |
 | S6 | User directory for systems | Core | done |
-| S12 | Suite seed accounts | Core | planned |
+| S12 | Suite seed accounts | Core | in-progress |
 | S4 | App initiated login and launcher | Login | planned |
 | S9 | Gateway for the whole suite | Gateway | planned |
 | S7 | Account activity and audit | Account | planned |
@@ -120,13 +120,23 @@ Systems need names, emails and roles for people their records point to (VMMS sch
 - [x] Review it (fresh model): `/check review user directory for systems` (skipped by choice, 2026-11-09; not run)
 - [x] Document it: `/document user directory for systems` (2026-11-09; PRs welinc-auth #19, welinc-backend-vrms #48, welinc-web-vrms #51, welinc-workspace #16)
 
-### S12. Suite seed accounts · planned · needs a decision · Beta
+### S12. Suite seed accounts · in-progress · Beta
+spec [0006](../../specs/_root/0006-suite-seed-accounts/index.md) · code in `welinc-auth/prisma/seeds/`, `welinc-backend-vrms/prisma/seeds/`, `docs/integration/seed-accounts.md`
+
 One seed in welinc-auth for all three systems instead of three drifting copies: fixed ids every system links its own rows to (as VRMS already does with `SEED_IDS`), one person per email, and people chosen to test the shared login.
 **Done when:** each system's roles have at least one seed person; there are accounts holding one, two and three systems for the launcher; a locked, a deactivated and a never verified account exist for testing; the platform admin from S10 has a seed account once S10 is built; no email means two different people across systems; and each system's own seed links to the shared ids instead of creating users.
 - Note (2026-11-08, replan): from specs 0001 and 0002. This row gets its own spec, and it must keep and extend spec 0002's `OAuthClient` seed, creating the section 4 clients alongside the people.
 - Note (2026-11-07): fixes the drift listed above (`ops.user` and the VMMS chief mechanics). Keep `@welinc.com` addresses for seeds. The seed writes users straight to the database, so no email check applies to them. Real users may use any email whose domain can receive mail, such as Gmail.
 - Note (2026-11-09, from spec 0004 follow-up): the seed needs people for every role in the catalog, Driver and Helper (BMS) included, one role per person where a system says so.
-- [ ] Design it (spec): `/architect suite seed accounts` (or inside the S1 spec)
+- [x] Design it (spec): `/architect suite seed accounts` (or inside the S1 spec)
+- Note (2026-11-09): spec 0006 decided one `people.json` manifest in welinc-auth (145 people, fixed ids), copied by each system and checked with `seed:check`; an upsert seed with a local only `--reset`, refused on production unless `SEED_ALLOW=staging`; emails `<system>.<role>@` (`ops.user@` becomes `bms.ops@` and `vmms.ops@`, `cs.user@` becomes `bms.cs@`); about 5 people per office role, all 32 BMS crew, four multi system and four broken state accounts; passwords per role (VRMS chief now `chief1234`). The guide for VMMS and BMS is written now; their seeds switch in S11.
+- [ ] Build it: `/develop suite seed accounts`
+  - [ ] Thin thread: manifest with today's 71 people, checks, guard, upsert, `seed:check`, VRMS copy and loader · AC-1, AC-2, AC-7, AC-8, AC-10, AC-11, AC-13 to AC-15
+  - [ ] Full roster: every person, renamed emails, passwords per role, state accounts, crew · AC-3 to AC-6, AC-15
+  - [ ] Reset, staging and output: `--reset` with both guards, no state accounts on staging, printed table · AC-9, AC-10, AC-12
+  - [ ] Guide: `docs/integration/seed-accounts.md`, README and setup guide pointers · AC-16
+- [ ] Verify it: `/check verify suite seed accounts`
+- [ ] Test it: `/test suite seed accounts`
 
 ## Login
 
