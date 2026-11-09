@@ -29,7 +29,7 @@ _These are recommendations to keep the build orderly, not requirements. Skip any
 | S5 | Roles per system | Core | done |
 | S6 | User directory for systems | Core | done |
 | S12 | Suite seed accounts | Core | done |
-| S4 | App initiated login and launcher | Login | planned |
+| S4 | App initiated login and launcher | Login | done |
 | S9 | Gateway for the whole suite | Gateway | planned |
 | S7 | Account activity and audit | Account | planned |
 | S8 | Profile extras | Account | planned |
@@ -140,11 +140,25 @@ One seed in welinc-auth for all three systems instead of three drifting copies: 
 
 ## Login
 
-### S4. App initiated login and launcher · planned · needs a decision
+### S4. App initiated login and launcher · done
+spec [0007](../../specs/_root/0007-app-initiated-login-launcher/index.md) · code in `welinc-auth/src/auth/sessions/` (launcher answer), `prisma/catalog/`, `welinc-web-portal` (launcher, Tailwind v4 and shadcn), `welinc-backend-vrms` and `welinc-web-vrms` (Switch system), `docs/integration/web-login.md`
 Replaces VRMS feature 60. Each app sends people to the portal with a return address and gets them back through a one time code it exchanges on its backend, not `?token=` in the URL. The portal shows a launcher of your systems only when opened directly (skipped when you have one), and each app gets a Switch system link.
 **Done when:** a deep link into any system survives login; tokens never appear in a URL; return addresses are checked against an allow list; the launcher lists only the systems you hold; one system users never see it; Switch system and logout work from every app; no new role or permission is created; and VMMS and BMS can use it.
 - Note (2026-11-07): chosen over the portal side picker (feature 60 as planned) and over separate login pages per system. Follows the app launcher pattern of Okta and Microsoft My Apps.
-- [ ] Design it (spec): `/architect app initiated login and launcher`
+- Note (2026-11-10): built. One addition the spec didn't name a source for: `/auth/sso`'s 403 `NO_SYSTEM_ACCESS` carries `user: { email }` (your own), so the no access state can show who is signed in (AC-19). Recorded in contract 0001 section 10; spec 0007's AC-1 and AC-19 owe that line through `/architect`.
+- Note (2026-11-10, replan, from spec 0007 follow up): owed around the merge: record the login hero exception (gradient and glows on the portal login only) in `design.md`, a shared file, so a workspace PR; and tell VMMS and BMS that the launcher lists their system, the guide is `docs/integration/web-login.md`, and their web apps should drop `?token=` intake. This row also delivers VRMS feature 50, dropped on 2026-11-10.
+- Note (2026-11-09): spec 0007 decided the Quiet workspace launcher (greeting, cards in the order BMS, VMMS, VRMS with description and your roles, a "You're here" tag from Switch system), `user.systems` in every grant answer so apps know when to show Switch system, no flag for systems not yet on the shared login (VMMS and BMS adjust in S11), sign out everywhere with a confirm, focus checks on the launcher, and the portal moved to Tailwind v4 and shadcn with the login kept as it looks today (only its states improve).
+- [x] Design it (spec): `/architect app initiated login and launcher` (2026-11-09, cross checked on another model, 9 gaps fixed)
+- [x] Build it: `/develop app initiated login and launcher` (2026-11-10, branch `feat/app-initiated-login-launcher` in welinc-auth, welinc-web-portal, welinc-backend-vrms and welinc-web-vrms)
+  - [x] welinc-auth launcher answer: catalog `description`, `/auth/sso` and `/auth/login` bodies, `system` dropped from login, `/auth/sso` limit, `user.systems` in grants · AC-1 to AC-7
+  - [x] The thin thread: portal routing rules and a plain launcher with Sign out, then Switch system in VRMS and the deep link check · AC-8 to AC-14, AC-17
+  - [x] Portal on Tailwind v4 and shadcn, login and forgot password states · AC-21, AC-22
+  - [x] The launcher finished: layout, account menu, four states, focus checks, responsive and keyboard · AC-15 to AC-20
+  - [x] Contract 0001 amendment and `docs/integration/web-login.md` · AC-23, AC-24
+- [x] Verify it: `/check verify app initiated login and launcher` (2026-11-10, all 40 steps passed, live)
+- [x] Test it: `/test app initiated login and launcher` (2026-11-10, gap tests in welinc-auth and the portal, all S4 suites green)
+- [x] Review it (fresh model): `/check review app initiated login and launcher` (skipped by choice, 2026-11-10; not run)
+- [ ] Document it: `/document app initiated login and launcher`
 - [ ] Polish it (optional, ask first): `web-design-guidelines` · `break-ui` (one, two and three systems, long names)
 
 ## Gateway
@@ -153,6 +167,7 @@ Replaces VRMS feature 60. Each app sends people to the portal with a return addr
 One gateway that routes every system and analytics service, with a port map that has no clashes, and a decision on where the gateway config lives (today inside `welinc-auth`).
 **Done when:** every system's API and analytics service is reachable through the gateway, each service has its own port in the README repos table, CORS and upload limits are set per route, and the config lives where the contract says.
 - Note (2026-11-09): each group clones and runs only the shared repos plus its own system; only the shared services owner runs everything. Integration with another system goes through the staging deployment (spec 0008), or a stub of the contract until staging exists, never another group's local clone. So the gateway must start and serve its routes with any system missing: keep today's pattern (`resolver 127.0.0.11` and a variable in `proxy_pass`) on every new route, so an absent system answers 502 on its own routes only. Also give `scripts/clone-all.sh` a group option (`clone-all.sh vmms` clones the shared repos plus that system) and say so in the setup guide.
+- Note (2026-11-10, replan, from spec 0007 follow up): include the CORS list and routes for the `/vmms` and `/bms` session routes, so the last step of `docs/integration/web-login.md` works.
 - [ ] Design it (spec): `/architect gateway for the whole suite`
 - [ ] Polish it (optional, ask first): `docker-patterns`
 
@@ -188,6 +203,7 @@ The move itself: their users merged into welinc-auth by email, their auth copies
 - Note (2026-11-09, from spec 0004 follow-up): the migration guide tells VMMS to drop its client side `getMobileAccessRole` check once `vmms-mobile` moves (welinc-auth now refuses it with `APP_NOT_ALLOWED`), and BMS to read role names from `GET /auth/systems`. Still to confirm with VMMS and BMS: BMS Driver and Helper, one role per person, any role they plan before the deadline, and whether the VMMS Admin still manages VMMS users.
 - Note (2026-11-09, replan, from spec 0005 follow-up): the migration guide points VMMS and BMS at the VRMS directory reader as the one to copy (`welinc-backend-vrms/src/modules/vrms/directory/`: `directory_sync_state`, the lease, stop on failure), and the BMS gateway moves off `users`, `user_roles` and `user_activity_logs` onto `/auth/directory/*`.
 - Note (2026-11-09, replan, from spec 0006 follow-up): the migration guide links to `docs/integration/seed-accounts.md` step 6, and each group's move includes switching its own seed to a copy of `people.json` (checked with `seed:check`).
+- Note (2026-11-10, replan, from spec 0007 follow up): the migration guide links to `docs/integration/web-login.md` instead of repeating it.
 - [ ] Design it (spec): `/architect move VMMS and BMS onto the shared services`
 
 ## Admin
@@ -206,6 +222,7 @@ Replaces VRMS feature 61 with the same scope (the full model, chosen 2026-11-07)
 - Note (2026-11-08, leaning, may change in the spec): **permissions edited centrally, optional per system.** The system admins and the superadmins are the same IT/operations team, so the role to permission matrix moves to suite settings and only a superadmin edits it (like Auth0's RBAC). Each system's code still declares which permissions exist (`vrms.ticket.view_all`) and still runs the check itself, reading its matrix from welinc-auth and keeping a copy that refreshes on change; permissions don't go in the token. VRMS moves first, and its settings page stops editing the matrix. BMS and VMMS may keep checking roles in their own code and join later. Every matrix edit is logged and alerts that system's admins. Open: where the suite settings screen lives (the portal is the likely home). S5 only leaves room for this in `/auth/systems`.
 - Note (2026-11-09, from spec 0004 follow-up): build on the `isSystemAdmin` flag and `GET /auth/systems` from S5 (additive permissions field later). Close the self grant hole with the temporary access exception here.
 - Note (2026-11-09, replan, from spec 0006 follow-up): add `suite.admin@welinc.com` (id 9001) to the `people.json` manifest once the platform admin exists, which also closes the last S12 Done when item.
+- Note (2026-11-10, replan, from spec 0007 follow up): the portal admin entry goes in the launcher's top bar.
 - [ ] Design it (spec): `/architect suite admin model`
 - [ ] Polish it (optional, ask first): `web-design-guidelines` (access report)
 

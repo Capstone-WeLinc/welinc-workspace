@@ -299,6 +299,7 @@ WL-205. A clickable timeline inside the ticket view, linked from My Repairs.
 **Done when:** the timeline is built from the audit trail, entries expand to show details and files, it filters by event type, and mechanics see only their own tickets' history.
 - Note (2026-10-29): filter `COST_UPDATE` events out of the mechanic view, since mechanics must never see costs (spec 0010).
 - Note (2026-11-04, replan): from spec 0021. Filter by the seven categories from `GET audit-logs/catalog`. Cost events are already hidden for anyone without `ticket.costs.view` (`hiddenAuditEvents`), so the mechanic rule above is covered. Share the event renderer with feature 64.
+- Note (2026-11-10, replan): from spec 0023. Render its four new checklist event types with the shared event renderer.
 - [ ] Build it: `/develop repair history timeline`
 - [ ] Polish it (optional, ask first): `impeccable` · `web-design-guidelines` · `break-ui` (long timelines, events with long notes)
 

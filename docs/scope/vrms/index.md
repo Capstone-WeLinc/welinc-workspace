@@ -11,16 +11,16 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 
 **Shared services:** the auth, portal and gateway rework the other groups need lives in the suite epic [_root/shared-services.md](../_root/shared-services.md) (rows S1 to S13, from 2026-11-07; S1 to S3 done on 2026-11-08, S5, S6 and S12 on 2026-11-09). It replaces features 60 and 61 and takes the auth and gateway half of feature 56. It started after feature 65 task 10; the verify runs for 58 and 65 are still open.
 
-**Integration:** the meeting with VMMS and BMS is planned for after the first week of November 2026 (features 55 and 56). Work tagged "feature 56 may change it" is safe to build before then, but expect changes after.
+**Integration:** direct talks with each group replaced the meeting with VMMS and BMS (decided 2026-11-10, features 55 and 56). Work tagged "feature 56 may change it" is safe to build, but expect changes once feature 56 is designed.
 
 ## Epics
 
 | Epic | File | Status |
 |---|---|---|
 | Foundations | [foundations.md](foundations.md) | 8 existing, 7 done, 1 planned |
-| UI refresh | [ui-refresh.md](ui-refresh.md) | 3 done, 6 in-progress, 3 planned |
+| UI refresh | [ui-refresh.md](ui-refresh.md) | 3 done, 6 in-progress, 2 planned, 1 dropped |
 | Repair workflow | [repair-workflow.md](repair-workflow.md) | 12 done, 1 in-progress, 9 planned, 1 dropped |
-| Platform | [platform.md](platform.md) | 2 in-progress, 6 planned, 2 dropped |
+| Platform | [platform.md](platform.md) | 1 done, 1 in-progress, 6 planned, 2 dropped |
 | Outsourcing | [outsourcing.md](outsourcing.md) | 4 planned |
 | Operations | [operations.md](operations.md) | 5 planned, 1 dropped |
 | Reports & AI | [reports-ai.md](reports-ai.md) | 4 planned |
@@ -45,7 +45,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 6 | Design system & UI foundation | Foundation | done |
 | 7 | Language support (English + Filipino) | Foundation | planned |
 | 52 | Configurable settings & modules | Foundation | done |
-| 55 | Integration kickoff prep | Integration | in-progress |
+| 55 | Integration kickoff prep | Integration | done |
 | 60 | Portal system picker for shared accounts | Integration | dropped |
 | 56 | Cross group integration contract | Integration | planned |
 | 61 | Suite admin model | Integration | dropped |
@@ -57,7 +57,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 13 | History & audit log pages | UI refresh | done |
 | 14 | User management page | UI refresh | in-progress |
 | 15 | Knowledge base page | UI refresh | in-progress |
-| 50 | Portal on the design system | UI refresh | planned |
+| 50 | Portal on the design system | UI refresh | dropped |
 | 51 | Analytics page | UI refresh | planned |
 | 64 | Audit log page redesign | UI refresh | planned |
 | 65 | Ticket detail redesign | UI refresh | in-progress |

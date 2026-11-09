@@ -112,17 +112,19 @@ spec [0007](../../specs/vrms/0007-knowledge-base-fix-library/index.md) · code i
   - [x] Suggestions and sweep: grouping, create from group with backfill, mechanic suggestions, tests, axe at 375px and 1280px (AC-32 to AC-36, AC-39)
 - Note (2026-10-25): built on `feat/knowledge-base-refresh` in welinc-auth, welinc-backend-vrms and welinc-web-vrms (not pushed). 73 backend tests pass (29 new); lint, typecheck and build are green in the touched files and repos; axe finds nothing at 375px and 1280px for admin, chief mechanic and mechanic. The local auth database has no migration history (built with `db push`), so its `CHIEF_MECHANIC` migration was applied with `prisma db execute`. One call made during the build: issues linked from a suggestion group are linked even when the new entry is saved as a draft (history), while the picker and the ticket link stay Active only. Verify steps in the spec's `verify.md`.
 - Note (2026-10-25): follow up, not part of spec 0007. The ticket's Known fix checklist can only be ticked today. You want it to stay a helper, so each ticket should let you add, remove and reword its own copied steps without changing the knowledge base entry. Needs a small spec (`/architect per ticket checklist edits`) once feature 15 is verified.
+- Note (2026-11-10, replan): follow ups from specs 0023 and 0024, none urgent. Check that typical parts and hours are easy to find on the entry page, since the ticket no longer shows them. Move the entry editor's Move up and Move down (`EntryFormSections.tsx`) to the same drag rows the ticket uses, so the two step editors match. Once real data exists, show how often an entry's steps were added to or reworded on tickets, and let a knowledge editor adopt them.
 - [x] Verify it: `/check verify knowledge base refresh`
 - [ ] Test it: `/test knowledge base refresh` (deferred 2026-11-02: the UI may be redone, so tests wait until it settles)
 - [ ] Polish it (optional, ask first): `impeccable` · `web-design-guidelines` · `break-ui` (long entry names and steps, empty library, many suggestions)
 
-### 50. Portal on the design system · planned · needs a decision · from spec 0001
+### 50. Portal on the design system · dropped · replaced by suite S4 · from spec 0001
 Copy the spec 0001 tokens and shared components into `welinc-web-portal` (already React 19, still Tailwind 3), so the SSO portal matches web-vrms. The portal is a shared repo, so agree on it with the other groups first.
 **Done when:** the portal runs Tailwind v4, uses only theme tokens, and its login and app picker use the shared components.
 - [ ] Design it (spec): `/architect portal on the design system`
 - [ ] Polish it (optional, ask first): `impeccable` · `web-design-guidelines`
 - Note (2026-10-22): the shared login, OTP and forgot password screens live here, moved from feature 9. Restyling them changes the login for every subsystem.
 - Note (2026-10-30): the portal has no app picker yet (it redirects straight to one system). Feature 60 builds it; restyle the picker here only once it exists.
+- Note (2026-11-10, replan): dropped, replaced by [S4. App initiated login and launcher](../_root/shared-services.md#s4-app-initiated-login-and-launcher--in-progress). Its branch moves the portal to Tailwind v4, shadcn and tokens with a lint rule against raw colors, and builds the launcher. The login and forgot password keep their gradient and glows on purpose (spec 0007 AC-22), so no further restyle is planned. Kept here for history.
 
 ### 51. Analytics page · planned · needs a decision · Facade
 Analytics charts on the new tokens. Split from feature 15.
@@ -137,6 +139,7 @@ You find the current Audit log page ugly, and want it redone. It should be redes
 **Done when:** the page has a new layout you signed off on, its filters come from `GET /vrms/repairs/audit-logs/catalog` (category chips, not 14 flat type chips), the busy step tick and photo rows don't bury status and cost changes, and it reads well at 375px and 1280px in its empty, loading and error states.
 - Note (2026-11-04): build after feature 24 (spec 0021) ships its categories, filters and catalog. Decide the design source in the spec. Consider sharing the event renderer with feature 32 (the per ticket timeline).
 - Note (2026-11-08, replan): from spec 0024. Group one checklist save's step rows in Activity (a save can write up to about 40 rows, spec 0023).
+- Note (2026-11-10, replan): from spec 0023. Include its four new checklist event types in the Checklist chip.
 - [ ] Design it (spec): `/architect audit log page redesign`
 - [ ] Polish it (optional, ask first): `impeccable` · `web-design-guidelines` · `break-ui` (long actor names, many step ticks, long remarks, empty filters)
 

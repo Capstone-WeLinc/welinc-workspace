@@ -28,12 +28,13 @@ welinc-auth stays the only owner of accounts and the only service that can sign 
 |---|---|---|
 | Token audience | One token per system: `aud` is that system, `roles` holds only that system's roles | S2, S5 |
 | Signing | ES256 (elliptic curve), keys published at a JWKS address (a public list of the keys that verify tokens) | S2 |
-| Web login | Code exchange on each system's backend (OAuth authorization code with PKCE), refresh token in an HttpOnly cookie on the shared domain, access token in memory only | S3 (spec 0003; S4 adds the launcher) |
+| Web login | Code exchange on each system's backend (OAuth authorization code with PKCE), refresh token in an HttpOnly cookie on the shared domain, access token in memory only | S3 (spec 0003) |
 | Web session | 30 minutes without user input in any app, or 12 hours since login, whichever comes first; idle is tracked on the server through a light activity ping | S3 |
 | Mobile login | Native login screen in the app, calling its own welinc-auth route (`/auth/mobile/login`) as a first party mobile client | S3 |
 | Mobile session | 7 days rolling (each refresh extends it) | S3 |
 | Revocation | Each backend checks the session at most 30 s stale; deactivation and logout also revoke refresh tokens, so a backend that skipped the check still loses access when the 15 minute access token runs out. The automatic lock blocks new logins only (spec 0003) | S3 |
 | Service identity | Signed client assertion (`private_key_jwt`): each backend proves itself with its own ES256 key | S2 |
+| Launcher | The portal lists the systems you hold when you open it yourself and hold two or more; with one it sends you straight in. Each app's Switch system opens `<portal>/?from=<SYS>` and shows only with two or more systems | S4 (spec 0007) |
 | User directory | Batch lookup by id plus a cursor change feed; a thin webhook nudge is reserved for later | S6 |
 | Gateway paths | Each service serves under its own prefix; the gateway forwards without rewriting | S9 |
 | Gateway config | Workspace repo `infra/gateway/`, for local and hosted (as spec 0008 planned), out of `welinc-auth` | S9 |
@@ -199,9 +200,15 @@ User grants answer:
   "refresh_token": "…", "sid": "uuid",
   "session_expires_at": "ISO 8601, the earlier of the idle and absolute cutoffs",
   "session_absolute_expires_at": "ISO 8601, web sessions only: login + 12 hours, the refresh cookie's max age (spec 0003)",
-  "user": { "id": "uuid", "name": "…", "email": "…", "roles": [{ "role": "ADMIN", "system": "VRMS" }] }
+  "user": {
+    "id": "uuid", "name": "…", "email": "…",
+    "roles": [{ "role": "ADMIN", "system": "VRMS" }],
+    "systems": ["VMMS", "VRMS"]
+  }
 }
 ```
+
+`user.systems` (spec 0007, S4) lists every system the user holds a role in, in the order BMS, VMMS, VRMS, read fresh at each grant. It decides only whether an app shows Switch system; access is still decided by `roles` and every grant. It is never put in a token. Clients ignore fields in `user` they don't know, so welinc-auth may add more.
 
 The client credentials grant answers `{ access_token, token_type, expires_in, scope }`, with no refresh token. The system backend's own routes (section 7) take `name` and `roles` from this `user` object; tokens never carry a name.
 
@@ -272,7 +279,7 @@ Host only cookies keep staging and production apart: `staging-api.<domain>` neve
 |---|---|---|---|---|
 | `/<sys>/session/start` | GET | `return` (path) | sets `<sys>_login`, 302 to `/auth/authorize` | none |
 | `/<sys>/session/callback` | GET | `code` and `state`, or `error` and `state` | sets `<sys>_rt`, 302 to the app | 302 to the portal with an error code (above) |
-| `/<sys>/session/refresh` | POST | the `<sys>_rt` cookie | `{ accessToken, expiresIn, sessionExpiresAt, sessionAbsoluteExpiresAt, user: { id, name, email, roles } }` from the `/auth/token` answer (`sessionAbsoluteExpiresAt` is the 12 hour end, so the app can tell it from the idle cutoff; spec 0003 AC-23); rotates the cookie | 401 `SESSION_ENDED` |
+| `/<sys>/session/refresh` | POST | the `<sys>_rt` cookie | `{ accessToken, expiresIn, sessionExpiresAt, sessionAbsoluteExpiresAt, user: { id, name, email, roles, systems } }` (`systems` passed through; a missing one counts as empty) from the `/auth/token` answer (`sessionAbsoluteExpiresAt` is the 12 hour end, so the app can tell it from the idle cutoff; spec 0003 AC-23); rotates the cookie | 401 `SESSION_ENDED` |
 | `/<sys>/session/activity` | POST | the `<sys>_rt` cookie | 204; passes the ping to `POST /auth/session/activity` | 401 `SESSION_ENDED` |
 | `/<sys>/session/logout` | POST | the `<sys>_rt` cookie | 204, clears the cookie, ends the `sid` at welinc-auth (which kills the SSO handle too) | none (always clears) |
 | `/<sys>/session/status` | GET | bearer user token | `{ sessionExpiresAt }`, asked fresh at welinc-auth, for the idle warning (spec 0003) | 401, 503 |
@@ -283,8 +290,23 @@ Host only cookies keep staging and production apart: `staging-api.<domain>` neve
 3. `Sec-Fetch-Site` must be `same-origin` or `same-site` when the browser sends it.
 4. The gateway's CORS list is the outer layer.
 
-- **Switch system** in every app links to the portal (`<portal>/`), which shows the launcher straight away thanks to the SSO cookie.
-- After logout the web app sends the browser to `<portal>/login`. Since the `sid` is gone, the old SSO cookie no longer counts and the portal asks for the password.
+- **Switch system** in every app opens `<portal>/?from=<SYS>` in the same tab and shows only when `user.systems` has two or more entries. The launcher tags that system "You're here"; `from` never decides where the browser goes.
+- After logout the web app sends the browser to `<portal>/login?reason=logout`. Since the `sid` is gone, the old SSO cookie no longer counts and the portal asks for the password.
+- **Where an app may send a person:** only its own `/<sys>/session/start`, `<portal>/login?reason=…`, or `<portal>/?error=<code>`. Never the bare `<portal>/` for a missing session: the portal forwards a one system user straight back to their app, so that would loop.
+
+**The launcher** (spec 0007). The portal picks its screen from the address and welinc-auth's answer, checked in this order:
+
+| Address | Portal does |
+|---|---|
+| has `reason` (`logout`, `idle`, `maxage`) | the form with its message; never calls `/auth/sso` |
+| has `request` (an app initiated login; any `error` ignored) | `/auth/sso` 200: continues at `/auth/authorize/resume` with no form and no launcher; otherwise the form, then resumes |
+| neither: `/auth/sso` answers 401 | the form, with the notice for any `error` |
+| 200 with one system and no `error` | `location.replace(url)`, no launcher drawn |
+| 200 with two or more systems, or with an `error` | the launcher, with the `error` notice above the cards. It never forwards on its own while an `error` is present, so a failing app can't loop |
+| 403 `NO_SYSTEM_ACCESS` | "no access to any WeLinc system" with the email and Sign out |
+| 429, 5xx, no network | the launcher's error state with Retry |
+
+After a form sign in with no `request`, the same rules use the login answer (no second `/auth/sso`). Every card address comes from welinc-auth's answer (each system's registered web address), never from the query string. The launcher asks `/auth/sso` again when its tab regains focus, at most every 10 seconds; these calls never count as activity. Sign out on the launcher ends the shared session for every app.
 - **The portal** is login plus launcher only. It authenticates with the SSO cookie on `/auth/login`, `/auth/logout`, `/auth/sso` and the authorize routes, and holds no access token. Profile pages live in each app.
 
 ### 8. Mobile login (`vmms-mobile`)
@@ -365,14 +387,14 @@ Existing routes stay unless marked. "System" means the token's `aud`; the old `?
 | `/auth/.well-known/oauth-authorization-server` | GET | anyone; issuer and endpoint addresses (RFC 8414) | new | S2 |
 | `/auth/authorize`, `/auth/authorize/resume` | GET | browser | new | S3 |
 | `/auth/token` | POST | clients | new | S2, S3, S4 |
-| `/auth/login` | POST | portal only: sets the SSO cookie, no token in the body. Until S4 adds the launcher it answers `{ user: { id, name, email }, system, url }`: the system welinc-auth picks (spec 0002) and that client's web address; 403 `NO_SYSTEM_ACCESS` with no role anywhere | changed | S2, S3, S4 |
+| `/auth/login` | POST | portal only: `{ email, password }` (`system` is gone; sending it gets 400). Sets the SSO cookie, no token in the body. Answers the same body as `/auth/sso`. No usable system means 403 `NO_SYSTEM_ACCESS` with `user: { email }` (your own) and no session is created | changed | S2, S3, S4 |
 | `/auth/login/otp` | POST | portal | reserved | feature 34 |
 | `/auth/mobile/login`, `/auth/mobile/login/otp` | POST | `vmms-mobile`, `bms-mobile` (tokens in the body, section 8) | new (OTP reserved) | S3 |
 | `/auth/logout` | POST | SSO cookie, a client with assertion and refresh token, or `vmms-mobile` with refresh token | new | S3 |
-| `/auth/sso` | GET | SSO cookie (portal) | new: until S4, `{ user: { id, name, email }, system, url }` like `/auth/login`; S4 makes it `{ user: { id, name, email, picture }, systems: [{ system, name, url, roles }] }` | S3, S4 |
+| `/auth/sso` | GET | SSO cookie (portal) | new: `{ user: { id, name, email, picture }, systems: [{ system, name, description, url, roles: [{ code, name }] }] }` with `Cache-Control: no-store`. `systems` in the order BMS, VMMS, VRMS, each with your roles in catalog order; `url` is the web address of the system's active confidential client, and a system without one is left out. `picture` is the stored `/uploads/...` path or null. 401 `SESSION_ENDED` without a live session; 403 `NO_SYSTEM_ACCESS` with `user: { email }` (your own) when no usable system is left. Never counts as activity | S3, S4 |
 | `/auth/session` | GET | user token | new: `{ active: true, sid, expiresAt, user: { id, name, email } }` (`expiresAt` is the earlier of the idle and absolute cutoffs; systems take the caller's name from `user`) or 401 with `SESSION_ENDED`, `ACCOUNT_INACTIVE` or `TOKEN_EXPIRED`. A locked account's live session still answers 200 | S3 |
 | `/auth/session/activity` | POST | a confidential client with its assertion and the user's refresh token, or the SSO cookie | new: 204, marks the `sid` active | S3 |
-| `/auth/systems` | GET | anyone, no token | new: `{ systems: [{ code, name, webAddress, maxRolesPerUser, roles: [{ code, name, description, isSystemAdmin }] }] }`, systems in `SystemType` order, roles in display order (also power order, most powerful first). `webAddress` is the web address of the system's active confidential client, or `null`; `maxRolesPerUser` is a whole number or `null` (no limit). Sends `Cache-Control: public, max-age=60` and an `ETag`, and answers 304 to a matching `If-None-Match`, so a catalog change can take up to 60 seconds to show. Reached through the gateway's existing `/auth` route, with its CORS list and rate limit, so browsers may call it. No user data and no permissions (S10 may add permissions as an optional field) | S5 |
+| `/auth/systems` | GET | anyone, no token | new: `{ systems: [{ code, name, description, webAddress, maxRolesPerUser, roles: [{ code, name, description, isSystemAdmin }] }] }`, systems in `SystemType` order, roles in display order (also power order, most powerful first). `description` is the system's one line launcher text from its catalog file (S4); `webAddress` is the web address of the system's active confidential client, or `null`; `maxRolesPerUser` is a whole number or `null` (no limit). Sends `Cache-Control: public, max-age=60` and an `ETag`, and answers 304 to a matching `If-None-Match`, so a catalog change can take up to 60 seconds to show. Reached through the gateway's existing `/auth` route, with its CORS list and rate limit, so browsers may call it. No user data and no permissions (S10 may add permissions as an optional field) | S5 |
 | `/auth/me` | GET | user token | changed: `roles` holds the account's roles in the token's `aud` only, not narrowed by the client's `allowed_roles` (the token's `roles` claim is). This narrows what the route returns; its only caller is VRMS, with VRMS tokens, so nothing it sees changes. A `?system=` that differs from `aud` answers 403 `WRONG_AUDIENCE` | S5 |
 | `/auth/me/sessions` | GET | user token | new: `{ sessions: SessionView[] }` (spec 0003: `sid`, kind, device, client, systems, created, last active, `current`) | S3 |
 | `/auth/me/sessions/:sid` | DELETE | user token | new: end one of your sessions | S3 |
@@ -410,6 +432,7 @@ Existing routes stay unless marked. "System" means the token's `aud`; the old `?
 | `/auth/mobile/login` | 5 a minute per address for every mobile client together, sharing the per account lockout | as above |
 | `/auth/token` | 600 a minute per client for calls with a valid assertion, which skip the per address count; 120 a minute per address for every other call and every refused assertion (spec 0003). public mobile clients (`vmms-mobile`, `bms-mobile`) 30 a minute per address, counted together | 429 with `Retry-After` and `{ "error": "rate_limited" }` |
 | `/auth/authorize` | 30 a minute per address | 429 error page |
+| `/auth/sso` | 60 a minute per address (S4); the launcher's focus checks stay far below it | 429 `RATE_LIMITED` with `Retry-After` |
 | `/auth/session/activity` | 2 a minute per `sid` (extra pings are accepted and ignored) | none |
 | `/auth/session` | none beyond the gateway; systems cache 30 s | none |
 | `/auth/directory/*` | 120 a minute per client, one count shared by all three routes, counted after the token check (calls answered 401 or 403 don't count). A first sync plus a poll every 30 to 60 s stays far below it | 429 `RATE_LIMITED` with `Retry-After`: wait that many seconds |
@@ -442,6 +465,7 @@ S rows may tighten these and must note it here.
   - Behaviour a reader may notice: the directory feed (section 9) writes at most one change per person per save, and none for a save nothing visible changed (a password change, a lock, the same values). Version 1 said "every change". No version 1 cursor was ever issued (the feed didn't exist yet), so none can break.
   - Additive: the feed serves up to the safe point instead of "older than 5 s" (a stronger guarantee, no reader change), the feed epoch and `INVALID_CURSOR` after a restore, the backfill, `phoneVerified` false until S8, and the directory codes `INVALID_CURSOR`, `VALIDATION_FAILED`, `FORBIDDEN` and `RATE_LIMITED` with `Retry-After` (sections 11, 12).
   - Changes per system: **VRMS** stops calling `/auth/users` with its service token and reads people through the directory, in the same release as welinc-auth. **VMMS** and **BMS**: none known. Their admin web apps call `/auth/users` with admins' user tokens, which still works, and their backends move onto the directory with S11.
+  - Additive in the same version (2026-11-10, spec 0007, S4): `user.systems` in user grant answers and the session refresh, and clients ignore unknown `user` fields (sections 5, 7); the launcher rules, Switch system to `<portal>/?from=<SYS>`, and where an app may send a person (section 7); `description` on `/auth/systems`, the final `/auth/login` and `/auth/sso` bodies, and the `/auth/sso` limit (sections 10, 12). `/auth/login` dropping `system` changes a portal only route that merges with the portal. Changes per system: **VRMS** shows Switch system from `user.systems`. **VMMS** and **BMS**: none until S11; then follow `docs/integration/web-login.md`.
 - **1** (2026-11-08): the first contract.
 
 ### 15. Configuration
@@ -472,13 +496,13 @@ Every gap from the 2026-11-07 check, mapped to the row that closes it.
 |---|---|
 | One `JWT_SECRET` held by every service, so any of them can mint a token | S2 |
 | VMMS has its own users, roles, refresh tokens, login activity, phone verification and account audit logs | S3, S5, S6, S7, S8, then S11 removes them |
-| VMMS web takes `?token=` from the portal; VRMS and the portal do the same | S4 |
+| VMMS web takes `?token=` from the portal; VRMS and the portal do the same | S3 (VRMS and the portal), S4 (the launcher and the guide [`docs/integration/web-login.md`](../../../integration/web-login.md)), S11 (VMMS moves) |
 | VMMS mobile logs in against the VMMS copy (`X-VMMS-Client`) | S3 (mobile client), S11 |
 | VMMS analytics checks callers through `GET auth/me?system=VMMS` on the VMMS backend | S2 (verify with JWKS), S3 (session check) |
 | The BMS gateway reads `users`, `user_roles` and `user_activity_logs` straight from the auth database | S6, S7, then S11 |
 | VRMS's mechanic sync downloads every user through `GET /auth/users` on page loads and after each save | S6 |
 | BMS calls `profile/activity`, `profile/verify-password` and `profile/deletion-request`, which don't exist | S7, S8 |
-| BMS has no portal handoff | S4 |
+| BMS has no portal handoff | S4 (the guide [`docs/integration/web-login.md`](../../../integration/web-login.md)), S11 (BMS moves) |
 | BMS runs auth from the old `welinc-backend` repo with admin checks removed and no refresh | S11 retires it |
 | BMS roles (Admin, Customer Support, Operations) and VMMS's one role rule live only in their code | S5 |
 | welinc-auth guesses the system from `?system=`, `Origin`, `Referer` and the path | S5 (the system is `aud`) |
