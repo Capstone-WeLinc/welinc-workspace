@@ -40,13 +40,13 @@ Catch errors in production before users report them.
 
 The VMMS and BMS groups went separate ways after Capstone 1. The integration meeting is planned for after the first week of November 2026; these two features prepare it and then settle what the three systems share.
 
-### 55. Integration kickoff prep · in-progress
+### 55. Integration kickoff prep · done
 Get ready for the first integration meeting: know what the other groups changed, what you need to ask them, and how the shared setup works now.
 **Done when:** a question list covers their repos, mobile app repo, services, auth, environments and CI; every change they made to the shared repos (welinc-auth, welinc-web-portal) is listed from a read only check; and a setup guide for the shared stack (auth, portal, gateway, docker network, CI, environments, dependency updates) is ready to hand over.
 - [x] Question list for VMMS and BMS (2026-11-03: 32 questions, kept in `docs/_private/vrms/` outside git)
 - [x] Shared repo drift check (read only) (2026-11-03: flipped to what you changed, [shared-repo-changes.md](../../integration/shared-repo-changes.md))
 - [x] Setup guide for the shared stack (2026-11-03: [setup-guide.md](../../integration/setup-guide.md))
-- [ ] Meeting held, answers recorded for feature 56
+- [x] Meeting held, answers recorded for feature 56 (skipped 2026-11-10: replaced by direct talks with each group; the answers are in the notes on the [shared services](../_root/shared-services.md) rows)
 - Note (2026-10-29): add to the question list that `CHIEF_MECHANIC` now exists in the shared auth role list (spec 0007), and that the VMMS and BMS backends likely carry the same copied login module and `users` table that spec 0009 removed here.
 - Note (2026-10-30): also ask which roles BMS has now (operations, customer service?), and tell them about feature 60 (the portal picker changes where their shared users land). Today admin is one separate grant per system; if the groups want a single suite wide superadmin instead, decide it in feature 56 (your Capstone 1 panel called one insecure).
 - Note (2026-10-31): from spec 0013. Tell the other groups that VRMS removed `/ai` and `/analytics` from `welinc-auth/nginx.conf` (merged in welinc-auth PR 14, when feature 3 retired the Python service).
@@ -67,6 +67,7 @@ One spec for everything VRMS shares with VMMS and BMS, written after the meeting
 - Note (2026-11-01, replan): from spec 0016. Decide who owns vehicle type once VMMS shares vehicle records.
 - Note (2026-11-03, replan): from spec 0020. Agree with VMMS who writes `UNDER_MAINTENANCE` (read only in VRMS today) and whether a VMMS status change writes `VehicleChange` rows through a VRMS API.
 - Note (2026-11-07, replan): the auth, roles, login handoff, gateway routes, ports and environment parts move to the suite epic ([S1. Shared services contract](../_root/shared-services.md#s1-shared-services-contract--done) and its rows). This feature keeps the domain contracts: vehicle status and who writes it, `VehicleChange` from VMMS, vehicle type ownership, the notification service, the one mobile app, and the copied Booking and maintenance models. Design it after S1 (done, spec 0001) and the integration meeting (feature 55).
+- Note (2026-11-10, replan): no integration meeting after all (feature 55 closed). Start this from the answers in the shared services notes, and settle anything still open directly with each group.
 - [ ] Design it (spec): `/architect cross group integration`
 
 ### 61. Suite admin model · dropped · replaced by suite S10

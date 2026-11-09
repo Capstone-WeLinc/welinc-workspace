@@ -4,7 +4,7 @@ The WeLinc fleet suite is three systems (VRMS, VMMS, BMS) on shared services (au
 
 | Workspace | Scope | Status |
 |---|---|---|
-| VRMS (Vehicle Repair Management System) | [vrms/index.md](vrms/index.md) | 8 existing, 22 done, 9 in-progress, 32 planned, 4 dropped |
+| VRMS (Vehicle Repair Management System) | [vrms/index.md](vrms/index.md) | 8 existing, 23 done, 8 in-progress, 31 planned, 5 dropped |
 | VMMS | not added yet | |
 | BMS | not added yet | |
 | Suite wide (`_root`): shared services | [_root/shared-services.md](_root/shared-services.md) | 6 done, 1 in-progress, 6 planned |
