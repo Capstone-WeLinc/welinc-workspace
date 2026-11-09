@@ -54,13 +54,18 @@ function copyTree(from, to, backups) {
       continue;
     }
     if (/^\.env/.test(entry.name) || entry.name === '.DS_Store' || entry.name === 'Thumbs.db') continue;
-    fs.mkdirSync(to, { recursive: true });
-    if (fs.existsSync(dest) && !fs.readFileSync(dest).equals(fs.readFileSync(src))) {
-      fs.copyFileSync(dest, `${dest}.bak`);
-      backups.push(dest);
-    }
-    fs.copyFileSync(src, dest);
+    copyFile(src, dest, backups);
   }
+}
+
+/** One file; an existing different file is kept beside it as `.bak`. */
+function copyFile(src, dest, backups) {
+  fs.mkdirSync(path.dirname(dest), { recursive: true });
+  if (fs.existsSync(dest) && !fs.readFileSync(dest).equals(fs.readFileSync(src))) {
+    fs.copyFileSync(dest, `${dest}.bak`);
+    backups.push(dest);
+  }
+  fs.copyFileSync(src, dest);
 }
 
 function pack() {
@@ -102,8 +107,9 @@ function unpack(file) {
   for (const item of ITEMS) {
     const src = path.join(stage, item);
     if (!fs.existsSync(src)) continue;
-    if (fs.statSync(src).isDirectory()) copyTree(src, path.join(root, item), backups);
-    else copyTree(path.dirname(src), path.dirname(path.join(root, item)), backups);
+    const dest = path.join(root, item);
+    if (fs.statSync(src).isDirectory()) copyTree(src, dest, backups);
+    else copyFile(src, dest, backups);
   }
   const memory = memoryDir();
   if (fs.existsSync(path.join(stage, MEMORY))) copyTree(path.join(stage, MEMORY), memory, backups);
