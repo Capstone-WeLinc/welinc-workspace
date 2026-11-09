@@ -135,7 +135,7 @@ One seed in welinc-auth for all three systems instead of three drifting copies: 
   - [x] Full roster: every person, renamed emails, passwords per role, state accounts, crew · AC-3 to AC-6, AC-15
   - [x] Reset, staging and output: `--reset` with both guards, no state accounts on staging, printed table · AC-9, AC-10, AC-12
   - [x] Guide: `docs/integration/seed-accounts.md`, README and setup guide pointers · AC-16
-- [ ] Verify it: `/check verify suite seed accounts`
+- [x] Verify it: `/check verify suite seed accounts` (2026-11-09, local stack; every verify.md step passed)
 - [ ] Test it: `/test suite seed accounts`
 
 ## Login
