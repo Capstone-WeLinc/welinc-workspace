@@ -2,6 +2,7 @@
 
 **Date**: 2026-11-08
 **Status**: Accepted
+**Partly superseded by**: [0005](../0005-user-directory/index.md) (AC-19 and AC-21: a service token no longer reads `GET /auth/users`; backends read `/auth/directory/*`)
 **Scope row**: [S2. Signing keys and service identity](../../../scope/_root/shared-services.md#s2-signing-keys-and-service-identity--done)
 **Builds contract sections**: [0001](../0001-shared-services-contract/index.md) section 4 (clients), section 5 (tokens, keys, `POST /auth/token` client credentials grant), section 10 (`.well-known` routes, `/auth/login`), section 12 (`/auth/token` limit), section 15 (configuration)
 
@@ -71,11 +72,11 @@ Reasoning, options and the current state inventory: see [rationale.md](rationale
   - 60 a minute per client, counted after the assertion passes, with the key `client:<id>` in the throttler storage.
 
   The throttler applies to this route only, not globally, so `/auth/login` stays unlimited until S3 and S4. welinc-auth trusts `TRUST_PROXY_HOPS` proxy hops (1 locally for nginx, 2 when hosted for the Container Apps ingress plus nginx), so the address is the real caller's, not the gateway's. A backend calling welinc-auth directly on the internal network is counted by its own address.
-- **AC-19**: `GET /auth/users` accepts either a user token holding `ADMIN` in its `aud` (as today) or a service token with `aud: AUTH` and scope `directory.read`. A route marker (`@ServiceScope('directory.read')`) lets the service token in; `RolesGuard` never treats a client as an admin. For a service token, the route answers what an admin of the client's `system` would see, read only. A `?system=` that differs from that system gets 403 `WRONG_AUDIENCE`. Every welinc-auth route without the marker answers a service token with 403 `WRONG_TOKEN_USE`.
+- **AC-19**: `GET /auth/users` accepts either a user token holding `ADMIN` in its `aud` (as today) or a service token with `aud: AUTH` and scope `directory.read`. A route marker (`@ServiceScope('directory.read')`) lets the service token in; `RolesGuard` never treats a client as an admin. For a service token, the route answers what an admin of the client's `system` would see, read only. A `?system=` that differs from that system gets 403 `WRONG_AUDIENCE`. Every welinc-auth route without the marker answers a service token with 403 `WRONG_TOKEN_USE`. *Superseded in part by [0005](../0005-user-directory/index.md) AC-9 (2026-11-09): `GET /auth/users` is admin only, and a service token gets 403 `WRONG_TOKEN_USE`. The first sentence no longer holds for this route.*
 
 *VRMS as a client*
 - **AC-20**: backend-vrms gets its service token with its own key (`AUTH_CLIENT_ID`, `AUTH_CLIENT_PRIVATE_KEY`), signing a fresh assertion (new `jti`, 60 s life) for every token request with `audience=AUTH` and `scope=directory.read`. It keeps the token until 60 s before it expires. Callers who need a token at the same moment share one request. If welinc-auth answers 401 to a call made with a cached token, backend-vrms drops it, gets a new one and retries once. A 403 is never retried.
-- **AC-21**: The mechanic roster (`sync` and `refreshOne`) calls `/auth/users?system=VRMS` with the VRMS service token instead of the caller's token. A Chief Mechanic action that runs `refreshOne` now works. Failing to get a token answers 503 `AUTH_UNAVAILABLE`, as a failed roster call does today.
+- **AC-21**: The mechanic roster (`sync` and `refreshOne`) calls `/auth/users?system=VRMS` with the VRMS service token instead of the caller's token. A Chief Mechanic action that runs `refreshOne` now works. Failing to get a token answers 503 `AUTH_UNAVAILABLE`, as a failed roster call does today. *Superseded by [0005](../0005-user-directory/index.md) AC-21 (2026-11-09): the roster reads welinc-auth's directory (`/auth/directory/*`) with the same service token, not `/auth/users`.*
 - **AC-22**: From slice 1, backend-vrms refuses to start when `AUTH_ISSUER`, `AUTH_JWKS_URL` or `AUTH_INTERNAL_URL` is missing, and `AUTH_SERVICE_URL` is renamed `AUTH_INTERNAL_URL`. From slice 2, it also refuses when `AUTH_CLIENT_ID` or `AUTH_CLIENT_PRIVATE_KEY` is missing, or when the private key isn't an EC P-256 private JWK with a `kid` and `alg: ES256`. `AUTH_ISSUER` is an identifier compared character for character, never an address anything fetches. Every service sets the identical string.
 
 *Keys tooling*
@@ -174,7 +175,7 @@ Stored on one line in env files. `AUTH_CLIENT_PRIVATE_KEY` is one private JWK ob
 | `/auth/.well-known/oauth-authorization-server` | GET | none | RFC 8414 metadata (AC-4) | none | none |
 | `/auth/login` | POST | `email`, `password`, `system?` | `{ accessToken, system, user }` | none | 401 bad credentials, 403 locked (unchanged), 403 `NO_SYSTEM_ACCESS`, 400 unknown system |
 | `/auth/token` | POST form | `grant_type=client_credentials`, `client_assertion_type`, `client_assertion`, `audience`, `scope` | `{ access_token, token_type, expires_in, scope }` | client assertion | 401 `invalid_client`, 400 `unauthorized_client`, `invalid_target`, `invalid_scope`, `unsupported_grant_type`, `invalid_request`, 429 `rate_limited` |
-| `/auth/users` | GET | `system?` | unchanged | admin user token, or service token `aud: AUTH` with `directory.read` | 403 `WRONG_AUDIENCE`, 403 `WRONG_TOKEN_USE` |
+| `/auth/users` | GET | `system?` | unchanged | admin user token only since [0005](../0005-user-directory/index.md) AC-9 (was: or service token `aud: AUTH` with `directory.read`) | 403 `WRONG_AUDIENCE`, 403 `WRONG_TOKEN_USE` |
 | every other user route | any | unchanged | unchanged | user token, system = `aud` | 401, 403 `WRONG_AUDIENCE`, 403 `WRONG_TOKEN_USE` |
 | backend-vrms, every protected route | any | bearer user token | unchanged | user token `aud: VRMS` | 401 `WRONG_AUDIENCE`, 403 `WRONG_TOKEN_USE`, 503 `AUTH_UNAVAILABLE` |
 

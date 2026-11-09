@@ -2,6 +2,7 @@
 
 **Date**: 2026-11-08
 **Status**: Accepted
+**Partly superseded by**: [0005](../0005-user-directory/index.md) (AC-9 and the `GET /auth/users` routes row: a `directory.read` service token no longer reads `GET /auth/users`)
 **Scope row**: [S5. Roles per system](../../../scope/_root/shared-services.md#s5-roles-per-system--done)
 **Builds contract sections**: [0001](../0001-shared-services-contract/index.md) sections 4 (clients gain allowed roles), 10 (`/auth/systems`, `/auth/me`), 11 (three new error codes), 13 rule 5
 
@@ -36,7 +37,7 @@ Reasoning and options: see [rationale.md](rationale.md).
 - **AC-8**: The migration then turns `user_roles.role` from the `UserRole` enum into text (`varchar(40)`, keeping every value), drops the `UserRole` type, and adds a foreign key from `user_roles (system, role)` to `system_roles (system, code)` that refuses deletes and updates. No other table changes except `oauth_clients` (AC-18).
 
 *Enforcing the rules*
-- **AC-9**: Every input that names a role (create user, edit user, the list filter on `GET /auth/users`) checks the (system, role) pair against the catalog. The list filter checks against the token's system (`aud`), for an admin and a `directory.read` service token alike. An unknown pair answers 400 `UNKNOWN_ROLE` with a message naming the system's valid roles: "BMS has no role 'MECHANIC'. Its roles are Admin, Operations, Customer Support, Driver, Helper."
+- **AC-9**: Every input that names a role (create user, edit user, the list filter on `GET /auth/users`) checks the (system, role) pair against the catalog. The list filter checks against the token's system (`aud`), for an admin and a `directory.read` service token alike. *Superseded in part by [0005](../0005-user-directory/index.md) AC-9 (2026-11-09): `GET /auth/users` is admin only now, so the list filter only ever checks an admin's system.* An unknown pair answers 400 `UNKNOWN_ROLE` with a message naming the system's valid roles: "BMS has no role 'MECHANIC'. Its roles are Admin, Operations, Customer Support, Driver, Helper."
 - **AC-10**: A create or edit whose result gives an account more roles in a system than its `maxRolesPerUser` answers 409 `ROLE_LIMIT`: "VRMS allows one role per person." With a limit of 1, a request carrying two roles for one system is refused, never trimmed. The limit counts roles in one system only. Checks run in this order: today's 400 for an empty list or a duplicate row (`normalizeRoleAssignments`), the 403 for another system's role, AC-9's `UNKNOWN_ROLE`, then `ROLE_LIMIT`.
 - **AC-11**: Editing a user's roles (`PATCH /auth/users/:id` with `roleAssignments`) replaces the caller's system roles in one step, as today, so changing Mechanic to Chief Mechanic is one request. Attaching a role to an existing account (create with `attachExisting`) still refuses an account that already holds a role in the caller's system (today's 409), so an attach can never change someone's role.
 - **AC-12**: A caller can't change their own roles: editing your own `roleAssignments` keeps today's 409 "You can't change your own role.", and attaching to your own account is refused by AC-11's rule (you already hold a role in your system). A test covers both, so the S10 no self grants rule builds on a tested base.
@@ -117,7 +118,7 @@ Relationships: `systems` 1:N `system_roles`; `system_roles` 1:N `user_roles`. Pr
 | `/auth/me` | GET | none (`?system=` ignored) | today's body, `roles` for `aud` only | user token | 401 |
 | `/auth/users` | POST | `roleAssignments: { role: string, system }[]`, `attachExisting?` | today's body | system admin (`@SystemAdmin()`) | 400 `UNKNOWN_ROLE`, 409 `ROLE_LIMIT`, 409 `ACCOUNT_EXISTS`, 403 other system |
 | `/auth/users/:id` | PATCH | `roleAssignments?` | today's body | system admin | 400 `UNKNOWN_ROLE`, 409 `ROLE_LIMIT`, 409 own role, 409 last admin |
-| `/auth/users` | GET | `role?` (validated against the caller's system) | today's body | system admin or `directory.read` | 400 `UNKNOWN_ROLE` |
+| `/auth/users` | GET | `role?` (validated against the caller's system) | today's body | system admin (a `directory.read` service token no longer, [0005](../0005-user-directory/index.md) AC-9) | 400 `UNKNOWN_ROLE` |
 | other `/auth/users*` admin routes | as today | as today | as today | system admin (was `@Roles(ADMIN)`) | as today |
 | `/auth/token` (code, refresh), `/auth/mobile/login` | POST | as today | as today, `roles` filtered by the client's allowed roles | client | 403 `APP_NOT_ALLOWED` |
 
