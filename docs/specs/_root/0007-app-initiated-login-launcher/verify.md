@@ -16,6 +16,7 @@ _Steps derived from spec 0007 acceptance criteria. `/check verify` runs these; `
 - [ ] Switch off every client of a test user's only system, `POST /auth/login` → 403 `NO_SYSTEM_ACCESS`, no new `sessions` row, no `welinc_sso` cookie; switch it back on → AC-2, AC-3
 - [ ] Sign in through VRMS as `multi.mixed@`, then `POST /vrms/session/refresh` → `user.systems` is `["VMMS","VRMS"]`; decode the access token → `roles` hold only VRMS roles and there is no `systems` claim → AC-6, AC-8
 - [ ] `POST /auth/mobile/login` as a mechanic with `vmms-mobile` → `user.systems` present → AC-6
+- [ ] Remove every role of a test user while they hold a live SSO session, `GET /auth/sso` → 403 `NO_SYSTEM_ACCESS` with `user: { email }` naming only that user; restore the roles → AC-19 (added by /develop, 2026-11-10)
 
 ## Portal and VRMS
 
@@ -38,6 +39,7 @@ _Steps derived from spec 0007 acceptance criteria. `/check verify` runs these; `
 - [ ] `docker stop welinc_auth_service`, reload the launcher → the error state with Retry; start it, Retry → the cards → AC-20
 - [ ] At 375px, 640px and 1280px → one, two, three columns, no horizontal scroll; Tab reaches every card and the account menu with a visible ring; with reduced motion on, the chevron doesn't move → AC-20
 - [ ] `localStorage`, `sessionStorage` and every URL hold no token or code through all of the above → AC-13 (invariant)
+- [ ] With that same user's live session, open `http://localhost:8000/` → the no access state shows the message, "Signed in as <their email>" and Sign out → AC-19 (added by /develop, 2026-11-10)
 
 ### Commands
 - [ ] `npm run lint`, `npm run build`, `npm run test` in welinc-web-portal → pass, and a hex value added to a component fails lint → AC-21
