@@ -387,7 +387,7 @@ Existing routes stay unless marked. "System" means the token's `aud`; the old `?
 | `/auth/.well-known/oauth-authorization-server` | GET | anyone; issuer and endpoint addresses (RFC 8414) | new | S2 |
 | `/auth/authorize`, `/auth/authorize/resume` | GET | browser | new | S3 |
 | `/auth/token` | POST | clients | new | S2, S3, S4 |
-| `/auth/login` | POST | portal only: `{ email, password }` (`system` is gone; sending it gets 400). Sets the SSO cookie, no token in the body. Answers the same body as `/auth/sso`. No usable system means 403 `NO_SYSTEM_ACCESS` and no session is created | changed | S2, S3, S4 |
+| `/auth/login` | POST | portal only: `{ email, password }` (`system` is gone; sending it gets 400). Sets the SSO cookie, no token in the body. Answers the same body as `/auth/sso`. No usable system means 403 `NO_SYSTEM_ACCESS` with `user: { email }` (your own) and no session is created | changed | S2, S3, S4 |
 | `/auth/login/otp` | POST | portal | reserved | feature 34 |
 | `/auth/mobile/login`, `/auth/mobile/login/otp` | POST | `vmms-mobile`, `bms-mobile` (tokens in the body, section 8) | new (OTP reserved) | S3 |
 | `/auth/logout` | POST | SSO cookie, a client with assertion and refresh token, or `vmms-mobile` with refresh token | new | S3 |

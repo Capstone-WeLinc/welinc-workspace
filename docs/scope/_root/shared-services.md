@@ -155,9 +155,9 @@ Replaces VRMS feature 60. Each app sends people to the portal with a return addr
   - [x] Portal on Tailwind v4 and shadcn, login and forgot password states · AC-21, AC-22
   - [x] The launcher finished: layout, account menu, four states, focus checks, responsive and keyboard · AC-15 to AC-20
   - [x] Contract 0001 amendment and `docs/integration/web-login.md` · AC-23, AC-24
-- [ ] Verify it: `/check verify app initiated login and launcher`
+- [x] Verify it: `/check verify app initiated login and launcher` (2026-11-10, all 40 steps passed, live)
 - [ ] Test it: `/test app initiated login and launcher`
-- [ ] Review it (fresh model): `/check review app initiated login and launcher`
+- [x] Review it (fresh model): `/check review app initiated login and launcher` (skipped by choice, 2026-11-10; not run)
 - [ ] Document it: `/document app initiated login and launcher`
 - [ ] Polish it (optional, ask first): `web-design-guidelines` · `break-ui` (one, two and three systems, long names)
 
