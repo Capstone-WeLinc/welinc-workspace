@@ -29,7 +29,7 @@ _These are recommendations to keep the build orderly, not requirements. Skip any
 | S5 | Roles per system | Core | done |
 | S6 | User directory for systems | Core | done |
 | S12 | Suite seed accounts | Core | done |
-| S4 | App initiated login and launcher | Login | in-progress |
+| S4 | App initiated login and launcher | Login | done |
 | S9 | Gateway for the whole suite | Gateway | planned |
 | S7 | Account activity and audit | Account | planned |
 | S8 | Profile extras | Account | planned |
@@ -140,7 +140,7 @@ One seed in welinc-auth for all three systems instead of three drifting copies: 
 
 ## Login
 
-### S4. App initiated login and launcher · in-progress
+### S4. App initiated login and launcher · done
 spec [0007](../../specs/_root/0007-app-initiated-login-launcher/index.md) · code in `welinc-auth/src/auth/sessions/` (launcher answer), `prisma/catalog/`, `welinc-web-portal` (launcher, Tailwind v4 and shadcn), `welinc-backend-vrms` and `welinc-web-vrms` (Switch system), `docs/integration/web-login.md`
 Replaces VRMS feature 60. Each app sends people to the portal with a return address and gets them back through a one time code it exchanges on its backend, not `?token=` in the URL. The portal shows a launcher of your systems only when opened directly (skipped when you have one), and each app gets a Switch system link.
 **Done when:** a deep link into any system survives login; tokens never appear in a URL; return addresses are checked against an allow list; the launcher lists only the systems you hold; one system users never see it; Switch system and logout work from every app; no new role or permission is created; and VMMS and BMS can use it.
@@ -156,7 +156,7 @@ Replaces VRMS feature 60. Each app sends people to the portal with a return addr
   - [x] The launcher finished: layout, account menu, four states, focus checks, responsive and keyboard · AC-15 to AC-20
   - [x] Contract 0001 amendment and `docs/integration/web-login.md` · AC-23, AC-24
 - [x] Verify it: `/check verify app initiated login and launcher` (2026-11-10, all 40 steps passed, live)
-- [ ] Test it: `/test app initiated login and launcher`
+- [x] Test it: `/test app initiated login and launcher` (2026-11-10, gap tests in welinc-auth and the portal, all S4 suites green)
 - [x] Review it (fresh model): `/check review app initiated login and launcher` (skipped by choice, 2026-11-10; not run)
 - [ ] Document it: `/document app initiated login and launcher`
 - [ ] Polish it (optional, ask first): `web-design-guidelines` · `break-ui` (one, two and three systems, long names)

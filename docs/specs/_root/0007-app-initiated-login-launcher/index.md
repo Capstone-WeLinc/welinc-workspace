@@ -1,7 +1,7 @@
 # 0007. App initiated login and the portal launcher
 
 **Date**: 2026-11-09
-**Status**: In Progress
+**Status**: Accepted
 **Scope row**: [S4. App initiated login and launcher](../../../scope/_root/shared-services.md#s4-app-initiated-login-and-launcher--in-progress)
 **Builds contract sections**: [0001](../0001-shared-services-contract/index.md) sections 5 (the `user` object of user grants), 7 (Switch system, the launcher), 10 (`/auth/login`, `/auth/sso`, `/auth/systems`), 12 (the `/auth/sso` limit)
 **Replaces**: VRMS feature 60 (portal system picker), dropped 2026-11-07
