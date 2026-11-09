@@ -130,11 +130,11 @@ One seed in welinc-auth for all three systems instead of three drifting copies: 
 - Note (2026-11-09, from spec 0004 follow-up): the seed needs people for every role in the catalog, Driver and Helper (BMS) included, one role per person where a system says so.
 - [x] Design it (spec): `/architect suite seed accounts` (or inside the S1 spec)
 - Note (2026-11-09): spec 0006 decided one `people.json` manifest in welinc-auth (145 people, fixed ids), copied by each system and checked with `seed:check`; an upsert seed with a local only `--reset`, refused on production unless `SEED_ALLOW=staging`; emails `<system>.<role>@` (`ops.user@` becomes `bms.ops@` and `vmms.ops@`, `cs.user@` becomes `bms.cs@`); about 5 people per office role, all 32 BMS crew, four multi system and four broken state accounts; passwords per role (VRMS chief now `chief1234`). The guide for VMMS and BMS is written now; their seeds switch in S11.
-- [ ] Build it: `/develop suite seed accounts`
-  - [ ] Thin thread: manifest with today's 71 people, checks, guard, upsert, `seed:check`, VRMS copy and loader · AC-1, AC-2, AC-7, AC-8, AC-10, AC-11, AC-13 to AC-15
-  - [ ] Full roster: every person, renamed emails, passwords per role, state accounts, crew · AC-3 to AC-6, AC-15
-  - [ ] Reset, staging and output: `--reset` with both guards, no state accounts on staging, printed table · AC-9, AC-10, AC-12
-  - [ ] Guide: `docs/integration/seed-accounts.md`, README and setup guide pointers · AC-16
+- [x] Build it: `/develop suite seed accounts`
+  - [x] Thin thread: manifest with today's 71 people, checks, guard, upsert, `seed:check`, VRMS copy and loader · AC-1, AC-2, AC-7, AC-8, AC-10, AC-11, AC-13 to AC-15
+  - [x] Full roster: every person, renamed emails, passwords per role, state accounts, crew · AC-3 to AC-6, AC-15
+  - [x] Reset, staging and output: `--reset` with both guards, no state accounts on staging, printed table · AC-9, AC-10, AC-12
+  - [x] Guide: `docs/integration/seed-accounts.md`, README and setup guide pointers · AC-16
 - [ ] Verify it: `/check verify suite seed accounts`
 - [ ] Test it: `/test suite seed accounts`
 
@@ -152,6 +152,7 @@ Replaces VRMS feature 60. Each app sends people to the portal with a return addr
 ### S9. Gateway for the whole suite · planned · needs a decision
 One gateway that routes every system and analytics service, with a port map that has no clashes, and a decision on where the gateway config lives (today inside `welinc-auth`).
 **Done when:** every system's API and analytics service is reachable through the gateway, each service has its own port in the README repos table, CORS and upload limits are set per route, and the config lives where the contract says.
+- Note (2026-11-09): each group clones and runs only the shared repos plus its own system; only the shared services owner runs everything. Integration with another system goes through the staging deployment (spec 0008), or a stub of the contract until staging exists, never another group's local clone. So the gateway must start and serve its routes with any system missing: keep today's pattern (`resolver 127.0.0.11` and a variable in `proxy_pass`) on every new route, so an absent system answers 502 on its own routes only. Also give `scripts/clone-all.sh` a group option (`clone-all.sh vmms` clones the shared repos plus that system) and say so in the setup guide.
 - [ ] Design it (spec): `/architect gateway for the whole suite`
 - [ ] Polish it (optional, ask first): `docker-patterns`
 

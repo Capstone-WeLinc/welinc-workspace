@@ -1,7 +1,7 @@
 # 0006. Suite seed accounts from one shared manifest
 
 **Date**: 2026-11-09
-**Status**: Proposed
+**Status**: In Progress
 
 ## Summary
 

@@ -98,7 +98,7 @@ The containers do not run database migrations or seeds on start. The first time,
 cd welinc-auth && npm install && npm run db:deploy && npm run seed
 ```
 
-Seed logins are in `welinc-auth/prisma/seeds/users.seed.ts`, for example `vrms.admin@welinc.com`, `vmms.admin@welinc.com`, `bms.admin@welinc.com`.
+Seed logins for every system are in [docs/integration/seed-accounts.md](docs/integration/seed-accounts.md), for example `vrms.admin@welinc.com`, `vmms.admin@welinc.com` and `bms.admin@welinc.com` (password `admin1234`).
 
 | App | URL |
 |---|---|

@@ -43,7 +43,7 @@ The first time, create the auth tables and seed users from your machine:
 cd welinc-auth && npm install && npm run db:deploy && npm run seed
 ```
 
-Seed logins are in `welinc-auth/prisma/seeds/users.seed.ts`: one admin per system (`vrms.admin@welinc.com`, `vmms.admin@welinc.com`, `bms.admin@welinc.com`) and more.
+Seed logins are in [seed-accounts.md](seed-accounts.md): people for every role in every system (`vrms.admin@welinc.com`, `vmms.admin@welinc.com`, `bms.admin@welinc.com` and more), multi system accounts and broken state accounts for testing.
 
 ## 3. Add your system's compose file
 
