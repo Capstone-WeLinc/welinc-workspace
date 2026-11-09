@@ -29,7 +29,7 @@ _These are recommendations to keep the build orderly, not requirements. Skip any
 | S5 | Roles per system | Core | done |
 | S6 | User directory for systems | Core | done |
 | S12 | Suite seed accounts | Core | done |
-| S4 | App initiated login and launcher | Login | planned |
+| S4 | App initiated login and launcher | Login | in-progress |
 | S9 | Gateway for the whole suite | Gateway | planned |
 | S7 | Account activity and audit | Account | planned |
 | S8 | Profile extras | Account | planned |
@@ -140,11 +140,24 @@ One seed in welinc-auth for all three systems instead of three drifting copies: 
 
 ## Login
 
-### S4. App initiated login and launcher · planned · needs a decision
+### S4. App initiated login and launcher · in-progress
+spec [0007](../../specs/_root/0007-app-initiated-login-launcher/index.md) · code in `welinc-auth/src/auth/sessions/` (launcher answer), `prisma/catalog/`, `welinc-web-portal` (launcher, Tailwind v4 and shadcn), `welinc-backend-vrms` and `welinc-web-vrms` (Switch system), `docs/integration/web-login.md`
 Replaces VRMS feature 60. Each app sends people to the portal with a return address and gets them back through a one time code it exchanges on its backend, not `?token=` in the URL. The portal shows a launcher of your systems only when opened directly (skipped when you have one), and each app gets a Switch system link.
 **Done when:** a deep link into any system survives login; tokens never appear in a URL; return addresses are checked against an allow list; the launcher lists only the systems you hold; one system users never see it; Switch system and logout work from every app; no new role or permission is created; and VMMS and BMS can use it.
 - Note (2026-11-07): chosen over the portal side picker (feature 60 as planned) and over separate login pages per system. Follows the app launcher pattern of Okta and Microsoft My Apps.
-- [ ] Design it (spec): `/architect app initiated login and launcher`
+- Note (2026-11-10): built. One addition the spec didn't name a source for: `/auth/sso`'s 403 `NO_SYSTEM_ACCESS` carries `user: { email }` (your own), so the no access state can show who is signed in (AC-19). Recorded in contract 0001 section 10; spec 0007's AC-1 and AC-19 owe that line through `/architect`.
+- Note (2026-11-09): spec 0007 decided the Quiet workspace launcher (greeting, cards in the order BMS, VMMS, VRMS with description and your roles, a "You're here" tag from Switch system), `user.systems` in every grant answer so apps know when to show Switch system, no flag for systems not yet on the shared login (VMMS and BMS adjust in S11), sign out everywhere with a confirm, focus checks on the launcher, and the portal moved to Tailwind v4 and shadcn with the login kept as it looks today (only its states improve).
+- [x] Design it (spec): `/architect app initiated login and launcher` (2026-11-09, cross checked on another model, 9 gaps fixed)
+- [x] Build it: `/develop app initiated login and launcher` (2026-11-10, branch `feat/app-initiated-login-launcher` in welinc-auth, welinc-web-portal, welinc-backend-vrms and welinc-web-vrms)
+  - [x] welinc-auth launcher answer: catalog `description`, `/auth/sso` and `/auth/login` bodies, `system` dropped from login, `/auth/sso` limit, `user.systems` in grants · AC-1 to AC-7
+  - [x] The thin thread: portal routing rules and a plain launcher with Sign out, then Switch system in VRMS and the deep link check · AC-8 to AC-14, AC-17
+  - [x] Portal on Tailwind v4 and shadcn, login and forgot password states · AC-21, AC-22
+  - [x] The launcher finished: layout, account menu, four states, focus checks, responsive and keyboard · AC-15 to AC-20
+  - [x] Contract 0001 amendment and `docs/integration/web-login.md` · AC-23, AC-24
+- [ ] Verify it: `/check verify app initiated login and launcher`
+- [ ] Test it: `/test app initiated login and launcher`
+- [ ] Review it (fresh model): `/check review app initiated login and launcher`
+- [ ] Document it: `/document app initiated login and launcher`
 - [ ] Polish it (optional, ask first): `web-design-guidelines` · `break-ui` (one, two and three systems, long names)
 
 ## Gateway
