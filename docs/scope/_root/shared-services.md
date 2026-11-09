@@ -158,7 +158,7 @@ Replaces VRMS feature 60. Each app sends people to the portal with a return addr
 - [x] Verify it: `/check verify app initiated login and launcher` (2026-11-10, all 40 steps passed, live)
 - [x] Test it: `/test app initiated login and launcher` (2026-11-10, gap tests in welinc-auth and the portal, all S4 suites green)
 - [x] Review it (fresh model): `/check review app initiated login and launcher` (skipped by choice, 2026-11-10; not run)
-- [ ] Document it: `/document app initiated login and launcher`
+- [x] Document it: `/document app initiated login and launcher` (2026-11-10, PRs welinc-auth #23, web-portal #15, backend-vrms #50, web-vrms #52, workspace #18)
 - [ ] Polish it (optional, ask first): `web-design-guidelines` · `break-ui` (one, two and three systems, long names)
 
 ## Gateway
