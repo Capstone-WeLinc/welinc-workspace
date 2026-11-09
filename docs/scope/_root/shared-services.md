@@ -116,7 +116,7 @@ Systems need names, emails and roles for people their records point to (VMMS sch
   - [x] Hardening and the switch: apply failure, auth down, `INVALID_CURSOR`, recovery sync, `/auth/users` admin only, every write path tests · AC-3, AC-9, AC-14, AC-15, AC-17, AC-21
   - [x] Contract 0001 amendments and docs · AC-10
 - [x] Verify it: `/check verify user directory for systems`
-- [ ] Test it: `/test user directory for systems`
+- [x] Test it: `/test user directory for systems`
 - [ ] Review it (fresh model): `/check review user directory for systems`
 - [ ] Document it: `/document user directory for systems`
 
