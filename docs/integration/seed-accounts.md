@@ -133,7 +133,7 @@ An id is one person forever. A removed person's id is retired, never reused. A n
 
 Driver n matches BMS `emp_id` `DRV-00n`, and helper n matches `HLP-00n`. Drivers and helpers carry their `+63` phone in `contact`, copied from the BMS crew seed.
 
-Together these give the launcher (S4) accounts with one system (most office people), two (the mechanics, `multi.chief@`, `multi.admin@`, `multi.mixed@`) and three (`multi.lead@`). Until S4, a portal login that names no system always lands on the same system for these accounts.
+Together these give the launcher (S4) accounts with one system (most office people), two (the mechanics, `multi.chief@`, `multi.admin@`, `multi.mixed@`) and three (`multi.lead@`). A portal login with two or more systems lands on the launcher, and one with a single system goes straight in.
 
 ## What the broken accounts show at login today
 

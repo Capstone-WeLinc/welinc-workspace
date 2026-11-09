@@ -62,7 +62,7 @@ Stored in `docs/specs/vrms/`. Format: `docs/specs/vrms/NNNN-title/`. Product bac
 Reference skills load on their own when the work matches (say "Using skill: <name>"). Audit and polish skills never run on their own, not even as a step of `/develop` or `/check verify`: offer them in one line and wait for a yes. Never run more than one taste skill on a change.
 
 - **Backend, load on match:** `prisma-client-api` and `prisma-cli` for Prisma 7 (backend-vrms, auth); `nestjs-best-practices` for NestJS.
-- **Frontend, load on match:** `tailwind-4-docs` (web-vrms is on v4, web-portal still on v3; its docs snapshot is not downloaded yet), `vercel-composition-patterns`, `react-hook-form` for forms, `ask-sonner` for toasts, `web-dnd-dnd-kit` for drag and drop (classic `@dnd-kit/core` and `@dnd-kit/sortable`). Two larger ones load only for substantial work, not copy or class tweaks: `shadcn` when building, restyling, theming or adding shadcn UI, and `vercel-react-best-practices` for new components or hooks, effects, data fetching, lists, performance, or a React review.
+- **Frontend, load on match:** `tailwind-4-docs` (web-vrms and web-portal are both on v4; its docs snapshot is not downloaded yet), `vercel-composition-patterns`, `react-hook-form` for forms, `ask-sonner` for toasts, `web-dnd-dnd-kit` for drag and drop (classic `@dnd-kit/core` and `@dnd-kit/sortable`). Two larger ones load only for substantial work, not copy or class tweaks: `shadcn` when building, restyling, theming or adding shadcn UI, and `vercel-react-best-practices` for new components or hooks, effects, data fetching, lists, performance, or a React review.
 - **Ask first (demanding or writes extra code):**
   - `web-design-guidelines`: accessibility and UX audit with `file:line` findings. Offer it after a UI change; it fetches its rules from GitHub.
   - `break-ui`: worst case data stress test behind a dev only toggle. Offer it on pages with lists, tables or typed text.
@@ -81,4 +81,4 @@ MCP servers (from `agents/vrms/mcp.json`): playwright, shadcn, atlassian (Jira; 
 - `welinc-web-vrms/AGENTS.md`: VRMS SPA structure, API and auth handling, color tokens, and effect rules.
 - `welinc-backend-vrms/AGENTS.md`: NestJS API modules (including analytics and AI), guards, Prisma and migration rules, Docker restart gotcha.
 - `welinc-auth/AGENTS.md`: shared auth service routes, role per system JWT, lockout, gateway nginx and CORS.
-- `welinc-web-portal/AGENTS.md`: SSO portal redirect by role, token handoff, Tailwind v3, session monitor.
+- `welinc-web-portal/AGENTS.md`: SSO portal launcher and routing rules, Tailwind v4 and shadcn.
