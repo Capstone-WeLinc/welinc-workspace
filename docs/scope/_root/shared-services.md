@@ -26,8 +26,8 @@ _These are recommendations to keep the build orderly, not requirements. Skip any
 | S1 | Shared services contract | Contract | done |
 | S2 | Signing keys and service identity | Core | done |
 | S3 | Sessions: refresh and logout, web and mobile | Core | done |
-| S5 | Roles per system | Core | in-progress |
-| S6 | User directory for systems | Core | planned |
+| S5 | Roles per system | Core | done |
+| S6 | User directory for systems | Core | in-progress |
 | S12 | Suite seed accounts | Core | planned |
 | S4 | App initiated login and launcher | Login | planned |
 | S9 | Gateway for the whole suite | Gateway | planned |
@@ -84,7 +84,7 @@ Short lived access tokens with refresh and logout in welinc-auth, for web and fo
 - [x] Review it (fresh model): `/check review sessions refresh and logout` (skipped by choice, 2026-11-08; not run)
 - [x] Document it: `/document sessions refresh and logout` (2026-11-08; PRs auth #16, backend-vrms #46, web-vrms #48, portal #13, workspace #13)
 
-### S5. Roles per system · in-progress
+### S5. Roles per system · done
 spec [0004](../../specs/_root/0004-roles-per-system/index.md) · code in `welinc-auth/prisma/catalog/`, `welinc-auth/src/auth/roles/`, `welinc-web-vrms/src/features/user-management/`
 
 Each system declares its roles and rules (VMMS: exactly one role per account; BMS: Admin, Customer Support, Operations; VRMS: Admin, Chief Mechanic, Mechanic), and welinc-auth enforces them, instead of one shared enum and rules copied into each system.
@@ -100,19 +100,32 @@ Each system declares its roles and rules (VMMS: exactly one role per account; BM
   - [x] Seed, docs and contract 0001 amendments, tests · AC-5, AC-21
 - [x] Verify it: `/check verify roles per system`
 - [x] Test it: `/test roles per system` (2026-11-09; welinc-auth 322, web-vrms 464 passing; role picker, `useVrmsRoles` and database flows stay with verify)
-- [ ] Review it (fresh model): `/check review roles per system`
-- [ ] Document it: `/document roles per system`
+- [x] Review it (fresh model): `/check review roles per system` (skipped by choice, 2026-11-09; not run)
+- [x] Document it: `/document roles per system` (2026-11-09; PRs welinc-auth #18, welinc-web-vrms #50, welinc-workspace #15)
 
-### S6. User directory for systems · planned · needs a decision
+### S6. User directory for systems · in-progress
+spec [0005](../../specs/_root/0005-user-directory/index.md) · code in `welinc-auth/prisma/migrations/` (feed trigger), `welinc-auth/src/auth/` (directory routes), `welinc-backend-vrms/src/modules/vrms/` (poll job, roster), `welinc-web-vrms/src/features/user-management/`
+
 Systems need names, emails and roles for people their records point to (VMMS schedules, BMS activity, VRMS mechanics) without their own users table or reading the auth database. Give them a lookup API and a change feed, generalizing VRMS's mechanic sync.
 **Done when:** a system can look up many users by id in one call, learns about created, changed and deactivated users without polling every user, keeps only a local copy of what it needs, and no system reads the auth database.
-- [ ] Design it (spec): `/architect user directory for systems`
+- Note (2026-11-09): spec 0005 decided a `directory_changes` feed written by deferred Postgres triggers (one row per person per save, only when something a system can see changed, a snapshot of the person after it), read in transaction order with an epoch in the cursor, three service only routes, and `/auth/users` back to admins only. VRMS polls every 30 s with a leased job, refreshes one person after its own Users page saves, keeps the just in time update, and drops the full downloads on page loads. Contract 0001 sections 9 and 10 get amended. Hard switch: auth, backend-vrms and web-vrms merge together.
+- [x] Design it (spec): `/architect user directory for systems`
+- [x] Build it: `/develop user directory for systems`
+  - [x] Thin thread: feed migration and triggers, backfill, seed in one save, `/directory/changes` and `/directory/users`, VRMS sync state and the leased poll job · AC-1, AC-2, AC-4, AC-5, AC-7, AC-8, AC-11 to AC-13, AC-16
+  - [x] Lookup and instant refresh: `/directory/users/lookup`, `refreshOne` and the refresh route, web-vrms drops page open syncs · AC-6, AC-18 to AC-20
+  - [x] Hardening and the switch: apply failure, auth down, `INVALID_CURSOR`, recovery sync, `/auth/users` admin only, every write path tests · AC-3, AC-9, AC-14, AC-15, AC-17, AC-21
+  - [x] Contract 0001 amendments and docs · AC-10
+- [x] Verify it: `/check verify user directory for systems`
+- [x] Test it: `/test user directory for systems`
+- [ ] Review it (fresh model): `/check review user directory for systems`
+- [ ] Document it: `/document user directory for systems`
 
 ### S12. Suite seed accounts · planned · needs a decision · Beta
 One seed in welinc-auth for all three systems instead of three drifting copies: fixed ids every system links its own rows to (as VRMS already does with `SEED_IDS`), one person per email, and people chosen to test the shared login.
 **Done when:** each system's roles have at least one seed person; there are accounts holding one, two and three systems for the launcher; a locked, a deactivated and a never verified account exist for testing; the platform admin from S10 has a seed account once S10 is built; no email means two different people across systems; and each system's own seed links to the shared ids instead of creating users.
 - Note (2026-11-08, replan): from specs 0001 and 0002. This row gets its own spec, and it must keep and extend spec 0002's `OAuthClient` seed, creating the section 4 clients alongside the people.
 - Note (2026-11-07): fixes the drift listed above (`ops.user` and the VMMS chief mechanics). Keep `@welinc.com` addresses for seeds. The seed writes users straight to the database, so no email check applies to them. Real users may use any email whose domain can receive mail, such as Gmail.
+- Note (2026-11-09, from spec 0004 follow-up): the seed needs people for every role in the catalog, Driver and Helper (BMS) included, one role per person where a system says so.
 - [ ] Design it (spec): `/architect suite seed accounts` (or inside the S1 spec)
 
 ## Login
@@ -159,6 +172,7 @@ The move itself: their users merged into welinc-auth by email, their auth copies
 - Note (2026-11-07): the old `welinc-backend` repo where BMS pushed an auth copy is part of this cleanup.
 - Note (2026-11-08, replan): from spec 0002. The migration guide tells each group to copy `welinc-backend-vrms/src/auth/verify/`, make their client key with `keys:client`, and move to Node 24 (`welinc-backend-vmms-analytics-ai` pins Node 20, end of life since April 2026). From spec 0001: if `welinc-mobile-bms` is still in use, it becomes a `bms-mobile` client like `vmms-mobile`.
 - Note (2026-11-08): BMS keeps the mobile app, but for different users than its web app. They likely haven't started building it, and you asked them on 2026-11-08 who will use it. If they are staff, it's a `bms-mobile` client plus a role in S5. If they are customers, their login is a separate suite decision that has to be made before this row's guide. The question is in `docs/_private/vrms/shared-services-questions.md`.
+- Note (2026-11-09, from spec 0004 follow-up): the migration guide tells VMMS to drop its client side `getMobileAccessRole` check once `vmms-mobile` moves (welinc-auth now refuses it with `APP_NOT_ALLOWED`), and BMS to read role names from `GET /auth/systems`. Still to confirm with VMMS and BMS: BMS Driver and Helper, one role per person, any role they plan before the deadline, and whether the VMMS Admin still manages VMMS users.
 - [ ] Design it (spec): `/architect move VMMS and BMS onto the shared services`
 
 ## Admin
@@ -175,6 +189,7 @@ Replaces VRMS feature 61 with the same scope (the full model, chosen 2026-11-07)
 - Note (2026-11-08, VMMS feedback): VMMS prefers the superadmin to have **no access to system data**, since each system has its own admin and the superadmin controls permissions; temporary access only in some cases. Their Admin now has reduced access (most of their workflow sits with Operations), and they plan to move to permission checks instead of role checks. To confirm with them: permissions granted to roles (the plan) or to individual people, and whether the VMMS Admin still manages VMMS users.
 - Note (2026-11-08, leaning, may change in the spec): **user admin moves to the portal, scoped by who is looking.** Account actions (create, edit name and email, role, reset or setup code, unlock, sessions, deactivate, activity) live in a portal admin section: a system Admin sees only their system's people and gives only their system's roles; the superadmin sees everyone plus the access report and permission settings. Each system keeps only work data about the person. Read only check of the 2026-11-06 code: the VMMS (`UserManagement.tsx`, 614 lines) and BMS (`admin/UserManagement.tsx`, 837 lines) pages are pure account actions on `/auth/users*` with no work data, so they delete them and their sidebar item links to the portal; their profile pages (VMMS phone check, BMS activity, verify password, deletion) can use the portal's My account too. VRMS keeps its Users page as a team and work view (role and status shown, Work column, open tickets, Reassign; Edit, reset, unlock, sessions and deactivate become one **Manage account** link; **Add user** opens the portal form with VRMS picked), keeps the Chief Mechanic dashboard Team section, and keeps its own My profile page (it already calls welinc-auth). Leavers: the portal cuts the account off right away and warns that open work gets flagged; VRMS reacts to the S6 change feed (`deactivated`, `roles_changed`) by flagging the person's open tickets as needing reassignment and alerting Chief Mechanics, which also covers a shared account deactivated from another system. Tell VMMS and BMS not to build more user management meanwhile.
 - Note (2026-11-08, leaning, may change in the spec): **permissions edited centrally, optional per system.** The system admins and the superadmins are the same IT/operations team, so the role to permission matrix moves to suite settings and only a superadmin edits it (like Auth0's RBAC). Each system's code still declares which permissions exist (`vrms.ticket.view_all`) and still runs the check itself, reading its matrix from welinc-auth and keeping a copy that refreshes on change; permissions don't go in the token. VRMS moves first, and its settings page stops editing the matrix. BMS and VMMS may keep checking roles in their own code and join later. Every matrix edit is logged and alerts that system's admins. Open: where the suite settings screen lives (the portal is the likely home). S5 only leaves room for this in `/auth/systems`.
+- Note (2026-11-09, from spec 0004 follow-up): build on the `isSystemAdmin` flag and `GET /auth/systems` from S5 (additive permissions field later). Close the self grant hole with the temporary access exception here.
 - [ ] Design it (spec): `/architect suite admin model`
 - [ ] Polish it (optional, ask first): `web-design-guidelines` (access report)
 

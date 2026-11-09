@@ -2,7 +2,7 @@
 
 **Date**: 2026-11-08
 **Status**: Accepted
-**Scope row**: [S5. Roles per system](../../../scope/_root/shared-services.md#s5-roles-per-system--in-progress)
+**Scope row**: [S5. Roles per system](../../../scope/_root/shared-services.md#s5-roles-per-system--done)
 **Builds contract sections**: [0001](../0001-shared-services-contract/index.md) sections 4 (clients gain allowed roles), 10 (`/auth/systems`, `/auth/me`), 11 (three new error codes), 13 rule 5
 
 ## Summary
