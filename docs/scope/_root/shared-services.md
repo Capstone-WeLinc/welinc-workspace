@@ -28,7 +28,7 @@ _These are recommendations to keep the build orderly, not requirements. Skip any
 | S3 | Sessions: refresh and logout, web and mobile | Core | done |
 | S5 | Roles per system | Core | done |
 | S6 | User directory for systems | Core | done |
-| S12 | Suite seed accounts | Core | in-progress |
+| S12 | Suite seed accounts | Core | done |
 | S4 | App initiated login and launcher | Login | planned |
 | S9 | Gateway for the whole suite | Gateway | planned |
 | S7 | Account activity and audit | Account | planned |
@@ -120,7 +120,7 @@ Systems need names, emails and roles for people their records point to (VMMS sch
 - [x] Review it (fresh model): `/check review user directory for systems` (skipped by choice, 2026-11-09; not run)
 - [x] Document it: `/document user directory for systems` (2026-11-09; PRs welinc-auth #19, welinc-backend-vrms #48, welinc-web-vrms #51, welinc-workspace #16)
 
-### S12. Suite seed accounts · in-progress · Beta
+### S12. Suite seed accounts · done · Beta
 spec [0006](../../specs/_root/0006-suite-seed-accounts/index.md) · code in `welinc-auth/prisma/seeds/`, `welinc-backend-vrms/prisma/seeds/`, `docs/integration/seed-accounts.md`
 
 One seed in welinc-auth for all three systems instead of three drifting copies: fixed ids every system links its own rows to (as VRMS already does with `SEED_IDS`), one person per email, and people chosen to test the shared login.
