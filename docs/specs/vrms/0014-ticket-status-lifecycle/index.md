@@ -1,7 +1,7 @@
 # 0014. Ticket status lifecycle: one transition table in code, verify and send back
 
 **Date**: 2026-10-31
-**Updated**: 2026-11-01 (spec 0016 switches on M1 and restores a Disabled truck on release)
+**Updated**: 2026-11-01 (spec 0016 switches on M1 and restores a Disabled truck on release); 2026-11-11 (staleness sweep: "Send back" reads "Return to mechanic" and the banner "Returned by {name}", per spec 0018 AC-15; AC-5's key count grew with later specs, the catalog now holds 28 keys; `applyStatusMove` lives in its own file, `src/modules/vrms/apply-status-move.ts`)
 **Status**: Accepted
 
 ## Summary
@@ -51,7 +51,7 @@ Decision history (context, options, rationale): [rationale.md](rationale.md).
 - **AC-17**: When `lastRejection` is set, the detail page shows a banner near the top: "Sent back by {name}, {relative time}" and the remarks, in the warning tone from `design.md` tokens, readable at 375px.
 - **AC-18**: Send for verification after a Send back opens with each issue's saved note, hours and "Followed the known fix" filled in, read from `issues[]` on the ticket response (`formatIssue` already returns them; no backend work). A linked issue with no saved choice still defaults "Followed the known fix" to ticked.
 - **AC-19**: The web reads `response.data.code`: a 400 with `INVALID_TRANSITION` shows the server's message as an error toast and quietly reloads the ticket; other 400s show their message in place as today. A 409 keeps today's stale flow, now also on Unlock and on the costs save.
-- **AC-21**: After a Send back, each issue still shows its saved "What fixed it" note and hours, tagged "Sent back, not resent yet", even though `resolvedAt` is cleared.
+- **AC-21**: ~~After a Send back, each issue still shows its saved "What fixed it" note and hours, tagged "Sent back, not resent yet", even though `resolvedAt` is cleared.~~ Dropped 2026-11-11: never built, and the Returned banner (with the reason) plus the prefilled resend dialog already show the mechanic what came back.
 
 *Existing data*
 - **AC-20**: No schema migration. The verify run shows every ticket's status is one of the nine and every open ticket has a move out under the table (Jira: existing tickets survive without loss).
@@ -192,7 +192,7 @@ export function statusMovesFrom(from: RepairStatus): TicketMove[];   // trigger 
 | finished move | vehicle status, odometer | `DISABLED` when the ticket's `priorVehicleStatus` is `DISABLED`, else `AVAILABLE` (spec 0016); `max(ticket.odometer, vehicle.odometer)` as today |
 | detail read | `moves` | `statusMovesFrom(status)` filtered by the caller's rights (AC-6) |
 | detail read | `lastRejection.remarks`, `byName`, `at` | the newest first scan in AC-14: the reject row's `note`, `actorName ?? actorEmail`, `createdAt` |
-| detail read | issue note tag "Sent back, not resent yet" | `resolutionNote` set and `resolvedAt` null |
+| detail read | ~~issue note tag "Sent back, not resent yet"~~ (dropped with AC-21) | `resolutionNote` set and `resolvedAt` null |
 | resend dialog | prefilled note, hours, followed | `issues[].resolutionNote`, `hoursSpent`, `followedKnownFix` on the detail response (spec 0007) |
 | banner | relative time | `lastRejection.at`, formatted in the browser |
 | `/me` | `ticket.verify` per role | catalog defaults, then the stored matrix (spec 0011) |
@@ -229,7 +229,7 @@ Tracer Bullet: the first slice runs the new table end to end on today's moves, t
 1. **Table and thin thread.** `ticket-transitions.ts` with all 14 moves, `findMove`, `statusMovesFrom`, unit tests for the table; `applyStatusMove` with the interactive transaction, the conditional `updatedAt` update, the write order of AC-12 and the vehicle release and odometer sync moved inside; `updateStatus` rewritten on top of it for M3, M4, M5, M14 with the check order of AC-3a, the same status rule and the 400 `INVALID_TRANSITION` body; the unassign release in `mechanic-work.service.ts` moved onto `applyStatusMove`; `lastUpdatedAt` required and conditional on the status, unlock and costs paths; remove `FORWARD_MOVES` and `MECHANIC_ALLOWED_TRANSITIONS`; update `repairs.status.spec.ts` and `mechanic-work.service.spec.ts` to the new rules. Satisfies **AC-1**, **AC-2**, **AC-3**, **AC-3a**, **AC-4**, **AC-7**, **AC-10**, **AC-11**, **AC-12**
 2. **Moves to the web.** `moves` and `can.verify` in `present()`; web types, `nextAction.ts` returning the action list (no `FORWARD` map, Cancel from `moves`, callouts on the primary move's `to`), the two button bar on desktop and phone, "Waiting for verification." text, Unlock and costs sending `lastUpdatedAt` with the 409 stale flow, the `INVALID_TRANSITION` toast read from `code`; update `nextAction.test.ts`. Satisfies **AC-13**, **AC-15**, **AC-19**
 3. **Verify right.** `ticket.verify` in `catalog.ts` and the `ticket.administer` relabel; `verify` in `TicketAction` with the self verification `cannot` after the `can` in `ability.factory.ts`; the status route guard; rights, `read` check and the two 403 messages in `updateStatus` and `moves`; update `repairs.access.spec.ts`, the route permissions spec and the `/me` per role test. The Chief Mechanic now sees Verify and close. Satisfies **AC-5**, **AC-6**
-4. **Send back.** M6 on the status endpoint with the remarks rule and no `ticket.remarks` write; the backward rule in `applyStatusMove`; `lastRejection` in `present()`; the Send back dialog state, the banner, the prefilled resend dialog, the "Sent back, not resent yet" notes. Satisfies **AC-8**, **AC-9**, **AC-14**, **AC-16**, **AC-17**, **AC-18**, **AC-21**
+4. **Send back.** M6 on the status endpoint with the remarks rule and no `ticket.remarks` write; the backward rule in `applyStatusMove`; `lastRejection` in `present()`; the Send back dialog state, the banner, the prefilled resend dialog (the "Sent back, not resent yet" notes were dropped with AC-21). Satisfies **AC-8**, **AC-9**, **AC-14**, **AC-16**, **AC-17**, **AC-18**
 5. **Existing data and docs.** Run the status count query and the table test against the dev database; in spec 0011 note that AC-12 is narrowed and the status route guard gains `ticket.verify`. Satisfies **AC-20**
 
 ## Consequences

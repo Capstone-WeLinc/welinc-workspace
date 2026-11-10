@@ -2,6 +2,7 @@
 
 **Date**: 2026-11-01
 **Status**: Accepted
+**Updated**: 2026-11-11 (staleness sweep). Spec 0018 replaced the photo kinds: Before and After photos with their own labels and per group limit message (AC-2, AC-3), and proof is images only, no PDF. Spec 0024 AC-13 moved the photos into their own Photos card after Issues with one add tile (no separate "Take photo" and "Choose photos" buttons; the full state reads "{Group} photos full (n of max)"), and put the Documents card on the detail page itself, not in `TicketSidePanel`.
 
 ## Summary
 
@@ -60,7 +61,7 @@ Repair tickets get one private place for files: vehicle photos, proof of complet
 - **AC-12a**: The upload's body is not read until the caller is known to see the ticket. `UploadAccessGuard` runs the ticket visibility check (AC-16) for `:id` (404 otherwise), then the throttle, and only then does the `FileInterceptor` buffer the file. So nobody can make the server load 25 MB for a ticket they can't see.
 - **AC-12b**: Error order is fixed, the first failing check wins. Upload: 404 ticket, 429 rate, 400 `kind`/DTO, 403 `FORBIDDEN_KIND`, 409 `TICKET_FINISHED`, 413 size, 400 `NO_FILE`, 415 type, 400 `ISSUE_NOT_ON_TICKET`, 200 duplicate (pre check), 409 caps (pre check), 422 pipeline. Then under the lock: 409 finished, 400 issue, 200 duplicate, 409 caps. Delete: 404 (ticket or attachment not visible), 204 if already deleted, 403 `NOT_YOUR_FILE`, 409 `TICKET_FINISHED`.
 - **AC-13**: Adding or removing a file never writes the `repair_tickets` row (its `updatedAt` and the 409 stale check are unaffected), even though the transaction locks it.
-- **AC-14**: The blobs are written before the database insert. If the insert (or anything after the first blob write) fails, the backend deletes the blobs it wrote before it answers. The gateway accepts bodies up to 26 MB on `/vrms` and `/repairs` (`client_max_body_size 26m` in `welinc-auth/nginx.conf`); without it nginx answers 413 before the backend sees the request. The same locations get `proxy_read_timeout 120s`, because a queued HEIC conversion on a cold replica can pass nginx's 60 s default.
+- **AC-14**: The blobs are written before the database insert. If the insert (or anything after the first blob write) fails, the backend deletes the blobs it wrote before it answers. The gateway accepts bodies up to 26 MB on `/vrms/` (`client_max_body_size 26m` in `infra/gateway/templates/default.conf.template` since spec 0008, which also dropped `/repairs`); without it nginx answers 413 before the backend sees the request. The same locations get `proxy_read_timeout 120s`, because a queued HEIC conversion on a cold replica can pass nginx's 60 s default.
 
 *Permissions*
 - **AC-15**: New permission keys in `catalog.ts` (group `Tickets`):
@@ -91,13 +92,13 @@ Repair tickets get one private place for files: vehicle photos, proof of complet
   Both are idempotent. A purged attachment never appears in the list.
 
 *Web: vehicle photos (folds in scope feature 21, WL-209 and WL-210)*
-- **AC-20**: `IssuesSection` shows a Photos strip at the top for untagged photos, and one under each issue for photos tagged to it. Each thumbnail is an `<img loading="lazy">` with its stored `width` and `height` (so space is reserved before it loads) and an alt text of "Photo by <name>, <date>". With no photos, a mechanic who can add sees a short empty state with the add buttons, and others see nothing.
+- **AC-20**: `IssuesSection` shows a Photos strip at the top for untagged photos, and one under each issue for photos tagged to it. Each thumbnail is an `<img loading="lazy">` with its stored `width` and `height` (so space is reserved before it loads) and an alt text of "<Group> photo by <name>, <date>" (for example "Before photo by Jo, Nov 1, 2026, 10:42 AM", from `photoName()` in `photoCaption.ts`). With no photos, a mechanic who can add sees a short empty state with the add buttons, and others see nothing.
 - **AC-21**: With `ticket.files.add` on an open ticket, the top strip and each issue offer two buttons. "Take photo" is `<input type="file" accept="image/*" capture="environment">` and opens the rear camera directly. "Choose photos" is `accept="image/*"` with `multiple`. Buttons inside an issue tag the photo to that issue. On desktop only "Choose photos" shows, and the strip also accepts drag and drop. The buttons are disabled with "Photo limit reached (5 of 5)" when the count is at the limit. On a finished ticket they don't render.
 - **AC-22**: Before upload, the browser shrinks each photo it can decode (`createImageBitmap` with `imageOrientation: 'from-image'`). The longest edge goes to at most 2560 px, as JPEG quality 0.85, named `<original base name>.jpg`. If decoding fails (for example HEIC on desktop Chrome), or the result is bigger than the original, the original is sent. The browser also checks the size limit and the accepted types from the list response's `limits` and `kinds` (labels and accepted types come from the server, so the web keeps no copy) and shows the same message as the server. The server stays the authority.
 - **AC-23**: Selected files go into an in memory queue per ticket and upload one at a time. Each shows a tile with its state (waiting, uploading with a percentage from `onUploadProgress`, done, failed). A network error or a 5xx retries automatically twice (after 2 s, then 6 s), then the tile shows the error with Retry and Remove. A 4xx never retries and shows the server's `message`. A 200 `duplicate` counts as done. Leaving the page drops unfinished uploads (persisting the queue is the offline feature's job).
 - **AC-24**: Tapping a thumbnail opens the photo viewer: `yet-another-react-lightbox`, imported lazily on first open, with only the Zoom and Captions plugins. It shows every live photo on the ticket in list order, with swipe, Previous and Next, arrow keys, pinch and double tap zoom, and a caption with uploader name, date and time (Asia/Manila), plus the issue's name when tagged. It's themed only through its CSS variables mapped to `design.md` tokens, and with `prefers-reduced-motion` its animations are off. Escape and the close button return focus to the thumbnail.
-- **AC-25**: A thumbnail the user may remove (`canRemove`) has a remove button with the accessible name "Remove photo". It opens a confirm dialog ("Remove this photo? It disappears from the ticket for everyone."), and after the 204 the photo leaves the strip and the viewer.
-- **AC-26**: Links are refreshed without the user noticing. The list query has `staleTime` 8 minutes and refetches on window focus. The first image load error refetches the list once, and a second failure shows "Could not load photo" on that tile.
+- **AC-25**: A thumbnail the user may remove (`canRemove`) has a remove button whose accessible name is "Remove" plus the photo's name (for example "Remove before photo by Jo, Nov 1, 2026, 10:42 AM"), so a screen reader can tell the buttons apart. It opens a confirm dialog ("Remove this photo? It disappears from the ticket for everyone."), and after the 204 the photo leaves the strip and the viewer.
+- **AC-26**: Links are refreshed without the user noticing. The list query has `staleTime` 8 minutes and refetches on window focus. The first image load error refetches the list once, and a second failure shows "Could not load" on that tile, with the photo's name as screen reader text.
 
 *Web: documents*
 - **AC-27**: `TicketSidePanel` shows a Documents card only to callers with `ticket.costs.view`. It lists receipts and other documents (kind label, file name, uploader, date) with Open (the signed link in a new tab, `rel="noopener noreferrer"`) and Remove (when `canRemove`, same confirm pattern as AC-25). With `ticket.documents.add` on an open ticket, "Add document" uploads one PDF as `OTHER_DOCUMENT` through the same queue and error handling. The card hides "Add document" at the documents limit and shows "Document limit reached".
@@ -208,7 +209,7 @@ The list has no pagination on purpose. It's bounded by the settings caps (at mos
 | Upload | rate limit identity | `req.user.sub` |
 | List | `url`, `thumbnailUrl`, `urlsExpireAt` | `FileStore.readUrl(key, fileName, mimeType)`, window from AC-2 (10 minute boundaries); host from `STORAGE_PUBLIC_URL` or the account URL |
 | List | `kinds[]` labels and accepted types | `attachment-kinds.ts` |
-| Activity, `/vrms/audit` | which attachment events show | `hideDocumentEvents(canViewCosts)` over `changes` `kind` (AC-16) |
+| Activity, `/vrms/audit` | which attachment events show | `hiddenAuditEvents(canViewCosts)` over `changes` `kind` (AC-16; it also hides `COST_UPDATE`, spec 0021 AC-12) |
 | List | which kinds show | `ticket.costs.view` on the caller's ability (AC-16) |
 | List | `canRemove` | AC-17 rule over `uploadedByUserId`, the add key for the kind, `ticket.files.remove_any`, and `isFinished` |
 | List | `limits.*` | the three settings, plus live counts from `attachments` |
@@ -275,13 +276,13 @@ Tracer Bullet: the first slice runs one real photo through every layer (Azurite,
    - `UploadAccessGuard` before the interceptor, multer limits and the size checks, HEIC through heic-convert, sRGB and the pixel cap, the semaphores.
    - `sha256` and duplicate handling (pre check, under lock, P2002 backstop), caps under `FOR NO KEY UPDATE`, the finished and `issueId` checks in both places, the error order.
    - The user throttler on the upload route, blob cleanup on failure, the credential choice and the 503 when unconfigured.
-   - Gateway `client_max_body_size 26m` and `proxy_read_timeout 120s` in `welinc-auth/nginx.conf`.
+   - Gateway `client_max_body_size 26m` and `proxy_read_timeout 120s` in `welinc-auth/nginx.conf` (now `infra/gateway/templates/default.conf.template`, spec 0008).
    - Satisfies **AC-3** to **AC-6**, **AC-8** to **AC-14** (with **AC-12a**, **AC-12b**).
 3. **Permissions, remove and audit.**
    - `addFiles`, `addDocuments` and `removeAny` in `AppAction`, the three catalog keys and their CASL rules (`addFiles` follows `ticket.view_all`), and the matrix labels.
    - The per kind check with `ticket.costs.view` for documents, `findVisibleTicket`, and cost based visibility in the list.
    - `DELETE` with the soft delete fields and `canRemove`.
-   - `ATTACHMENT_ADDED` and `ATTACHMENT_REMOVED` in `audit-events.ts`, `hideDocumentEvents` in the ticket activity and `findAuditEvents`, and their rows in spec 0010's event table.
+   - `ATTACHMENT_ADDED` and `ATTACHMENT_REMOVED` in `audit-events.ts`, `hiddenAuditEvents` (first named `hideDocumentEvents`) in the ticket activity and `findAuditEvents`, and their rows in spec 0010's event table.
    - Satisfies **AC-15** to **AC-18**.
 4. **Phone photo UX.**
    - "Take photo" and "Choose photos" per strip and per issue, drag and drop on desktop, browser shrink, the upload queue with progress and two automatic retries, error messages from the server.

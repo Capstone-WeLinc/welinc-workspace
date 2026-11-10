@@ -2,6 +2,7 @@
 
 **Date**: 2026-10-22
 **Status**: Accepted
+**Updated**: 2026-11-11 (staleness sweep). The status badge keys follow spec 0010's nine status names (`OPEN`, `ASSIGNED`, ... `CLOSED`; `PENDING`, `COMPLETED` and `PENDING_VERIFICATION` are gone); the High priority pill is the `highlight/25` tint with `highlight-foreground` text and every pill uses `BadgePill` (spec 0024 AC-19); `confirm()` and `confirmChoice()` gained a `warning` tone.
 
 ## Summary
 
@@ -54,7 +55,7 @@ This feature has no data model, no state machine and no backend API. Its interfa
 
 | Layer | Now | After |
 |---|---|---|
-| React | 18.3 | 19 (latest), `@types/react` 19; `react-router-dom` bumped to latest 6.x |
+| React | 18.3 | 19 (latest), `@types/react` 19; `react-router-dom` bumped to latest 6.x (now on 7.x, recorded 2026-11-11) |
 | Tailwind | 3.4, JS config, PostCSS | 4 (latest) with `@tailwindcss/vite`, config in `index.css` (`@theme inline`), `tw-animate-css` for motion |
 | Components | hand written | shadcn/ui, style `new-york`, Radix primitives, `components.json` updated (`tailwind.config` empty, `style: new-york`) |
 | Toasts | custom context | `sonner` |
@@ -306,7 +307,7 @@ Every component takes its visible text through props, with English defaults, so 
 Tracer Bullet: milestone 1 is a thin thread through every layer of the system (upgrade, token, Tailwind utility, shadcn component, showcase, axe check, lint rule). Milestones 2 to 4 thicken it one strand at a time. The app stays working after every milestone.
 
 **Milestone 1. Thin thread: upgrade, tokens, one component end to end**
-1. Upgrade React to 19 (`react`, `react-dom`, `@types/react`, `@types/react-dom`) and `react-router-dom` to latest 6.x; fix any type errors. Satisfies **AC-1**
+1. Upgrade React to 19 (`react`, `react-dom`, `@types/react`, `@types/react-dom`) and `react-router-dom` to latest 6.x (since moved to 7.x); fix any type errors. Satisfies **AC-1**
 2. Upgrade Tailwind to v4 with the official upgrade tool (`npx @tailwindcss/upgrade`, on a clean git tree; it renames v3 scale classes such as `shadow-sm` to `shadow-xs`, so review its diff), switch to `@tailwindcss/vite`, delete `tailwind.config.js`, `postcss.config.js` and `autoprefixer`, drop the unused custom utilities, and keep the legacy classes in `@layer components`. Satisfies **AC-1**
 3. Write the token set in `index.css` in the order in *Token set* (values on `:root`, the `@theme inline` mapping, aliases on `:root` only, the base border color rule). Rename `var(--muted)`, `var(--accent)` and `var(--accent-soft)` at every use (components and `index.css`). In this milestone the palette reset line is left commented out, so legacy palette classes still render until milestone 4. Satisfies **AC-2**, **AC-4**
 4. Remove dark mode (Topbar toggle, `.dark` rules, theme state); set `color-scheme: light`. Satisfies **AC-5**

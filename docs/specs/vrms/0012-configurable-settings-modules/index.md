@@ -3,6 +3,7 @@
 **Date**: 2026-10-30
 **Updated**: 2026-10-30 (Recent changes asked by key, AC-31; change rows read with units and the reset value, AC-26; AC-24 review step and a required reason when a right is removed)
 **Updated**: 2026-11-01 (spec 0016 adds generic lookup lists, a Vehicles section and one threshold; see Follow-up)
+**Updated**: 2026-11-11 (staleness sweep: the catalog holds 18 settings now, not AC-1's 7, added by specs 0013, 0015, 0016, 0017 and 0018; `/settings` has six sections with Vehicles; the Python service parts of AC-13 to AC-15 and AC-17 moved into backend-vrms with spec 0013, which reads the module switches itself)
 **Status**: Accepted
 
 ## Summary

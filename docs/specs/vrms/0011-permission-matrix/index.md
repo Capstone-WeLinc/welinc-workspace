@@ -1,7 +1,7 @@
 # 0011. Permission matrix: Admin editable grants, enforced with CASL
 
 **Date**: 2026-10-29
-**Updated**: 2026-10-31 (AC-12 narrowed by spec 0014 AC-6: `ticket.administer` no longer closes a ticket, closing and sending back need the new `ticket.verify`; the status route guard gains `ticket.verify`) · 2026-10-30 (AC-25 replaced by spec 0012 AC-24: the matrix is read and edited in the Settings hub)
+**Updated**: 2026-10-31 (AC-12 narrowed by spec 0014 AC-6: `ticket.administer` no longer closes a ticket, closing and sending back need the new `ticket.verify`; the status route guard gains `ticket.verify`) · 2026-10-30 (AC-25 replaced by spec 0012 AC-24: the matrix is read and edited in the Settings hub) · 2026-11-11 (staleness sweep: later specs grew the catalog from 16 to 28 keys, 84 rows (`settings.manage`, `lookups.manage`, `ai.use`, `ticket.verify`, `ticket.assign`, `ticket.edit`, `ticket.checklist.edit`, `ticket.files.add`, `ticket.documents.add`, `ticket.files.remove_any`, `vehicle.manage`, `mechanics.view`); `can` gained `verify`, `assign`, `edit` and `editChecklist`; `@Public` also covers the `/vrms/session/*` routes and `/vrms/health`, and `@Authenticated` covers session status and the attachment routes; spec 0015 AC-1 turned `ticket.costs.view` on for the Chief Mechanic; knowledge categories are read with `config.read` and written with `lookups.manage`, spec 0012 AC-19)
 **Status**: Accepted
 
 ## Summary
@@ -109,7 +109,7 @@ Defaults: ✓ allowed, ✗ not allowed, 🔒 locked. Every key the code has toda
 | Tickets | `ticket.create` | Create tickets and pick mechanics | ✓ | ✗ | ✗ | `POST /repairs`, `GET available-mechanics` |
 | Tickets | `ticket.work` | Work your assigned tickets (status, steps, knowledge link) | ✗ | ✓ | ✓ | `isMechanic` branch of `updateStatus`, `assertCanWork` |
 | Tickets | `ticket.administer` | Move any ticket to any valid status, including close and cancel | ✓ | ✗ | ✗ | `!isMechanic` branch of the same |
-| Tickets | `ticket.costs.view` | See costs | ✓ | ✗ | ✗ | `formatTicket(t, isMechanic)`, summary `spend` |
+| Tickets | `ticket.costs.view` | See costs | ✓ | ✓ (spec 0015 AC-1) | ✗ | `formatTicket(t, isMechanic)`, summary `spend` |
 | Tickets | `ticket.costs.edit` | Encode costs | ✓ | ✗ | ✗ | `PATCH :id/costs`, cost fields on status |
 | Tickets | `ticket.unlock` | Unlock closed tickets | ✓ | ✗ | ✗ | `PATCH :id/unlock` |
 | Records | `audit.view` | See the audit log | ✓ | ✗ | ✗ | `GET audit-logs`, `audit-logs/actors` |
@@ -151,7 +151,7 @@ Every key also yields the flag rule `can(key, 'Permission')`, which is what `@Re
 | `GET /` | `@Public()` |
 | `GET /vrms/permissions/me` | `@Authenticated()` |
 | `GET /vrms/permissions`, `PATCH /vrms/permissions`, `GET /vrms/permissions/changes` | `permissions.manage` |
-| `POST /vrms/repairs`, `GET /vrms/repairs/available-mechanics` | `ticket.create` |
+| `POST /vrms/repairs` | `ticket.create` (the mechanics list moved to `GET /vrms/mechanics/available`, `config.read`, below) |
 | `GET /vrms/repairs`, `GET /vrms/repairs/history`, `GET /vrms/repairs/:id` | `ticket.view` or `ticket.view_all` (either; scope from the ability) |
 | `PATCH /vrms/repairs/:id/status` | `ticket.work`, `ticket.administer` or `ticket.verify` (any; each move's own right is checked in the service, spec 0014 AC-5, AC-6) |
 | `PATCH …/issues/:issueId/knowledge`, `PATCH …/issues/:issueId/steps/:stepId` | `ticket.work` or `ticket.administer` (either; ownership from the ability) |

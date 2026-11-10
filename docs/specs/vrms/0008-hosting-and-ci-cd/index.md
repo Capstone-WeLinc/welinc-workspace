@@ -2,6 +2,7 @@
 
 **Date**: 2026-10-25
 **Status**: In Progress
+**Updated**: 2026-11-11 (staleness sweep). Facts that moved on since this was written: the gateway is `infra/gateway/` in the workspace with one template for local and Azure (`_root` spec 0008), not `welinc-auth/nginx.conf`, and `/repairs` is no longer routed; tokens are ES256 checked against `AUTH_JWKS_URL` (`_root` spec 0002), so there is no `JWT_SECRET` or `JWT_ACCESS_EXPIRY`; web-vrms reads only `VITE_API_BASE_URL` and `VITE_PORTAL_URL` (no `VITE_VRMS_URL`, no `VITE_AUTH_MODE`); VRMS ticket files also need a Blob Storage account and the `vrms-attachments` container (spec 0017 Follow-up), beside the Azure Files share for auth's profile pictures. CD, Bicep, the seed job and `staticwebapp.config.json` are not built yet.
 
 ## Summary
 
@@ -75,7 +76,7 @@ The two SPAs run on Static Web Apps; auth, backend-vrms and the nginx gateway ru
 
 **Network**: the gateway has public ingress. Auth and backend-vrms have internal ingress. The database server allows connections from Azure services only, with SSL required (`sslmode=require`).
 
-**Gateway rules**: the nginx template reads `AUTH_UPSTREAM`, `VRMS_UPSTREAM` and `ALLOWED_ORIGINS` from environment values. Inside Container Apps, internal ingress routes by the Host header, so for each upstream it sets `Host` to that upstream's own name (the local config passes the gateway's host) and uses the container's own DNS resolver (the local `127.0.0.11` line only works under Docker). Routes: `/auth` and `/uploads` to auth, `/vrms` and `/repairs` to backend-vrms. `/ai` and `/analytics` are not routed. It answers CORS preflight only for the two app origins of that environment, not for any origin as the local config does.
+**Gateway rules**: the nginx template reads `AUTH_UPSTREAM`, `VRMS_UPSTREAM` and `ALLOWED_ORIGINS` from environment values. Inside Container Apps, internal ingress routes by the Host header, so for each upstream it sets `Host` to that upstream's own name (the local config passes the gateway's host) and uses the container's own DNS resolver (the local `127.0.0.11` line only works under Docker). Routes: `/auth` and `/uploads` to auth, `/vrms` to backend-vrms (`/repairs` was dropped by `_root` spec 0008). `/ai` and `/analytics` are not routed. It answers CORS preflight only for the two app origins of that environment, not for any origin as the local config does.
 
 **Revisions and probes**: single revision mode. Readiness probes call `/auth/health` and `/vrms/health` with a generous startup delay. They are readiness probes, not liveness probes, so a database outage does not restart loop the apps.
 
@@ -86,7 +87,7 @@ The two SPAs run on Static Web Apps; auth, backend-vrms and the nginx gateway ru
 - web-portal: `npm ci`, `npm run lint`, `npm run build`.
 - backend-vrms and auth: `npm ci`, `npx prisma generate`, `npm run lint:ci` (the new non fixing script), `npm run build`, `npm test`.
 - analytics-ai: `python -m py_compile` on the Python files.
-It sets `permissions: contents: read`, cancels older runs of the same branch, caches npm and times out at 15 minutes.
+It sets `permissions: contents: read`, cancels older runs of the same pull request (a push run to a branch is never cancelled, so every merge keeps its result), caches npm and times out at 15 minutes.
 
 **CD for a backend (`deploy.yml`)**: on push to `development` (staging) or `workflow_dispatch` on `release` (production):
 1. Log in with OIDC using that environment's app registration.

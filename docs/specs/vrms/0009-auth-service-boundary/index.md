@@ -3,6 +3,7 @@
 **Date**: 2026-10-27
 **Status**: Accepted
 **Partly superseded** (2026-11-08) by suite spec [0003](../../_root/0003-sessions-refresh-logout/index.md): AC-4's `/auth/me?system=VRMS` check and AC-15's `?token=` handoff no longer hold. The rest of this spec stands.
+**Updated**: 2026-11-11 (staleness sweep). The account check calls `GET /auth/session`, cached by `sid` for at most 30 s, and caches ended answers too (`_root` spec 0003 AC-26), not AC-7's "only 200 is cached". `AUTH_SERVICE_URL` is now `AUTH_INTERNAL_URL`. AC-11 and AC-12's sync through `/auth/users?system=VRMS` is replaced by the directory feed (`_root` spec 0005): a 30 s poll, `users.manage` on `POST /vrms/mechanics/sync`, and after a save the web calls `POST /vrms/mechanics/:authUserId/refresh` with "It will catch up within a minute.". `Mechanic.authUserId` is required and the audit actor column is `actorUserId` (spec 0010). AC-22's fixed shared UUIDs come from the `people.json` manifest (`_root` spec 0006). welinc-auth's session action list gained `SESSIONS_ENDED`.
 
 ## Summary
 

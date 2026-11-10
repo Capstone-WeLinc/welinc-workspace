@@ -2,6 +2,7 @@
 
 **Date**: 2026-11-01
 **Status**: Accepted
+**Updated**: 2026-11-11 (staleness sweep). AC-17's `POST /repairs/:id/assignments` is now a thin alias of spec 0019's `PUT` logic: it adds to the current list on any open status, no longer `OPEN` only.
 
 ## Summary
 

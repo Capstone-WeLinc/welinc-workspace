@@ -1,7 +1,7 @@
 # 0007. Knowledge base as a fix library that fills itself from repairs
 
 **Date**: 2026-10-25
-**Updated**: 2026-10-30 (`KNOWLEDGE_SETTINGS` replaced by stored settings, spec 0012 AC-3)
+**Updated**: 2026-10-30 (`KNOWLEDGE_SETTINGS` replaced by stored settings, spec 0012 AC-3); 2026-11-11 (staleness sweep: AC-4's migration now lives in spec 0010's squashed baseline; the role enum, `@Roles`, `RequireRole`, `isMechanicRole` and `EDITABLE_ROLES` of AC-1 to AC-3 are gone, replaced by permission keys (spec 0011) and the role catalog from welinc-auth (`_root` spec 0004, picker in `useVrmsRoles.ts`); the open work check is `openWorkFlow.ts` and `openWorkCopy.ts` (spec 0011 AC-35); `KnowledgeEntryChange` is one row per event with `actor*` columns and a `changes` JSON list (spec 0010 AC-9); `RepairIssueStep` gained `origin` and `editedAt` (spec 0023); the Python AI service of AC-37 is retired, the AI lives in backend-vrms (spec 0013))
 **Status**: In Progress
 
 ## Summary
