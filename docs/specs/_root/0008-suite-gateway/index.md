@@ -232,7 +232,7 @@ Tracer Bullet: the thin thread is the real auth and VRMS flow on the new config,
 9. [x] `scripts/clone-all.sh` group option, with a line in the setup guide, satisfies **AC-25**
 10. [x] Docs: the README as the one setup page (the setup guide merged in and removed), `scripts/setup.sh`, `start.sh` and `stop.sh`, `suite-overview.md`, `infra/gateway/README.md`, the attachments `AGENTS.md` line in backend-vrms, satisfies **AC-26**, **AC-28**
 11. [x] Contract 0001 amendments, as version 3, satisfies **AC-27**. Section 2: the Docker service names `vmms-backend`, `vmms-analytics`, `bms-gateway`, which S11's compose files must use. Section 3: drop `/repairs`; locations end in a slash; one template, no separate local config; the gateway's `/health`, 404 and error codes; the flood limit; `X-Forwarded-For` is one value and hops follow `TRUST_PROXY_HOPS`; service logging of `X-Request-Id` moves to a follow up; the CORS header lists. Section 11: the five new codes. Section 12: the flood limit row. Section 14: version 3. Also the headers the gateway hides.
-12. [ ] Delete `welinc-auth/nginx.conf` through its own PR, last, satisfies **AC-14**
+12. [x] Delete `welinc-auth/nginx.conf` through its own PR, last, satisfies **AC-14**
 
 ## Migration plan
 
