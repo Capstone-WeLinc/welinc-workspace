@@ -180,7 +180,7 @@ One gateway that routes every system and analytics service, with a port map that
   - [x] Handover: `clone-all.sh` groups, docs, contract 0001 amendments, then delete `welinc-auth/nginx.conf` · AC-14, AC-25 to AC-28 (2026-11-11: `nginx.conf` deleted in welinc-auth PR 24)
 - [x] Verify it: `/check verify gateway for the whole suite` (2026-11-11, PASS: 103 route checks, live stack, fresh clone setup, 22 MB upload)
 - [x] Test it: `/test gateway for the whole suite` (2026-11-11, no new tests needed; the route harness passes 103 of 103, health specs cover AC-22 and AC-23)
-- [x] Document it: `/document gateway for the whole suite` (2026-11-11, workspace PR)
+- [x] Document it: `/document gateway for the whole suite` (2026-11-11, workspace PR #20)
 - [ ] Polish it (optional, ask first): `docker-patterns`
 
 ## Account

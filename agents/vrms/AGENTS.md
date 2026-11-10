@@ -28,6 +28,14 @@ Tracer Bullet: each feature is built end to end through every layer and working 
 docker compose -f docker-compose.shared.yml up -d
 docker compose -f docker-compose.vrms.yml up -d
 
+# Same thing with scripts (spec 0008): first time setup, then start and stop
+sh scripts/setup.sh vrms   # clones, .env files, keys, packages, migrations, seeds; safe to run again
+sh scripts/start.sh vrms   # starts the stack and prints ok per service
+sh scripts/stop.sh         # stops every welinc_ container
+
+# Gateway checks (needs Docker; starts and removes its own containers)
+node infra/gateway/test/check-routes.mjs
+
 # Inside a Node repo
 npm install
 npm run lint
