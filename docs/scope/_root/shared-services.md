@@ -31,7 +31,7 @@ _These are recommendations to keep the build orderly, not requirements. Skip any
 | S12 | Suite seed accounts | Core | done |
 | S4 | App initiated login and launcher | Login | done |
 | S9 | Gateway for the whole suite | Gateway | done |
-| S14 | Environment checked at startup | Config | in-progress |
+| S14 | Environment checked at startup | Config | done |
 | S7 | Account activity and audit | Account | planned |
 | S8 | Profile extras | Account | planned |
 | S13 | Email verification | Account | in-progress |
@@ -187,7 +187,7 @@ One gateway that routes every system and analytics service, with a port map that
 
 ## Config
 
-### S14. Environment checked at startup · in-progress · from spec 0010
+### S14. Environment checked at startup · done · from spec 0010
 spec [0010](../../specs/_root/0010-startup-env-validation/index.md) · code in `src/config/` of welinc-auth and welinc-backend-vrms, `env.schema.ts` and `vite.config.ts` of welinc-web-vrms and welinc-web-portal, `scripts/sync-env.mjs` and `scripts/setup.sh`
 
 Every app checks its environment variables when it starts or builds and refuses to run with a clear list of what is missing or malformed, and setup tops up an old `.env` with new names.
@@ -199,7 +199,7 @@ Every app checks its environment variables when it starts or builds and refuses 
   - [x] Setup top up: `scripts/sync-env.mjs`, its `setup.sh` call, and the VRMS build rule moved to `build:local` · AC-8, AC-12 (2026-11-11)
 - [x] Verify it: `/check verify environment checked at startup` (2026-11-11, all steps in `verify.md` ran and passed)
 - [x] Test it: `/test environment checked at startup` (2026-11-11, gap check against AC-1 to AC-13 added the AC-11 lint rule test in both backends and the AC-7 no localhost test in both frontends)
-- [ ] Document it: `/document environment checked at startup`
+- [x] Document it: `/document environment checked at startup` (2026-11-11, PRs welinc-auth #27, welinc-backend-vrms #53, welinc-web-vrms #54, welinc-web-portal #18, workspace #22)
 
 ## Account
 
