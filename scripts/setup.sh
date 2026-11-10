@@ -67,11 +67,26 @@ for repo in $repos; do
   fi
 done
 
+step "Prisma clients"
+# The Dockerfiles generate the client for the containers; the database steps below run on this
+# machine, so each repo with a schema needs its own generated client here too
+for repo in $repos; do
+  if [ -f "$repo/prisma/schema.prisma" ]; then
+    echo "prisma generate in $repo"
+    (cd "$repo" && npx prisma generate >/dev/null)
+  fi
+done
+
 step "Signing keys"
-# Only checks that the setting's name is present; never reads its value
-if grep -q '^AUTH_SIGNING_KEYS=' welinc-auth/.env; then
+# has_value <file> <NAME>: true when NAME has a value in the file. Never prints the value.
+# .env.example ships these names empty, so a present name alone is not enough. keys:dev writes the
+# value single quoted, so a quote followed by real content counts, and '' or "" does not.
+has_value() {
+  grep -Eq "^$2=([^[:space:]\"']|[\"'][^\"'[:space:]])" "$1"
+}
+if has_value welinc-auth/.env AUTH_SIGNING_KEYS; then
   echo "keep  the keys already in welinc-auth/.env"
-  if [ "$group" = vrms ] && ! grep -q '^AUTH_CLIENT_PRIVATE_KEY=' welinc-backend-vrms/.env; then
+  if [ "$group" = vrms ] && ! has_value welinc-backend-vrms/.env AUTH_CLIENT_PRIVATE_KEY; then
     echo "note  welinc-backend-vrms/.env has no client key. Run: cd welinc-auth && npm run keys:dev -- --force"
   fi
 elif [ -d welinc-backend-vrms ]; then

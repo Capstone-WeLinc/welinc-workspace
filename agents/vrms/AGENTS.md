@@ -12,7 +12,7 @@ The VRMS group's rules for AI tools: Vehicle Repair Management System, built by 
 | `welinc-web-vrms` | React + Vite + Tailwind SPA | 8001 |
 | `welinc-backend-vrms` | NestJS + Prisma + PostgreSQL API | 3002 |
 
-- **Gateway routes**: `/vrms` and `/repairs`.
+- **Gateway route**: `/vrms/` (`/repairs` is gone since contract version 3). The gateway config lives in `infra/gateway/`.
 - **File storage**: Azurite (the local Blob Storage emulator, port 10000) in `docker-compose.vrms.yml`, Azure Blob Storage when hosted. Only `welinc-backend-vrms` talks to it (spec 0017); the browser gets signed links.
 - **Package manager**: npm in every Node repo (`package-lock.json`).
 - **Runtime**: Node 24 everywhere (`.nvmrc` and the Dockerfiles in auth, backend-vrms, web-vrms and web-portal; `engines` is `24.x` in the backends).

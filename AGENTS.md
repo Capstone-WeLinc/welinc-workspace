@@ -10,7 +10,7 @@ This file holds only the rules every group shares. Each group's own AI rules, sk
 |---|---|---|
 | `welinc-auth` | NestJS + Prisma auth service (JWT, a role per system) | 3001 |
 | `welinc-web-portal` | React + Vite SSO portal | 8000 |
-| Gateway | Nginx; config currently in `welinc-auth/nginx.conf` | 3000 |
+| Gateway | Nginx; config in `infra/gateway/` (this repo, spec 0008) | 3000 |
 
 - Run them with `docker compose -f docker-compose.shared.yml up -d`, always first: it creates the `welinc-network` Docker network every system joins. Its compose project name stays `auth-infrastructure` so existing containers and volumes keep working.
 - Architecture: microservices between systems (own containers, database and deployment, API calls through the gateway), a modular monolith inside each system. No system reads another system's database.
