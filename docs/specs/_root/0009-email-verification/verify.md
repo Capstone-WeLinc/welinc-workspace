@@ -56,3 +56,65 @@ Steps for `/check verify email verification`. Run them on the local stack.
 ### Docs
 
 26. Contract 0001 sections 8, 10, 11 and 12 and `docs/integration/seed-accounts.md` carry the changes. **AC-31**
+
+## Added by /develop (2026-11-11)
+
+_Extra steps from the build, one or more per acceptance criterion plus the Value sourcing rows. They overlap the steps above on purpose; skip a step the list above already ran._
+
+**Before you start:** local welinc-auth sends real mail. Run it with mail off so codes print in its log, using a compose override that sets `SMTP_HOST`, `SMTP_USER` and `SMTP_PASS` to `""` on `auth-service` (`docker compose -f docker-compose.shared.yml -f <override> up -d --no-deps auth-service`, then restart `welinc_api_gateway`). Read a code with `docker logs welinc_auth_service 2>&1 | grep -A2 "<email phrase>"`. Run `npm run seed` in the auth container after each pass (it puts `state.unverified@` back). Put the container back on its normal settings when done.
+
+### UI / manual
+- [x] Portal, `state.unverified@` / `mechanic1234` → the card says "Check your email", "We sent a 6 digit code to state.unverified@welinc.com", focus is in the code field, Verify disabled, "Resend code in 60 s" → AC-7, AC-25, AC-26
+- [x] Type a wrong code → "That code isn't right. 4 tries left." as an alert, boxes cleared, focus back in the field → AC-4, AC-25, AC-26
+- [x] Type the right code → submits on the 6th digit and lands on the launcher (two systems); signing in again goes straight in → AC-9, AC-25
+- [x] Open the portal with `?request=` from VRMS (an app initiated login) as `state.unverified@` → after the code, you land back in VRMS, not the launcher → AC-25
+- [x] Paste 6 digits into the field → every box fills and it submits → AC-26
+- [x] At 375px the step fits, the six boxes are 44px, focus rings show (the page's existing hero overflow of 18px is separate) → AC-26
+- [x] Use a different account → back to the password step; the URL and sessionStorage hold no ticket → AC-25
+- [x] Wait out a code (or force `expires_at` into the past) and verify → back to the password step with "That code expired. Sign in again to get a new one." → AC-25
+- [x] VRMS My profile while unverified → "Not verified yet. You'll confirm it the next time you sign in." → AC-28
+- [x] My profile → Change email with a wrong password → "That password isn't right." under the password field → AC-17, AC-27
+- [x] Change email to your own address, to `vrms.admin@welinc.com`, and to a domain that can't receive mail (`x@nodomain.invalid`) → each message under the new email field → AC-17, AC-27
+- [x] Change email properly → code step; close it → profile shows "Waiting for you to confirm …" with Enter code and Cancel; your email is unchanged → AC-17, AC-27
+- [x] Enter code → the profile, the account summary and the shell show the new email, the toast confirms it, the session stays → AC-18, AC-27
+- [ ] Start a change, then Cancel on the profile → the pending notice goes; `/auth/me` answers `pendingEmail: null` → AC-19, AC-27
+- [x] Users page as `vrms.admin@`: a user with `password_set` false reads Setup pending, one with a password and `email_verified` false reads Email not verified; sort Locked, Setup pending, Email not verified, Active, Inactive (Inactive last by decision) → AC-29
+- [x] Email not verified row → Send reset code says "Using it sets a new password and confirms their email. They'll also get a code when they next sign in." → AC-29
+- [x] Edit a user and type a new email → the field says "They'll confirm the new address at their next sign in, and we'll tell the old one."; editing yourself, the email is read only with "Change your own email from My profile." → AC-21, AC-29
+- [x] Reactivate a Setup pending user → the dialog reads "They still need to set a password…" → AC-29
+
+### Commands
+- [x] `POST /auth/login` (Origin `http://localhost:8000`) for `state.unverified@` → 200 `EMAIL_VERIFICATION_REQUIRED`, `Cache-Control: no-store`, no `Set-Cookie` → AC-7
+- [x] The same login again inside 60 s → a new `challengeId`, no new email; the old ticket with the right code → 400 `CODE_EXPIRED` → AC-8
+- [ ] A user with no system and an unverified email → 403 `NO_SYSTEM_ACCESS`, no code in the log → AC-7
+- [x] `/auth/login/verify-email/resend` inside the wait → 429 `CODE_SEND_LIMIT` with `Retry-After`; after 60 s → 200 `{ resendAfter: 60 }` and the same ticket works → AC-5, AC-10
+- [x] 11 calls a minute to `/auth/login/verify-email` from one address → the 11th is 429 `RATE_LIMITED` with `Retry-After`; same for `/auth/verify-otp` (`code-public`) → AC-6
+- [x] `verify-email` with a 5 digit code → plain 400, `attempts` unchanged in `verification_codes` → AC-4
+- [x] Mobile: `POST /auth/mobile/login` (`vmms-mobile`) for `state.unverified@` → the step body; wrong code → `INVALID_CODE`; right code → the token body; an `APP_NOT_ALLOWED` account gets 403 before any code → AC-11
+- [x] `/auth/forgot-password` public, twice inside 60 s → the same generic message both times, one email; with an admin token the second answers 429 `CODE_SEND_LIMIT` → AC-5, AC-13
+- [x] `/auth/verify-otp` 5 wrong times, then the right code → "Invalid or expired OTP" every time → AC-4, AC-14
+- [x] `/auth/reset-password` with a right code → `email_verified` and `password_set` true, sessions ended, lock cleared → AC-12
+- [x] `PATCH /auth/users/:id/password` → 404; `POST /auth/users` with `password` → 400; `PATCH /auth/profile` with `email` → 400 → AC-15, AC-20
+- [x] `POST /auth/users` (no password) → `setupEmailSent: true`, the row has `password_set` and `email_verified` false; pressing Send reset code within 60 s → 429 → AC-5, AC-15
+- [x] Admin changes a Setup pending user's email → old address gets "An admin changed your email", a setup code goes to the new one, the old code no longer works, `setupEmailSent: true` → AC-2, AC-21, AC-24
+- [x] Admin changes their own email on `PATCH /auth/users/:id` → 409 `SELF_EMAIL`; to a taken address → 409 `EMAIL_TAKEN` → AC-21
+- [x] Own email change start → `{ pendingEmail, expiresAt, resendAfter }`; old address gets "An email change was started"; `directory_changes` has no new row until the code is used, then exactly one → AC-17, AC-23, AC-24
+- [x] `GET /auth/me` → `passwordSet`, `pendingEmail`; `GET /auth/users` rows carry `passwordSet` → AC-20, AC-22
+- [x] `SELECT code_hash FROM verification_codes` → argon2 hashes only; `password_reset_tokens` doesn't exist; no log line outside the dev mail fallback holds an address or a code → AC-1
+- [x] Set a code's `created_at` to 25 hours ago and run the sweep → the row is gone → AC-1
+- [x] `docker exec welinc_auth_service npm run test:db` → the migration and code service specs pass → AC-1 to AC-5, AC-16
+- [x] `npm run seed` → every seed person has `password_set` true and `state.unverified@` keeps `email_verified` false → AC-16
+- [x] Contract 0001 reads version 4 with sections 8, 10, 11, 12 and 14 amended; `docs/integration/seed-accounts.md` says `state.unverified@` meets the code step → AC-31
+
+### Value sourcing
+- [x] `challengeId` is 43 base64url characters and only its SHA-256 is in `challenge_hash` → Value sourcing (ticket)
+- [x] `resendAfter` counts down from the family's newest send: start, wait 20 s, sign in again → `resendAfter` about 40 → Value sourcing (resendAfter)
+- [x] After 5 sends in an hour, `Retry-After` is when the oldest of the last 5 turns an hour old, not 60 → Value sourcing (Retry-After)
+- [x] `attemptsLeft` is 5 minus the tries: 4, 3, 2, 1, then `CODE_EXPIRED` → Value sourcing (attemptsLeft)
+- [x] A setup code email says "1 hour", the others "10 minutes" → Value sourcing (lifetime text)
+- [x] The notice to the old address names the address from before the update, not the new one as "old" → Value sourcing (old address)
+- [x] `forgot-password` for a user with `password_set` false sends setup wording, else reset wording → Value sourcing (setup or reset)
+- [x] Make the mail fail on a resend (stop SMTP mid run) → 503 `MAIL_FAILED`, the earlier code still works, and the next send is allowed at once → Value sourcing (restore row)
+
+### Acceptance-criteria coverage
+- AC-1 command steps (hashes, sweep, logs) · AC-2 admin change step · AC-3 lifetime text · AC-4 wrong code UI and command steps · AC-5 limits steps · AC-6 address limit step · AC-7 login steps · AC-8 second login step · AC-9 portal right code · AC-10 resend step · AC-11 mobile step · AC-12 reset step · AC-13 forgot steps · AC-14 verify-otp step · AC-15 admin password steps · AC-16 seed and test:db steps · AC-17 to AC-20 profile steps · AC-21 admin email steps · AC-22 `/auth/users` step · AC-23 directory step · AC-24 notice steps · AC-25, AC-26 portal UI steps · AC-27, AC-28 My profile steps · AC-29 Users page steps · AC-30 `password` sent nowhere (no field in the web-vrms payload types) · AC-31 docs step

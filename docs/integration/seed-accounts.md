@@ -142,7 +142,7 @@ Together these give the launcher (S4) accounts with one system (most office peop
 | `state.locked@` | 403 "Account is locked. Contact your Admin to unlock." with `isLocked: true` |
 | `state.deactivated@` | 401 "Invalid credentials" |
 | `state.deleted@` | 401 "Invalid credentials" (soft deleted; its roles stay) |
-| `state.unverified@` | Signs in. S13 decides whether an unverified account may sign in |
+| `state.unverified@` | The right password answers the email step (200 `EMAIL_VERIFICATION_REQUIRED`, spec 0009), not a session: the portal and the mobile login ask for the 6 digit code emailed to it. Once the code is used it signs in like anyone else, until the next `npm run seed` makes it unverified again. Locally, run welinc-auth with SMTP blank so the code prints in its log instead of going out as real mail |
 
 They exist only on local databases, never on staging. A reseed puts them back in their state, so if you unlock `state.locked@`, it is locked again after the next `npm run seed`.
 

@@ -217,7 +217,7 @@ The profile routes the other apps already call: phone verification (VMMS), verif
 - [ ] Design it (spec): `/architect profile extras`
 
 ### S13. Email verification · in-progress
-spec [0009](../../specs/_root/0009-email-verification/index.md)
+spec [0009](../../specs/_root/0009-email-verification/index.md) · code in `welinc-auth/src/auth/codes/` (code service, sign in step), `welinc-auth/src/auth/sessions/` (the step routes), `welinc-web-portal/src/pages/auth/EmailCodeStep.tsx`, `welinc-web-vrms/src/features/auth/` (Change email) and `src/features/user-management/` (statuses)
 
 Prove a person owns their email before the suite relies on it, instead of only checking that the domain can receive mail. Today `emailVerified` turns true only when someone uses a setup or reset code; an account an admin creates with a typed password, and any email change by an admin or on the profile, is never checked.
 **Done when:** every new account and every email change sends a code or link to that address; `emailVerified` is true only after it is used; admins and the user can see whether an email is verified and send the code again; the rule for an unverified account (sign in allowed or not, which emails it gets) is decided and enforced.
@@ -225,13 +225,14 @@ Prove a person owns their email before the suite relies on it, instead of only c
 - Note (2026-11-09, replan, from spec 0006 follow-up): the sign in rule for unverified accounts is this spec's call; `state.unverified@welinc.com` is the seeded test account for it.
 - Note (2026-11-10): spec 0009 decided a 6 digit code (no link); unverified accounts can't sign in until they type the code, carried by a ticket in the contract's reserved OTP shape, on the portal and mobile; admins can no longer type or set passwords; your own email change keeps the old address until the new one is confirmed, needs your password, and tells the old address at start and at the end; an admin's change switches at once and is confirmed at the next sign in. Every code kind moves into one hashed `verification_codes` table (10 minutes, setup 60, dead after 5 wrong tries, 60 s resend wait, 5 sends an hour, 10 calls a minute per IP on public code routes), which also closes the guessable reset route. `users.password_set` tells Setup pending from Email not verified on the VRMS Users page. Cross checked on another model, 27 fixes applied.
 - [x] Design it (spec): `/architect email verification` (2026-11-10)
-- [ ] Build it: `/develop email verification`
-  - [ ] Thin thread: migration, the code service, the sign in step on `/auth/login` and the portal code screen with `InputOTP` · AC-1 to AC-10, AC-24 to AC-26
-  - [ ] Setup and reset on the shared service, typed admin passwords removed, `password_set`, seeds · AC-6, AC-12 to AC-16, AC-22
-  - [ ] Email changes: your own (`/auth/profile/email*`) and an admin's, notices · AC-17 to AC-21, AC-23, AC-24
-  - [ ] Mobile step, VRMS profile and Users statuses, contract 0001 amendments · AC-11, AC-27 to AC-31
-- [ ] Verify it: `/check verify email verification`
-- [ ] Test it: `/test email verification`
+- Note (2026-11-11, /develop): the Users page keeps Inactive last (Locked, Setup pending, Email not verified, Active, Inactive), your call: AC-29's list reads as the order the status is decided in. Spec 0009's AC-29 still says Inactive first; `/architect` owes that line. Contract 0001 is now version 4 (breaking: the admin password route and fields are gone, and both logins may answer the email step).
+- [x] Build it: `/develop email verification` (2026-11-11, branch `feat/email-verification` in welinc-auth, welinc-web-portal, welinc-web-vrms and the workspace; not pushed)
+  - [x] Thin thread: migration, the code service, the sign in step on `/auth/login` and the portal code screen with `InputOTP` · AC-1 to AC-10, AC-24 to AC-26
+  - [x] Setup and reset on the shared service, typed admin passwords removed, `password_set`, seeds · AC-6, AC-12 to AC-16, AC-22
+  - [x] Email changes: your own (`/auth/profile/email*`) and an admin's, notices · AC-17 to AC-21, AC-23, AC-24
+  - [x] Mobile step, VRMS profile and Users statuses, contract 0001 amendments · AC-11, AC-27 to AC-31
+- [x] Verify it: `/check verify email verification` (2026-11-11)
+- [x] Test it: `/test email verification` (2026-11-11)
 - [ ] Document it: `/document email verification`
 - [ ] Polish it (optional, ask first): `web-design-guidelines` (the portal code step)
 
