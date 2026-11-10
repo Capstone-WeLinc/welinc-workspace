@@ -31,6 +31,7 @@ _These are recommendations to keep the build orderly, not requirements. Skip any
 | S12 | Suite seed accounts | Core | done |
 | S4 | App initiated login and launcher | Login | done |
 | S9 | Gateway for the whole suite | Gateway | done |
+| S14 | Environment checked at startup | Config | in-progress |
 | S7 | Account activity and audit | Account | planned |
 | S8 | Profile extras | Account | planned |
 | S13 | Email verification | Account | in-progress |
@@ -184,6 +185,22 @@ One gateway that routes every system and analytics service, with a port map that
 - [ ] Polish it (optional, ask first): `docker-patterns`
 
 ## Account
+## Config
+
+### S14. Environment checked at startup · in-progress · from spec 0010
+spec [0010](../../specs/_root/0010-startup-env-validation/index.md) · code in `src/config/` of welinc-auth and welinc-backend-vrms, `env.schema.ts` and `vite.config.ts` of welinc-web-vrms and welinc-web-portal, `scripts/sync-env.mjs` and `scripts/setup.sh`
+
+Every app checks its environment variables when it starts or builds and refuses to run with a clear list of what is missing or malformed, and setup tops up an old `.env` with new names.
+**Done when:** all four apps validate at boot or build against their schema, no app code reads `process.env` or falls back to `localhost`, the drift tests pass, and `setup.sh` adds missing names to an existing `.env`.
+- [x] Design it (spec): `/architect startup environment validation` (2026-11-11, cross checked on another model, 15 gaps fixed)
+- [ ] Build it: `/develop environment checked at startup`
+  - [ ] Thin thread on VRMS: welinc-backend-vrms schema, `testEnv`, lint rule, `env:check`, then welinc-web-vrms `checkEnv` and `build:local` · AC-1 to AC-11, AC-13
+  - [ ] The shared pair: welinc-auth, then welinc-web-portal, same pattern · AC-1 to AC-11, AC-13
+  - [ ] Setup top up: `scripts/sync-env.mjs`, its `setup.sh` call, and the VRMS build rule moved to `build:local` · AC-8, AC-12
+- [ ] Verify it: `/check verify environment checked at startup`
+- [ ] Test it: `/test environment checked at startup`
+- [ ] Document it: `/document environment checked at startup`
+
 
 ### S7. Account activity and audit · planned · needs a decision
 Login activity and account change history from welinc-auth, so VMMS (`me/login-activity`, `users/:id/login-activity`, `audit-logs`) and BMS (`profile/activity`, its activity log page) stop keeping or reading their own.
