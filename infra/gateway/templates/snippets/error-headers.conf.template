@@ -1,0 +1,13 @@
+# What every gateway answer of its own carries (the 404, 413, 429, 502 and 504, spec 0008):
+# JSON whatever the path's extension, the same CORS headers as a proxied answer, the request id
+# and HSTS. Included by the named error locations in default.conf.template.
+
+types { }
+default_type application/json;
+
+add_header Access-Control-Allow-Origin $cors_origin always;
+add_header Access-Control-Allow-Credentials $cors_credentials always;
+add_header Access-Control-Expose-Headers $cors_expose_headers always;
+add_header Vary Origin always;
+add_header X-Request-Id $gateway_request_id always;
+add_header Strict-Transport-Security "${GATEWAY_HSTS}" always;

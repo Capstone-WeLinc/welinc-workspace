@@ -173,9 +173,9 @@ One gateway that routes every system and analytics service, with a port map that
 - Note (2026-11-10): spec 0008 decided one nginx template set in `infra/gateway/` for every environment, built into one image run from settings; `/repairs` removed (nothing serves it); JSON errors with CORS for 404, 413, 429, 502 and 504; a separate `/health`; a flood limit per client (20 a second, burst 40); `X-Forwarded-For` sent as one value; a JSON access log with no query strings; `/auth/health` and `/vrms/health` built here. VMMS and BMS routes are proven with stub containers until S11. The image is ready for Azure, the deploy stays in VRMS spec 0008. Deferred, blocks nothing: services logging `X-Request-Id`.
 - [x] Design it (spec): `/architect gateway for the whole suite` (2026-11-10, cross checked on another model, 5 bugs and 14 gaps fixed)
 - [ ] Build it: `/develop gateway for the whole suite`
-  - [ ] The thin thread: `infra/gateway/` with auth and VRMS on the real stack, then the test harness · AC-1, AC-14, AC-24
-  - [ ] Every route and answer: all prefixes, limits, timeouts, `/health`, 404s and JSON errors · AC-1 to AC-7, AC-11, AC-12
-  - [ ] Hardening: CORS finished, settings checks, forwarded headers, request id, flood limit, log, HSTS · AC-8 to AC-10, AC-13, AC-15 to AC-21
+  - [x] The thin thread: `infra/gateway/` with auth and VRMS on the real stack, then the test harness · AC-1, AC-14, AC-24
+  - [x] Every route and answer: all prefixes, limits, timeouts, `/health`, 404s and JSON errors · AC-1 to AC-7, AC-11, AC-12
+  - [x] Hardening: CORS finished, settings checks, forwarded headers, request id, flood limit, log, HSTS · AC-8 to AC-10, AC-13, AC-15 to AC-21
   - [ ] Health routes in welinc-auth and backend-vrms · AC-22, AC-23
   - [ ] Handover: `clone-all.sh` groups, docs, contract 0001 amendments, then delete `welinc-auth/nginx.conf` · AC-14, AC-25 to AC-27
 - [ ] Verify it: `/check verify gateway for the whole suite`

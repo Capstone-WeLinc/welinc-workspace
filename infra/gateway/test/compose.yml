@@ -1,0 +1,71 @@
+# The gateway test harness (spec 0008): the real gateway image in front of stub upstreams that use the
+# real service names and ports. Run `node infra/gateway/test/check-routes.mjs` from the workspace root;
+# it starts and removes everything here. Its own project and network, so it never touches the real stack.
+name: welinc-gateway-test
+
+x-stub: &stub
+  image: node:24-alpine
+  command: ["node", "/stub/stub.mjs"]
+  volumes:
+    - ./stub.mjs:/stub/stub.mjs:ro
+  networks:
+    - gateway-test
+
+x-upstreams: &upstreams
+  AUTH_UPSTREAM: http://auth-service:3001
+  VRMS_UPSTREAM: http://vrms-backend:3002
+  VMMS_UPSTREAM: http://vmms-backend:3010
+  VMMS_ANALYTICS_UPSTREAM: http://vmms-analytics:3011
+  BMS_UPSTREAM: http://bms-gateway:3020
+  ALLOWED_ORIGINS: http://localhost:8000,http://localhost:8001,http://localhost:8002,http://localhost:8003
+
+services:
+  auth-service:
+    <<: *stub
+    environment: { SERVICE: auth, PORT: "3001" }
+  vrms-backend:
+    <<: *stub
+    environment: { SERVICE: vrms, PORT: "3002" }
+  vmms-backend:
+    <<: *stub
+    environment: { SERVICE: vmms, PORT: "3010" }
+  vmms-analytics:
+    <<: *stub
+    environment: { SERVICE: vmms-analytics, PORT: "3011" }
+  bms-gateway:
+    <<: *stub
+    environment: { SERVICE: bms, PORT: "3020" }
+
+  # Routes, CORS, errors and limits, as local runs it. No bind mounts: the image runs from settings alone.
+  gateway:
+    build: ..
+    image: welinc-gateway-test:local
+    ports:
+      - "3100:3000"
+    environment:
+      <<: *upstreams
+      TRUST_EDGE_PROXY: "0"
+      GATEWAY_RATE_PER_SECOND: "1000"
+      GATEWAY_RATE_BURST: "1000"
+      GATEWAY_HSTS: ""
+    networks:
+      - gateway-test
+
+  # As hosted runs it: behind an edge proxy, a low flood limit, HSTS on
+  gateway-edge:
+    build: ..
+    image: welinc-gateway-test:local
+    ports:
+      - "3101:3000"
+    environment:
+      <<: *upstreams
+      TRUST_EDGE_PROXY: "1"
+      GATEWAY_RATE_PER_SECOND: "5"
+      GATEWAY_RATE_BURST: "5"
+      GATEWAY_HSTS: max-age=60
+    networks:
+      - gateway-test
+
+networks:
+  gateway-test:
+    name: welinc-gateway-test

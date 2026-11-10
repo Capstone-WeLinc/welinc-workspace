@@ -1,7 +1,7 @@
 # 0008. Gateway for the whole suite
 
 **Date**: 2026-11-10
-**Status**: Proposed
+**Status**: In Progress
 **Scope row**: [S9. Gateway for the whole suite](../../../scope/_root/shared-services.md#s9-gateway-for-the-whole-suite--in-progress)
 **Builds contract section**: [0001](../0001-shared-services-contract/index.md) section 3 (and amends it, see AC-27)
 
@@ -220,18 +220,18 @@ The stub accepts any body. Over limit checks send a real `Content-Length` and ac
 
 Tracer Bullet: the thin thread is the real auth and VRMS flow on the new config, then the routes and hardening grow on it, with the test script alongside.
 
-1. The thin thread: `infra/gateway/` (Dockerfile, our `nginx.conf`, start check, template with `/auth/`, `/uploads/` and `/vrms/`, the `route.conf` template), `.gitattributes`, and `docker-compose.shared.yml` switched to it. Prove login, refresh and an upload on the real stack. Confirm the image's local resolver step works under compose, satisfies **AC-14**, **AC-24**
-2. The test harness: `test/compose.yml`, `stub.mjs`, `check-routes.mjs`, covering the first routes, satisfies **AC-1**, **AC-14**
-3. All routes, no `/repairs`, slash ended prefixes, body limits and timeouts, satisfies **AC-1**, **AC-2**, **AC-6**, **AC-7**, **AC-12**
-4. Gateway answers: `/health`, the 404 catch all and bare prefix locations, named error locations, `error-headers.conf`, satisfies **AC-3**, **AC-4**, **AC-5**, **AC-11**
-5. CORS finished: the generated map, the settings checks, exposed headers, satisfies **AC-8**, **AC-9**, **AC-10**, **AC-13**
-6. Forwarded headers, request id, `Host` from the upstream, satisfies **AC-15**, **AC-16**, **AC-17**, **AC-18**
-7. Flood limit, JSON log, `error_log` level, HSTS, satisfies **AC-19**, **AC-20**, **AC-21**
-8. `/auth/health` in welinc-auth and `/vrms/health` in backend-vrms, satisfies **AC-22**, **AC-23**
-9. `scripts/clone-all.sh` group option, with a line in the setup guide, satisfies **AC-25**
-10. Docs: README repos table, setup guide section 4 and "taken" ports, `suite-overview.md`, `infra/gateway/README.md`, the attachments `AGENTS.md` line in backend-vrms, satisfies **AC-26**
-11. Contract 0001 amendments, satisfies **AC-27**. Section 2: the Docker service names `vmms-backend`, `vmms-analytics`, `bms-gateway`, which S11's compose files must use. Section 3: drop `/repairs`; locations end in a slash; one template, no separate local config; the gateway's `/health`, 404 and error codes; the flood limit; `X-Forwarded-For` is one value and hops follow `TRUST_PROXY_HOPS`; service logging of `X-Request-Id` moves to a follow up; the CORS header lists. Section 11: the five new codes.
-12. Delete `welinc-auth/nginx.conf` through its own PR, last, satisfies **AC-14**
+1. [x] The thin thread: `infra/gateway/` (Dockerfile, our `nginx.conf`, start check, template with `/auth/`, `/uploads/` and `/vrms/`, the `route.conf` template), `.gitattributes`, and `docker-compose.shared.yml` switched to it. Prove login, refresh and an upload on the real stack. Confirm the image's local resolver step works under compose, satisfies **AC-14**, **AC-24**
+2. [x] The test harness: `test/compose.yml`, `stub.mjs`, `check-routes.mjs`, covering the first routes, satisfies **AC-1**, **AC-14**
+3. [x] All routes, no `/repairs`, slash ended prefixes, body limits and timeouts, satisfies **AC-1**, **AC-2**, **AC-6**, **AC-7**, **AC-12**
+4. [x] Gateway answers: `/health`, the 404 catch all and bare prefix locations, named error locations, `error-headers.conf`, satisfies **AC-3**, **AC-4**, **AC-5**, **AC-11**
+5. [x] CORS finished: the generated map, the settings checks, exposed headers, satisfies **AC-8**, **AC-9**, **AC-10**, **AC-13**
+6. [x] Forwarded headers, request id, `Host` from the upstream, satisfies **AC-15**, **AC-16**, **AC-17**, **AC-18**
+7. [x] Flood limit, JSON log, `error_log` level, HSTS, satisfies **AC-19**, **AC-20**, **AC-21**
+8. [ ] `/auth/health` in welinc-auth and `/vrms/health` in backend-vrms, satisfies **AC-22**, **AC-23**
+9. [ ] `scripts/clone-all.sh` group option, with a line in the setup guide, satisfies **AC-25**
+10. [ ] Docs: README repos table, setup guide section 4 and "taken" ports, `suite-overview.md`, `infra/gateway/README.md`, the attachments `AGENTS.md` line in backend-vrms, satisfies **AC-26**
+11. [ ] Contract 0001 amendments, satisfies **AC-27**. Section 2: the Docker service names `vmms-backend`, `vmms-analytics`, `bms-gateway`, which S11's compose files must use. Section 3: drop `/repairs`; locations end in a slash; one template, no separate local config; the gateway's `/health`, 404 and error codes; the flood limit; `X-Forwarded-For` is one value and hops follow `TRUST_PROXY_HOPS`; service logging of `X-Request-Id` moves to a follow up; the CORS header lists. Section 11: the five new codes.
+12. [ ] Delete `welinc-auth/nginx.conf` through its own PR, last, satisfies **AC-14**
 
 ## Migration plan
 
