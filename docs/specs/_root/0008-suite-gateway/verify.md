@@ -23,6 +23,17 @@ Start with `docker compose -f docker-compose.shared.yml up -d --build`, then `do
 9. In an empty folder outside the workspace, run a copy of `clone-all.sh` with `vmms`, and confirm the list; run it with a made up group and confirm the usage error. Clone nothing you don't need to (**AC-25**).
 10. README, setup guide, suite overview and the attachments `AGENTS.md` match (**AC-26**). Contract 0001 sections 2, 3 and 11 carry the amendments (**AC-27**).
 
+## Scripts and the one page setup (added 2026-11-10, during the build)
+
+The setup guide was merged into the workspace README, and `scripts/setup.sh`, `start.sh` and `stop.sh` were added. Run these in Git Bash on Windows and in a terminal on the Mac.
+
+11. Fresh machine path: in an empty folder outside the workspace, clone the workspace and follow only the README's "Start here". `sh scripts/setup.sh vrms` finishes with every service ok, and you can sign in at `http://localhost:8000` as `vrms.admin@welinc.com`. Stop your main stack first, since both use the same ports and container names (**AC-24**, **AC-25**, **AC-26**).
+12. Run `sh scripts/setup.sh vrms` a second time on a working setup: it keeps every `.env` file, keeps the keys, applies no migrations and says it kept the VRMS data. A ticket you changed before is still changed (checked on the PC 2026-11-10).
+13. `sh scripts/stop.sh` leaves no `welinc_` container running; `sh scripts/start.sh vrms` brings them back and prints ok for gateway, auth and vrms (checked on the PC 2026-11-10).
+14. `sh scripts/start.sh oops` and `sh scripts/setup.sh` with no group print the usage and exit 1.
+15. With Docker Desktop closed, `sh scripts/start.sh vrms` says to start Docker Desktop and exits 1.
+16. No link in the workspace points to `docs/integration/setup-guide.md` except spec 0006's history (**AC-26**).
+
 ## Owed to staging (spec 0008 of VRMS, not this row)
 
 See the staging item under Follow-up in [index.md](index.md).
