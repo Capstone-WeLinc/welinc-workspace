@@ -172,13 +172,13 @@ One gateway that routes every system and analytics service, with a port map that
 - Note (2026-11-10, replan, from spec 0007 follow up): include the CORS list and routes for the `/vmms` and `/bms` session routes, so the last step of `docs/integration/web-login.md` works.
 - Note (2026-11-10): spec 0008 decided one nginx template set in `infra/gateway/` for every environment, built into one image run from settings; `/repairs` removed (nothing serves it); JSON errors with CORS for 404, 413, 429, 502 and 504; a separate `/health`; a flood limit per client (20 a second, burst 40); `X-Forwarded-For` sent as one value; a JSON access log with no query strings; `/auth/health` and `/vrms/health` built here. VMMS and BMS routes are proven with stub containers until S11. The image is ready for Azure, the deploy stays in VRMS spec 0008. Deferred, blocks nothing: services logging `X-Request-Id`.
 - [x] Design it (spec): `/architect gateway for the whole suite` (2026-11-10, cross checked on another model, 5 bugs and 14 gaps fixed)
-- [ ] Build it: `/develop gateway for the whole suite`
+- [x] Build it: `/develop gateway for the whole suite`
   - [x] The thin thread: `infra/gateway/` with auth and VRMS on the real stack, then the test harness · AC-1, AC-14, AC-24
   - [x] Every route and answer: all prefixes, limits, timeouts, `/health`, 404s and JSON errors · AC-1 to AC-7, AC-11, AC-12
   - [x] Hardening: CORS finished, settings checks, forwarded headers, request id, flood limit, log, HSTS · AC-8 to AC-10, AC-13, AC-15 to AC-21
   - [x] Health routes in welinc-auth and backend-vrms · AC-22, AC-23
-  - [ ] Handover: `clone-all.sh` groups, docs, contract 0001 amendments, then delete `welinc-auth/nginx.conf` · AC-14, AC-25 to AC-28 (2026-11-11: all done except the `nginx.conf` deletion, migration phase 2 of spec 0008)
-- [ ] Verify it: `/check verify gateway for the whole suite`
+  - [x] Handover: `clone-all.sh` groups, docs, contract 0001 amendments, then delete `welinc-auth/nginx.conf` · AC-14, AC-25 to AC-28 (2026-11-11: `nginx.conf` deleted in welinc-auth PR 24)
+- [x] Verify it: `/check verify gateway for the whole suite` (2026-11-11, PASS: 103 route checks, live stack, fresh clone setup, 22 MB upload)
 - [ ] Test it: `/test gateway for the whole suite`
 - [ ] Document it: `/document gateway for the whole suite`
 - [ ] Polish it (optional, ask first): `docker-patterns`

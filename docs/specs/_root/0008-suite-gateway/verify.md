@@ -15,7 +15,7 @@ Start with `docker compose -f docker-compose.shared.yml up -d --build`, then `do
 4. Wait for or force a token refresh in VRMS. The session continues, and the `vrms_rt` cookie is set by way of `localhost:3000` (**AC-24**).
 5. Upload a 25 MB attachment to a ticket. It succeeds, and the file opens (**AC-24**).
 6. `GET http://localhost:3000/auth/health` and `/vrms/health` answer 200 with their checks. Stop `welinc_vrms_db`: `/vrms/health` answers 503 `HEALTH_CHECK_FAILED` with `"database": "failed"`. Start it again (**AC-22**, **AC-23**).
-7. With the VRMS stack stopped, `/vrms/health` answers the JSON 502 and `/auth/health` still answers 200. Start it, and `/vrms/health` recovers within 10 seconds with no gateway restart (**AC-5**, on the real stack).
+7. With the VRMS stack stopped, `/vrms/health` answers the JSON 502 and `/auth/health` still answers 200. Start it and wait until `http://localhost:3002/vrms/health` answers (about 23 seconds locally, the app's own boot). Then `/vrms/health` through the gateway recovers within 10 seconds, with no gateway restart (**AC-5**, on the real stack).
 
 ## Files
 
