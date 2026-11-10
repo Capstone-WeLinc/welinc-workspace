@@ -3,7 +3,7 @@
 The shared services (auth, portal, gateway) that VRMS, VMMS and BMS should all run on. Today only VRMS uses them: VMMS keeps its own copy of auth, BMS reads the auth database directly, and neither has a portal handoff. This epic turns the shared services into something the other two groups can actually move onto. Part of the [suite scope map](../index.md).
 
 **Build approach:** Tracer Bullet (each piece built end to end and proven on VRMS first, since VRMS already runs on the shared services; the other groups then move onto it with S11).
-**Workflow:** GA (after `/develop`: `/check verify`, `/test`, a fresh model `/check review`, then `/document`). Auth, sessions and admin rights are where a mistake exposes every system's data.
+**Workflow:** GA without the review (after `/develop`: `/check verify`, `/test`, then `/document`). No `/check review` in this project, by choice on 2026-11-11, for the deadline. Auth, sessions and admin rights are where a mistake exposes every system's data.
 
 _These are recommendations to keep the build orderly, not requirements. Skip anything that does not fit. You decide when a row is `done`._
 
@@ -30,7 +30,7 @@ _These are recommendations to keep the build orderly, not requirements. Skip any
 | S6 | User directory for systems | Core | done |
 | S12 | Suite seed accounts | Core | done |
 | S4 | App initiated login and launcher | Login | done |
-| S9 | Gateway for the whole suite | Gateway | planned |
+| S9 | Gateway for the whole suite | Gateway | done |
 | S7 | Account activity and audit | Account | planned |
 | S8 | Profile extras | Account | planned |
 | S13 | Email verification | Account | in-progress |
@@ -163,12 +163,24 @@ Replaces VRMS feature 60. Each app sends people to the portal with a return addr
 
 ## Gateway
 
-### S9. Gateway for the whole suite · planned · needs a decision
+### S9. Gateway for the whole suite · done
+spec [0008](../../specs/_root/0008-suite-gateway/index.md) · code in `infra/gateway/`, `docker-compose.shared.yml`, `scripts/clone-all.sh`, the health routes in `welinc-auth` and `welinc-backend-vrms`
+
 One gateway that routes every system and analytics service, with a port map that has no clashes, and a decision on where the gateway config lives (today inside `welinc-auth`).
 **Done when:** every system's API and analytics service is reachable through the gateway, each service has its own port in the README repos table, CORS and upload limits are set per route, and the config lives where the contract says.
 - Note (2026-11-09): each group clones and runs only the shared repos plus its own system; only the shared services owner runs everything. Integration with another system goes through the staging deployment (spec 0008), or a stub of the contract until staging exists, never another group's local clone. So the gateway must start and serve its routes with any system missing: keep today's pattern (`resolver 127.0.0.11` and a variable in `proxy_pass`) on every new route, so an absent system answers 502 on its own routes only. Also give `scripts/clone-all.sh` a group option (`clone-all.sh vmms` clones the shared repos plus that system) and say so in the setup guide.
 - Note (2026-11-10, replan, from spec 0007 follow up): include the CORS list and routes for the `/vmms` and `/bms` session routes, so the last step of `docs/integration/web-login.md` works.
-- [ ] Design it (spec): `/architect gateway for the whole suite`
+- Note (2026-11-10): spec 0008 decided one nginx template set in `infra/gateway/` for every environment, built into one image run from settings; `/repairs` removed (nothing serves it); JSON errors with CORS for 404, 413, 429, 502 and 504; a separate `/health`; a flood limit per client (20 a second, burst 40); `X-Forwarded-For` sent as one value; a JSON access log with no query strings; `/auth/health` and `/vrms/health` built here. VMMS and BMS routes are proven with stub containers until S11. The image is ready for Azure, the deploy stays in VRMS spec 0008. Deferred, blocks nothing: services logging `X-Request-Id`.
+- [x] Design it (spec): `/architect gateway for the whole suite` (2026-11-10, cross checked on another model, 5 bugs and 14 gaps fixed)
+- [x] Build it: `/develop gateway for the whole suite`
+  - [x] The thin thread: `infra/gateway/` with auth and VRMS on the real stack, then the test harness · AC-1, AC-14, AC-24
+  - [x] Every route and answer: all prefixes, limits, timeouts, `/health`, 404s and JSON errors · AC-1 to AC-7, AC-11, AC-12
+  - [x] Hardening: CORS finished, settings checks, forwarded headers, request id, flood limit, log, HSTS · AC-8 to AC-10, AC-13, AC-15 to AC-21
+  - [x] Health routes in welinc-auth and backend-vrms · AC-22, AC-23
+  - [x] Handover: `clone-all.sh` groups, docs, contract 0001 amendments, then delete `welinc-auth/nginx.conf` · AC-14, AC-25 to AC-28 (2026-11-11: `nginx.conf` deleted in welinc-auth PR 24)
+- [x] Verify it: `/check verify gateway for the whole suite` (2026-11-11, PASS: 103 route checks, live stack, fresh clone setup, 22 MB upload)
+- [x] Test it: `/test gateway for the whole suite` (2026-11-11, no new tests needed; the route harness passes 103 of 103, health specs cover AC-22 and AC-23)
+- [x] Document it: `/document gateway for the whole suite` (2026-11-11, workspace PR #20)
 - [ ] Polish it (optional, ask first): `docker-patterns`
 
 ## Account

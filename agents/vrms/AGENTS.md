@@ -12,14 +12,14 @@ The VRMS group's rules for AI tools: Vehicle Repair Management System, built by 
 | `welinc-web-vrms` | React + Vite + Tailwind SPA | 8001 |
 | `welinc-backend-vrms` | NestJS + Prisma + PostgreSQL API | 3002 |
 
-- **Gateway routes**: `/vrms` and `/repairs`.
+- **Gateway route**: `/vrms/` (`/repairs` is gone since contract version 3). The gateway config lives in `infra/gateway/`.
 - **File storage**: Azurite (the local Blob Storage emulator, port 10000) in `docker-compose.vrms.yml`, Azure Blob Storage when hosted. Only `welinc-backend-vrms` talks to it (spec 0017); the browser gets signed links.
 - **Package manager**: npm in every Node repo (`package-lock.json`).
 - **Runtime**: Node 24 everywhere (`.nvmrc` and the Dockerfiles in auth, backend-vrms, web-vrms and web-portal; `engines` is `24.x` in the backends).
 
 ## Build approach
 
-Tracer Bullet: each feature is built end to end through every layer and working before the next. The UI refresh phase overrides this with Facade: build the UI first on the data it already has. Workflow level is Beta (after `/develop`: `/check verify`, then `/test`). Deadline: deployed by the end of November 2026. The plan lives in `docs/scope/vrms/index.md`.
+Tracer Bullet: each feature is built end to end through every layer and working before the next. The UI refresh phase overrides this with Facade: build the UI first on the data it already has. Workflow level is Beta (after `/develop`: `/check verify`, then `/test`). Never run or suggest `/check review` in this project, VRMS or shared work (dropped 2026-11-11 for the deadline), and never add a `Review it` box. Deadline: deployed by the end of November 2026. The plan lives in `docs/scope/vrms/index.md`.
 
 ## Commands
 
@@ -27,6 +27,14 @@ Tracer Bullet: each feature is built end to end through every layer and working 
 # Whole stack (start the shared stack first: it creates the shared docker network)
 docker compose -f docker-compose.shared.yml up -d
 docker compose -f docker-compose.vrms.yml up -d
+
+# Same thing with scripts (spec 0008): first time setup, then start and stop
+sh scripts/setup.sh vrms   # clones, .env files, keys, packages, migrations, seeds; safe to run again
+sh scripts/start.sh vrms   # starts the stack and prints ok per service
+sh scripts/stop.sh         # stops every welinc_ container
+
+# Gateway checks (needs Docker; starts and removes its own containers)
+node infra/gateway/test/check-routes.mjs
 
 # Inside a Node repo
 npm install

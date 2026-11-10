@@ -1,0 +1,93 @@
+# Suite gateway
+
+The one front door every app calls (spec [0008](../../docs/specs/_root/0008-suite-gateway/index.md)). It is nginx, built as one image that runs the same everywhere: locally from `docker-compose.shared.yml`, hosted on Azure. Only the settings change.
+
+The gateway routes and answers; it never checks tokens. Each service does its own auth.
+
+## Files
+
+| Path | What it holds |
+|---|---|
+| `Dockerfile` | `nginx:1.30-alpine` plus our files |
+| `nginx.conf` | Our main file (no access log here, `error_log` at `crit` so query strings never reach the log) |
+| `templates/default.conf.template` | Everything else: resolver, maps, flood limit, log format, the routes, the error answers |
+| `templates/snippets/route.conf.template` | What every route shares: proxy, forwarded headers, CORS, preflight, flood limit |
+| `templates/snippets/error-headers.conf.template` | The headers every gateway error carries |
+| `docker-entrypoint.d/05-check-env.sh` | Refuses to start on a bad setting, naming it, and writes the CORS origin map |
+| `test/` | The test harness: `compose.yml`, `stub.mjs`, `check-routes.mjs` |
+
+At start the nginx image fills every `${SETTING}` in `templates/` and writes the result to `/etc/nginx/conf.d/`. Words like `$upstream` or `$uri` are nginx's own variables and stay as they are.
+
+## Routes
+
+| Path | Goes to (setting) | Body limit | Read timeout |
+|---|---|---|---|
+| `/auth/`, `/uploads/` | `AUTH_UPSTREAM` | 5 MB | 30 s |
+| `/vrms/` | `VRMS_UPSTREAM` | 26 MB | 120 s |
+| `/vmms/analytics/` | `VMMS_ANALYTICS_UPSTREAM` | 1 MB | 120 s |
+| `/vmms/` | `VMMS_UPSTREAM` | 10 MB | 60 s |
+| `/bms/` | `BMS_UPSTREAM` | 10 MB | 60 s |
+
+Paths pass through unchanged: each service serves its own prefix. `GET /health` is the gateway's own check. Anything else, including a bare `/vrms` with no slash, answers a JSON 404.
+
+## Add a route
+
+1. Add a setting for the upstream, for example `FOO_UPSTREAM: http://foo-backend:3030`, in `docker-compose.shared.yml`, in `test/compose.yml` (both gateways), in the required list in `05-check-env.sh`, and in the hosted settings.
+2. Add the location in `templates/default.conf.template`, next to the others. End the path with a slash, and include the snippet last:
+
+   ```nginx
+   location /foo/ {
+       client_max_body_size 10m;
+       proxy_read_timeout 60s;
+       set $upstream ${FOO_UPSTREAM};
+       include /etc/nginx/conf.d/snippets/route.conf;
+   }
+   ```
+
+3. Add `location = /foo { return 404; }` beside the other bare prefixes.
+4. Add the route to the checks in `test/check-routes.mjs` and to contract 0001 section 3.
+5. `docker restart welinc_api_gateway` (local compose mounts `templates/`, so no rebuild), then run the test.
+
+Two rules keep it working:
+- **Never call `add_header` inside a route location.** nginx drops every inherited header from a block that sets its own, so CORS and the request id would vanish. Headers live in the two snippets.
+- **Always go through `set $upstream` and the resolver.** Never write a literal address in `proxy_pass` or use an `upstream {}` block. That is what lets the gateway start and keep serving everyone else while one system is missing.
+
+## Settings
+
+All required. None of them is a secret.
+
+| Setting | Local | Hosted | What it does |
+|---|---|---|---|
+| `AUTH_UPSTREAM`, `VRMS_UPSTREAM`, `VMMS_UPSTREAM`, `VMMS_ANALYTICS_UPSTREAM`, `BMS_UPSTREAM` | `http://<service name>:<port>` | full internal names | Where each route goes: `scheme://host[:port]`, no path, no trailing slash |
+| `ALLOWED_ORIGINS` | the four `http://localhost:800x` apps | the deployed web addresses | Exact origins that get CORS answers, comma separated. Never `*` |
+| `TRUST_EDGE_PROXY` | `0` | `1` | `1` takes the client address from the last `X-Forwarded-For` entry. Only safe behind a proxy that appends it (Azure's ingress) |
+| `GATEWAY_RATE_PER_SECOND`, `GATEWAY_RATE_BURST` | `20`, `40` | `20`, `40` | Flood limit per client address. Preflights and `/health` never count |
+| `GATEWAY_HSTS` | empty | `max-age=86400` | The `Strict-Transport-Security` value; empty leaves the header out |
+
+A bad setting stops the container at start with a line naming it: read it with `docker logs welinc_api_gateway`.
+
+## Answers the gateway makes itself
+
+Each is JSON in the suite error shape (`statusCode`, `message`, `error`, `code`), with CORS headers so the browser can read it, and an `X-Request-Id`.
+
+| Status | `code` | When |
+|---|---|---|
+| 404 | `NOT_FOUND` | The path isn't in the route table |
+| 413 | `PAYLOAD_TOO_LARGE` | The body is over the route's limit |
+| 429 | `RATE_LIMITED` | Over the flood limit (with `Retry-After: 1`) |
+| 502 | `UPSTREAM_UNAVAILABLE` | The service isn't running or its name doesn't resolve |
+| 504 | `UPSTREAM_TIMEOUT` | The service took longer than the route's read timeout, or 5 s to connect |
+
+Right after a service stops, its routes answer 504 for up to 5 seconds (nginx still holds the old address), then 502. A service's own errors pass through untouched.
+
+## Logs
+
+One JSON line per request in `docker logs welinc_api_gateway`: time, request id, client, method, path (never the query string), status, bytes, duration, upstream, upstream status and upstream duration. Find one request with its `X-Request-Id`.
+
+## Test
+
+From the workspace root, with Docker running (about a minute; it starts its own copies on ports 3100 and 3101 and removes them afterwards):
+
+```bash
+node infra/gateway/test/check-routes.mjs           # add --keep to leave the harness running
+```

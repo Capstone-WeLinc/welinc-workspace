@@ -68,14 +68,33 @@ services:
     networks:
       - welinc-network
 
+  # The suite gateway (spec 0008): the same image and templates as staging, only these settings change.
+  # Routes and settings: infra/gateway/README.md. It starts and serves its routes with any system
+  # missing; that system's routes answer a JSON 502 until it runs.
   api-gateway:
-    image: nginx:alpine
+    build:
+      context: ./infra/gateway
+    image: welinc-gateway:local
     container_name: welinc_api_gateway
     restart: unless-stopped
     ports:
       - "3000:3000"
+    # Mounted for quick edits: after changing a template, `docker restart welinc_api_gateway`
     volumes:
-      - ./welinc-auth/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./infra/gateway/templates:/etc/nginx/templates:ro
+    environment:
+      AUTH_UPSTREAM: http://auth-service:3001
+      VRMS_UPSTREAM: http://vrms-backend:3002
+      VMMS_UPSTREAM: http://vmms-backend:3010
+      VMMS_ANALYTICS_UPSTREAM: http://vmms-analytics:3011
+      BMS_UPSTREAM: http://bms-gateway:3020
+      ALLOWED_ORIGINS: http://localhost:8000,http://localhost:8001,http://localhost:8002,http://localhost:8003
+      # 0 locally: nothing in front of the gateway appends the real address
+      TRUST_EDGE_PROXY: "0"
+      GATEWAY_RATE_PER_SECOND: "20"
+      GATEWAY_RATE_BURST: "40"
+      # Empty locally (plain http); hosted sets max-age=86400
+      GATEWAY_HSTS: ""
     networks:
       - welinc-network
 
