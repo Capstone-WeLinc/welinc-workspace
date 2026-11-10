@@ -34,7 +34,7 @@ _These are recommendations to keep the build orderly, not requirements. Skip any
 | S14 | Environment checked at startup | Config | done |
 | S7 | Account activity and audit | Account | planned |
 | S8 | Profile extras | Account | planned |
-| S13 | Email verification | Account | in-progress |
+| S13 | Email verification | Account | done |
 | S11 | Move VMMS and BMS onto the shared services | Cutover | planned |
 | S10 | Suite admin model | Admin | planned |
 
@@ -216,7 +216,7 @@ The profile routes the other apps already call: phone verification (VMMS), verif
 - Note (2026-11-09, replan, from spec 0005 follow-up): add a phone verified column in welinc-auth, put it in the `directory_changes` snapshot (a migration that changes the trigger) and map it to `phoneVerified`. If a deletion request erases personal data, it must also clear that person's feed snapshots, which otherwise keep names, emails and phones forever.
 - [ ] Design it (spec): `/architect profile extras`
 
-### S13. Email verification · in-progress
+### S13. Email verification · done
 spec [0009](../../specs/_root/0009-email-verification/index.md) · code in `welinc-auth/src/auth/codes/` (code service, sign in step), `welinc-auth/src/auth/sessions/` (the step routes), `welinc-web-portal/src/pages/auth/EmailCodeStep.tsx`, `welinc-web-vrms/src/features/auth/` (Change email) and `src/features/user-management/` (statuses)
 
 Prove a person owns their email before the suite relies on it, instead of only checking that the domain can receive mail. Today `emailVerified` turns true only when someone uses a setup or reset code; an account an admin creates with a typed password, and any email change by an admin or on the profile, is never checked.
