@@ -231,8 +231,8 @@ Prove a person owns their email before the suite relies on it, instead of only c
   - [x] Setup and reset on the shared service, typed admin passwords removed, `password_set`, seeds · AC-6, AC-12 to AC-16, AC-22
   - [x] Email changes: your own (`/auth/profile/email*`) and an admin's, notices · AC-17 to AC-21, AC-23, AC-24
   - [x] Mobile step, VRMS profile and Users statuses, contract 0001 amendments · AC-11, AC-27 to AC-31
-- [ ] Verify it: `/check verify email verification`
-- [ ] Test it: `/test email verification`
+- [x] Verify it: `/check verify email verification` (2026-11-11)
+- [x] Test it: `/test email verification` (2026-11-11)
 - [ ] Document it: `/document email verification`
 - [ ] Polish it (optional, ask first): `web-design-guidelines` (the portal code step)
 
