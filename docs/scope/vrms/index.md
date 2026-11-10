@@ -124,7 +124,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | State | Set by | The feature shows |
 |---|---|---|
 | `planned` · needs a decision | `/scope` | one box: `Design it (spec): /architect <feature>` |
-| `in-progress` (designed) | **`/architect` at spec capture** | `Design it` ticked; spec linked; `Build it: /develop <feature>` + **2 to 5 milestones**; the tier's closing boxes (`Verify it` Alpha+, `Test it` Beta+, `Review it` + `Document it` GA); any surfaced follow-up enrolled |
+| `in-progress` (designed) | **`/architect` at spec capture** | `Design it` ticked; spec linked; `Build it: /develop <feature>` + **2 to 5 milestones**; the tier's closing boxes (`Verify it` Alpha+, `Test it` Beta+, `Document it` GA; no `Review it` in this project); any surfaced follow-up enrolled |
 | `in-progress` (building) | `/develop` | milestone sub-boxes tick one by one; code pointer filled |
 | `in-progress` (verified) | `/check verify` | `Build it` + milestones ticked; `Verify it` ticked |
 | `done` | **you, when you decide it is** (any skill sets it when you say so); `/sync` reconciles | boxes you ran ticked, skipped ones marked skipped; the tier's last stage (`Prototype` → after `/develop`; `Alpha` → after `/check verify`; `Beta`/`GA` → after `/test`) is the suggested point to call it done; `/sync` captures conventions |
@@ -136,7 +136,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 - **Status** `planned` → `in-progress` → `done`, plus `existing` (pre-workflow) and `dropped` (de-scoped, kept for history).
 - **Approach tag** beside a heading (e.g. `· Facade`) overrides the project default for that feature; no tag = inherits it.
 - **Workflow tier tag** beside a heading (e.g. `· GA`) sets that one feature's rigor above or below the project default; no tag inherits the default.
-- **Workflow** (header line) is the project default, what runs after `/develop`: **Prototype** = nothing; **Alpha** = `/check verify`; **Beta** = `/check verify` then `/test`; **GA** = adds a fresh model `/check review` then `/document`. A feature built on an unratified decision (an `Assumed` spec) stays flagged, but that never blocks `done`.
+- **Workflow** (header line) is the project default, what runs after `/develop`: **Prototype** = nothing; **Alpha** = `/check verify`; **Beta** = `/check verify` then `/test`; **GA** = adds `/document`. This project never runs `/check review` (decided 2026-11-11, for the deadline), so no feature gets a `Review it` box. A feature built on an unratified decision (an `Assumed` spec) stays flagged, but that never blocks `done`.
 - **Pointer line** (`spec <n> · code in <path>`): the spec link added by `/architect`, the code path by `/develop`.
 - **WL-xxx** are the Jira story IDs each feature comes from.
 

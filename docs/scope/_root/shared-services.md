@@ -3,7 +3,7 @@
 The shared services (auth, portal, gateway) that VRMS, VMMS and BMS should all run on. Today only VRMS uses them: VMMS keeps its own copy of auth, BMS reads the auth database directly, and neither has a portal handoff. This epic turns the shared services into something the other two groups can actually move onto. Part of the [suite scope map](../index.md).
 
 **Build approach:** Tracer Bullet (each piece built end to end and proven on VRMS first, since VRMS already runs on the shared services; the other groups then move onto it with S11).
-**Workflow:** GA (after `/develop`: `/check verify`, `/test`, a fresh model `/check review`, then `/document`). Auth, sessions and admin rights are where a mistake exposes every system's data.
+**Workflow:** GA without the review (after `/develop`: `/check verify`, `/test`, then `/document`). No `/check review` in this project, by choice on 2026-11-11, for the deadline. Auth, sessions and admin rights are where a mistake exposes every system's data.
 
 _These are recommendations to keep the build orderly, not requirements. Skip anything that does not fit. You decide when a row is `done`._
 
@@ -177,10 +177,9 @@ One gateway that routes every system and analytics service, with a port map that
   - [x] Every route and answer: all prefixes, limits, timeouts, `/health`, 404s and JSON errors · AC-1 to AC-7, AC-11, AC-12
   - [x] Hardening: CORS finished, settings checks, forwarded headers, request id, flood limit, log, HSTS · AC-8 to AC-10, AC-13, AC-15 to AC-21
   - [x] Health routes in welinc-auth and backend-vrms · AC-22, AC-23
-  - [ ] Handover: `clone-all.sh` groups, docs, contract 0001 amendments, then delete `welinc-auth/nginx.conf` · AC-14, AC-25 to AC-27
+  - [ ] Handover: `clone-all.sh` groups, docs, contract 0001 amendments, then delete `welinc-auth/nginx.conf` · AC-14, AC-25 to AC-28 (2026-11-11: all done except the `nginx.conf` deletion, migration phase 2 of spec 0008)
 - [ ] Verify it: `/check verify gateway for the whole suite`
 - [ ] Test it: `/test gateway for the whole suite`
-- [ ] Review it (fresh model): `/check review gateway for the whole suite`
 - [ ] Document it: `/document gateway for the whole suite`
 - [ ] Polish it (optional, ask first): `docker-patterns`
 

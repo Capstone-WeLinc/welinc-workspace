@@ -23,7 +23,7 @@ Routing
 - **AC-2**: `/vmms/analytics/x` reaches the VMMS analytics service and `/vmms/x` reaches the VMMS backend.
 - **AC-3**: `/`, `/repairs/x`, `/vmmsx`, each bare prefix with no trailing slash (`/auth`, `/uploads`, `/vrms`, `/vmms`, `/vmms/analytics`, `/bms`) and any other path outside the table answer 404 `NOT_FOUND` and reach no upstream.
 - **AC-4**: `GET /health` answers 200 `{ "status": "ok" }` with every upstream stopped.
-- **AC-5**: With one system stopped, its routes answer 502 `UPSTREAM_UNAVAILABLE` and every other route keeps working. Once that system starts, its routes work within 10 seconds, with no gateway restart. (Proven locally; what a stopped Azure app answers is a staging check, see Follow-up.)
+- **AC-5**: With one system stopped, its routes answer 502 `UPSTREAM_UNAVAILABLE` and every other route keeps working. For up to 5 seconds right after the stop they may answer 504 `UPSTREAM_TIMEOUT` instead, while the gateway still holds the old address (the resolver's `valid=5s`). Once that system starts, its routes work within 10 seconds, with no gateway restart. (Proven locally; what a stopped Azure app answers is a staging check, see Follow-up.)
 - **AC-6**: For each route, a body exactly at the limit passes and one byte over answers 413 `PAYLOAD_TOO_LARGE`.
 - **AC-7**: An upstream slower than its route's read timeout answers 504 `UPSTREAM_TIMEOUT` (proven live on the 30 s route). Each route's timeout and body limit in the loaded config (`nginx -T`) match the table.
 
@@ -56,8 +56,9 @@ Health routes
 Whole suite
 - **AC-24**: Through the new gateway, the real stack still logs in through the portal, refreshes a VRMS session, and uploads a 25 MB attachment.
 - **AC-25**: `sh scripts/clone-all.sh vmms` (also `vrms`, `bms`) clones the shared repos (`welinc-auth`, `welinc-web-portal`) plus that group's repos: `vrms` is `welinc-web-vrms` and `welinc-backend-vrms`; `vmms` is `welinc-web-vmms`, `welinc-backend-vmms`, `welinc-backend-vmms-analytics-ai` and `welinc-mobile-vrms_vmms`; `bms` is `welinc-web-bms`, `welinc-backend-bms` and `welinc-backend-bms-analytics-ai`. With no argument it clones everything, as today. An unknown group prints the usage and exits with an error.
-- **AC-26**: The README repos table lists every service in contract section 2 with its port. The setup guide's gateway section and its "taken" ports describe `infra/gateway/`, `docs/context/suite-overview.md` names the new config home, and the gateway line in `welinc-backend-vrms/src/modules/attachments/AGENTS.md` points to it with no `/repairs`.
-- **AC-27**: Contract 0001 sections 2 and 3 carry the amendments listed in the Build plan.
+- **AC-26**: The README is the one setup page: `docs/integration/setup-guide.md` is merged into it and removed, and nothing links to it except specs written before. The README's repos table lists every service in contract section 2 with its port, its plug in steps describe `infra/gateway/`, `infra/gateway/README.md` explains the routes, settings and how to add one, `docs/context/suite-overview.md` names the new config home, and the gateway line in `welinc-backend-vrms/src/modules/attachments/AGENTS.md` points to it with no `/repairs`.
+- **AC-27**: Contract 0001 sections 2, 3, 11, 12 and 14 carry the amendments listed in the Build plan, as contract version 3.
+- **AC-28**: `sh scripts/setup.sh <group>` takes a fresh clone of the workspace to a running, seeded stack (repos, `.env` files from the examples, signing keys, packages, migrations, seeds), and is safe to run again: it never overwrites a `.env` file or the keys, and never runs the VRMS seed on a database that holds tickets. `sh scripts/start.sh [<group>] [--build]` starts the shared stack before the group's and waits for `/health`, `/auth/health` and the group's `<prefix>/health`. `sh scripts/stop.sh` stops every stack and keeps the data. An unknown group prints the usage and exits with an error, and so does a closed Docker Desktop, with a plain message.
 
 ## Decision
 
@@ -127,7 +128,7 @@ Each bare prefix gets an exact location that answers the 404 (`location = /vmms 
 | Gateway errors and 404 | Yes, `error-headers.conf` | Yes | Yes | 429 only, always 1 |
 | `GET /health` | No | Yes | Yes | No |
 
-**CORS values**: methods `GET, POST, PUT, PATCH, DELETE, OPTIONS`; request headers `Authorization, Content-Type, X-Request-Id`; exposed headers `X-Request-Id, Retry-After`; max age 600. Each of these, and the credentials value, comes from a map on `$cors_origin` that is empty for an unlisted origin, so nginx leaves the header out. `X-VMMS-Client` isn't allowed (S11 drops it). `proxy_hide_header` covers `Access-Control-Allow-Origin`, `-Credentials`, `-Methods`, `-Headers`, `-Expose-Headers`, `-Max-Age` and `Vary`.
+**CORS values**: methods `GET, POST, PUT, PATCH, DELETE, OPTIONS`; request headers `Authorization, Content-Type, X-Request-Id`; exposed headers `X-Request-Id, Retry-After`; max age 600. Each of these, and the credentials value, comes from a map on `$cors_origin` that is empty for an unlisted origin, so nginx leaves the header out. `X-VMMS-Client` isn't allowed (S11 drops it). `proxy_hide_header` covers `Access-Control-Allow-Origin`, `-Credentials`, `-Methods`, `-Headers`, `-Expose-Headers`, `-Max-Age`, `Vary`, `X-Request-Id` and `Strict-Transport-Security`: the gateway owns those, so a service setting them itself can't break AC-18 or AC-21.
 
 **The resolver, the flood limit and the maps** (at `http` level, except `limit_req`):
 
@@ -229,8 +230,8 @@ Tracer Bullet: the thin thread is the real auth and VRMS flow on the new config,
 7. [x] Flood limit, JSON log, `error_log` level, HSTS, satisfies **AC-19**, **AC-20**, **AC-21**
 8. [x] `/auth/health` in welinc-auth and `/vrms/health` in backend-vrms, satisfies **AC-22**, **AC-23**
 9. [x] `scripts/clone-all.sh` group option, with a line in the setup guide, satisfies **AC-25**
-10. [x] Docs: README repos table, setup guide section 4 and "taken" ports, `suite-overview.md`, `infra/gateway/README.md`, the attachments `AGENTS.md` line in backend-vrms, satisfies **AC-26**
-11. [ ] Contract 0001 amendments, satisfies **AC-27**. Section 2: the Docker service names `vmms-backend`, `vmms-analytics`, `bms-gateway`, which S11's compose files must use. Section 3: drop `/repairs`; locations end in a slash; one template, no separate local config; the gateway's `/health`, 404 and error codes; the flood limit; `X-Forwarded-For` is one value and hops follow `TRUST_PROXY_HOPS`; service logging of `X-Request-Id` moves to a follow up; the CORS header lists. Section 11: the five new codes.
+10. [x] Docs: the README as the one setup page (the setup guide merged in and removed), `scripts/setup.sh`, `start.sh` and `stop.sh`, `suite-overview.md`, `infra/gateway/README.md`, the attachments `AGENTS.md` line in backend-vrms, satisfies **AC-26**, **AC-28**
+11. [x] Contract 0001 amendments, as version 3, satisfies **AC-27**. Section 2: the Docker service names `vmms-backend`, `vmms-analytics`, `bms-gateway`, which S11's compose files must use. Section 3: drop `/repairs`; locations end in a slash; one template, no separate local config; the gateway's `/health`, 404 and error codes; the flood limit; `X-Forwarded-For` is one value and hops follow `TRUST_PROXY_HOPS`; service logging of `X-Request-Id` moves to a follow up; the CORS header lists. Section 11: the five new codes. Section 12: the flood limit row. Section 14: version 3. Also the headers the gateway hides.
 12. [ ] Delete `welinc-auth/nginx.conf` through its own PR, last, satisfies **AC-14**
 
 ## Migration plan
@@ -239,7 +240,7 @@ Tracer Bullet: the thin thread is the real auth and VRMS flow on the new config,
 
 **Phases**:
 1. Workspace PR: `infra/gateway/`, compose and docs, on `main`, once `/develop` asks you. Health routes go by PR into `development` in auth and backend-vrms.
-2. welinc-auth PR into `development` deletes `nginx.conf`, only after phase 1 is merged and everyone has pulled it. Anyone who pulls the deletion while still on the old compose would have Docker create a folder named `nginx.conf` in its place.
+2. welinc-auth PR into `development` deletes `nginx.conf`, only after phase 1 is merged and everyone has pulled it. Until S11 only the shared services owner runs the shared stack, so "everyone" means that person's machines: merge the workspace PR, run `git pull` and `sh scripts/start.sh vrms --build` on each machine, confirm `curl localhost:3000/health` answers, then open this PR. Anyone who pulls the deletion while still on the old compose would have Docker create a folder named `nginx.conf` in its place.
 
 Everyone runs `docker compose -f docker-compose.shared.yml up -d --build` once after pulling.
 
@@ -271,7 +272,12 @@ Everyone runs `docker compose -f docker-compose.shared.yml up -d --build` once a
 - [ ] On staging, confirm the real client address reaches `req.ip` with `TRUST_EDGE_PROXY=1` and `TRUST_PROXY_HOPS=2`, using two different client addresses. Check whether Azure's address entry carries a port (it would make the flood key per connection, needing the port stripped in the map), and what a stopped or scaled to zero Container App answers through the gateway. Raise `GATEWAY_HSTS` to a year once the domain is stable.
 - [ ] S11 migration guide: use the service names from contract section 2; VMMS drops `X-VMMS-Client` and calls analytics through `/vmms/analytics`; BMS web moves from 5173 to 8003; VMMS and BMS add `<prefix>/health`; VMMS's `/uploads/` static route moves under `/vmms/` so it doesn't collide with auth's.
 - [ ] Service logging of `X-Request-Id` (auth, backend-vrms, then the others).
-- [ ] After S9: `/sync` updates the root `AGENTS.md` shared services table, `agents/vrms/AGENTS.md` (gateway routes) and `welinc-auth/AGENTS.md` (the `nginx.conf` row and gotcha).
+- [ ] At S9's merge, `/sync` owes:
+  - root `AGENTS.md`: the shared services table still says the gateway config is in `welinc-auth/nginx.conf`; it is `infra/gateway/`. Mention `scripts/setup.sh`, `start.sh` and `stop.sh` as the way to run the stack.
+  - `agents/vrms/AGENTS.md`: the gateway routes still list `/repairs`; it is `/vrms/` only. The Commands block can use `sh scripts/start.sh vrms`.
+  - `welinc-auth/AGENTS.md`: the `nginx.conf` row and its gotcha (once phase 2 deletes the file).
+  - `docs/integration/shared-repo-changes.md`: an S9 row (the gateway moved to `infra/gateway/`, JSON errors, health routes, contract version 3).
+  - `docs/context/vrms/setup.md`: much of it now repeats the README; trim it to the VRMS only notes.
 - [ ] Run `check-routes.mjs` in CI when the gateway workflow arrives with spec 0008.
 
 ## Rationale

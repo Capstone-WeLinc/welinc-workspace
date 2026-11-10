@@ -19,7 +19,7 @@ The VRMS group's rules for AI tools: Vehicle Repair Management System, built by 
 
 ## Build approach
 
-Tracer Bullet: each feature is built end to end through every layer and working before the next. The UI refresh phase overrides this with Facade: build the UI first on the data it already has. Workflow level is Beta (after `/develop`: `/check verify`, then `/test`). Deadline: deployed by the end of November 2026. The plan lives in `docs/scope/vrms/index.md`.
+Tracer Bullet: each feature is built end to end through every layer and working before the next. The UI refresh phase overrides this with Facade: build the UI first on the data it already has. Workflow level is Beta (after `/develop`: `/check verify`, then `/test`). Never run or suggest `/check review` in this project, VRMS or shared work (dropped 2026-11-11 for the deadline), and never add a `Review it` box. Deadline: deployed by the end of November 2026. The plan lives in `docs/scope/vrms/index.md`.
 
 ## Commands
 
