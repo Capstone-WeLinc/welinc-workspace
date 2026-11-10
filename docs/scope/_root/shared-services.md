@@ -30,7 +30,7 @@ _These are recommendations to keep the build orderly, not requirements. Skip any
 | S6 | User directory for systems | Core | done |
 | S12 | Suite seed accounts | Core | done |
 | S4 | App initiated login and launcher | Login | done |
-| S9 | Gateway for the whole suite | Gateway | in-progress |
+| S9 | Gateway for the whole suite | Gateway | done |
 | S7 | Account activity and audit | Account | planned |
 | S8 | Profile extras | Account | planned |
 | S13 | Email verification | Account | planned |
@@ -163,7 +163,7 @@ Replaces VRMS feature 60. Each app sends people to the portal with a return addr
 
 ## Gateway
 
-### S9. Gateway for the whole suite · in-progress
+### S9. Gateway for the whole suite · done
 spec [0008](../../specs/_root/0008-suite-gateway/index.md) · code in `infra/gateway/`, `docker-compose.shared.yml`, `scripts/clone-all.sh`, the health routes in `welinc-auth` and `welinc-backend-vrms`
 
 One gateway that routes every system and analytics service, with a port map that has no clashes, and a decision on where the gateway config lives (today inside `welinc-auth`).
@@ -179,8 +179,8 @@ One gateway that routes every system and analytics service, with a port map that
   - [x] Health routes in welinc-auth and backend-vrms · AC-22, AC-23
   - [x] Handover: `clone-all.sh` groups, docs, contract 0001 amendments, then delete `welinc-auth/nginx.conf` · AC-14, AC-25 to AC-28 (2026-11-11: `nginx.conf` deleted in welinc-auth PR 24)
 - [x] Verify it: `/check verify gateway for the whole suite` (2026-11-11, PASS: 103 route checks, live stack, fresh clone setup, 22 MB upload)
-- [ ] Test it: `/test gateway for the whole suite`
-- [ ] Document it: `/document gateway for the whole suite`
+- [x] Test it: `/test gateway for the whole suite` (2026-11-11, no new tests needed; the route harness passes 103 of 103, health specs cover AC-22 and AC-23)
+- [x] Document it: `/document gateway for the whole suite` (2026-11-11, workspace PR)
 - [ ] Polish it (optional, ask first): `docker-patterns`
 
 ## Account

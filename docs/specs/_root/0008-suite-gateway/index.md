@@ -1,7 +1,7 @@
 # 0008. Gateway for the whole suite
 
 **Date**: 2026-11-10
-**Status**: In Progress
+**Status**: Accepted
 **Scope row**: [S9. Gateway for the whole suite](../../../scope/_root/shared-services.md#s9-gateway-for-the-whole-suite--in-progress)
 **Builds contract section**: [0001](../0001-shared-services-contract/index.md) section 3 (and amends it, see AC-27)
 
