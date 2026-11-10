@@ -82,6 +82,7 @@ A safe way to have "someone who can do everything" across VRMS, VMMS and BMS, th
 WL-102. Admins confirm login with the same OTP mechanics use.
 **Done when:** Admin pages are unreachable without a completed OTP step (checked on the server), codes expire after 5 minutes and work once, 5 wrong tries lock for 15 minutes, resend waits 60 seconds, and every OTP event is logged.
 - Note (2026-10-29): safe to build before the integration meeting, but feature 56 (integration contract) may change it: OTP lives in the shared welinc-auth and portal, which the other groups also use.
+- Note (2026-11-10, from suite spec 0009): reuse its sign in ticket and step (`verification_codes` with a new purpose) instead of a new mechanism. Its rules (codes dead after 5 wrong tries, never an account lock, 10 minute lifetime) differ from this row's Done when (5 minutes, a 15 minute lock); settle that in this row's spec.
 - [ ] Build it: `/develop admin OTP`
 - [ ] Polish it (optional, ask first): `web-design-guidelines`
 

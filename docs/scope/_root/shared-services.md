@@ -33,7 +33,7 @@ _These are recommendations to keep the build orderly, not requirements. Skip any
 | S9 | Gateway for the whole suite | Gateway | planned |
 | S7 | Account activity and audit | Account | planned |
 | S8 | Profile extras | Account | planned |
-| S13 | Email verification | Account | planned |
+| S13 | Email verification | Account | in-progress |
 | S11 | Move VMMS and BMS onto the shared services | Cutover | planned |
 | S10 | Suite admin model | Admin | planned |
 
@@ -177,6 +177,7 @@ One gateway that routes every system and analytics service, with a port map that
 Login activity and account change history from welinc-auth, so VMMS (`me/login-activity`, `users/:id/login-activity`, `audit-logs`) and BMS (`profile/activity`, its activity log page) stop keeping or reading their own.
 **Done when:** each login, failed login, lockout, logout and refresh is recorded with device and address; a user sees their own; a system admin sees their system's users and account changes; and nothing outside welinc-auth reads those tables.
 - Note (2026-11-08, from a look at a friend's company suite (SBSI User & Access Management) on 2026-11-08, ideas to weigh in the spec, nothing decided): one activity page with login events and account changes (`UserChange`) in a single timeline, filtered by category, actor, date and address, like their Security & Activity Audit Trail. Lessons from their bugs: log the real client address from `X-Forwarded-For` (they log the Docker gateway `172.19.0.1` for everyone), record a logout once (they log the same one twice in the same second), and keep emails out of the event text since the log is kept forever.
+- Note (2026-11-10, from spec 0009 follow-up): record code events too (sent, mail failed, used, dead after 5 wrong tries), with the real client address.
 - [ ] Design it (spec): `/architect account activity and audit`
 
 ### S8. Profile extras · planned · needs a decision · Beta
@@ -185,12 +186,25 @@ The profile routes the other apps already call: phone verification (VMMS), verif
 - Note (2026-11-09, replan, from spec 0005 follow-up): add a phone verified column in welinc-auth, put it in the `directory_changes` snapshot (a migration that changes the trigger) and map it to `phoneVerified`. If a deletion request erases personal data, it must also clear that person's feed snapshots, which otherwise keep names, emails and phones forever.
 - [ ] Design it (spec): `/architect profile extras`
 
-### S13. Email verification · planned · needs a decision
+### S13. Email verification · in-progress
+spec [0009](../../specs/_root/0009-email-verification/index.md)
+
 Prove a person owns their email before the suite relies on it, instead of only checking that the domain can receive mail. Today `emailVerified` turns true only when someone uses a setup or reset code; an account an admin creates with a typed password, and any email change by an admin or on the profile, is never checked.
 **Done when:** every new account and every email change sends a code or link to that address; `emailVerified` is true only after it is used; admins and the user can see whether an email is verified and send the code again; the rule for an unverified account (sign in allowed or not, which emails it gets) is decided and enforced.
 - Note (2026-11-08): found while checking the email domain rule. The domain check accepts any real domain (Gmail works); the test domain skip list now applies only outside production. Setup and reset codes used `Math.random()`; fixed the same day with `crypto.randomInt` (`newOtp()` in `auth.service.ts`), merged into `development` on 2026-11-09 (welinc-auth #22). Questions for the spec: code or link; whether an unverified account may sign in; what happens to the old email on a change (keep it until the new one is verified, and tell the old address); and how this fits drivers and helpers on BMS mobile (S5).
 - Note (2026-11-09, replan, from spec 0006 follow-up): the sign in rule for unverified accounts is this spec's call; `state.unverified@welinc.com` is the seeded test account for it.
-- [ ] Design it (spec): `/architect email verification`
+- Note (2026-11-10): spec 0009 decided a 6 digit code (no link); unverified accounts can't sign in until they type the code, carried by a ticket in the contract's reserved OTP shape, on the portal and mobile; admins can no longer type or set passwords; your own email change keeps the old address until the new one is confirmed, needs your password, and tells the old address at start and at the end; an admin's change switches at once and is confirmed at the next sign in. Every code kind moves into one hashed `verification_codes` table (10 minutes, setup 60, dead after 5 wrong tries, 60 s resend wait, 5 sends an hour, 10 calls a minute per IP on public code routes), which also closes the guessable reset route. `users.password_set` tells Setup pending from Email not verified on the VRMS Users page. Cross checked on another model, 27 fixes applied.
+- [x] Design it (spec): `/architect email verification` (2026-11-10)
+- [ ] Build it: `/develop email verification`
+  - [ ] Thin thread: migration, the code service, the sign in step on `/auth/login` and the portal code screen with `InputOTP` · AC-1 to AC-10, AC-24 to AC-26
+  - [ ] Setup and reset on the shared service, typed admin passwords removed, `password_set`, seeds · AC-6, AC-12 to AC-16, AC-22
+  - [ ] Email changes: your own (`/auth/profile/email*`) and an admin's, notices · AC-17 to AC-21, AC-23, AC-24
+  - [ ] Mobile step, VRMS profile and Users statuses, contract 0001 amendments · AC-11, AC-27 to AC-31
+- [ ] Verify it: `/check verify email verification`
+- [ ] Test it: `/test email verification`
+- [ ] Review it (fresh model): `/check review email verification`
+- [ ] Document it: `/document email verification`
+- [ ] Polish it (optional, ask first): `web-design-guidelines` (the portal code step)
 
 ## Cutover
 
@@ -205,6 +219,7 @@ The move itself: their users merged into welinc-auth by email, their auth copies
 - Note (2026-11-09, replan, from spec 0006 follow-up): the migration guide links to `docs/integration/seed-accounts.md` step 6, and each group's move includes switching its own seed to a copy of `people.json` (checked with `seed:check`).
 - Note (2026-11-10, replan, from spec 0007 follow up): the migration guide links to `docs/integration/web-login.md` instead of repeating it.
 - Note (2026-11-10, replan): this row's Done when needs staging, which comes from VRMS feature 26 (milestones 2 to 4 are still open and on hold). Spec 0008 owes its update through `/architect` before those milestones, using what S9 decides.
+- Note (2026-11-10, from spec 0009 follow-up): the migration guide makes the code screen a required change for `vmms-mobile` and `bms-mobile` (the login can answer `EMAIL_VERIFICATION_REQUIRED` instead of tokens); BMS stops resetting people to a default password, since admins can't set passwords anymore, and uses Send reset code; VMMS and BMS profile pages change email through `/auth/profile/email*`.
 - [ ] Design it (spec): `/architect move VMMS and BMS onto the shared services`
 
 ## Admin
@@ -224,6 +239,7 @@ Replaces VRMS feature 61 with the same scope (the full model, chosen 2026-11-07)
 - Note (2026-11-09, from spec 0004 follow-up): build on the `isSystemAdmin` flag and `GET /auth/systems` from S5 (additive permissions field later). Close the self grant hole with the temporary access exception here.
 - Note (2026-11-09, replan, from spec 0006 follow-up): add `suite.admin@welinc.com` (id 9001) to the `people.json` manifest once the platform admin exists, which also closes the last S12 Done when item.
 - Note (2026-11-10, replan, from spec 0007 follow up): the portal admin entry goes in the launcher's top bar.
+- Note (2026-11-10, from spec 0009 follow-up): the portal admin section shows Setup pending and Email not verified (`passwordSet`, `emailVerified`) and offers Send reset code; there is no admin password setting to carry over.
 - [ ] Design it (spec): `/architect suite admin model`
 - [ ] Polish it (optional, ask first): `web-design-guidelines` (access report)
 
