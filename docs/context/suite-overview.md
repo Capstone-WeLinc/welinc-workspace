@@ -16,7 +16,7 @@ The WeLinc fleet suite (Capstone 2) is three systems built by three groups for W
 |---|---|---|---|
 | Auth | `welinc-auth` | Login, OTP, password reset and users for every system; issues the JWT with a role per system | 3001 |
 | Portal | `welinc-web-portal` | The one sign in page; sends each user to their system | 8000 |
-| Gateway | Nginx, config in `welinc-auth/nginx.conf` for now | One front door that routes each path to its service | 3000 |
+| Gateway | Nginx, built from `infra/gateway/` in this workspace (spec 0008) | One front door that routes each path to its service | 3000 |
 
 They run from `docker-compose.shared.yml`, which also creates the `welinc-network` Docker network every system joins.
 

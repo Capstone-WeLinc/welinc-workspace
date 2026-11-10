@@ -176,7 +176,7 @@ One gateway that routes every system and analytics service, with a port map that
   - [x] The thin thread: `infra/gateway/` with auth and VRMS on the real stack, then the test harness · AC-1, AC-14, AC-24
   - [x] Every route and answer: all prefixes, limits, timeouts, `/health`, 404s and JSON errors · AC-1 to AC-7, AC-11, AC-12
   - [x] Hardening: CORS finished, settings checks, forwarded headers, request id, flood limit, log, HSTS · AC-8 to AC-10, AC-13, AC-15 to AC-21
-  - [ ] Health routes in welinc-auth and backend-vrms · AC-22, AC-23
+  - [x] Health routes in welinc-auth and backend-vrms · AC-22, AC-23
   - [ ] Handover: `clone-all.sh` groups, docs, contract 0001 amendments, then delete `welinc-auth/nginx.conf` · AC-14, AC-25 to AC-27
 - [ ] Verify it: `/check verify gateway for the whole suite`
 - [ ] Test it: `/test gateway for the whole suite`
