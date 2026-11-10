@@ -58,6 +58,8 @@ make_env() {
 }
 make_env welinc-auth
 [ "$group" = vrms ] && make_env welinc-backend-vrms
+# An older .env gets the names its .env.example gained since (spec 0010); names only are printed
+node scripts/sync-env.mjs
 
 step "Installing packages (a few minutes the first time)"
 for repo in $repos; do

@@ -31,6 +31,7 @@ _These are recommendations to keep the build orderly, not requirements. Skip any
 | S12 | Suite seed accounts | Core | done |
 | S4 | App initiated login and launcher | Login | done |
 | S9 | Gateway for the whole suite | Gateway | done |
+| S14 | Environment checked at startup | Config | done |
 | S7 | Account activity and audit | Account | planned |
 | S8 | Profile extras | Account | planned |
 | S13 | Email verification | Account | in-progress |
@@ -147,6 +148,7 @@ Replaces VRMS feature 60. Each app sends people to the portal with a return addr
 - Note (2026-11-07): chosen over the portal side picker (feature 60 as planned) and over separate login pages per system. Follows the app launcher pattern of Okta and Microsoft My Apps.
 - Note (2026-11-10): built. One addition the spec didn't name a source for: `/auth/sso`'s 403 `NO_SYSTEM_ACCESS` carries `user: { email }` (your own), so the no access state can show who is signed in (AC-19). Recorded in contract 0001 section 10 and in spec 0007 (AC-1, AC-19).
 - Note (2026-11-10, replan, from spec 0007 follow up): owed around the merge: record the login hero exception (gradient and glows on the portal login only) in `design.md`, a shared file, so a workspace PR; and tell VMMS and BMS that the launcher lists their system, the guide is `docs/integration/web-login.md`, and their web apps should drop `?token=` intake. This row also delivers VRMS feature 50, dropped on 2026-11-10.
+- Note (2026-11-11, replan): merged. Spec 0007 already carries the 403 `user: { email }` (AC-1, AC-19). Still owed: the login hero exception is not in `design.md` yet (a workspace PR), and the note to VMMS and BMS.
 - Note (2026-11-09): spec 0007 decided the Quiet workspace launcher (greeting, cards in the order BMS, VMMS, VRMS with description and your roles, a "You're here" tag from Switch system), `user.systems` in every grant answer so apps know when to show Switch system, no flag for systems not yet on the shared login (VMMS and BMS adjust in S11), sign out everywhere with a confirm, focus checks on the launcher, and the portal moved to Tailwind v4 and shadcn with the login kept as it looks today (only its states improve).
 - [x] Design it (spec): `/architect app initiated login and launcher` (2026-11-09, cross checked on another model, 9 gaps fixed)
 - [x] Build it: `/develop app initiated login and launcher` (2026-11-10, branch `feat/app-initiated-login-launcher` in welinc-auth, welinc-web-portal, welinc-backend-vrms and welinc-web-vrms)
@@ -183,6 +185,22 @@ One gateway that routes every system and analytics service, with a port map that
 - [x] Document it: `/document gateway for the whole suite` (2026-11-11, workspace PR #20)
 - [ ] Polish it (optional, ask first): `docker-patterns`
 
+## Config
+
+### S14. Environment checked at startup · done · from spec 0010
+spec [0010](../../specs/_root/0010-startup-env-validation/index.md) · code in `src/config/` of welinc-auth and welinc-backend-vrms, `env.schema.ts` and `vite.config.ts` of welinc-web-vrms and welinc-web-portal, `scripts/sync-env.mjs` and `scripts/setup.sh`
+
+Every app checks its environment variables when it starts or builds and refuses to run with a clear list of what is missing or malformed, and setup tops up an old `.env` with new names.
+**Done when:** all four apps validate at boot or build against their schema, no app code reads `process.env` or falls back to `localhost`, the drift tests pass, and `setup.sh` adds missing names to an existing `.env`.
+- [x] Design it (spec): `/architect startup environment validation` (2026-11-11, cross checked on another model, 15 gaps fixed)
+- [x] Build it: `/develop environment checked at startup` (2026-11-11, branch `feat/startup-env-validation` in the four service repos; workspace `scripts/sync-env.mjs` on `docs/startup-env-validation-spec`)
+  - [x] Thin thread on VRMS: welinc-backend-vrms schema, `testEnv`, lint rule, `env:check`, then welinc-web-vrms `checkEnv` and `build:local` · AC-1 to AC-11, AC-13 (2026-11-11, branch `feat/startup-env-validation` in both repos, not pushed)
+  - [x] The shared pair: welinc-auth, then welinc-web-portal, same pattern · AC-1 to AC-11, AC-13 (2026-11-11, branch `feat/startup-env-validation` in both repos, not pushed)
+  - [x] Setup top up: `scripts/sync-env.mjs`, its `setup.sh` call, and the VRMS build rule moved to `build:local` · AC-8, AC-12 (2026-11-11)
+- [x] Verify it: `/check verify environment checked at startup` (2026-11-11, all steps in `verify.md` ran and passed)
+- [x] Test it: `/test environment checked at startup` (2026-11-11, gap check against AC-1 to AC-13 added the AC-11 lint rule test in both backends and the AC-7 no localhost test in both frontends)
+- [x] Document it: `/document environment checked at startup` (2026-11-11, PRs welinc-auth #27, welinc-backend-vrms #53, welinc-web-vrms #54, welinc-web-portal #18, workspace #22)
+
 ## Account
 
 ### S7. Account activity and audit · planned · needs a decision
@@ -214,7 +232,6 @@ Prove a person owns their email before the suite relies on it, instead of only c
   - [ ] Mobile step, VRMS profile and Users statuses, contract 0001 amendments · AC-11, AC-27 to AC-31
 - [ ] Verify it: `/check verify email verification`
 - [ ] Test it: `/test email verification`
-- [ ] Review it (fresh model): `/check review email verification`
 - [ ] Document it: `/document email verification`
 - [ ] Polish it (optional, ask first): `web-design-guidelines` (the portal code step)
 
@@ -262,6 +279,7 @@ Replaces VRMS feature 61 with the same scope (the full model, chosen 2026-11-07)
 - **Gateway before account features.** The other groups can't call welinc-auth through one address until their routes and ports exist.
 - **Account features before the move.** Their apps already call those routes; moving them earlier would break their screens.
 - **Suite admin last.** It needs the new roles, the directory and OTP, and nobody is blocked without it.
+- **Hosting cuts in after S13** (2026-11-11). VRMS feature 26 runs next, before S7, S8, S11 and S10: deploying by the end of November is the hard deadline, and S11 can't finish without staging.
 
 ## Legend
 
