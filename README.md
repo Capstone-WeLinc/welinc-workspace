@@ -94,7 +94,8 @@ Inside a repo, before you push:
 |---|---|
 | Code style | `npm run lint` |
 | Types (web apps) | `npm run typecheck` |
-| It builds | `npm run build` |
+| It builds (backends) | `npm run build` |
+| It builds (web apps) | `npm run build:local` (plain `npm run build` is the online build and needs real `https` addresses) |
 | Tests | `npm run test` |
 
 ### Container names
@@ -124,20 +125,29 @@ Then check what changed:
 | `package.json` | `npm install` in that repo, then `sh scripts/start.sh vrms --build` |
 | `prisma/migrations/` | In that backend: `npx prisma migrate deploy` (in `welinc-auth`: `npm run db:deploy`) |
 | A Dockerfile, a compose file or `infra/gateway/` | `sh scripts/start.sh vrms --build` |
-| `.env.example` got a new line | Add the same line to your own `.env` |
+| `.env.example` got a new line | `node scripts/sync-env.mjs` adds it to your `.env` for you (setup does this too) |
 | `agents/<group>/` | `node scripts/use-agents.mjs vrms` |
 
 Or just run `sh scripts/setup.sh vrms` again. It's safe, and it does all of this for you.
 
 ## Environment files
 
-Each backend has a `.env` file with your local secrets. `setup.sh` makes them for you.
+Each backend has a `.env` file with your local settings and keys. `setup.sh` makes them for you, and when a teammate adds a new setting, running setup again adds it to your `.env` (it never changes a line you already have).
+
+The web apps need no `.env`: they use the `.env.development` file that's already in git.
 
 | File | Holds | Shared in git? |
 |---|---|---|
 | `.env.example` | The list of settings, with safe sample values | Yes |
+| `.env.development` (web apps) | The local addresses the web app calls | Yes |
 | `.env` | Your real values and keys | **Never** |
 | `.env.local` | Your personal changes | **Never** |
+
+**Every app checks its settings when it starts.** If one is missing or wrong, the app stops and lists each problem by name, for example `AUTH_ISSUER: is required`. It never shows the value. Fix the names it lists (usually by running `sh scripts/setup.sh vrms` again), then start it again. To check without starting the app, run `npm run env:check` in the backend.
+
+Optional extras (mail, AI) don't stop the app. If one is off, the app starts anyway and writes one warning line in its log, which you can read with `docker logs welinc_vrms_backend` or `docker logs welinc_auth_service`.
+
+Online (in production) the check is stricter: every address must use `https` and must not be `localhost`, cookies must be secure, and mail and file storage must be set. A bad setting there stops the deploy instead of breaking the live site.
 
 Optional extras you can add to your `.env`:
 
@@ -155,7 +165,7 @@ If the script stops with an error, this table shows each step, so you can run th
 | Step | Command |
 |---|---|
 | 1. Download your group's repos | `sh scripts/clone-all.sh vrms` |
-| 2. Make the `.env` files | `cp welinc-auth/.env.example welinc-auth/.env` (and the same in your backend) |
+| 2. Make the `.env` files | `cp welinc-auth/.env.example welinc-auth/.env` (and the same in your backend). If you already have them: `node scripts/sync-env.mjs` adds any new settings |
 | 3. Install packages | `npm install` in each repo |
 | 4. Make the login keys | `cd welinc-auth && npm run keys:dev` |
 | 5. Start the shared services | `docker compose -f docker-compose.shared.yml up -d --build` |
@@ -197,6 +207,8 @@ node scripts/use-agents.mjs vrms
 | What you see | What to do |
 |---|---|
 | `Docker isn't running` | Open Docker Desktop and wait until it says it's running |
+| `Environment check failed` in a backend's log, and it won't start | The lines under it name each setting that's missing or wrong. Run `sh scripts/setup.sh vrms` again to add new ones, or fix the value in that backend's `.env` |
+| `Environment check failed (mode production)` when building a web app | Use `npm run build:local` on your machine. Plain `npm run build` is for the online build |
 | `$'\r': command not found` | You ran the script in PowerShell or with Windows line endings. Use Git Bash and pull again |
 | `port is already allocated` | Something else uses that port. Run `docker ps` and stop the old one |
 | Error `UPSTREAM_UNAVAILABLE` (502) | That service isn't running or is still starting. Wait a moment, or read its log |
@@ -215,7 +227,7 @@ node scripts/use-agents.mjs vrms
 
 | Folder or file | What's in it |
 |---|---|
-| `scripts/` | `setup.sh`, `start.sh`, `stop.sh`, `clone-all.sh`, `use-agents.mjs` |
+| `scripts/` | `setup.sh`, `start.sh`, `stop.sh`, `clone-all.sh`, `sync-env.mjs` (adds new settings to your `.env`), `use-agents.mjs` |
 | `infra/gateway/` | The gateway: its settings, paths and tests |
 | `docker-compose.shared.yml` | The shared services: auth, gateway, portal |
 | `docker-compose.vrms.yml` | VRMS's services (one file per group) |
