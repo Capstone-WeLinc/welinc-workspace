@@ -1,7 +1,7 @@
 # 0008. Gateway for the whole suite
 
 **Date**: 2026-11-10
-**Status**: In Progress
+**Status**: Accepted
 **Scope row**: [S9. Gateway for the whole suite](../../../scope/_root/shared-services.md#s9-gateway-for-the-whole-suite--in-progress)
 **Builds contract section**: [0001](../0001-shared-services-contract/index.md) section 3 (and amends it, see AC-27)
 
@@ -23,7 +23,7 @@ Routing
 - **AC-2**: `/vmms/analytics/x` reaches the VMMS analytics service and `/vmms/x` reaches the VMMS backend.
 - **AC-3**: `/`, `/repairs/x`, `/vmmsx`, each bare prefix with no trailing slash (`/auth`, `/uploads`, `/vrms`, `/vmms`, `/vmms/analytics`, `/bms`) and any other path outside the table answer 404 `NOT_FOUND` and reach no upstream.
 - **AC-4**: `GET /health` answers 200 `{ "status": "ok" }` with every upstream stopped.
-- **AC-5**: With one system stopped, its routes answer 502 `UPSTREAM_UNAVAILABLE` and every other route keeps working. For up to 5 seconds right after the stop they may answer 504 `UPSTREAM_TIMEOUT` instead, while the gateway still holds the old address (the resolver's `valid=5s`). Once that system starts, its routes work within 10 seconds, with no gateway restart. (Proven locally; what a stopped Azure app answers is a staging check, see Follow-up.)
+- **AC-5**: With one system stopped, its routes answer 502 `UPSTREAM_UNAVAILABLE` and every other route keeps working. For up to 5 seconds right after the stop they may answer 504 `UPSTREAM_TIMEOUT` instead, while the gateway still holds the old address (the resolver's `valid=5s`). Once that system answers its own health check, its routes work within 10 seconds, with no gateway restart (the system's own boot time comes first: the local VRMS backend takes about 23 seconds). (Proven locally; what a stopped Azure app answers is a staging check, see Follow-up.)
 - **AC-6**: For each route, a body exactly at the limit passes and one byte over answers 413 `PAYLOAD_TOO_LARGE`.
 - **AC-7**: An upstream slower than its route's read timeout answers 504 `UPSTREAM_TIMEOUT` (proven live on the 30 s route). Each route's timeout and body limit in the loaded config (`nginx -T`) match the table.
 
@@ -212,7 +212,7 @@ The stub accepts any body. Over limit checks send a real `Content-Length` and ac
 **Critical test scenarios** (all in `check-routes.mjs`):
 - Every route reaches the right stub with its path intact, the longest prefix included: **AC-1**, **AC-2**
 - Each bare prefix answers the JSON 404, and no stub sees it: **AC-3**
-- Stop the `bms-gateway` stub: `/bms/x` answers JSON 502 with CORS, `/vrms/x` still works; start it, `/bms/x` works within 10 seconds: **AC-5**, **AC-11**
+- Stop the `bms-gateway` stub: `/bms/x` answers JSON 502 with CORS, `/vrms/x` still works; start it, `/bms/x` works within 10 seconds of the stub answering: **AC-5**, **AC-11**
 - Unlisted origin on a request and a preflight gets no `Access-Control-*` header: **AC-8**, **AC-9**
 - `?code=topsecret` while the upstream is down, then search `docker compose logs`: no `topsecret`: **AC-20**
 - On `gateway-edge`, two `X-Forwarded-For` client addresses limit separately: **AC-16**, **AC-19**
