@@ -3,7 +3,7 @@
 The shared services (auth, portal, gateway) that VRMS, VMMS and BMS should all run on. Today only VRMS uses them: VMMS keeps its own copy of auth, BMS reads the auth database directly, and neither has a portal handoff. This epic turns the shared services into something the other two groups can actually move onto. Part of the [suite scope map](../index.md).
 
 **Build approach:** Tracer Bullet (each piece built end to end and proven on VRMS first, since VRMS already runs on the shared services; the other groups then move onto it with S11).
-**Workflow:** GA (after `/develop`: `/check verify`, `/test`, a fresh model `/check review`, then `/document`). Auth, sessions and admin rights are where a mistake exposes every system's data.
+**Workflow:** GA without the review (after `/develop`: `/check verify`, `/test`, then `/document`). No `/check review` in this project, by choice on 2026-11-11, for the deadline. Auth, sessions and admin rights are where a mistake exposes every system's data.
 
 _These are recommendations to keep the build orderly, not requirements. Skip anything that does not fit. You decide when a row is `done`._
 
@@ -30,7 +30,7 @@ _These are recommendations to keep the build orderly, not requirements. Skip any
 | S6 | User directory for systems | Core | done |
 | S12 | Suite seed accounts | Core | done |
 | S4 | App initiated login and launcher | Login | done |
-| S9 | Gateway for the whole suite | Gateway | planned |
+| S9 | Gateway for the whole suite | Gateway | in-progress |
 | S7 | Account activity and audit | Account | planned |
 | S8 | Profile extras | Account | planned |
 | S13 | Email verification | Account | planned |
@@ -145,7 +145,7 @@ spec [0007](../../specs/_root/0007-app-initiated-login-launcher/index.md) · cod
 Replaces VRMS feature 60. Each app sends people to the portal with a return address and gets them back through a one time code it exchanges on its backend, not `?token=` in the URL. The portal shows a launcher of your systems only when opened directly (skipped when you have one), and each app gets a Switch system link.
 **Done when:** a deep link into any system survives login; tokens never appear in a URL; return addresses are checked against an allow list; the launcher lists only the systems you hold; one system users never see it; Switch system and logout work from every app; no new role or permission is created; and VMMS and BMS can use it.
 - Note (2026-11-07): chosen over the portal side picker (feature 60 as planned) and over separate login pages per system. Follows the app launcher pattern of Okta and Microsoft My Apps.
-- Note (2026-11-10): built. One addition the spec didn't name a source for: `/auth/sso`'s 403 `NO_SYSTEM_ACCESS` carries `user: { email }` (your own), so the no access state can show who is signed in (AC-19). Recorded in contract 0001 section 10; spec 0007's AC-1 and AC-19 owe that line through `/architect`.
+- Note (2026-11-10): built. One addition the spec didn't name a source for: `/auth/sso`'s 403 `NO_SYSTEM_ACCESS` carries `user: { email }` (your own), so the no access state can show who is signed in (AC-19). Recorded in contract 0001 section 10 and in spec 0007 (AC-1, AC-19).
 - Note (2026-11-10, replan, from spec 0007 follow up): owed around the merge: record the login hero exception (gradient and glows on the portal login only) in `design.md`, a shared file, so a workspace PR; and tell VMMS and BMS that the launcher lists their system, the guide is `docs/integration/web-login.md`, and their web apps should drop `?token=` intake. This row also delivers VRMS feature 50, dropped on 2026-11-10.
 - Note (2026-11-09): spec 0007 decided the Quiet workspace launcher (greeting, cards in the order BMS, VMMS, VRMS with description and your roles, a "You're here" tag from Switch system), `user.systems` in every grant answer so apps know when to show Switch system, no flag for systems not yet on the shared login (VMMS and BMS adjust in S11), sign out everywhere with a confirm, focus checks on the launcher, and the portal moved to Tailwind v4 and shadcn with the login kept as it looks today (only its states improve).
 - [x] Design it (spec): `/architect app initiated login and launcher` (2026-11-09, cross checked on another model, 9 gaps fixed)
@@ -163,12 +163,24 @@ Replaces VRMS feature 60. Each app sends people to the portal with a return addr
 
 ## Gateway
 
-### S9. Gateway for the whole suite · planned · needs a decision
+### S9. Gateway for the whole suite · in-progress
+spec [0008](../../specs/_root/0008-suite-gateway/index.md) · code in `infra/gateway/`, `docker-compose.shared.yml`, `scripts/clone-all.sh`, the health routes in `welinc-auth` and `welinc-backend-vrms`
+
 One gateway that routes every system and analytics service, with a port map that has no clashes, and a decision on where the gateway config lives (today inside `welinc-auth`).
 **Done when:** every system's API and analytics service is reachable through the gateway, each service has its own port in the README repos table, CORS and upload limits are set per route, and the config lives where the contract says.
 - Note (2026-11-09): each group clones and runs only the shared repos plus its own system; only the shared services owner runs everything. Integration with another system goes through the staging deployment (spec 0008), or a stub of the contract until staging exists, never another group's local clone. So the gateway must start and serve its routes with any system missing: keep today's pattern (`resolver 127.0.0.11` and a variable in `proxy_pass`) on every new route, so an absent system answers 502 on its own routes only. Also give `scripts/clone-all.sh` a group option (`clone-all.sh vmms` clones the shared repos plus that system) and say so in the setup guide.
 - Note (2026-11-10, replan, from spec 0007 follow up): include the CORS list and routes for the `/vmms` and `/bms` session routes, so the last step of `docs/integration/web-login.md` works.
-- [ ] Design it (spec): `/architect gateway for the whole suite`
+- Note (2026-11-10): spec 0008 decided one nginx template set in `infra/gateway/` for every environment, built into one image run from settings; `/repairs` removed (nothing serves it); JSON errors with CORS for 404, 413, 429, 502 and 504; a separate `/health`; a flood limit per client (20 a second, burst 40); `X-Forwarded-For` sent as one value; a JSON access log with no query strings; `/auth/health` and `/vrms/health` built here. VMMS and BMS routes are proven with stub containers until S11. The image is ready for Azure, the deploy stays in VRMS spec 0008. Deferred, blocks nothing: services logging `X-Request-Id`.
+- [x] Design it (spec): `/architect gateway for the whole suite` (2026-11-10, cross checked on another model, 5 bugs and 14 gaps fixed)
+- [ ] Build it: `/develop gateway for the whole suite`
+  - [x] The thin thread: `infra/gateway/` with auth and VRMS on the real stack, then the test harness · AC-1, AC-14, AC-24
+  - [x] Every route and answer: all prefixes, limits, timeouts, `/health`, 404s and JSON errors · AC-1 to AC-7, AC-11, AC-12
+  - [x] Hardening: CORS finished, settings checks, forwarded headers, request id, flood limit, log, HSTS · AC-8 to AC-10, AC-13, AC-15 to AC-21
+  - [x] Health routes in welinc-auth and backend-vrms · AC-22, AC-23
+  - [ ] Handover: `clone-all.sh` groups, docs, contract 0001 amendments, then delete `welinc-auth/nginx.conf` · AC-14, AC-25 to AC-28 (2026-11-11: all done except the `nginx.conf` deletion, migration phase 2 of spec 0008)
+- [ ] Verify it: `/check verify gateway for the whole suite`
+- [ ] Test it: `/test gateway for the whole suite`
+- [ ] Document it: `/document gateway for the whole suite`
 - [ ] Polish it (optional, ask first): `docker-patterns`
 
 ## Account
@@ -204,6 +216,7 @@ The move itself: their users merged into welinc-auth by email, their auth copies
 - Note (2026-11-09, replan, from spec 0005 follow-up): the migration guide points VMMS and BMS at the VRMS directory reader as the one to copy (`welinc-backend-vrms/src/modules/vrms/directory/`: `directory_sync_state`, the lease, stop on failure), and the BMS gateway moves off `users`, `user_roles` and `user_activity_logs` onto `/auth/directory/*`.
 - Note (2026-11-09, replan, from spec 0006 follow-up): the migration guide links to `docs/integration/seed-accounts.md` step 6, and each group's move includes switching its own seed to a copy of `people.json` (checked with `seed:check`).
 - Note (2026-11-10, replan, from spec 0007 follow up): the migration guide links to `docs/integration/web-login.md` instead of repeating it.
+- Note (2026-11-10, replan): this row's Done when needs staging, which comes from VRMS feature 26 (milestones 2 to 4 are still open and on hold). Spec 0008 owes its update through `/architect` before those milestones, using what S9 decides.
 - [ ] Design it (spec): `/architect move VMMS and BMS onto the shared services`
 
 ## Admin

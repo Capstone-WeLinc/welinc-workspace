@@ -126,7 +126,6 @@ spec [0011](../../specs/vrms/0011-permission-matrix/index.md) · code in `welinc
   - [x] Close out: lint, build, tests and typecheck in all three repos (AC-37)
 - [x] Verify it: `/check verify permission matrix`
 - [x] Test it: `/test permission matrix`
-- [ ] Review it (fresh model): `/check review permission matrix`
 - [x] Document it: `/document permission matrix`
 
 ### 6. Design system & UI foundation · done

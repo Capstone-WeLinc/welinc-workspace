@@ -1,0 +1,175 @@
+# The suite gateway (spec 0008, docs/specs/_root/0008-suite-gateway/). One template for every
+# environment: the image fills in each ${SETTING} at start, and $name values are nginx's own.
+# How to add a route: infra/gateway/README.md.
+#
+# Rules that keep it working:
+# - Every upstream goes through $upstream and the resolver, never a literal proxy_pass or an
+#   upstream {} block, so the gateway starts and serves its other routes with a system missing.
+# - A route location never calls add_header: nginx drops every inherited header from a block that
+#   sets its own. Headers live in snippets/route.conf and snippets/error-headers.conf.
+
+resolver ${NGINX_LOCAL_RESOLVERS} valid=5s ipv6=off;
+resolver_timeout 2s;
+
+# The real client: the gateway's own peer, or behind Azure's ingress (TRUST_EDGE_PROXY=1) the last
+# X-Forwarded-For entry, the one the ingress appended. Used for the flood limit, upstream and log.
+map "${TRUST_EDGE_PROXY}:$http_x_forwarded_for" $client_addr {
+    default $remote_addr;
+    "~^1:(?:.*,)?\s*(?<last>[^,\s]+)\s*$" $last;
+}
+
+map "${TRUST_EDGE_PROXY}:$http_x_forwarded_proto" $forwarded_proto {
+    default $scheme;
+    "~^1:(?<proto>https?)$" $proto;
+}
+
+# Keep a caller's request id when it is safe to log, else make one
+map $http_x_request_id $gateway_request_id {
+    default $request_id;
+    "~^[A-Za-z0-9._-]{1,64}$" $http_x_request_id;
+}
+
+# CORS: exact origins from ALLOWED_ORIGINS (written by the start check), never *. Every CORS value
+# is empty for an unlisted origin, and nginx leaves out a header whose value is empty.
+map $http_origin $cors_origin {
+    default "";
+    include /etc/nginx/generated/cors-origins.map;
+}
+map $cors_origin $cors_credentials {
+    default "true";
+    "" "";
+}
+map $cors_origin $cors_methods {
+    default "GET, POST, PUT, PATCH, DELETE, OPTIONS";
+    "" "";
+}
+map $cors_origin $cors_request_headers {
+    default "Authorization, Content-Type, X-Request-Id";
+    "" "";
+}
+map $cors_origin $cors_expose_headers {
+    default "X-Request-Id, Retry-After";
+    "" "";
+}
+map $cors_origin $cors_max_age {
+    default "600";
+    "" "";
+}
+
+# Flood guard per client. Counted only in snippets/route.conf, so preflights, /health and 404s are free.
+limit_req_zone $client_addr zone=flood:10m rate=${GATEWAY_RATE_PER_SECOND}r/s;
+limit_req_status 429;
+
+# One JSON line per request. $uri, never $request_uri: query strings can hold secrets (?code=...).
+log_format gateway_json escape=json
+    '{"time":"$time_iso8601","request_id":"$gateway_request_id","client":"$client_addr",'
+    '"method":"$request_method","path":"$uri","status":$status,"bytes":$body_bytes_sent,'
+    '"duration":$request_time,"upstream":"$upstream_addr","upstream_status":"$upstream_status",'
+    '"upstream_duration":"$upstream_response_time"}';
+
+server {
+    listen 3000 default_server;
+    server_name _;
+    access_log /var/log/nginx/access.log gateway_json;
+
+    # Only errors nginx makes itself land here (proxy_intercept_errors stays off)
+    error_page 404 @not_found;
+    error_page 413 @too_large;
+    error_page 429 @rate_limited;
+    error_page 502 @unavailable;
+    error_page 504 @timeout;
+
+    # The gateway's own check: needs no upstream, isn't logged and isn't rate limited
+    location = /health {
+        access_log off;
+        types { }
+        default_type application/json;
+        add_header X-Request-Id $gateway_request_id always;
+        add_header Strict-Transport-Security "${GATEWAY_HSTS}" always;
+        return 200 '{"status":"ok"}';
+    }
+
+    # Routes (contract 0001 section 3). Each ends in a slash, so /vmmsx can't match /vmms.
+    location /auth/ {
+        client_max_body_size 5m;
+        proxy_read_timeout 30s;
+        set $upstream ${AUTH_UPSTREAM};
+        include /etc/nginx/conf.d/snippets/route.conf;
+    }
+
+    location /uploads/ {
+        client_max_body_size 5m;
+        proxy_read_timeout 30s;
+        set $upstream ${AUTH_UPSTREAM};
+        include /etc/nginx/conf.d/snippets/route.conf;
+    }
+
+    # 25 MB attachments plus the multipart overhead, and time for a queued HEIC conversion (VRMS spec 0017)
+    location /vrms/ {
+        client_max_body_size 26m;
+        proxy_read_timeout 120s;
+        set $upstream ${VRMS_UPSTREAM};
+        include /etc/nginx/conf.d/snippets/route.conf;
+    }
+
+    location /vmms/analytics/ {
+        client_max_body_size 1m;
+        proxy_read_timeout 120s;
+        set $upstream ${VMMS_ANALYTICS_UPSTREAM};
+        include /etc/nginx/conf.d/snippets/route.conf;
+    }
+
+    location /vmms/ {
+        client_max_body_size 10m;
+        proxy_read_timeout 60s;
+        set $upstream ${VMMS_UPSTREAM};
+        include /etc/nginx/conf.d/snippets/route.conf;
+    }
+
+    location /bms/ {
+        client_max_body_size 10m;
+        proxy_read_timeout 60s;
+        set $upstream ${BMS_UPSTREAM};
+        include /etc/nginx/conf.d/snippets/route.conf;
+    }
+
+    # A bare prefix answers 404 here, so nginx's automatic 301 to the slash form never fires
+    location = /auth { return 404; }
+    location = /uploads { return 404; }
+    location = /vrms { return 404; }
+    location = /vmms { return 404; }
+    location = /vmms/analytics { return 404; }
+    location = /bms { return 404; }
+
+    # Everything outside the route table, /repairs included
+    location / {
+        return 404;
+    }
+
+    # Gateway answers, in contract 0001 section 11's error shape
+    location @not_found {
+        include /etc/nginx/conf.d/snippets/error-headers.conf;
+        return 404 '{"statusCode":404,"message":"Unknown path","error":"Not Found","code":"NOT_FOUND"}';
+    }
+
+    location @too_large {
+        include /etc/nginx/conf.d/snippets/error-headers.conf;
+        return 413 '{"statusCode":413,"message":"Request body is over this route\'s limit","error":"Payload Too Large","code":"PAYLOAD_TOO_LARGE"}';
+    }
+
+    location @rate_limited {
+        include /etc/nginx/conf.d/snippets/error-headers.conf;
+        add_header Retry-After 1 always;
+        return 429 '{"statusCode":429,"message":"Too many requests","error":"Too Many Requests","code":"RATE_LIMITED"}';
+    }
+
+    location @unavailable {
+        include /etc/nginx/conf.d/snippets/error-headers.conf;
+        return 502 '{"statusCode":502,"message":"This service isn\'t reachable right now","error":"Bad Gateway","code":"UPSTREAM_UNAVAILABLE"}';
+    }
+
+    location @timeout {
+        include /etc/nginx/conf.d/snippets/error-headers.conf;
+        return 504 '{"statusCode":504,"message":"This service took too long to answer","error":"Gateway Timeout","code":"UPSTREAM_TIMEOUT"}';
+    }
+}

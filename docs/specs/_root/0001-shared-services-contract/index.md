@@ -3,8 +3,8 @@
 **Date**: 2026-11-08
 **Status**: Accepted
 **Scope row**: [S1. Shared services contract](../../../scope/_root/shared-services.md#s1-shared-services-contract--planned--needs-a-decision)
-**Contract version**: 2
-**Amended**: 2026-11-09, additive, from spec [0004](../0004-roles-per-system/index.md) (sections 4, 8, 10, 11, 12, 13) · 2026-11-09, version 2 (breaking), from spec [0005](../0005-user-directory/index.md) (sections 5, 9, 10, 11, 12, 14, 15 and the gap map)
+**Contract version**: 3
+**Amended**: 2026-11-09, additive, from spec [0004](../0004-roles-per-system/index.md) (sections 4, 8, 10, 11, 12, 13) · 2026-11-09, version 2 (breaking), from spec [0005](../0005-user-directory/index.md) (sections 5, 9, 10, 11, 12, 14, 15 and the gap map) · 2026-11-11, version 3 (breaking, no caller affected), from spec [0008](../0008-suite-gateway/index.md) (sections 2, 3, 11, 12, 14)
 
 ## Summary
 
@@ -82,23 +82,29 @@ Everything in this section is the promise. Paths are as seen through the gateway
 
 - Free in each block: VRMS 3003 to 3009, VMMS 3012 to 3019, BMS 3026 to 3029. A new service takes the next free port in its block and adds it to the README repos table.
 - Databases keep their own container ports and are never reached through the gateway.
+- **Docker service names** (spec 0008): the gateway reaches each upstream by its Docker service name, so every compose file uses these: `auth-service`, `vrms-backend`, `vmms-backend`, `vmms-analytics`, `bms-gateway`. S11's compose files for VMMS and BMS must use them. Hosted, the same settings hold the full internal names instead.
 
 ### 3. Gateway routes
 
 | Path prefix | Goes to | Body limit | Read timeout |
 |---|---|---|---|
-| `/auth`, `/uploads` | `welinc-auth` 3001 | 5 MB | 30 s |
-| `/vrms`, `/repairs` | `welinc-backend-vrms` 3002 | 26 MB | 120 s |
-| `/vmms/analytics` | `welinc-backend-vmms-analytics-ai` 3011 | 1 MB | 120 s |
-| `/vmms` | `welinc-backend-vmms` 3010 | 10 MB | 60 s |
-| `/bms` | `bms-gateway` 3020 (which fans out to the BMS services and analytics itself) | 10 MB | 60 s |
+| `/auth/`, `/uploads/` | `welinc-auth` 3001 | 5 MB | 30 s |
+| `/vrms/` | `welinc-backend-vrms` 3002 | 26 MB | 120 s |
+| `/vmms/analytics/` | `welinc-backend-vmms-analytics-ai` 3011 | 1 MB | 120 s |
+| `/vmms/` | `welinc-backend-vmms` 3010 | 10 MB | 60 s |
+| `/bms/` | `bms-gateway` 3020 (which fans out to the BMS services and analytics itself) | 10 MB | 60 s |
 
 - **No rewriting.** Each service serves its own prefix (VMMS sets a global `vmms` prefix and serves analytics under `vmms/analytics`; `bms-gateway` swaps its `/api` strip for `/bms`). The same path works directly on the service port and through the gateway.
-- **Longest prefix wins** (`/vmms/analytics` before `/vmms`).
-- **Headers the gateway sets:** `X-Forwarded-For`, `X-Forwarded-Proto`, `X-Request-Id` (kept if the caller sent one). Services trust one proxy hop and log `X-Request-Id` on every line.
-- **CORS:** the gateway answers preflight (the browser's "may I call this?" check) only for the web origins of its environment (section 1), with credentials allowed. Locally it also allows the `localhost` ports in section 2. No `*`.
-- **Health:** every upstream answers `GET <prefix>/health` with 200 and a database check, for the spec 0008 smoke test.
-- **Config home:** `infra/gateway/` in the workspace repo holds the nginx template (upstreams read from environment values, as spec 0008 describes) and the local config that `docker-compose.shared.yml` mounts. `welinc-auth/nginx.conf` is removed.
+- **Prefixes end in a slash** (version 3). `/vmmsx` never matches `/vmms/`, and a bare prefix with no slash (`/vrms`) answers 404. **Longest prefix wins** (`/vmms/analytics/` before `/vmms/`). `/repairs` is gone (version 3): nothing served it.
+- **Every connection** to an upstream gives up after 5 s (504).
+- **The gateway's own answers.** `GET /health` answers 200 `{ "status": "ok" }` with no upstream running. Any path outside the table answers 404 `NOT_FOUND`. A body over the route's limit answers 413 `PAYLOAD_TOO_LARGE`, the flood limit 429 `RATE_LIMITED`, a service that isn't reachable 502 `UPSTREAM_UNAVAILABLE`, and one past its read timeout 504 `UPSTREAM_TIMEOUT`. Each is JSON in the section 11 shape, carries the CORS headers below and `X-Request-Id`. Right after a service stops, its routes may answer 504 for up to 5 s (the gateway's address cache) before the steady 502. An error a service sends itself passes through untouched.
+- **Flood limit:** per client address, 20 a second with bursts of 40 (settings, section 12). Preflights, `/health` and the 404s never count.
+- **Headers the gateway sends upstream:** `X-Forwarded-For` as **one value**, the real client (never appended to, so a caller can't plant an address; behind Azure's ingress it is the last entry the ingress appended); `X-Forwarded-Proto`; `X-Request-Id`, kept when the caller's matches `^[A-Za-z0-9._-]{1,64}$`, else a new one, and returned on every answer; `Host` as the upstream's own name. Services keep counting hops with `TRUST_PROXY_HOPS` (1 locally, 2 hosted), which the one value keeps right. Services logging `X-Request-Id` on every line is a follow up of spec 0008, not yet a rule.
+- **Headers the gateway owns:** it hides any `Access-Control-*`, `Vary`, `X-Request-Id` or `Strict-Transport-Security` an upstream sends, and sets its own, so a browser sees one of each.
+- **CORS:** the gateway answers only the exact web origins of its environment (section 1), listed in its `ALLOWED_ORIGINS` setting; locally the `localhost` ports in section 2. No `*`. A listed origin gets `Access-Control-Allow-Origin` with that origin, `Access-Control-Allow-Credentials: true`, `Vary: Origin` and `Access-Control-Expose-Headers: X-Request-Id, Retry-After`. Its preflight answers 204 with methods `GET, POST, PUT, PATCH, DELETE, OPTIONS`, request headers `Authorization, Content-Type, X-Request-Id` and a max age of 600, without reaching the service. An unlisted origin gets no `Access-Control-*` header at all.
+- **HSTS:** every answer carries `Strict-Transport-Security` from the `GATEWAY_HSTS` setting when it is set (hosted), and none locally.
+- **Health:** every upstream answers `GET <prefix>/health` with 200 `{ "status": "ok", "checks": { ... } }`, or 503 `HEALTH_CHECK_FAILED` with the failed check, needing no token and showing no error text. Each check counts as failed after 2 s. `/auth/health` and `/vrms/health` exist; VMMS and BMS add theirs in S11.
+- **Config home:** `infra/gateway/` in the workspace repo builds one image from one template set, the same for every environment; only settings differ (`docker-compose.shared.yml` locally, the hosting settings online). There is no separate local config. `welinc-auth/nginx.conf` is removed.
 - A body limit or timeout change for one route is a one line PR to `infra/gateway/` that the owning group opens; it is not a contract change.
 
 ### 4. Clients (who may ask welinc-auth for tokens)
@@ -422,6 +428,7 @@ Existing routes stay unless marked. "System" means the token's `aud`; the old `?
 - welinc-auth and the system session routes answer with Nest's usual body plus a stable `code`: `{ "statusCode": 409, "message": "…", "error": "Conflict", "code": "ACCOUNT_EXISTS" }`. Clients branch on `code`, never on `message`.
 - `/auth/token` answers in the OAuth format so standard libraries understand it: `{ "error": "invalid_grant", "error_description": "…" }` (400), `invalid_client` (401), or `invalid_target` and `invalid_scope` (400) for an audience or scope the client may not have.
 - Codes this contract introduces: `SESSION_ENDED`, `ACCOUNT_INACTIVE`, `ACCOUNT_LOCKED`, `TOKEN_EXPIRED` (a good token past its `exp`: refresh and retry once), `CSRF_REJECTED`, `AUTH_UNAVAILABLE`, `NO_SYSTEM_ACCESS`, `WRONG_AUDIENCE`, `WRONG_TOKEN_USE`, `REAUTH_REQUIRED`, `RATE_LIMITED`, `UNKNOWN_ROLE` (400, a role the system's catalog doesn't have), `ROLE_LIMIT` (409, more roles in one system than it allows), `APP_NOT_ALLOWED` (403, the account's roles aren't allowed on this app, section 4; its message names the allowed roles and is safe to show), the directory codes `INVALID_CURSOR` (400, a cursor welinc-auth did not issue or one from before a restore: read everything again), `VALIDATION_FAILED` (400, a bad `limit` or lookup body) and `FORBIDDEN` (403, a caller the directory doesn't serve, section 9), and the portal error codes `LOGIN_REQUEST_EXPIRED`, `LOGIN_STATE_INVALID`, `LOGIN_FAILED`.
+- Codes the gateway answers itself (version 3, section 3): `NOT_FOUND` (404), `PAYLOAD_TOO_LARGE` (413), `RATE_LIMITED` (429, with `Retry-After: 1`), `UPSTREAM_UNAVAILABLE` (502) and `UPSTREAM_TIMEOUT` (504). Every health route answers `HEALTH_CHECK_FAILED` (503) when a check fails. A web app can tell a gateway answer from its own service's by these codes.
 - `NO_SYSTEM_ACCESS` and `APP_NOT_ALLOWED` are about the account, not the client's request, so they use the coded body above on every route, `/auth/token` included (403), not the OAuth format.
 
 ### 12. Limits
@@ -437,6 +444,7 @@ Existing routes stay unless marked. "System" means the token's `aud`; the old `?
 | `/auth/session` | none beyond the gateway; systems cache 30 s | none |
 | `/auth/directory/*` | 120 a minute per client, one count shared by all three routes, counted after the token check (calls answered 401 or 403 don't count). A first sync plus a poll every 30 to 60 s stays far below it | 429 `RATE_LIMITED` with `Retry-After`: wait that many seconds |
 | `/auth/users/lookup` | 30 a minute (kept) | 429 |
+| Every gateway route (version 3) | 20 a second per client address with bursts of 40, from the gateway's settings; preflights, `/health` and 404s don't count. A flood guard in front of the limits above, never instead of them | 429 `RATE_LIMITED` with `Retry-After: 1` |
 
 - A confidential client's call with a valid assertion may carry `X-WeLinc-User-Address`, the user's address as the system backend saw it (its own `X-Forwarded-For` through `TRUST_PROXY_HOPS`). welinc-auth stores it as the session's last seen address and ignores the header on any call without a valid assertion (spec 0003).
 
@@ -460,6 +468,10 @@ S rows may tighten these and must note it here.
 - Each S row spec links back here and states which sections it builds.
 
 **Versions:**
+- **3** (2026-11-11, spec 0008, S9).
+  - Breaking, with no caller affected: the `/repairs` route is removed (nothing served or called it), and a bare prefix with no slash (`/vrms`) answers 404 instead of reaching the service (nothing calls one).
+  - Additive: the Docker service names (section 2); the gateway's `/health`, its JSON 404, 413, 429, 502 and 504 answers and their codes, the flood limit, `X-Forwarded-For` as one value, the request id rule, the headers it owns, the CORS header lists and HSTS (sections 3, 11, 12); `<prefix>/health` with `HEALTH_CHECK_FAILED`; the config home in `infra/gateway/`, one template for every environment.
+  - Changes per system: **VRMS** none (`/vrms/health` is new). **VMMS** and **BMS**: none until S11. Then they use the section 2 service names, add `<prefix>/health`, and VMMS drops `X-VMMS-Client`, calls analytics through `/vmms/analytics/`, and moves its `/uploads/` static route under `/vmms/` so it doesn't collide with auth's.
 - **2** (2026-11-09, spec 0005, S6).
   - Breaking: `GET /auth/users` no longer takes service tokens; it is for admins only (section 10).
   - Behaviour a reader may notice: the directory feed (section 9) writes at most one change per person per save, and none for a save nothing visible changed (a password change, a lock, the same values). Version 1 said "every change". No version 1 cursor was ever issued (the feed didn't exist yet), so none can break.
