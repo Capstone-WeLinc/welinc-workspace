@@ -233,7 +233,7 @@ Prove a person owns their email before the suite relies on it, instead of only c
   - [x] Mobile step, VRMS profile and Users statuses, contract 0001 amendments · AC-11, AC-27 to AC-31
 - [x] Verify it: `/check verify email verification` (2026-11-11)
 - [x] Test it: `/test email verification` (2026-11-11)
-- [ ] Document it: `/document email verification`
+- [x] Document it: `/document email verification` (2026-11-11, PRs opened)
 - [ ] Polish it (optional, ask first): `web-design-guidelines` (the portal code step)
 
 ## Cutover
