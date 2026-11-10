@@ -1,7 +1,7 @@
 # 0009. Email verification and one shared code service
 
 **Date**: 2026-11-10
-**Status**: Proposed
+**Status**: In Progress
 **Scope row**: [S13. Email verification](../../../scope/_root/shared-services.md#s13-email-verification--in-progress)
 **Amends contract sections**: [0001](../0001-shared-services-contract/index.md) sections 8 (mobile login), 10 (routes for people), 11 (errors), 12 (limits)
 **Related**: [0003](../0003-sessions-refresh-logout/index.md) (sessions, login), [0006](../0006-suite-seed-accounts/index.md) (the `state.unverified@` seed), [0007](../0007-app-initiated-login-launcher/index.md) (the `/auth/login` answer), VRMS spec 0009 (setup codes, admin resets) and 0011 (who may change whose email)
