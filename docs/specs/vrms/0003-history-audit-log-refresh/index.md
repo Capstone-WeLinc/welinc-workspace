@@ -2,6 +2,7 @@
 
 **Date**: 2026-10-22
 **Status**: Accepted
+**Updated**: 2026-11-11 (staleness sweep). Spec 0010 renamed the statuses (`COMPLETED` is `CLOSED`), gave every log one audit shape (`actorUserId`, `actorEmail`, `actorName`, a `changes` JSON list), dropped `shop_change_logs` (`SHOP_CHANGE` is `GARAGE_CHANGE`, chip "Garage") and squashed the migrations into one baseline, so the backfill of AC-17 no longer exists as its own migration. The history summary is `{ finished, closed, cancelled, spend }` (finished = closed + cancelled) with tiles Finished, Closed, Cancelled, Total spend. `/audit-logs` is gated by `audit.view`, not the Admin role (spec 0011). The API wrapper is `src/lib/api/auditApi.ts`. On the ticket page an event names the ticket "this ticket" (spec 0024 AC-15).
 
 ## Summary
 
@@ -24,7 +25,7 @@ Reasoning and options: see [rationale.md](rationale.md).
 
 *Repair history (`/history`, admins and mechanics)*
 
-- **AC-1**: The `PageHeader` reads "Repair history" with the `History` icon and the subtitle "Closed repairs, completed and cancelled." There is no primary action button on the page.
+- **AC-1**: The `PageHeader` reads "Repair history" with the `History` icon and the subtitle "Finished repairs, closed and cancelled." There is no primary action button on the page.
 - **AC-2**: A summary strip of `KpiCard`s sits under the header: **Closed** (`Archive`), **Completed** (`CheckCircle2`, success tone), **Cancelled** (`XCircle`), and for admins only **Total spend** (`PhilippinePeso`). The values come from the response's `summary` and cover every row that matches the current filters (search, outcome, garage, date range), not just the current page. Mechanics see three tiles; the API never sends them spend. Four in a row from 1024px up, two by two below.
 - **AC-3**: Filters: a search box (repair #, plate or driver, as today), **Outcome** (All, Completed, Cancelled), **Garage** (All garages, then the list from `getGarages()`), and **Date range** with presets All time (default), This month, Last 90 days, This year, and Custom. Custom shows two date inputs (from and to, both inclusive, in the browser's local time); both are required, and no request is sent until both are set. If "from" is after "to", an inline error reads "Start date must be on or before the end date." and no request is sent. Changing any filter goes back to page 1. At 375px the filters wrap with no horizontal scroll.
 - **AC-4**: The list uses `DataTable` with these columns: **Repair #** (`mobile: 'title'`), with a lock icon (accessible name "Locked") when the ticket is locked, or an "Unlocked" badge when `isUnlocked` is true, for admins and mechanics alike (the API now sends `isUnlocked` to both); **Vehicle** plate (`mobile: 'subtitle'`); **Outcome** `StatusBadge` (`mobile: 'badge'`), and for cancelled tickets the cancellation reason as one muted line below it, cut off at one line with the full text in a tooltip; **Duration** (completed tickets: "Same day", "1 day" or "N days", see *Text and formatting rules*; cancelled: "—"); **Garage**; **Cost** (admins only, end aligned, `tabular-nums`); **Closed** (date). Rows are sorted by `closedAt`, newest first.

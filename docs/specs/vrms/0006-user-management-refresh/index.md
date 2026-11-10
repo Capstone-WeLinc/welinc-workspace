@@ -2,6 +2,7 @@
 
 **Date**: 2026-10-25
 **Status**: In Progress
+**Updated**: 2026-11-11 (staleness sweep). The route guard is `RequirePermission keys={['users.manage']}` (spec 0011). The table has Name, Email, Work (feature 57), Role, Status and Added. Deactivating someone with open work uses spec 0011's release flow (AC-32, AC-33: "Move them back to the queue" or "Keep them assigned", through `open-work` and `release-tickets`), not AC-16's "Reassign {name}'s work first" block, and the confirm reads "Their history stays.". The VRMS database holds no users: the backend reads `email` from `Mechanic.email`, not a linked VRMS user (AC-23).
 
 ## Summary
 

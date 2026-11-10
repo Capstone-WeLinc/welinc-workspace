@@ -86,7 +86,7 @@ welinc-auth, new table `directory_changes`:
 
 | Column | Type | Rules |
 |---|---|---|
-| `seq` | `bigint`, identity | primary key |
+| `seq` | `bigserial` (a `bigint` the database counts up) | primary key |
 | `txid` | `xid8` | required, `pg_current_xact_id()` at the trigger |
 | `user_id` | `uuid` | required, no foreign key (a hard delete must not fail or lose its row) |
 | `type` | `text` | required, one of `created`, `updated`, `roles_changed`, `activated`, `deactivated`, `deleted` (check constraint) |

@@ -2,6 +2,7 @@
 
 **Date**: 2026-10-25
 **Status**: In Progress
+**Updated**: 2026-11-11 (staleness sweep). The route guard is `RequirePermission keys={['ticket.create']}` (spec 0011; `RequireRole` is gone). Mechanics are sent by `Mechanic` id (spec 0010 AC-12); the outsourced chip waits for feature 36. The Repair shop field and `shopName` are gone (spec 0010). The driver picker is keyed by license with `driverId` or `newDriver` (spec 0016 AC-6), and corporation is `corporationId` from the lookup list (spec 0016 AC-4). The create body sends an `issues` list (at least one), not `issueDescription`, and priority, account type and corporation are now stored.
 
 ## Summary
 
