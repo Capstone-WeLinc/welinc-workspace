@@ -32,7 +32,7 @@ _These are recommendations to keep the build orderly, not requirements. Skip any
 | S4 | App initiated login and launcher | Login | done |
 | S9 | Gateway for the whole suite | Gateway | done |
 | S14 | Environment checked at startup | Config | done |
-| S7 | Account activity and audit | Account | in-progress |
+| S7 | Account activity and audit | Account | done |
 | S8 | Profile extras | Account | planned |
 | S13 | Email verification | Account | done |
 | S11 | Move VMMS and BMS onto the shared services | Cutover | planned |
@@ -203,7 +203,7 @@ Every app checks its environment variables when it starts or builds and refuses 
 
 ## Account
 
-### S7. Account activity and audit · in-progress
+### S7. Account activity and audit · done
 spec [0011](../../specs/_root/0011-account-activity-audit/index.md) · code in `welinc-auth/src/auth/` (events module, sessions, codes), `welinc-web-vrms/src/features/auth/` (My profile) and `src/features/user-management/` (Activity dialog)
 
 Login activity and account change history from welinc-auth, so VMMS (`me/login-activity`, `users/:id/login-activity`, `audit-logs`) and BMS (`profile/activity`, its activity log page) stop keeping or reading their own.

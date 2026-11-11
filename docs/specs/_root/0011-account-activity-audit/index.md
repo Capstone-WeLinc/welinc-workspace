@@ -1,7 +1,7 @@
 # 0011. Account activity and audit
 
 **Date**: 2026-11-11
-**Status**: In Progress
+**Status**: Accepted
 
 ## Summary
 
