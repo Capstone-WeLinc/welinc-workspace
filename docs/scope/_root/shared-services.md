@@ -219,8 +219,8 @@ Login activity and account change history from welinc-auth, so VMMS (`me/login-a
   - [x] Admin reads: `/auth/users/:id/activity`, `/auth/activity` with scope, filters and limit, `/changes` removed, the VRMS Activity dialog · AC-12 to AC-14, AC-16, AC-20
   - [x] Location: `GeoService`, `geo:fetch`, the Dockerfile and setup steps, places and the DB-IP credit · AC-17 to AC-20
   - [x] Retention and handover: the sweep, contract 0001 version 5, the VMMS and BMS route map in `docs/integration/` · AC-9, AC-16
-- [ ] Verify it: `/check verify account activity and audit`
-- [ ] Test it: `/test account activity and audit`
+- [x] Verify it: `/check verify account activity and audit` (2026-11-12, local stack; every verify.md step passed, the VRMS screens through Playwright)
+- [x] Test it: `/test account activity and audit` (2026-11-12; welinc-auth 147 new unit tests plus the 59 database tests, all green; code service events, the authenticator call site and the VRMS screens stay with verify)
 - [ ] Document it: `/document account activity and audit`
 
 ### S8. Profile extras · planned · needs a decision · Beta
