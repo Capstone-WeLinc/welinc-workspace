@@ -111,6 +111,8 @@ Loading (skeletons shaped like the content, not spinners), empty (icon, one sent
 
 Gradients, glassmorphism, glows, purple/indigo "AI" styling, cards inside cards, emoji in UI, heavy shadows on data cards, decorative color, centered paragraphs of body text, and anything that only works with a mouse.
 
+**One exception:** the portal's login and forgot password pages (`AuthHero.tsx`) keep their dark navy split layout with a gradient overlay and soft gold glows (spec 0007, AC-22). It applies to those two pages only. The launcher, every other portal page and every system follow the ban above.
+
 ## Icons
 
 lucide-react only. 16px inline, 20px default, 24px in buttons on phones. `text-muted-foreground` by default; status icons take their status color.

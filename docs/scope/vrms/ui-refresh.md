@@ -140,6 +140,7 @@ You find the current Audit log page ugly, and want it redone. It should be redes
 - Note (2026-11-04): build after feature 24 (spec 0021) ships its categories, filters and catalog. Decide the design source in the spec. Consider sharing the event renderer with feature 32 (the per ticket timeline).
 - Note (2026-11-08, replan): from spec 0024. Group one checklist save's step rows in Activity (a save can write up to about 40 rows, spec 0023).
 - Note (2026-11-10, replan): from spec 0023. Include its four new checklist event types in the Checklist chip.
+- Note (2026-11-12, replan, from suite spec 0011): the day grouped row style built for My profile Recent activity and the Users Activity dialog can be reused here.
 - [ ] Design it (spec): `/architect audit log page redesign`
 - [ ] Polish it (optional, ask first): `impeccable` · `web-design-guidelines` · `break-ui` (long actor names, many step ticks, long remarks, empty filters)
 

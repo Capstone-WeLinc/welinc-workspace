@@ -214,6 +214,6 @@ Tracer Bullet: a thin thread from welinc-auth through the portal to VRMS first, 
 - [ ] Tell VMMS and BMS once this lands: the launcher lists their system for anyone with a role there, the guide is `docs/integration/web-login.md`, and their web apps should drop `?token=` intake.
 - [ ] S11: the migration guide links to `docs/integration/web-login.md` instead of repeating it.
 - [ ] S9: the gateway CORS list and routes for `/vmms` and `/bms` session routes, so the guide's last step works.
-- [ ] Record the login hero exception (gradient and glows on the portal login only) in `design.md` (a shared file, so a workspace PR).
+- [x] Record the login hero exception (gradient and glows on the portal login only) in `design.md` (a shared file, so a workspace PR).
 - [ ] `/sync`: welinc-web-portal `AGENTS.md` (Tailwind v4, shadcn, the launcher, the routing rules), welinc-auth `AGENTS.md` (the `/auth/login` body, `launcher.ts` replacing `login-system.ts`), `agents/vrms/AGENTS.md` (`tailwind-4-docs` note that the portal is still on v3), and `docs/integration/seed-accounts.md` (the "always land on the same system" note).
 - [ ] S10: the suite admin will want a portal admin entry; this launcher's top bar is where it goes.
