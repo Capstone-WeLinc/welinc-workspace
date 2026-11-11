@@ -98,6 +98,11 @@ else
   (cd welinc-auth && npm run keys:dev --silent -- --vrms-env .env.vrms-client.local && rm -f .env.vrms-client.local)
 fi
 
+# Spec 0011: country and network provider for account activity (DB-IP Lite, free). A failed download
+# only leaves places empty, so it never stops the setup.
+step "Location files for account activity"
+(cd welinc-auth && npm run geo:fetch --silent -- --soft)
+
 step "Starting the shared stack"
 docker compose -f docker-compose.shared.yml up -d --build
 

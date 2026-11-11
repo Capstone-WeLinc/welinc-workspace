@@ -32,7 +32,7 @@ _These are recommendations to keep the build orderly, not requirements. Skip any
 | S4 | App initiated login and launcher | Login | done |
 | S9 | Gateway for the whole suite | Gateway | done |
 | S14 | Environment checked at startup | Config | done |
-| S7 | Account activity and audit | Account | planned |
+| S7 | Account activity and audit | Account | in-progress |
 | S8 | Profile extras | Account | planned |
 | S13 | Email verification | Account | done |
 | S11 | Move VMMS and BMS onto the shared services | Cutover | planned |
@@ -203,13 +203,25 @@ Every app checks its environment variables when it starts or builds and refuses 
 
 ## Account
 
-### S7. Account activity and audit · planned · needs a decision
+### S7. Account activity and audit · in-progress
+spec [0011](../../specs/_root/0011-account-activity-audit/index.md) · code in `welinc-auth/src/auth/` (events module, sessions, codes), `welinc-web-vrms/src/features/auth/` (My profile) and `src/features/user-management/` (Activity dialog)
+
 Login activity and account change history from welinc-auth, so VMMS (`me/login-activity`, `users/:id/login-activity`, `audit-logs`) and BMS (`profile/activity`, its activity log page) stop keeping or reading their own.
 **Done when:** each login, failed login, lockout, logout and refresh is recorded with device and address; a user sees their own; a system admin sees their system's users and account changes; and nothing outside welinc-auth reads those tables.
 - Note (2026-11-08, from a look at a friend's company suite (SBSI User & Access Management) on 2026-11-08, ideas to weigh in the spec, nothing decided): one activity page with login events and account changes (`UserChange`) in a single timeline, filtered by category, actor, date and address, like their Security & Activity Audit Trail. Lessons from their bugs: log the real client address from `X-Forwarded-For` (they log the Docker gateway `172.19.0.1` for everyone), record a logout once (they log the same one twice in the same second), and keep emails out of the event text since the log is kept forever.
 - Note (2026-11-10, from spec 0009 follow-up): record code events too (sent, mail failed, used, dead after 5 wrong tries), with the real client address.
 - Note (2026-11-11, replan, your call): first in the order, before the S11 handoff. VMMS and BMS already call the activity routes, so their screens must not break when they move.
-- [ ] Design it (spec): `/architect account activity and audit`
+- Note (2026-11-11): spec 0011 decided one append only `account_events` table replacing `user_changes` (sign in, session, code and account events), one `SYSTEM_OPENED` per system per session instead of a row per refresh, unknown emails only in a log line with the domain, a year for sign in, session and code rows and forever for account changes, admin scope by the event's system tag (a system's own history outlives membership, account wide rows only for current members), actors as ids with "An admin" shown to the person, country and network provider from offline DB-IP Lite files (optional), codes plus a label catalog, `/auth/users/:id/changes` removed, no export and no alerts. VRMS gets a Recent activity card on My profile and an Activity item on the Users row menu. Cross checked on another model, 28 fixes applied.
+- [x] Design it (spec): `/architect account activity and audit` (2026-11-11)
+- [x] Build it: `/develop account activity and audit` (2026-11-12)
+  - [x] Thin thread: migration with the trigger and the copy, the events module and repointed `change()`, sign in events with the atomic counter, `/auth/profile/activity`, the catalog, the VRMS Recent activity card · AC-1, AC-1b, AC-2, AC-3, AC-6 to AC-8, AC-10, AC-11, AC-15, AC-19, AC-21 (2026-11-12; also pulled forward: `/changes` removed with its table, `ROLE_CHANGED` per system and on create, `SIGNED_IN` plus `SYSTEM_OPENED` at mobile create)
+  - [x] Sessions, codes and self edits: `end()` and `addAudience` events, code events, password, name and picture, roles per system · AC-4 to AC-6
+  - [x] Admin reads: `/auth/users/:id/activity`, `/auth/activity` with scope, filters and limit, `/changes` removed, the VRMS Activity dialog · AC-12 to AC-14, AC-16, AC-20
+  - [x] Location: `GeoService`, `geo:fetch`, the Dockerfile and setup steps, places and the DB-IP credit · AC-17 to AC-20
+  - [x] Retention and handover: the sweep, contract 0001 version 5, the VMMS and BMS route map in `docs/integration/` · AC-9, AC-16
+- [ ] Verify it: `/check verify account activity and audit`
+- [ ] Test it: `/test account activity and audit`
+- [ ] Document it: `/document account activity and audit`
 
 ### S8. Profile extras · planned · needs a decision · Beta
 The profile routes the other apps already call: phone verification (VMMS), verify password before a sensitive action and an account deletion request (BMS).
