@@ -39,3 +39,10 @@ Run on the local stack through the gateway (`http://localhost:3000`). Use seed a
 ## VRMS screens
 - [ ] My profile Recent activity: 10 rows grouped by day, Show more adds the next page, DB-IP credit visible, loading, empty and error states → AC-19
 - [ ] Users page row menu → Activity → dialog with category chips, actor names, Show more; at 375px and 1280px → AC-20
+
+## Added by /develop (2026-11-12)
+- [ ] Locally every request reaches the gateway from the Docker bridge, so rows read `172.19.0.1` (Local network). Check the real address instead with a direct call to auth (it trusts one hop): `POST http://localhost:3001/auth/login` with `X-Forwarded-For: 112.198.0.1` and a wrong password → the row's address is `112.198.0.1`, country `PH`, network Globe Telecom. Replaces "not `172.x`" in the first Recording step for local runs → AC-3, AC-17
+- [ ] Feed day edges: a row written at 23:30 Manila on the 11th (15:30 UTC) shows with `to=2026-11-11` and not with `from=2026-11-12` → AC-13, value sourcing (date filters)
+- [ ] Users page, Send reset code on someone → one `CODE_SENT` (reason `PASSWORD_RESET`) with you as actor; their own Recent activity reads "An admin sent you a code" without your name → AC-5, AC-11
+- [ ] Mobile login (`POST /auth/mobile/login` with `deviceName: "Pixel 8"`) → `SIGNED_IN` and `SYSTEM_OPENED` (VMMS) in the same second, device `Pixel 8` → AC-1, AC-4
+- [ ] Users page, Activity on Gilbert Navarro (his failed try from `112.198.0.1` has a place) → "Philippines · Globe Telecom" on the row and the "IP data by DB-IP" credit under the list → AC-18, AC-20
