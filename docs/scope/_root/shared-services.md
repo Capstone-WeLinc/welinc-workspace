@@ -221,7 +221,7 @@ Login activity and account change history from welinc-auth, so VMMS (`me/login-a
   - [x] Retention and handover: the sweep, contract 0001 version 5, the VMMS and BMS route map in `docs/integration/` · AC-9, AC-16
 - [x] Verify it: `/check verify account activity and audit` (2026-11-12, local stack; every verify.md step passed, the VRMS screens through Playwright)
 - [x] Test it: `/test account activity and audit` (2026-11-12; welinc-auth 147 new unit tests plus the 59 database tests, all green; code service events, the authenticator call site and the VRMS screens stay with verify)
-- [ ] Document it: `/document account activity and audit`
+- [x] Document it: `/document account activity and audit` (2026-11-12, PR text for welinc-auth, welinc-web-vrms and the workspace)
 
 ### S8. Profile extras · planned · needs a decision · Beta
 The profile routes the other apps already call: phone verification (VMMS), verify password before a sensitive action and an account deletion request (BMS).
