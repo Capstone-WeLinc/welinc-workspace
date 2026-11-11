@@ -208,12 +208,14 @@ Login activity and account change history from welinc-auth, so VMMS (`me/login-a
 **Done when:** each login, failed login, lockout, logout and refresh is recorded with device and address; a user sees their own; a system admin sees their system's users and account changes; and nothing outside welinc-auth reads those tables.
 - Note (2026-11-08, from a look at a friend's company suite (SBSI User & Access Management) on 2026-11-08, ideas to weigh in the spec, nothing decided): one activity page with login events and account changes (`UserChange`) in a single timeline, filtered by category, actor, date and address, like their Security & Activity Audit Trail. Lessons from their bugs: log the real client address from `X-Forwarded-For` (they log the Docker gateway `172.19.0.1` for everyone), record a logout once (they log the same one twice in the same second), and keep emails out of the event text since the log is kept forever.
 - Note (2026-11-10, from spec 0009 follow-up): record code events too (sent, mail failed, used, dead after 5 wrong tries), with the real client address.
+- Note (2026-11-11, replan, your call): first in the order, before the S11 handoff. VMMS and BMS already call the activity routes, so their screens must not break when they move.
 - [ ] Design it (spec): `/architect account activity and audit`
 
 ### S8. Profile extras · planned · needs a decision · Beta
 The profile routes the other apps already call: phone verification (VMMS), verify password before a sensitive action and an account deletion request (BMS).
 **Done when:** phone numbers can be verified by code, a sensitive action can ask for the password again, a user can request deletion and an admin of each of their systems sees it, and every one of these events is logged.
 - Note (2026-11-09, replan, from spec 0005 follow-up): add a phone verified column in welinc-auth, put it in the `directory_changes` snapshot (a migration that changes the trigger) and map it to `phoneVerified`. If a deletion request erases personal data, it must also clear that person's feed snapshots, which otherwise keep names, emails and phones forever.
+- Note (2026-11-11, replan, your call): second, right after S7 and before the S11 handoff. VMMS phone verification and the BMS verify password and deletion screens call these routes.
 - [ ] Design it (spec): `/architect profile extras`
 
 ### S13. Email verification · done
@@ -250,6 +252,7 @@ The move itself: their users merged into welinc-auth by email, their auth copies
 - Note (2026-11-10, replan, from spec 0007 follow up): the migration guide links to `docs/integration/web-login.md` instead of repeating it.
 - Note (2026-11-10, replan): this row's Done when needs staging, which comes from VRMS feature 26 (milestones 2 to 4 are still open and on hold). Spec 0008 owes its update through `/architect` before those milestones, using what S9 decides.
 - Note (2026-11-10, from spec 0009 follow-up): the migration guide makes the code screen a required change for `vmms-mobile` and `bms-mobile` (the login can answer `EMAIL_VERIFICATION_REQUIRED` instead of tokens); BMS stops resetting people to a default password, since admins can't set passwords anymore, and uses Send reset code; VMMS and BMS profile pages change email through `/auth/profile/email*`.
+- Note (2026-11-11, replan, your call): comes after S7, S8 and S10, so VMMS and BMS move onto the finished shared services. The guide also tells them not to build more user management (S10 moves it to the portal). Their staging half waits for VRMS feature 26.
 - [ ] Design it (spec): `/architect move VMMS and BMS onto the shared services`
 
 ## Admin
@@ -270,6 +273,7 @@ Replaces VRMS feature 61 with the same scope (the full model, chosen 2026-11-07)
 - Note (2026-11-09, replan, from spec 0006 follow-up): add `suite.admin@welinc.com` (id 9001) to the `people.json` manifest once the platform admin exists, which also closes the last S12 Done when item.
 - Note (2026-11-10, replan, from spec 0007 follow up): the portal admin entry goes in the launcher's top bar.
 - Note (2026-11-10, from spec 0009 follow-up): the portal admin section shows Setup pending and Email not verified (`passwordSet`, `emailVerified`) and offers Send reset code; there is no admin password setting to carry over.
+- Note (2026-11-11, replan, your call): third, before the S11 handoff, so the groups hear the final admin model and don't build more user management. If time runs short, cut the permission editing, not the platform admin and the access report.
 - [ ] Design it (spec): `/architect suite admin model`
 - [ ] Polish it (optional, ask first): `web-design-guidelines` (access report)
 
@@ -280,7 +284,8 @@ Replaces VRMS feature 61 with the same scope (the full model, chosen 2026-11-07)
 - **Gateway before account features.** The other groups can't call welinc-auth through one address until their routes and ports exist.
 - **Account features before the move.** Their apps already call those routes; moving them earlier would break their screens.
 - **Suite admin last.** It needs the new roles, the directory and OTP, and nobody is blocked without it.
-- **Hosting cuts in after S13** (2026-11-11). VRMS feature 26 runs next, before S7, S8, S11 and S10: deploying by the end of November is the hard deadline, and S11 can't finish without staging.
+- **Hosting cuts in after S13** (2026-11-11). VRMS feature 26 runs before S7, S8 and S10: deploying by the end of November is the hard deadline, and S11 can't finish without staging.
+- **Order from 2026-11-11** (your call): S7, S8 and S10 first, then the S11 migration guide handed to VMMS and BMS, then hosting (VRMS feature 26). The groups start locally once the guide is out.
 
 ## Legend
 
