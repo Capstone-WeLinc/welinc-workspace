@@ -7,7 +7,7 @@
 
 Today each system makes its own copy of the same test people, and the copies have drifted apart (one email is two different people). This spec makes one list of seed people, a JSON file in welinc-auth, that every system copies and links to by fixed ids. The list covers every role in every system, several people per role, people who hold two or three systems, and four broken accounts (locked, deactivated, never verified, deleted) for testing. Running the seed again puts seed people back to their listed state without touching anyone else, and it refuses to run on production.
 
-Scope row: [S12 in the shared services scope](../../../scope/_root/shared-services.md#s12-suite-seed-accounts--planned--needs-a-decision--beta). Builds on [0002](../0002-signing-keys-service-identity/index.md) (the client seed it keeps), [0004](../0004-roles-per-system/index.md) (the role catalog it checks against) and [0005](../0005-user-directory/index.md) (the change feed it must not churn).
+Scope row: [S12 in the shared services scope](../../../scope/_root/shared-services.md#s12-suite-seed-accounts--done--beta). Builds on [0002](../0002-signing-keys-service-identity/index.md) (the client seed it keeps), [0004](../0004-roles-per-system/index.md) (the role catalog it checks against) and [0005](../0005-user-directory/index.md) (the change feed it must not churn).
 
 ## Requirements
 

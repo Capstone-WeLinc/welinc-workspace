@@ -41,13 +41,21 @@ Every person has a fixed id: `00000000-0000-4000-8000-` plus a 12 digit number. 
 | 4101 to 4199 | Named mechanics (VRMS and VMMS Mechanic) |
 | 4201 to 4299 | Bulk mechanics (VRMS and VMMS Mechanic) |
 | 5001 to 5099 | Broken state accounts |
-| 9001 | Reserved for the platform admin (S10) |
+| 9001 | The suite admin (spec 0013) |
 
 Read it as: first digit is the system (1 VRMS, 2 VMMS, 3 BMS), second digit is the role in that system's catalog order, the last two digits count the people. A first digit of 4 means more than one system, and 5 means a broken account.
 
 An id is one person forever. A removed person's id is retired, never reused. A new person takes the next free number in their block.
 
 ## Accounts
+
+### Suite admin
+
+| Id | Email | Name | Roles | Password | State |
+|---|---|---|---|---|---|
+| 9001 | `suite.admin@welinc.com` | Ramon Villanueva | none (suite admin, spec 0013) | `admin1234` | active |
+
+Every admin, this one included, confirms each portal sign in with an emailed code. Seed addresses get no mail, so on your machine set `ADMIN_SIGN_IN_CODE=false` in welinc-auth's `.env`, or leave `SMTP_*` blank and read the code from the auth log.
 
 ### VRMS office accounts
 

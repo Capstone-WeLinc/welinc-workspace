@@ -10,4 +10,5 @@ Big decisions become suite specs in `docs/specs/_root/` (the shared contract is 
 | [web-login.md](web-login.md) | How a system's web app joins the shared web login: the session routes, the boot sequence, Switch system, sign out (spec 0007) |
 | [account-activity.md](account-activity.md) | Moving VMMS and BMS activity screens onto welinc-auth's account events: routes, fields and labels (spec 0011) |
 | [account-deletion.md](account-deletion.md) | Password recheck, the deletion request, admin review, restore and erasure; what the BMS and VMMS profile screens change (spec 0012) |
+| [suite-admin.md](suite-admin.md) | The portal admin section and suite admins: the two new answers to handle, linking your menu item to the portal, deleting your user pages, temporary roles, the optional central matrix (spec 0013) |
 | [shared-repo-changes.md](shared-repo-changes.md) | What changed in welinc-auth and welinc-web-portal this term, and what is planned |
