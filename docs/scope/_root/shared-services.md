@@ -321,7 +321,7 @@ Replaces VRMS feature 61 with the same scope (the full model, chosen 2026-11-07)
   - Note (2026-11-13, /check verify): 124 of 141 steps in `verify.md` are ticked, each with evidence from a live run (2026-11-12 commands and UI run in subagents, plus a 2026-11-13 re run of the steps that failed on old code, all passing after the portal fixes), and the unit suites pass. Nothing failed. You chose to tick `Verify it` with 17 steps unproven, listed at the top of `verify.md` (L69, L75, L78, L83, L85, L105, L122, L123, L131, L150, L153, L172, L177, L181, L182, L193, L216). Worth a manual look before go live: the deletion request approve and reject flow, the orphan ordering, the Suite admins add dialog checks and the matrix save toast.
 - [x] Test it: `/test suite admin model`
   - Note (2026-11-13, /test): the last portal fixes got tests (portal `10e6f97`: `deletePerson` keeps its JSON body so the CSRF guard lets it through, and the edit dialog locks your own email, AC-16); the portal suite passes, 73 tests. Gotcha: run vitest from a path with an uppercase drive letter (`C:/Users/...`); from Git Bash's `/c/Users/...` every portal test file fails with "Vitest failed to find the current suite". Status stays in-progress until `Verify it` is done.
-- [ ] Document it: `/document suite admin model`
+- [x] Document it: `/document suite admin model` (PRs: auth #31, backend-vrms #56, web-vrms #58, portal #22, workspace #26)
 - [ ] Polish it (optional, ask first): `web-design-guidelines` (access report)
 
 ## Why this order
