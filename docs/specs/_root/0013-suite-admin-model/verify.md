@@ -224,3 +224,15 @@ _Steps for build plan tasks 19 to 24. Already run once locally in the AC-28 orde
 - AC-28: the import rerun and the moved history rows
 - AC-29: the sync, outage and empty matrix steps
 - AC-30: the VRMS Settings step and the removed routes
+
+# Verify: slice 6, contract and guide · spec 0013 · updated 2026-11-13
+_Steps for build plan task 25 (AC-34). Docs only: no app needs to run._
+
+## Commands
+- [ ] Contract 0001's header reads `**Contract version**: 7`, and its Amended line ends with the version 7 entry naming spec 0013 → AC-34
+- [ ] Each AC-34 item is in the contract: `SIGN_IN_CODE_REQUIRED` (section 10, `/auth/login`), `ADMIN_CODE_REQUIRED` (sections 10, 10a, 11), `SUITE_ADMIN_NO_ROLES` (sections 10, 10a, 11), `TEMP_ACCESS_ENDED` (section 6), `temporaryRoles` (section 9), the `/auth/admin/*` and `/auth/permissions/:system` routes (section 10a), the bearer admin routes marked deprecated (section 10), and the removed VRMS matrix routes (sections 10a, 14) → AC-34
+- [ ] Every `@Get`, `@Post`, `@Patch` and `@Delete` in welinc-auth's `admin.controller.ts`, `admin-accounts.controller.ts`, `suite-admin.controller.ts`, `admin-permissions.controller.ts` and `permissions.controller.ts` has a row in the section 10a table, and every row has a route → AC-34
+- [ ] `docs/integration/suite-admin.md` tells VMMS and BMS to delete their user pages (BMS keeps its crew screens), link the menu item to `<portal>/admin/people?system=<SYS>`, handle `SIGN_IN_CODE_REQUIRED` and `ADMIN_CODE_REQUIRED`, and that the central matrix is optional; every link in it and the contract's new links open → AC-34
+
+## Acceptance-criteria coverage
+- AC-34: the four steps above
