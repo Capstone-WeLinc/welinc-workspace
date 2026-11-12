@@ -318,7 +318,8 @@ Replaces VRMS feature 61 with the same scope (the full model, chosen 2026-11-07)
   - [x] Contract 0001 version 7 and the `docs/integration/suite-admin.md` guide · AC-34
     - Note (2026-11-13, /develop): checked against the built code, so the contract also carries the extras the build added (`GET /auth/admin/users/:id`, `picture` and `temporaryGrants` on `GET /auth/admin/me`, the People `status` values). The routes went into a new section 10a. Found while checking: the contract promises `/auth/users/lookup` 30 calls a minute, but welinc-auth enforces no limit there (bearer or cookie). That predates S10; your call whether to add the limit or drop the promise. The BMS user page also holds crew management (drivers and helpers), so the guide tells BMS to keep that as its own page. BMS's `LogIn.tsx` still posts to `/auth/login` and expects a token.
 - [ ] Verify it: `/check verify suite admin model`
-- [ ] Test it: `/test suite admin model`
+- [x] Test it: `/test suite admin model`
+  - Note (2026-11-13, /test): the last portal fixes got tests (portal `10e6f97`: `deletePerson` keeps its JSON body so the CSRF guard lets it through, and the edit dialog locks your own email, AC-16); the portal suite passes, 73 tests. Gotcha: run vitest from a path with an uppercase drive letter (`C:/Users/...`); from Git Bash's `/c/Users/...` every portal test file fails with "Vitest failed to find the current suite". Status stays in-progress until `Verify it` is done.
 - [ ] Document it: `/document suite admin model`
 - [ ] Polish it (optional, ask first): `web-design-guidelines` (access report)
 
