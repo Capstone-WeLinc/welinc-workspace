@@ -1,6 +1,6 @@
 # Changes in the shared repos (Capstone 2)
 
-A record of what changed in `welinc-auth` and `welinc-web-portal` during Capstone 2, and what is proposed next. Checked against each repo's `development` branch on 2026-11-03. All of this term's changes so far were made by the VRMS group, apart from Dependabot updates.
+A record of what changed in `welinc-auth` and `welinc-web-portal` during Capstone 2, and what is proposed next. Checked against each repo's `development` branch on 2026-11-03; the suite rows (spec 0007, spec 0013) added 2026-11-13. All of this term's changes so far were made by the VRMS group, apart from Dependabot updates.
 
 `main` in both repos is still the Capstone 1 state. Everything below is on `development`, the branch every system builds against.
 
@@ -17,6 +17,8 @@ A record of what changed in `welinc-auth` and `welinc-web-portal` during Capston
 | **New role `CHIEF_MECHANIC`** (`59c2aa0`) | The role list is now `ADMIN`, `MECHANIC`, `CHIEF_MECHANIC`, `CUSTOMER_SUPPORT`, `OPERATIONS`. Code that switches on role names should handle the new one, or ignore it. |
 | **Gateway: `/ai` and `/analytics` removed** (`6e682d7`) | VRMS moved its AI and analytics into its main backend, so those two gateway routes no longer exist. |
 | **Gateway: bigger uploads on the VRMS routes** (`1803092`) | `/vrms` and `/repairs` allow 26 MB bodies and a 120 second read timeout. Other routes keep the Nginx default of 1 MB unless they set their own limit. |
+| **Portal launcher and Switch system** (suite spec [0007](../specs/_root/0007-app-initiated-login-launcher/index.md), S4; replaces VRMS scope feature 60) | People with one system go straight in; people with two or more pick from a launcher. Each app's Switch system opens `<portal>/?from=<SYS>`. Guide: [web-login.md](web-login.md). |
+| **Suite admin model and the portal admin section** (suite spec [0013](../specs/_root/0013-suite-admin-model/index.md), S10, contract version 7; replaces VRMS scope features 61 and 34) | 1 to 3 suite admins with no system roles, temporary access with a reason, an emailed code at every admin sign in (the admin OTP), and all account management in `<portal>/admin`. Admin calls may answer 403 `ADMIN_CODE_REQUIRED`, and `/auth/login` may answer `SIGN_IN_CODE_REQUIRED`. Each system deletes its own user pages and links to the portal. Guide: [suite-admin.md](suite-admin.md). |
 
 ## Changes to how the repos work
 
@@ -28,17 +30,15 @@ A record of what changed in `welinc-auth` and `welinc-web-portal` during Capston
 | **Env files** | Each repo has a `.env.example` with every variable name. Real values go in a local `.env` (never committed). The portal also commits a `.env.development` with safe defaults. |
 | **SMS removed** | The unused Semaphore SMS variables are gone from auth. Codes go by email. |
 | **AGENTS.md** | Each repo has an `AGENTS.md` describing its files, rules and gotchas, for people and AI tools. Read it before changing the repo. |
+| **Portal on Tailwind v4 and shadcn** (suite spec 0007; replaces VRMS scope feature 50) | The portal moved to Tailwind v4, shadcn and the shared design tokens in the workspace `design.md`. |
 | **Portal** | Lint and build errors fixed, toast and subsystem files split, system names corrected to match the glossary. Behavior is the same as Capstone 1. Earlier Capstone 1 work that also never reached `main` is here too: the session inactivity monitor, the forgot password fix, and the login field fix. |
 
 ## Proposed changes
 
-Not built. Each one changes the shared repos, so it needs agreement from every group before it is built. The VRMS scope tracks them; other groups can propose their own the same way.
+Not built. Each one changes the shared repos, so it gets a suite spec first (contract 0001, section 14): the shared services owner decides, and the other groups are told before it lands. The VRMS scope tracks them; other groups can propose their own the same way.
 
 | Proposal | Effect on the systems |
 |---|---|
-| **Portal system picker** (VRMS scope feature 60) | Today the portal sends a user with roles in several systems to VRMS first. The picker would send single system users straight in and let shared accounts choose, with a "Switch system" link in each app. |
-| **Suite admin model** (VRMS scope feature 61) | A safe "can do everything" setup across systems: a platform admin who manages accounts but can't see any system's data without that system's role, plus break glass accounts with MFA. No single superadmin that skips checks. |
-| **Admin OTP and reCAPTCHA** (VRMS scope features 34, 35) | Admins would confirm login with an OTP, and the login page would check reCAPTCHA. Both change the shared login. |
-| **Portal on a design system** (VRMS scope feature 50) | The portal would move to Tailwind v4 and shared design tokens, changing the look of the shared login. Which design standard it follows is still open. |
+| **reCAPTCHA on login** (VRMS scope feature 35) | The login page would check reCAPTCHA. It changes the shared login. (The admin OTP proposed beside it shipped with the suite admin model above.) |
 | **Email through Brevo** | Auth sends mail through a personal Gmail account today. Before staging it would move to Brevo with a sender address the team controls. Only the `SMTP_*` values change. |
 | **Hosting on Azure** (VRMS spec 0008) | The draft puts the shared gateway, auth, portal and one PostgreSQL server on Azure, with staging deployed from `development` and production from a `release` branch. Every system's services would need to fit the same setup. |
