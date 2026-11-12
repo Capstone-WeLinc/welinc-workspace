@@ -113,3 +113,51 @@ _Steps for build plan tasks 8 to 11. Sign in as `vrms.admin@` (VRMS Admin) or `m
 - AC-18: the bearer route steps
 - AC-23: the People, person, Deletion requests and Activity views
 - AC-31: the VRMS Users page, Add user, open tickets, `team.manage` and the ADMIN_CODE_REQUIRED toast
+
+# Verify: slice 3, suite admin powers · spec 0013 · updated 2026-11-13
+_Steps for build plan tasks 12 to 17. Every add, remove, grant and early end sends alert emails, and local SMTP is real: blank `SMTP_*` (read mails from the auth log) before those steps. Sign in as `suite.admin@` (`admin1234`) and pass the code._
+
+## UI / manual
+- [ ] `/admin` as the suite admin → Overview: admins per system (name, since, granted by), live temporary access under its system, Needs attention (only groups with a count), Recent admin changes → AC-19, AC-23
+- [ ] Suite admins → the list with who added each and why; Add suite admin searches only active accounts with no role; reason under 10 characters is refused in the dialog; a wrong password says the tries left → AC-1, AC-24
+- [ ] Add a second suite admin (a fresh account with no role), then remove them → both emails in the log reach every admin, the removed person included; Remove is hidden on your own row → AC-1, AC-2, AC-13
+- [ ] Temporary access → the dialog: system, role (changes with the system), hours 1 to 8 with 4 picked, reason with a counter, password; start VRMS Admin for 2 hours → banner "You have temporary VRMS Admin access until …" with Open VRMS and End now; VRMS admins get the email → AC-9, AC-13, AC-24
+- [ ] Open VRMS from the banner → you are in VRMS as Admin → AC-9
+- [ ] End now → it warns that it signs you out everywhere; confirm → back to the login screen; VRMS admins get "ended early" → AC-10, AC-24
+- [ ] People → "All people" first (people with no role included, every system's roles shown with the system name, a Suite admin badge); pick VRMS → Add person shows → AC-17, AC-23
+- [ ] A person page as the suite admin → the system switcher; a person not in that system says "Pick another system above" → AC-23
+- [ ] As `vrms.admin@` while the suite admin holds a live grant: People shows them with "Temporary until …"; editing that role → "End the grant instead"; Temporary access lists the grant with End now → AC-11
+- [ ] Activity → "Suite wide" tab lists everyone's events, former members included → AC-20
+- [ ] Deletion requests → "All systems": orphans first with "No admin left" → AC-21
+- [ ] Overview, Temporary access, People and Suite admins at 375px: no sideways scroll, the dialog scrolls inside the screen → AC-23
+
+## Commands
+- [ ] `POST /auth/admin/suite-admins` without a reauth token → 403 `REAUTH_REQUIRED`; for someone holding a role → 409 `HOLDS_SYSTEM_ROLES`; for `state.unverified@` → 409 `NOT_ELIGIBLE`; a fourth → 409 `SUITE_ADMIN_LIMIT` → AC-1
+- [ ] Two adds of a third and fourth suite admin at once (two shells, same moment) → one wins, the other gets `SUITE_ADMIN_LIMIT` → AC-1
+- [ ] `POST /auth/admin/suite-admins/<own id>/remove` → 409 `SELF_ROLE` → AC-2
+- [ ] `insert into user_roles (… user_id = 9001, temporary_grant_id null …)` in psql → `suite_admin_no_roles` at commit → AC-3
+- [ ] As `vrms.admin@`, `PATCH /auth/admin/users/<9001>/status` with `isActive: false` (while 9001 holds a VRMS grant) → 409 `IS_SUITE_ADMIN`; same for `DELETE` → AC-3
+- [ ] As the suite admin, `POST /auth/profile/deletion-request` → 409 `IS_SUITE_ADMIN` and the reauth token stays unused → AC-3
+- [ ] `POST /auth/admin/temporary-grants` with `hours: 9` → 400 `VALIDATION_FAILED`; a second VRMS grant while one is live → 409 `GRANT_ACTIVE`; as `vrms.admin@` → 403 `NOT_SUITE_ADMIN` → AC-9
+- [ ] A grant inserted with `expires_at` a minute away → within about two minutes `end_reason = EXPIRED`, no actor, its `user_roles` row gone, `TEMP_ACCESS_ENDED` written, the directory feed's latest roles for 9001 empty → AC-10
+- [ ] With `expires_at` in the past but before the sweep runs, a VRMS refresh for that session answers without the role → AC-10 lazy expiry
+- [ ] `GET /auth/admin/report` as `vrms.admin@` → 403 `NOT_SUITE_ADMIN`; `GET /auth/admin/temporary-grants?system=BMS` as `vrms.admin@` → 403 `NOT_ADMIN_OF_SYSTEM` → AC-11, AC-19
+- [ ] `GET /auth/admin/users`, `/activity` and `/deletion-requests` with no `system` as the suite admin → 200 suite wide; as `vrms.admin@` → 400 → AC-17, AC-20, AC-21
+- [ ] A suite admin `PATCH /auth/admin/users/:id` giving any VRMS role → 403 `REAUTH_REQUIRED` without a token; with one → VRMS admins get "given the … role by a suite admin" → AC-14c
+
+## Value sourcing
+- [ ] Report `since`: change a VRMS admin's name (not their role) → `since` stays; remove and give the admin role again → `since` is the new time → Value sourcing "report, admins, since"
+- [ ] Report `grantedBy`: give `vrms.chief@` the VRMS Admin role from the portal → Overview shows you as granted by; a seed admin shows none → Value sourcing "report, admins, grantedBy"
+- [ ] Grant `expiresAt`: start with 3 hours → `expires_at - started_at` is exactly 3 hours → Value sourcing "temporary grant, expiresAt"
+- [ ] `temporaryUntil` on user lists equals the grant's `expires_at` → Value sourcing "user lists, temporaryUntil"
+- [ ] `orphan`: a VRMS only person asks for deletion while VRMS has other admins → not orphan; deactivate every other VRMS admin in a test copy → orphan → Value sourcing "deletion lists, orphan"
+- [ ] Alert recipients: a VRMS grant reaches suite admins and VRMS admins only, not VMMS or BMS admins → Value sourcing "alert email, recipients"
+
+## Acceptance-criteria coverage
+- AC-1, AC-2, AC-4: the Suite admins steps and the suite admin commands
+- AC-3: the trigger, `IS_SUITE_ADMIN` and deletion request commands
+- AC-9 to AC-11: the Temporary access steps, expiry and lazy expiry commands, the VRMS admin view
+- AC-13, AC-14c: the alert checks in the log
+- AC-17, AC-20, AC-21: All people, Suite wide activity, All systems deletion requests
+- AC-19, AC-23, AC-24: Overview, the views, the banner, 375px
+- Not built yet: the VRMS roster skip (AC-11 last part, waiting on the directory shape), AC-32, slices 5 and 6
