@@ -2,7 +2,7 @@
 
 **Date**: 2026-11-08
 **Status**: Accepted
-**Scope row**: [S1. Shared services contract](../../../scope/_root/shared-services.md#s1-shared-services-contract--planned--needs-a-decision)
+**Scope row**: [S1. Shared services contract](../../../scope/_root/shared-services.md#s1-shared-services-contract--done)
 **Contract version**: 7
 **Amended**: 2026-11-09, additive, from spec [0004](../0004-roles-per-system/index.md) (sections 4, 8, 10, 11, 12, 13) · 2026-11-09, version 2 (breaking), from spec [0005](../0005-user-directory/index.md) (sections 5, 9, 10, 11, 12, 14, 15 and the gap map) · 2026-11-11, version 3 (breaking, no caller affected), from spec [0008](../0008-suite-gateway/index.md) (sections 2, 3, 11, 12, 14) · 2026-11-11, version 4 (breaking), from spec [0009](../0009-email-verification/index.md) (sections 8, 10, 11, 12, 14) · 2026-11-12, version 5 (breaking), from spec [0011](../0011-account-activity-audit/index.md) (sections 10, 11, 12, 14 and the gap map) · 2026-11-12, version 6 (breaking), from spec [0012](../0012-profile-extras/index.md) (sections 7, 9, 10, 11, 12, 14 and the gap map) · 2026-11-13, version 7 (breaking), from spec [0013](../0013-suite-admin-model/index.md) (sections 4 to 15 and the gap map; the new section 10a)
 
