@@ -161,3 +161,25 @@ _Steps for build plan tasks 12 to 17. Every add, remove, grant and early end sen
 - AC-17, AC-20, AC-21: All people, Suite wide activity, All systems deletion requests
 - AC-19, AC-23, AC-24: Overview, the views, the banner, 375px
 - Not built yet: the VRMS roster skip (AC-11 last part, waiting on the directory shape), AC-32, slices 5 and 6
+
+# Verify: slice 4, VRMS leavers · spec 0013 · updated 2026-11-13
+_Steps for build plan task 18. The local database already holds feed release rows from 2026-11-11, so the notice shows until 2026-11-18; after that, make a fresh one (deactivate a seed mechanic who holds an open ticket, wait 30 s). Local SMTP is real, so blank `SMTP_*` before any account change._
+
+## UI / manual
+- [ ] Sign in as `vrms.chief@` and open the Dashboard → a "Released after account changes" notice under At a glance, one row per release: plate, "<name>, account deactivated" (or deleted, or VRMS role removed), "Now <status>, <time> ago" → AC-32
+- [ ] Click a row → that ticket's page opens → AC-32
+- [ ] As a mechanic only account (no `mechanics.view`) → no notice, and no request to `/vrms/mechanics/released` in the network tab → AC-32
+- [ ] With no release in the last 7 days (or after the window passes) → the notice is gone, nothing else on the dashboard moves → AC-32
+- [ ] At 375px → rows wrap, no sideways scroll → AC-32
+
+## Commands
+- [ ] `GET /vrms/mechanics/released` with no token → 401; as `vrms.mechanic@` → 403; as `vrms.chief@` → 200, newest first, at most 50 → AC-32
+- [ ] As an Admin, release a person's tickets by hand on the Users page (`POST .../release-tickets`) → those rows do not appear (only the feed's `SYSTEM` rows count) → AC-32
+
+## Value sourcing
+- [ ] Released tickets come from `audit_logs` `MECHANIC_UNASSIGNED` rows with `actor_role = 'SYSTEM'`: compare the list with `select … where action = 'MECHANIC_UNASSIGNED' and actor_role = 'SYSTEM' and created_at >= now() - interval '7 days'` → same rows → Value sourcing "Chief notice, released tickets"
+- [ ] Edge: a row 8 days old (move one row's `created_at` back in a test copy, with the append only trigger off) → it drops out → Value sourcing "Chief notice, released tickets"
+- [ ] Erase a released person → the row now reads "Deleted user, account deleted" → Value sourcing "Chief notice, released tickets"
+
+## Acceptance-criteria coverage
+- AC-32: every step above
