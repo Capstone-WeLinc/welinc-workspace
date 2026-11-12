@@ -36,7 +36,7 @@ _These are recommendations to keep the build orderly, not requirements. Skip any
 | S8 | Profile extras | Account | done |
 | S13 | Email verification | Account | done |
 | S11 | Move VMMS and BMS onto the shared services | Cutover | planned |
-| S10 | Suite admin model | Admin | in-progress |
+| S10 | Suite admin model | Admin | done |
 
 ## Contract
 
@@ -284,7 +284,7 @@ The move itself: their users merged into welinc-auth by email, their auth copies
 
 ## Admin
 
-### S10. Suite admin model · in-progress · GA
+### S10. Suite admin model · done · GA
 spec [0013](../../specs/_root/0013-suite-admin-model/index.md)
 
 Replaces VRMS feature 61 with the same scope (the full model, chosen 2026-11-07). A platform admin in welinc-auth manages accounts and grants each system's roles but sees no system's data without that system's own role. One or two break glass accounts need MFA, log a reason and alert every admin on each login. An admin access report shows who holds admin where and since when. Every admin grant or removal alerts and logs, and nobody can raise their own access.

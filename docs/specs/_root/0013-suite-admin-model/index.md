@@ -1,8 +1,8 @@
 # 0013. Suite admin model: suite admins, temporary access, portal admin and central permissions
 
 **Date**: 2026-11-12
-**Status**: In Progress
-**Scope row**: [S10. Suite admin model](../../../scope/_root/shared-services.md#s10-suite-admin-model--in-progress--ga)
+**Status**: Accepted
+**Scope row**: [S10. Suite admin model](../../../scope/_root/shared-services.md#s10-suite-admin-model--done--ga)
 **Builds contract sections**: [0001](../0001-shared-services-contract/index.md) version 7 (breaking): the login answer, the admin code gate on admin routes, the new `/auth/admin/*` and `/auth/permissions/:system` routes, the removed VRMS matrix routes
 **Related**: [0004](../0004-roles-per-system/index.md) (catalog, `isSystemAdmin`), [0005](../0005-user-directory/index.md) (directory feed), [0006](../0006-suite-seed-accounts/index.md) (seed manifest), [0007](../0007-app-initiated-login-launcher/index.md) (launcher top bar), [0009](../0009-email-verification/index.md) (sign in code), [0011](../0011-account-activity-audit/index.md) (events, scope), [0012](../0012-profile-extras/index.md) (reauth token, deletion), VRMS spec 0011 (permission matrix)
 
