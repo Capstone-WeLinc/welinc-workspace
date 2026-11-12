@@ -183,3 +183,44 @@ _Steps for build plan task 18. The local database already holds feed release row
 
 ## Acceptance-criteria coverage
 - AC-32: every step above
+
+# Verify: slice 5, central permissions · spec 0013 · updated 2026-11-13
+_Steps for build plan tasks 19 to 24. Already run once locally in the AC-28 order (catalog:sync, export, import, VRMS sync, drop). A matrix save sends alert emails and local SMTP is real: blank `SMTP_*` (read mails from the auth log) before saving. Sign in to the portal as `suite.admin@` (`admin1234`) and pass the code._
+
+## UI / manual
+- [ ] Portal `/admin/permissions` as the suite admin → VRMS picked; groups Tickets, Records, Knowledge, Admin; columns Admin, Chief Mechanic, Mechanic; Admin on Manage the team and Change settings, and Mechanic on Remove anyone's files, show a lock and can't be clicked → AC-27
+- [ ] Flip a Mechanic cell on → it highlights, "1 change not saved" with Discard and Review and save; flip it back → the bar goes → AC-27
+- [ ] Review and save a right added → the note is optional; save → toast, the Change history shows it at the top with your name; VRMS admins get "permissions were changed" with a link to the Permissions view → AC-27, AC-13
+- [ ] Take a right away → the dialog asks for a note of 5 to 500 characters and refuses "meh" → AC-27
+- [ ] Open the matrix in two tabs, save in one, then save in the other → "Someone saved this matrix after you opened it" with Reload the matrix → AC-27
+- [ ] As `vrms.admin@`: Permissions shows the VRMS matrix read only (no checkboxes enabled), with the history → AC-27
+- [ ] Change history → the 87 rows moved from VRMS read ", moved from VRMS"; Load more pages → AC-28
+- [ ] Within about a minute of a save, sign in to VRMS as that role → the right is there (or gone) with no restart → AC-29
+- [ ] VRMS Settings as `vrms.admin@` → no Roles and permissions section; "Permissions are edited in the portal. Open Permissions" opens the portal view in a new tab; the History filter offers All, Settings, Lookup lists → AC-30
+- [ ] Portal Permissions at 375px → each permission stacks with its role checkboxes named, no sideways page scroll → AC-27
+
+## Commands
+- [ ] `npm run catalog:sync` twice in welinc-auth → the second prints "VRMS permissions: no changes" → AC-25
+- [ ] Set a locked cell by hand (`update role_permissions set allowed = false where role = 'ADMIN' and key = 'team.manage'`), run catalog:sync → "1 locked cells reset", one "Catalog sync" history row, version up by one → AC-25
+- [ ] `update permission_changes set note = 'x'` and `delete from permission_changes` in psql → both refused "append only" → AC-27
+- [ ] `GET /auth/permissions/VRMS` with VRMS's service token → 200 with `ETag: "v<n>"`; again with `If-None-Match` → 304; `GET /auth/permissions/BMS` with it → 403 `WRONG_SYSTEM`; a user token → 403 → AC-26
+- [ ] `PATCH /auth/admin/permissions/VRMS` as `vrms.admin@` → 403 `NOT_SUITE_ADMIN`; as the suite admin with an old `version` → 409 `MATRIX_STALE`; a locked cell → 409 `LOCKED_CELL`; role `DRIVER` → 400 `UNKNOWN_ROLE`; key `ticket.fly` → 400 `UNKNOWN_PERMISSION`; the same cell twice → 400 `VALIDATION_FAILED`; a save of current values → 200, same version → AC-27
+- [ ] `npm run permissions:import -- VRMS <file>` a second time → refused, "history was imported already" → AC-28
+- [ ] Stop welinc-auth for two minutes → VRMS logs one "Permission matrix sync failing" warning and keeps working on its copy; start it → "is back after … s" → AC-29
+- [ ] Make welinc-auth answer an empty matrix (every VRMS cell false in a test copy, version raised) → VRMS refuses it, keeps its copy and warns once → AC-29
+- [ ] `PATCH /vrms/permissions` and `GET /vrms/permissions/changes` → 404; `GET /vrms/permissions` as `vrms.admin@` → the synced copy with `source.etag` → AC-30
+- [ ] `npm run test` in backend-vrms → `catalog.spec.ts` keeps VRMS's keys equal to welinc-auth's 27 → AC-25, AC-30
+
+## Value sourcing
+- [ ] Matrix ETag is `permission_matrices.version`: save once → the tag VRMS stores in `permission_sync_state.etag` moves from `"v<n>"` to `"v<n+1>"` → Value sourcing "matrix read, ETag"
+- [ ] Import actor: a VRMS history row whose actor no longer exists here keeps its name with `actor_id` null; a VRMS backfill row (no actor) reads "VRMS (automatic)" → Value sourcing "matrix import, history actor"
+- [ ] VRMS sync matrix: a cell changed in the portal shows in VRMS's `role_permissions` after the next tick, and `GET /vrms/permissions/me` follows → Value sourcing "VRMS sync, matrix"
+- [ ] Alert recipients for a VRMS matrix save: suite admins and VRMS admins only → AC-13 table "permission matrix edited"
+
+## Acceptance-criteria coverage
+- AC-25: the catalog:sync and locked cell commands, the key match test
+- AC-26: the service token commands
+- AC-27: the Permissions view steps and the PATCH commands
+- AC-28: the import rerun and the moved history rows
+- AC-29: the sync, outage and empty matrix steps
+- AC-30: the VRMS Settings step and the removed routes
