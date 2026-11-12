@@ -52,3 +52,64 @@ Before you start: seed admin addresses get no mail. Set `ADMIN_SIGN_IN_CODE=fals
 - AC-22, AC-23: the portal UI steps
 - AC-33: the seed and `seed:check` steps
 - Later slices (AC-1 to AC-4, AC-9 to AC-11, AC-13, AC-14a to AC-14c, AC-16 to AC-21, AC-24 to AC-32, AC-34): not built yet, steps come with them
+
+# Verify: slice 2, system admins in the portal · spec 0013 · updated 2026-11-12
+_Steps for build plan tasks 8 to 11. Sign in as `vrms.admin@` (VRMS Admin) or `multi.admin@` (VRMS and VMMS Admin) and pass the code first. Local SMTP sends real mail: use `ADMIN_SIGN_IN_CODE=false` or blank `SMTP_*` (code read from the log) before any signed in step._
+
+## UI / manual
+- [ ] Portal `/admin/people` as `vrms.admin@`: VRMS people only, each row with role and status badges, Load more after 50 → AC-16, AC-23
+- [ ] Type a name in the search: the list narrows after a moment and `?q=` is in the address; pick Locked: only locked people, `?status=LOCKED` → AC-23
+- [ ] As `multi.admin@`: a VRMS and VMMS switcher shows; VMMS lists VMMS people only → AC-23
+- [ ] Open `/admin/people?system=BMS` as `vrms.admin@` → "You aren't an admin of BMS", no list → AC-16
+- [ ] Open `/admin/people/<id>?system=VRMS` for a VRMS mechanic: details, signed in devices, recent activity → AC-23
+- [ ] The same link for a BMS only person → "This person isn't in VRMS" → AC-16
+- [ ] `/admin/people/new?system=VRMS`: add a new address with Mechanic → the person page opens, a setup code goes out → AC-16, AC-23
+- [ ] Add again with an email that already has a VMMS account → "already has a WeLinc account" with Add the VRMS role; it attaches without touching their name or password → AC-16
+- [ ] Add a person with the Admin role → the password dialog opens before the save; Cancel leaves nothing created; the right password creates them → AC-14a
+- [ ] Wrong password in that dialog → "That password is not right. N tries left"; 5 wrong ones lock your own account → AC-14
+- [ ] Edit a mechanic's name → saved with no password asked → AC-16
+- [ ] Edit a mechanic's role to Admin → password asked once, then saved; VRMS admins get an alert email → AC-14a, AC-13
+- [ ] On another VRMS admin's page: Send reset code, Unlock (lock them first), End all sessions, an email edit → each asks your password and sends an alert email to the VRMS admins → AC-14b, AC-13
+- [ ] The same actions on a mechanic → no password asked, no alert → AC-14b
+- [ ] Your own page: no Deactivate, Delete or End all sessions in the menu; the email edit is locked with "Change your own email from your profile" → AC-16
+- [ ] Deactivate the last active VRMS Admin from another admin's account (deactivate the others first) → the server's last admin message shows → AC-16
+- [ ] Delete a VRMS only mechanic → back on People, they are gone; Deletion requests, Deleted, can restore lists them; Restore brings them back inactive → AC-16, AC-23
+- [ ] Delete a person shared with VMMS → the shared account message; nothing changes → AC-16
+- [ ] Deletion requests: a pending request from VRMS My profile shows; Reject needs a 5 to 500 character note; Approve deletes and drops the row → AC-16, AC-23
+- [ ] Activity: VRMS events newest first with the person's name linking to their page; Load more works → AC-16, AC-23
+- [ ] A step up owed partway (flag on, a session from before): any People call opens Confirm it's you, then the call runs again → AC-22
+- [ ] VRMS `/users` as the VRMS Admin: no Edit, reset, unlock, sessions, activity, deactivate or Deletion requests chip; each row's menu has Manage account (portal, new tab, `?system=VRMS`) and Open tickets for mechanics → AC-31
+- [ ] VRMS Add user opens the portal's `/admin/people/new?system=VRMS` in a new tab; after adding, back in the VRMS tab the list refreshes → AC-31
+- [ ] Click a mechanic row → their open tickets with Unassign and Reassign still work; the Work column updates → AC-31
+- [ ] Chief Mechanic dashboard Team section still opens a mechanic's open tickets → AC-31 (shared component kept)
+- [ ] Settings, permissions: give Chief Mechanic `team.manage` → the Users item shows for them (the list itself still needs a VRMS Admin, see the scope note) → AC-31
+- [ ] With `ADMIN_SIGN_IN_CODE=true` and a VRMS session that never passed the code, open VRMS Users → toast "Confirm your sign in in the portal" with Open the portal; after the portal step up, Retry loads the list → AC-31, AC-6
+
+## Commands
+- [ ] `curl -s http://localhost:3000/auth/admin/users?system=VRMS` with no cookie → 401 `NOT_SIGNED_IN` → AC-14
+- [ ] With an admin cookie, `PATCH /auth/admin/users/<id>/unlock` without the portal `Origin` → 403 `CSRF_REJECTED`; with it → 200 → AC-14
+- [ ] With an admin cookie, `GET /auth/admin/users?system=VMMS` as `vrms.admin@` → 403 `NOT_ADMIN_OF_SYSTEM` → AC-16
+- [ ] Bearer `PATCH /auth/users/<id>` giving VRMS Admin with no `reauthToken` → 403 `REAUTH_REQUIRED`; with a token from `POST /auth/profile/verify-password` purpose `ADMIN_ACTION` → 200; the same token again → 403 `REAUTH_REQUIRED` → AC-14a, AC-18
+- [ ] Bearer `POST /auth/profile/verify-password` purpose `ADMIN_ACTION` as a mechanic → 403 `NOT_AN_ADMIN`, no try counted → AC-14a
+- [ ] `POST /auth/admin/verify-password` purpose `TEMPORARY_ACCESS` as a VRMS admin → 403 `NOT_SUITE_ADMIN` → AC-14
+- [ ] Bearer `DELETE /auth/users/<admin id>/sessions` with no body → 403 `REAUTH_REQUIRED`; on a mechanic → 200 `{ ended }` → AC-14b, AC-18
+- [ ] Bearer `POST /auth/forgot-password` with an admin token for another admin's email and no `reauthToken` → 403 `REAUTH_REQUIRED`; anonymous → the usual 200 message → AC-14b
+- [ ] In `welinc_vrms_db`: `select role, allowed from role_permissions where permission='team.manage'` → ADMIN true, the others false → AC-31
+- [ ] `npm test` in welinc-auth (in the container), backend-vrms, the portal (from a `C:/` path on Windows) and web-vrms → all pass → AC-16, AC-18
+
+## Value sourcing
+- [ ] The system an admin acts in is the `system` input checked against their admin roles: as `multi.admin@`, the same person under `?system=VRMS` and `?system=VMMS` shows that system's roles only → Value sourcing "which system the admin acts in"
+- [ ] The caller of a cookie route: in a second browser signed in as `vrms.admin2@`, the People list and the actor name in Activity are theirs → Value sourcing "any cookie route, the caller"
+- [ ] Alert recipients are the suite admins plus the active admins of the system concerned: give VRMS Admin to someone; `suite.admin@` and every active VRMS admin get one email each, a deactivated VRMS admin and the VMMS admins get none → Value sourcing "alert email, recipients"
+- [ ] Alert time is Asia/Manila: the email's When line matches the Manila clock, not UTC → Value sourcing "alert email, time"
+- [ ] Alert link uses `PORTAL_URL`: it opens `<PORTAL_URL>/admin/people/<id>?system=VRMS` → Value sourcing "alert email, VRMS links"
+
+## Acceptance-criteria coverage
+- AC-13 (slice 2 rows: admin role added or removed on create, attach, edit, delete, approve, restore; actions on an admin account): the alert steps. The suite admin, temporary access and matrix rows come with slices 3 and 5
+- AC-14: the verify password, CSRF and no cookie steps
+- AC-14a: the Add and Edit admin role steps, the bearer reauth steps
+- AC-14b: the actions on another admin, the bearer sessions and forgot password steps
+- AC-16: People, person page, Add, scope, self and last admin steps
+- AC-18: the bearer route steps
+- AC-23: the People, person, Deletion requests and Activity views
+- AC-31: the VRMS Users page, Add user, open tickets, `team.manage` and the ADMIN_CODE_REQUIRED toast
