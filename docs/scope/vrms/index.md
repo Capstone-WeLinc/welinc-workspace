@@ -9,7 +9,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 
 **Deadline:** deployed by the end of November 2026, about 5 weeks from this plan. The whole plan is in scope; nothing is set aside for trimming. Documentation and QA tasks (WL-E10, WL-E11) stay in Jira, not here.
 
-**Shared services:** the auth, portal and gateway rework the other groups need lives in the suite epic [_root/shared-services.md](../_root/shared-services.md) (rows S1 to S13, from 2026-11-07; S1 to S3 done on 2026-11-08, S5, S6 and S12 on 2026-11-09, S4 on 2026-11-10, S9, S13 and S14 on 2026-11-11). It replaces features 60 and 61 and takes the auth and gateway half of feature 56. It started after feature 65 task 10; the verify runs for 58 and 65 are still open.
+**Shared services:** the auth, portal and gateway rework the other groups need lives in the suite epic [_root/shared-services.md](../_root/shared-services.md) (rows S1 to S13, from 2026-11-07; S1 to S3 done on 2026-11-08, S5, S6 and S12 on 2026-11-09, S4 on 2026-11-10, S9, S13 and S14 on 2026-11-11, S7 and S8 on 2026-11-12; S10 and S11 are the rows left). It replaces features 60 and 61 and takes the auth and gateway half of feature 56. It started after feature 65 task 10; the verify runs for 58 and 65 are still open.
 
 **Integration:** direct talks with each group replaced the meeting with VMMS and BMS (decided 2026-11-10, features 55 and 56). Work tagged "feature 56 may change it" is safe to build, but expect changes once feature 56 is designed.
 
@@ -86,7 +86,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 32 | Repair history timeline | Slice 2 | planned |
 | 33 | Admin status override | Slice 2 | planned |
 | 62 | Costs after close | Slice 2 | planned |
-| 34 | Admin OTP | Slice 3 | planned |
+| 34 | Admin OTP | Slice 3 | dropped (suite S10) |
 | 35 | reCAPTCHA on login | Slice 3 | planned |
 | 36 | Outsourced shop directory | Slice 4 | planned |
 | 37 | Transfer to outsourced shop | Slice 4 | planned |

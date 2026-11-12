@@ -36,7 +36,7 @@ _These are recommendations to keep the build orderly, not requirements. Skip any
 | S8 | Profile extras | Account | done |
 | S13 | Email verification | Account | done |
 | S11 | Move VMMS and BMS onto the shared services | Cutover | planned |
-| S10 | Suite admin model | Admin | planned |
+| S10 | Suite admin model | Admin | in-progress |
 
 ## Contract
 
@@ -279,13 +279,16 @@ The move itself: their users merged into welinc-auth by email, their auth copies
 - Note (2026-11-10, from spec 0009 follow-up): the migration guide makes the code screen a required change for `vmms-mobile` and `bms-mobile` (the login can answer `EMAIL_VERIFICATION_REQUIRED` instead of tokens); BMS stops resetting people to a default password, since admins can't set passwords anymore, and uses Send reset code; VMMS and BMS profile pages change email through `/auth/profile/email*`.
 - Note (2026-11-11, replan, your call): comes after S7, S8 and S10, so VMMS and BMS move onto the finished shared services. The guide also tells them not to build more user management (S10 moves it to the portal). Their staging half waits for VRMS feature 26.
 - Note (2026-11-12, replan, from spec 0011 follow up): the migration guide carries the VMMS and BMS route and field map from spec 0011 (`docs/integration/`): BMS loses its `location` text (country and network instead), BMS's "Logins" filter becomes a `type` filter, and VMMS's audit page pages through two sources.
+- Note (2026-11-12, replan, from spec 0012 follow up): the migration guide tells BMS to change `{ valid }` to `reauthToken` on verify password and to read `GET /auth/profile/deletion-request` instead of `deletionRequestStatus`; VMMS wires its deletion dialog and deletes its phone verification and Semaphore code (they no longer send SMS). `docs/integration/account-deletion.md` is the page to link.
 - [ ] Design it (spec): `/architect move VMMS and BMS onto the shared services`
 
 ## Admin
 
-### S10. Suite admin model · planned · needs a decision · GA
+### S10. Suite admin model · in-progress · GA
+spec [0013](../../specs/_root/0013-suite-admin-model/index.md)
+
 Replaces VRMS feature 61 with the same scope (the full model, chosen 2026-11-07). A platform admin in welinc-auth manages accounts and grants each system's roles but sees no system's data without that system's own role. One or two break glass accounts need MFA, log a reason and alert every admin on each login. An admin access report shows who holds admin where and since when. Every admin grant or removal alerts and logs, and nobody can raise their own access.
-**Done when:** all of the above hold, checked on the server, and the VMMS and BMS groups agree.
+**Done when:** all of the above hold, checked on the server. (The "VMMS and BMS agree" clause was dropped on 2026-11-12: suite specs get no group review; you tell the groups as it lands.)
 - Note (2026-11-07): a single everyday `SUPERADMIN` role that skips checks stays out on purpose (the Capstone 1 panel called it insecure), as does temporary elevation. The MFA step uses VRMS feature 34's OTP. It builds on spec 0009's change record and spec 0011's system scoping.
 - Note (2026-11-07, reopened, to discuss before `/architect`): two inputs to weigh against the model above.
   - Claude's suggestion: a real Super admin role in welinc-auth (at most 3 holders, MFA, the last one can't be removed); no hidden bypass, so using a system still needs that system's role; giving yourself a system role is allowed but expires (about 8 hours), needs a reason and alerts that system's admins; keep the access report and admin change alerts; break glass dropped for now.
@@ -301,7 +304,18 @@ Replaces VRMS feature 61 with the same scope (the full model, chosen 2026-11-07)
 - Note (2026-11-10, from spec 0009 follow-up): the portal admin section shows Setup pending and Email not verified (`passwordSet`, `emailVerified`) and offers Send reset code; there is no admin password setting to carry over.
 - Note (2026-11-11, replan, your call): third, before the S11 handoff, so the groups hear the final admin model and don't build more user management. If time runs short, cut the permission editing, not the platform admin and the access report.
 - Note (2026-11-12, replan, from spec 0011 follow up): the access report is built on the `ACCOUNT` rows of `account_events`. A system admin can't see a former member's sign ins (scope follows current membership), so the suite admin gets a view over every person's events, former members included.
-- [ ] Design it (spec): `/architect suite admin model`
+- Note (2026-11-12, replan, from spec 0012 follow up): the suite admin view also shows deletion requests and accounts in the 30 day grace across all systems, and decides requests for people with no system admin left. Until then, an account whose last role in a system was removed before its deletion drops out of every admin's grace list and nobody can restore it.
+- Note (2026-11-12, spec 0013): decided a `suite_admins` table (1 to 3, no system roles, separate accounts), temporary self grants of any role for 1 to 8 hours with a reason, spec 0009's emailed code at every admin portal sign in (TOTP later, optional), a recovery script instead of break glass accounts, cookie routes under `/auth/admin/*` for one portal admin section scoped by who is looking, alerts on admin level changes, and the permission matrix moved into welinc-auth (suite admins edit, VRMS syncs a cached copy, history moved). It also covers VRMS feature 34 (Admin OTP).
+- [x] Design it (spec): `/architect suite admin model`
+- [ ] Build it: `/develop suite admin model`
+  - [ ] Admin identity and the sign in code: suite admins table, code at login and step up, cookie admin guard, seed account, recovery script, portal Admin entry · AC-5 to AC-8, AC-12, AC-14, AC-15, AC-22, AC-33
+  - [ ] System admins in the portal: one service layer for both route families, People, Deletion requests and Activity views, admin rechecks, VRMS Users page as a team view · AC-14a, AC-14b, AC-16, AC-18, AC-23, AC-31
+  - [ ] Suite admin powers: add and remove suite admins, temporary grants and their sweep, alerts, the report, suite scope, Chief dashboard leaver notice · AC-1 to AC-4, AC-9 to AC-11, AC-13, AC-14c, AC-17, AC-19 to AC-21, AC-24, AC-32
+  - [ ] Central permissions (cut first if time runs short): catalog permissions, matrix routes and portal view, export and import, VRMS sync and removals · AC-25 to AC-30
+  - [ ] Contract 0001 version 7 and the `docs/integration/suite-admin.md` guide · AC-34
+- [ ] Verify it: `/check verify suite admin model`
+- [ ] Test it: `/test suite admin model`
+- [ ] Document it: `/document suite admin model`
 - [ ] Polish it (optional, ask first): `web-design-guidelines` (access report)
 
 ## Why this order

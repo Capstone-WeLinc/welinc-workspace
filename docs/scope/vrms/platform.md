@@ -83,8 +83,9 @@ A safe way to have "someone who can do everything" across VRMS, VMMS and BMS, th
 
 ## Slice 3: Login hardening
 
-### 34. Admin OTP · planned · GA
+### 34. Admin OTP · dropped · replaced by suite S10
 WL-102. Admins confirm login with the same OTP mechanics use.
+- Note (2026-11-12): covered by suite [S10](../_root/shared-services.md#s10-suite-admin-model--in-progress--ga), spec [0013](../../specs/_root/0013-suite-admin-model/index.md) AC-5 to AC-8: every admin (suite and system) confirms each portal sign in with spec 0009's emailed code, and admin routes refuse a session that didn't. Spec 0009's code rules (10 minutes, 5 wrong tries retire the code, never an account lock) replace this row's 5 minutes and 15 minute lock. Kept here for history.
 **Done when:** Admin pages are unreachable without a completed OTP step (checked on the server), codes expire after 5 minutes and work once, 5 wrong tries lock for 15 minutes, resend waits 60 seconds, and every OTP event is logged.
 - Note (2026-10-29): safe to build before the integration meeting, but feature 56 (integration contract) may change it: OTP lives in the shared welinc-auth and portal, which the other groups also use.
 - Note (2026-11-10, from suite spec 0009): reuse its sign in ticket and step (`verification_codes` with a new purpose) instead of a new mechanism. Its rules (codes dead after 5 wrong tries, never an account lock, 10 minute lifetime) differ from this row's Done when (5 minutes, a 15 minute lock); settle that in this row's spec.
