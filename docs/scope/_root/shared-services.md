@@ -33,7 +33,7 @@ _These are recommendations to keep the build orderly, not requirements. Skip any
 | S9 | Gateway for the whole suite | Gateway | done |
 | S14 | Environment checked at startup | Config | done |
 | S7 | Account activity and audit | Account | done |
-| S8 | Profile extras | Account | planned |
+| S8 | Profile extras | Account | done |
 | S13 | Email verification | Account | done |
 | S11 | Move VMMS and BMS onto the shared services | Cutover | planned |
 | S10 | Suite admin model | Admin | planned |
@@ -223,13 +223,25 @@ Login activity and account change history from welinc-auth, so VMMS (`me/login-a
 - [x] Test it: `/test account activity and audit` (2026-11-12; welinc-auth 147 new unit tests plus the 59 database tests, all green; code service events, the authenticator call site and the VRMS screens stay with verify)
 - [x] Document it: `/document account activity and audit` (2026-11-12, PR text for welinc-auth, welinc-web-vrms and the workspace)
 
-### S8. Profile extras · planned · needs a decision · Beta
-The profile routes the other apps already call: phone verification (VMMS), verify password before a sensitive action and an account deletion request (BMS).
-**Done when:** phone numbers can be verified by code, a sensitive action can ask for the password again, a user can request deletion and an admin of each of their systems sees it, and every one of these events is logged.
+### S8. Profile extras · done · Beta
+spec [0012](../../specs/_root/0012-profile-extras/index.md) · code in `welinc-auth/src/auth/` (profile, deletion, sweeper, directory), `welinc-backend-vrms/src/modules/vrms/` (directory, mechanic work), `welinc-web-vrms/src/features/` (profile, user management)
+
+The profile routes the other apps already call: verify password before a sensitive action and an account deletion request (BMS, VMMS). Phone verification is dropped (no system sends SMS).
+**Done when:** a sensitive action can ask for the password again, a user can request deletion and an admin of each of their systems sees it and decides, a deleted account's personal data is erased after the grace period in welinc-auth and VRMS, and every one of these events is logged. (Phone verification was dropped on 2026-11-12, spec 0012.)
 - Note (2026-11-09, replan, from spec 0005 follow-up): add a phone verified column in welinc-auth, put it in the `directory_changes` snapshot (a migration that changes the trigger) and map it to `phoneVerified`. If a deletion request erases personal data, it must also clear that person's feed snapshots, which otherwise keep names, emails and phones forever.
 - Note (2026-11-11, replan, your call): second, right after S7 and before the S11 handoff. VMMS phone verification and the BMS verify password and deletion screens call these routes.
 - Note (2026-11-12, replan, from spec 0011 follow up): phone, verify password and deletion request events join the `account_events` table as new `ACCOUNT` types, so they need codes and labels in the activity catalog from the start.
-- [ ] Design it (spec): `/architect profile extras`
+- Note (2026-11-12): spec 0012 decided: no phone verification (VMMS said they no longer use SMS; `phoneVerified` and the phone routes leave the contract, version 6). A purpose bound, one use reauth token from `verify-password`; wrong passwords there and on email and password change share the login lockout. Any one admin of the person's systems approves or rejects (a note is required on reject); approval soft deletes at once, and every soft deleted account is erased to "Deleted user" after `ACCOUNT_ERASURE_GRACE_DAYS` (30), with Restore until then. Erasure blanks logs, sessions and directory snapshots, and VRMS rewrites its name copies from a new `erased` flag. VRMS unassigns open tickets when a mechanic is deleted, deactivated or loses the role. Cross checked on another model, 24 fixes applied.
+- [x] Design it (spec): `/architect profile extras` (2026-11-12)
+- [x] Build it: `/develop profile extras`
+  - [x] Thin thread: migration, `verifyOwnPassword()` and the lockout, verify password, the request routes, approve and reject, VRMS Delete account card and Deletion requests view · AC-1 to AC-12, AC-22, AC-23
+  - [x] Emails, admin delete closing a request, restore, the grace view and `pendingDeletion` · AC-4, AC-9, AC-10, AC-13, AC-14, AC-23
+  - [x] Erasure in welinc-auth: the capped sweep, trigger exception, sessions and snapshot scrub, `erased` in the directory · AC-15 to AC-19
+  - [x] VRMS reacts to the feed: unassign on deleted, inactive or role removed, and the erasure rewrite · AC-24, AC-25
+  - [x] Contact edits logged, catalog labels, contract 0001 version 6, `docs/integration/account-deletion.md` · AC-20, AC-21
+    - Note (2026-11-12, /develop): contact logging, catalog labels and `docs/integration/account-deletion.md` are built. Contract 0001 version 6 was written by `/architect` the same day, which also dropped the admin half of AC-20 (`PATCH /auth/users/:id` takes no `contact`).
+- [x] Verify it: `/check verify profile extras` (2026-11-12, local stack, three runs; 33 of 35 `verify.md` steps ran and passed. Two were not run live and are covered by tests: the service token call, and a new account on an erased person's old email, which would send real mail)
+- [x] Test it: `/test profile extras` (2026-11-12; 6 new unit test files, welinc-auth 26 and web-vrms 105 passing; the database specs, components and AC-24 UI stay with verify)
 
 ### S13. Email verification · done
 spec [0009](../../specs/_root/0009-email-verification/index.md) · code in `welinc-auth/src/auth/codes/` (code service, sign in step), `welinc-auth/src/auth/sessions/` (the step routes), `welinc-web-portal/src/pages/auth/EmailCodeStep.tsx`, `welinc-web-vrms/src/features/auth/` (Change email) and `src/features/user-management/` (statuses)
