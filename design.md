@@ -111,7 +111,16 @@ Loading (skeletons shaped like the content, not spinners), empty (icon, one sent
 
 Gradients, glassmorphism, glows, purple/indigo "AI" styling, cards inside cards, emoji in UI, heavy shadows on data cards, decorative color, centered paragraphs of body text, and anything that only works with a mouse.
 
-**One exception:** the portal's login and forgot password pages (`AuthHero.tsx`) keep their dark navy split layout with a gradient overlay and soft gold glows (spec 0007, AC-22). It applies to those two pages only. The launcher, every other portal page and every system follow the ban above.
+**Exceptions:** the portal's login and forgot password pages (`AuthHero.tsx`) keep their dark navy split layout with a gradient overlay and soft gold glows (spec 0007, AC-22). The rest of the portal gets a brand band (Brand surfaces below). Every system follows the ban above.
+
+## Brand surfaces (portal only)
+
+The portal is the front door, so it carries the brand; the systems' work screens stay calm. Inside the portal (`LauncherShell`):
+
+- **Navy band:** the top bar is `hero` navy with the gold logo mark (`LogoMark`, the SVG mark alone; never the square `welinc-logo.jpg` at icon size), a white wordmark and white account menu (gold initials avatar). On the launcher the band grows to hold the greeting, and the first cards overlap its bottom edge (`-mt-12`). Working pages (Admin) carry only their page header in the band (back link, title, one line) with no overlap; the work itself sits below on the light canvas.
+- **Texture:** one faint 32px white grid (`brand-grid` in `index.css`), fading out downward. No other gradient, glow or photo outside the login pages.
+- **On the band:** a gold uppercase eyebrow (`text-xs tracking-wide`; gold text is allowed on navy, never on light surfaces), the greeting at `text-2xl`, `sm:text-3xl` (the only place above `text-2xl`), and the subtitle in white at 70%.
+- **Accent icon squares:** a card's lead icon may be a solid `primary` square with a gold icon to mark it as a brand item (the Admin card); system cards keep the soft tinted square.
 
 ## Icons
 
