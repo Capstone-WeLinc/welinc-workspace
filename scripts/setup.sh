@@ -57,7 +57,12 @@ make_env() {
   fi
 }
 make_env welinc-auth
-[ "$group" = vrms ] && make_env welinc-backend-vrms
+case "$group" in
+  vrms) make_env welinc-backend-vrms ;;
+  # Suite spec 0014: one .env per backend repo; every BMS process reads welinc-backend-bms/.env
+  vmms) make_env welinc-backend-vmms && make_env welinc-backend-vmms-analytics-ai ;;
+  bms) make_env welinc-backend-bms && make_env welinc-backend-bms-analytics-ai ;;
+esac
 # An older .env gets the names its .env.example gained since (spec 0010); names only are printed
 node scripts/sync-env.mjs
 
@@ -98,6 +103,25 @@ else
   (cd welinc-auth && npm run keys:dev --silent -- --vrms-env .env.vrms-client.local && rm -f .env.vrms-client.local)
 fi
 
+# Suite spec 0014, AC-16: a moved VMMS or BMS gets its own client key. The private key goes to the
+# backend's .env, the public one to welinc-auth's .env, and the auth seed below registers it (it
+# runs seed:clients). Only once the system has moved (its compose file exists), and only when the
+# key is missing: --force then replaces nothing but the empty name .env.example ships.
+case "$group" in
+  vmms) client_env=welinc-backend-vmms/.env ;;
+  bms) client_env=welinc-backend-bms/.env ;;
+  *) client_env="" ;;
+esac
+if [ -n "$client_env" ] && [ -f "docker-compose.$group.yml" ]; then
+  if [ ! -f "$client_env" ]; then
+    echo "note  $client_env is missing, so no $group client key was made (its .env.example names AUTH_CLIENT_PRIVATE_KEY)"
+  elif has_value "$client_env" AUTH_CLIENT_PRIVATE_KEY; then
+    echo "keep  the $group client key already in $client_env"
+  else
+    (cd welinc-auth && npm run keys:client --silent -- "$group" "../$client_env" .env --force)
+  fi
+fi
+
 # Spec 0011: country and network provider for account activity (DB-IP Lite, free). A failed download
 # only leaves places empty, so it never stops the setup.
 step "Location files for account activity"
@@ -124,9 +148,28 @@ case "$group" in
     docker restart welinc_vrms_backend >/dev/null
     ;;
   *)
-    step "$group"
-    echo "The $group stack isn't in this workspace yet (it moves onto the shared services in suite row S11)."
-    echo "Start your own system the way your group's README says until then."
+    step "$group: stack, tables and seed data"
+    if [ -f "docker-compose.$group.yml" ]; then
+      docker compose -f "docker-compose.$group.yml" up -d --build
+      # Every service container with a package.json: its migrations when it has a Prisma schema,
+      # then its seed when it has one. The move guide asks each seed to keep data already there.
+      for container in $(docker compose -f "docker-compose.$group.yml" ps --format '{{.Name}}'); do
+        docker exec "$container" test -f package.json 2>/dev/null || continue
+        if docker exec "$container" test -f prisma/schema.prisma; then
+          echo "migrate  $container"
+          docker exec "$container" npx prisma migrate deploy
+        fi
+        if docker exec "$container" node -e "process.exit(require('./package.json').scripts?.seed ? 0 : 1)"; then
+          echo "seed     $container"
+          docker exec "$container" npm run seed --silent
+        fi
+        docker restart "$container" >/dev/null
+      done
+    else
+      echo "docker-compose.$group.yml doesn't exist yet: $group moves onto the shared services with"
+      echo "docs/integration/move-$group.md (suite spec 0014), which carries the compose template."
+      echo "Start your own system the way your group's README says until then."
+    fi
     ;;
 esac
 

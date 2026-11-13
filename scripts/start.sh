@@ -37,7 +37,7 @@ if [ -n "$group" ]; then
     echo "Starting $group..."
     docker compose -f "docker-compose.$group.yml" up -d $build
   else
-    echo "note  docker-compose.$group.yml doesn't exist yet, so only the shared stack runs"
+    echo "note  docker-compose.$group.yml doesn't exist yet, so only the shared stack runs (see docs/integration/move-$group.md)"
   fi
 fi
 
@@ -61,10 +61,20 @@ wait_for() {
 
 wait_for gateway http://localhost:3000/health welinc_api_gateway
 wait_for auth http://localhost:3000/auth/health welinc_auth_service
-# VMMS and BMS add <prefix>/health when they move onto the shared services (suite row S11)
-if [ "$group" = vrms ]; then
-  wait_for vrms http://localhost:3000/vrms/health welinc_vrms_backend
-fi
+# Each system's health routes through the gateway (suite spec 0014, AC-16); VMMS and BMS only once
+# they have moved (their compose file exists). Container names are the ones the move guides fix.
+case "$group" in
+  vrms) wait_for vrms http://localhost:3000/vrms/health welinc_vrms_backend ;;
+  vmms)
+    if [ -f docker-compose.vmms.yml ]; then
+      wait_for vmms http://localhost:3000/vmms/health welinc_vmms_backend
+      wait_for "vmms analytics" http://localhost:3000/vmms/analytics/health welinc_vmms_analytics
+    fi
+    ;;
+  bms)
+    [ -f docker-compose.bms.yml ] && wait_for bms http://localhost:3000/bms/health welinc_bms_gateway
+    ;;
+esac
 
 echo
 echo "  Portal (sign in here)   http://localhost:8000"

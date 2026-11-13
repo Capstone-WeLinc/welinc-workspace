@@ -31,6 +31,7 @@ docker compose -f docker-compose.vrms.yml up -d
 # Same thing with scripts (spec 0008): first time setup, then start and stop
 sh scripts/setup.sh vrms   # clones, .env files, keys, packages, migrations, seeds; safe to run again
 sh scripts/start.sh vrms   # starts the stack and prints ok per service
+node scripts/check-system.mjs vrms   # suite spec 0014 checker: live login checks plus the leftovers scan (exit 0 passes)
 sh scripts/stop.sh         # stops every welinc_ container
 
 # Gateway checks (needs Docker; starts and removes its own containers)

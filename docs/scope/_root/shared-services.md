@@ -35,8 +35,9 @@ _These are recommendations to keep the build orderly, not requirements. Skip any
 | S7 | Account activity and audit | Account | done |
 | S8 | Profile extras | Account | done |
 | S13 | Email verification | Account | done |
-| S11 | Move VMMS and BMS onto the shared services | Cutover | planned |
+| S11 | Move VMMS and BMS onto the shared services | Cutover | in-progress |
 | S10 | Suite admin model | Admin | done |
+| S15 | Authenticator app sign in for admins | Admin | planned |
 
 ## Contract
 
@@ -265,7 +266,8 @@ Prove a person owns their email before the suite relies on it, instead of only c
 
 ## Cutover
 
-### S11. Move VMMS and BMS onto the shared services · planned · needs a decision
+### S11. Move VMMS and BMS onto the shared services · in-progress
+spec [0014](../../specs/_root/0014-move-vmms-bms-shared-services/index.md) · code in `welinc-auth` (launcher, authorize, clients seed, lookup limit), `welinc-web-portal` (phone only state), `welinc-backend-vrms` (session callback, Users page source), `scripts/check-system.mjs`, `scripts/setup.sh`, `scripts/start.sh`, `docs/integration/move-*.md`, `fleet-api.md`; the moves themselves in the VMMS and BMS repos
 The move itself: their users merged into welinc-auth by email, their auth copies and direct database reads removed, their apps on the portal login. Their groups change their own repos; this row gives them the migration guide, a user import script and a test plan, and tracks it to the end.
 **Done when:** every VMMS and BMS account logs in through welinc-auth with no duplicates, neither system has its own users or tokens tables or reads the auth database, all three systems run together behind one login on staging, and each group signs off.
 - Note (2026-11-07): the old `welinc-backend` repo where BMS pushed an auth copy is part of this cleanup.
@@ -280,7 +282,19 @@ The move itself: their users merged into welinc-auth by email, their auth copies
 - Note (2026-11-11, replan, your call): comes after S7, S8 and S10, so VMMS and BMS move onto the finished shared services. The guide also tells them not to build more user management (S10 moves it to the portal). Their staging half waits for VRMS feature 26.
 - Note (2026-11-12, replan, from spec 0011 follow up): the migration guide carries the VMMS and BMS route and field map from spec 0011 (`docs/integration/`): BMS loses its `location` text (country and network instead), BMS's "Logins" filter becomes a `type` filter, and VMMS's audit page pages through two sources.
 - Note (2026-11-12, replan, from spec 0012 follow up): the migration guide tells BMS to change `{ valid }` to `reauthToken` on verify password and to read `GET /auth/profile/deletion-request` instead of `deletionRequestStatus`; VMMS wires its deletion dialog and deletes its phone verification and Semaphore code (they no longer send SMS). `docs/integration/account-deletion.md` is the page to link.
-- [ ] Design it (spec): `/architect move VMMS and BMS onto the shared services`
+- Note (2026-11-13, replan, from spec 0013 follow up): the migration guide links `docs/integration/suite-admin.md`. VMMS and BMS delete their user pages (BMS keeps crew management for drivers and helpers as its own page) and link to the portal. BMS's `LogIn.tsx` moves off the token answer from `/auth/login`. They may join the central permission matrix later, when they switch to permission checks (their catalog files then get `permissions`). Once both have moved, a follow up spec removes the bearer admin routes (`/auth/users*` for admins), so the cookie routes under `/auth/admin/*` are the only admin routes left.
+- Note (2026-11-13, replan, from S10 contract check): contract 0001 promises `/auth/users/lookup` at 30 calls a minute, but welinc-auth enforces no limit there. Decide this in this spec, before the guide goes out: add the limit, or drop the promise.
+- Note (2026-11-13): spec 0014 decided a move kit: a guide per system, `scripts/check-system.mjs` (live checks plus a static scan, proven on VRMS first), and the VRMS folders copied (no shared package). VMMS and BMS move in parallel with a hard switch each and reseed from `people.json` (no import: nobody holds real users). The `vmms` and `bms` web clients admit office roles only; mechanics, drivers and helpers get a phone only state at the portal (`mobileSystems`, `app_released`; new seed person `vmms.mech@`). BMS's gateway is ported to NestJS and owns its login (booking as the fallback). All of `welinc_db` goes: drivers into BMS dispatch, trucks and garages from a new VMMS fleet API (`fleet.read` service token, live reads, fresh at assignment), BMS analytics on its own read model database; the old `welinc-backend` is archived. The lookup limit is added (30 a minute). Done is local (two ticks per group: login, then fleet) then staging. The bearer admin routes go in the last slice, after the VRMS Users page reads its own directory copy (Active, Inactive and Deleted only). Cross checked on another model, 22 fixes applied.
+- [x] Design it (spec): `/architect move VMMS and BMS onto the shared services` (2026-11-13)
+- [ ] Build it: `/develop move VMMS and BMS onto the shared services`
+  - [x] Thin thread, web vs app rules: `app_released`, the clients seed, `vmms.mech@`, the launcher split, the authorize refusal, the VRMS callback, the portal phone only state · AC-1 to AC-8
+  - [x] Rest of the shared side: lookup limit, `fleet.read` on `bms`, contract 0001 version 8 · AC-9 to AC-11
+  - [ ] The kit, proven on VRMS: `check-system.mjs`, `setup.sh` and `start.sh` for vmms and bms, `move-vmms.md`, `move-bms.md`, `fleet-api.md`; tell both groups · AC-12 to AC-16
+  - [ ] The moves (the groups build AC-17 to AC-30): VMMS login done [ ], VMMS fleet done [ ], BMS login done [ ], BMS fleet done [ ], `welinc-backend` archived [ ] · AC-17 to AC-31
+  - [ ] Cleanup: VRMS Users page off `GET /auth/users`, the gated removal of the bearer admin routes, contract 0001 version 9 · AC-33
+- [ ] Verify it: `/check verify move VMMS and BMS onto the shared services` (the staging run, AC-32, waits for VRMS feature 26)
+- [ ] Test it: `/test move VMMS and BMS onto the shared services`
+- [ ] Document it: `/document move VMMS and BMS onto the shared services`
 
 ## Admin
 
@@ -323,6 +337,12 @@ Replaces VRMS feature 61 with the same scope (the full model, chosen 2026-11-07)
   - Note (2026-11-13, /test): the last portal fixes got tests (portal `10e6f97`: `deletePerson` keeps its JSON body so the CSRF guard lets it through, and the edit dialog locks your own email, AC-16); the portal suite passes, 73 tests. Gotcha: run vitest from a path with an uppercase drive letter (`C:/Users/...`); from Git Bash's `/c/Users/...` every portal test file fails with "Vitest failed to find the current suite". Status stays in-progress until `Verify it` is done.
 - [x] Document it: `/document suite admin model` (PRs: auth #31, backend-vrms #56, web-vrms #58, portal #22, workspace #26)
 - [ ] Polish it (optional, ask first): `web-design-guidelines` (access report)
+
+### S15. Authenticator app sign in for admins · planned · needs a decision · from spec 0013
+An optional authenticator app code (TOTP, a 6 digit code from an app on your phone) for admins, and later for anyone who wants it. It closes the gap spec 0013 accepted: whoever reads an admin's inbox can reset the password and also read the emailed sign in code.
+**Done when:** an admin can turn on an authenticator app, sign in with it instead of the emailed code, use recovery codes if the phone is lost, and a suite admin can reset a lost one; the secret is stored encrypted; and every one of these events is logged.
+- Note (2026-11-13, replan): after S11 and hosting; it blocks nothing before go live. You tell the groups when it is ready. A break glass account stays dropped (spec 0013 AC-12); revisit only if the suite grows past one small team.
+- [ ] Design it (spec): `/architect authenticator app sign in for admins`
 
 ## Why this order
 
