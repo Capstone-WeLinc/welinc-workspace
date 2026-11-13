@@ -56,7 +56,7 @@ An id is one person forever. A removed person's id is retired, never reused. A n
 |---|---|---|---|---|---|
 | 9001 | `suite.admin@welinc.com` | Leonora Castillo | none (suite admin, spec 0013) | `admin1234` | active |
 
-Every admin, this one included, confirms each portal sign in with an emailed code when `ADMIN_SIGN_IN_CODE` is on. Seed addresses get no mail, so a new local `.env` has it off (`.env.example` sets `false`; production refuses `false`). To try the code step, set it to `true`, leave `SMTP_*` blank, recreate the auth container (`docker compose -f docker-compose.shared.yml up -d --force-recreate auth-service`; a plain restart keeps the old value) and read the code from `docker logs welinc_auth_service`.
+Every admin, this one included, confirms each portal sign in with an emailed code (`ADMIN_SIGN_IN_CODE`, on by default). Seed addresses aren't real inboxes, so on your machine auth never sends mail to `@welinc.com` (or `localhost`, `test.com`, `example.com`): it prints the whole email, code included, to `docker logs welinc_auth_service`, even with `SMTP_*` set. Mail to a real address, such as an account you made with your own Gmail, goes out through SMTP as usual.
 
 ### VRMS office accounts
 

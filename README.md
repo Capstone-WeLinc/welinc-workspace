@@ -173,7 +173,7 @@ Optional extras you can add to your `.env`:
 
 | File | Setting | Turns on |
 |---|---|---|
-| `welinc-auth/.env` | `SMTP_HOST`, `SMTP_USER`, `SMTP_PASS` | Real emails for account setup and password reset. Without them, emails are only printed to the log |
+| `welinc-auth/.env` | `SMTP_HOST`, `SMTP_USER`, `SMTP_PASS` | Real emails for account setup, password reset and sign in codes. Without them, emails are only printed to the log. Mail to the made up seed addresses (`@welinc.com`) is always printed to the log on your machine, never sent |
 | `welinc-backend-vrms/.env` | `GEMINI_API_KEY` | VRMS's AI features. Get a key at aistudio.google.com |
 
 Never paste a `.env` value into chat, code or a commit. Settings starting with `VITE_` end up in the browser, so they must never hold a secret.
