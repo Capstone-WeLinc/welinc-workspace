@@ -113,6 +113,7 @@ export const RULES = [
 function isComment(line, ext) {
   const t = line.trim();
   if (t.startsWith('//') || t.startsWith('/*') || t.startsWith('*') || t.startsWith('<!--')) return true;
+  if (t.startsWith('--') && ext === '.sql') return true;
   return t.startsWith('#') && HASH_COMMENT_EXTENSIONS.has(ext);
 }
 

@@ -273,7 +273,7 @@ Tracer Bullet: each shared change goes end to end and is proven on VRMS (and the
 12. Per group, when its PR is up: review the checker output (it proves the group's AC-17 to AC-23 for VMMS, AC-24 to AC-29 for BMS), then run the cross system steps in `verify.md` and tick the group in the scope row; after BMS, confirm `welinc-backend` is archived, satisfies **AC-17** to **AC-31**
 
 *Slice 5, cleanup, after both groups pass*
-13a. VRMS Users page off `GET /auth/users`: backend-vrms keeps every VRMS person from the directory feed and serves the list; the page shows Active, Inactive and Deleted only (*VRMS Users page source*); drop the `allow AC-33 pending` line, satisfies **AC-33**
+13a. [x] VRMS Users page off `GET /auth/users`: backend-vrms keeps every VRMS person from the directory feed and serves the list; the page shows Active, Inactive and Deleted only (*VRMS Users page source*); drop the `allow AC-33 pending` line, satisfies **AC-33**
 13. Gate: `check-system.mjs vrms|vmms|bms --static-only` finds no `/auth/users` or `/auth/deletion-requests` caller and no `allow AC-33 pending` line, or the task stops. Then remove the bearer admin routes, their tests and DTOs; contract 0001 version 9, satisfies **AC-33**
 14. Staging run of the cross system steps once VRMS feature 26 is live, satisfies **AC-32**
 
