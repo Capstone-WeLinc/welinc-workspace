@@ -2,14 +2,14 @@
 
 The VMMS checklist for [suite spec 0014](../specs/_root/0014-move-vmms-bms-shared-services/index.md). When you finish it, VMMS has no login of its own: people sign in once at the portal, welinc-auth issues every token, and VMMS checks them the way VRMS does. You copy VRMS's code instead of writing your own, and a checker script tells you when you're done.
 
-You change only your own repos: `welinc-backend-vmms`, `welinc-backend-vmms-analytics-ai`, `welinc-web-vmms` and `welinc-mobile-vrms_vmms`. Nothing in welinc-auth, the portal or the gateway needs a change from you. If something there looks wrong, tell Samuel.
+You change only your own repos: `welinc-backend-vmms`, `welinc-backend-vmms-analytics-ai`, `welinc-web-vmms` and `welinc-mobile-vrms_vmms`. Nothing in welinc-auth, the portal or the gateway needs a change from you. If something there looks wrong, tell the shared services lead.
 
 ## Before you start
 
-- **The first time:** clone the workspace repo, then download your repos with `sh scripts/clone-all.sh vmms` (it adds the shared repos and checks yours out on `development`, or your default branch when there is none). The README's `setup.sh` step comes later, at step 1 of this checklist.
+- **The first time:** clone the workspace repo, then download your repos with `sh scripts/clone-all.sh vmms` (it adds the shared repos and checks yours out on `development`, or your default branch when there is none). Then run `sh scripts/clone-all.sh vrms` too: the VRMS repos are where you copy the login code from, and you only read them, never change them.
 - Work on one branch per repo (`feat/shared-services`), from `development`. Merge all four together at the end: the move is a hard switch, so the old login and the new one never run side by side.
 - No data is moved. Every VMMS database is reseeded from the suite's seed people, because no deployment holds real users.
-- Don't run `seed:clients` or `setup.sh vmms` against the shared stack until you start step 1: before that, your old login still runs.
+- You can run `sh scripts/setup.sh vmms` any time. Until `docker-compose.vmms.yml` exists it only starts the shared stack (auth, portal, gateway) and fills auth with the test people; it makes your client key and starts your stack only after step 1 adds the compose file. If your old stack is still running and a port clashes, stop it first.
 - Read [web-login.md](web-login.md) once before you start. It explains the session routes, which are most of the work.
 
 ### Tools and versions
@@ -111,17 +111,17 @@ Tick these in order. Each links the guide that already explains it.
 
 ### 10. Prove it
 
-- [ ] `node scripts/check-system.mjs vmms` from the workspace root, with your stack running. Every line must say `ok`. It checks:
+- [ ] When everything above is ticked, tell the shared services lead. They run `node scripts/check-system.mjs vmms` from the workspace root against your stack. Every line must say `ok`. It checks:
   - **login**: `/vmms/health`; a protected route refusing no token, a tampered token and a VRMS token; `session/start`, the callback cookie, the CSRF check, refresh, logout and the 31 s session end; `vmms.mech@` landing on the `APP_NOT_ALLOWED` page on the web and signing in on the phone app; analytics health and its token check.
   - **fleet**: the fleet routes refusing no token and a user token, and (once BMS has moved) BMS listing the same plates as VMMS.
   - **static**: a scan of your four repos for leftovers (`JWT_SECRET`, `HS256`, `X-VMMS-Client`, a token in `localStorage` or a URL, `SEMAPHORE_`, calls to `/auth/users`). Each hit prints `file:line`. A line that must stay (a test proving `HS256` is refused, say) ends in `// check-system: allow <reason>`.
-- [ ] Run one group at a time while you work: `--static-only`, `--login`, `--fleet`.
+- [ ] While you work you may run `node scripts/check-system.mjs vmms --static-only` yourselves: it only scans your repos for leftovers, so it finds old login code early. The full run is the shared services lead's.
 
 ### 11. Pull requests and sign off
 
-- [ ] Open one pull request per repo into `development`, with the checker's output pasted in.
+- [ ] One pull request per repo into `development`. The shared services lead posts the checker's output on them.
 - [ ] Your group lead confirms in writing that the checklist is done.
-- [ ] Samuel runs the cross system steps (one sign in across three apps, sign out everywhere within 30 s, a deactivation and an erasure reaching VMMS) and ticks VMMS in the scope row. Login done and fleet done are separate ticks, so you can finish login first.
+- [ ] The shared services lead runs the cross system steps (one sign in across three apps, sign out everywhere within 30 s, a deactivation and an erasure reaching VMMS) and ticks VMMS in the scope row. Login done and fleet done are separate ticks, so you can finish login first.
 
 ## Compose template
 

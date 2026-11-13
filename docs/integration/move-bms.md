@@ -2,14 +2,14 @@
 
 The BMS checklist for [suite spec 0014](../specs/_root/0014-move-vmms-bms-shared-services/index.md). When you finish it, BMS has no login of its own and reads nothing from the old Capstone 1 database (`welinc_db`): people sign in once at the portal, welinc-auth issues every token, every BMS process checks them the way VRMS does, and trucks come from VMMS. You copy VRMS's code instead of writing your own, and a checker script tells you when you're done.
 
-You change only your own repos: `welinc-backend-bms` (all its processes), `welinc-backend-bms-analytics-ai` and `welinc-web-bms`. Nothing in welinc-auth, the portal or the gateway needs a change from you. If something there looks wrong, tell Samuel.
+You change only your own repos: `welinc-backend-bms` (all its processes), `welinc-backend-bms-analytics-ai` and `welinc-web-bms`. Nothing in welinc-auth, the portal or the gateway needs a change from you. If something there looks wrong, tell the shared services lead.
 
 ## Before you start
 
-- **The first time:** clone the workspace repo, then download your repos with `sh scripts/clone-all.sh bms` (it adds the shared repos and checks yours out on `development`, or your default branch when there is none). The README's `setup.sh` step comes later, at step 1 of this checklist.
+- **The first time:** clone the workspace repo, then download your repos with `sh scripts/clone-all.sh bms` (it adds the shared repos and checks yours out on `development`, or your default branch when there is none). Then run `sh scripts/clone-all.sh vrms` too: the VRMS repos are where you copy the login code from, and you only read them, never change them.
 - Work on one branch per repo (`feat/shared-services`) from the branch you push to today (`latest-bms-backend`, `latest-bms-frontend`, `main` for analytics), and open the pull requests into `development` (create it from that branch if it doesn't exist yet). Merge all three together at the end: the move is a hard switch.
 - No data is moved. Every BMS database is reseeded from the suite's seed people, because no deployment holds real users.
-- Don't run `seed:clients` or `setup.sh bms` against the shared stack until you start step 1.
+- You can run `sh scripts/setup.sh bms` any time. Until `docker-compose.bms.yml` exists it only starts the shared stack (auth, portal, gateway) and fills auth with the test people; it makes your client key and starts your stack only after step 1 adds the compose file. If your old stack is still running and a port clashes, stop it first.
 - Read [web-login.md](web-login.md) once before you start. It explains the session routes, which are most of the login work.
 - The trucks part depends on VMMS serving the [fleet API](fleet-api.md). You can finish login first (a separate tick) and the fleet part when VMMS has it.
 
@@ -84,7 +84,7 @@ The browser reaches BMS only at `<gateway>/bms/...`. These public paths are fixe
 - [ ] Forward no `/auth/*` path: the web app calls welinc-auth through the suite gateway. Delete `auth-integration.mjs` and its test, and any database code.
 - [ ] Forward the user's bearer token unchanged to every process.
 - [ ] `GET /bms/health`, public: `{ status: 'ok', checks: { ... } }`, 503 `HEALTH_CHECK_FAILED` when a check fails. Copy `welinc-backend-vrms/src/health/`.
-- [ ] **Fallback** if the port can't land in time: the booking service hosts the session routes and `/bms/health` instead, and `bms-gateway` stays a plain proxy. Tell Samuel before you take it.
+- [ ] **Fallback** if the port can't land in time: the booking service hosts the session routes and `/bms/health` instead, and `bms-gateway` stays a plain proxy. Tell the shared services lead before you take it.
 
 ### 4. Token check in every process
 
@@ -134,17 +134,17 @@ The browser reaches BMS only at `<gateway>/bms/...`. These public paths are fixe
 
 ### 11. Prove it
 
-- [ ] `node scripts/check-system.mjs bms` from the workspace root, with your stack running (and VMMS's, for the fleet group). Every line must say `ok`. It checks:
+- [ ] When everything above is ticked, tell the shared services lead. They run `node scripts/check-system.mjs bms` from the workspace root against your stack (and VMMS's, for the fleet group). Every line must say `ok`. It checks:
   - **login**: `/bms/health`; a protected route refusing no token, a tampered token and a VRMS token; `session/start`, the callback cookie, the CSRF check, refresh, logout and the 31 s session end; `driver.ramon@` landing on the `APP_NOT_ALLOWED` page; a 5 MB body to `POST /bms/booking` passing your gateway and answering 400 from booking's validation (a 413 means a body limit below 10 MB somewhere).
   - **fleet**: VMMS's fleet routes refusing no token and a user token, and `GET /bms/config/vehicles` listing the same plates as VMMS.
   - **static**: a scan of your three repos for leftovers (`JWT_SECRET`, `AUTH_DATABASE_URL`, `BMS_PARTNER_DATABASE_URL`, `5433/welinc_db`, `HS256`, `jwt-decode`, a token in `localStorage` or a URL, calls to `/auth/users`). Each hit prints `file:line`. A line that must stay ends in `// check-system: allow <reason>`.
-- [ ] Run one group at a time while you work: `--static-only`, `--login`, `--fleet`.
+- [ ] While you work you may run `node scripts/check-system.mjs bms --static-only` yourselves: it only scans your repos for leftovers, so it finds old login code early. The full run is the shared services lead's.
 
 ### 12. Pull requests and sign off
 
-- [ ] One pull request per repo into `development`, with the checker's output pasted in.
+- [ ] One pull request per repo into `development`. The shared services lead posts the checker's output on them.
 - [ ] Your group lead confirms in writing that the checklist is done.
-- [ ] Samuel runs the cross system steps and ticks BMS in the scope row (login done and fleet done are separate ticks).
+- [ ] The shared services lead runs the cross system steps and ticks BMS in the scope row (login done and fleet done are separate ticks).
 - [ ] Once the checker passes, `welinc_db` leaves every BMS setup and the old `welinc-backend` repo is archived on GitHub (read only, history kept).
 
 ## Compose template

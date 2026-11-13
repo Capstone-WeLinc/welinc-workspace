@@ -27,7 +27,7 @@ cd welinc-workspace
 sh scripts/setup.sh vrms
 ```
 
-**VMMS and BMS:** until your system has moved onto the shared login, don't run `setup.sh` yet. Start with your checklist instead ([Adding your system](#adding-your-system-vmms-and-bms) below); it tells you when.
+**VMMS and BMS:** `setup.sh vmms` (or `bms`) works for you too, but until your system has moved it only starts the shared services; your own system joins once your checklist adds its compose file. Follow your checklist ([Adding your system](#adding-your-system-vmms-and-bms) below).
 
 `setup.sh` downloads your group's repos, makes your settings files and keys, installs packages, starts everything, fills the databases with test data, and waits until it all answers. The first run takes a few minutes. When it prints **Setup finished**, open **http://localhost:8000** and sign in, for example as `vrms.admin@welinc.com` with password `admin1234`. All test accounts are in [docs/integration/seed-accounts.md](docs/integration/seed-accounts.md).
 
