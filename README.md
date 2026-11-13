@@ -227,7 +227,7 @@ node scripts/use-agents.mjs vrms
 
 | Folder or file | What's in it |
 |---|---|
-| `scripts/` | `setup.sh`, `start.sh`, `stop.sh`, `clone-all.sh`, `sync-env.mjs` (adds new settings to your `.env`), `use-agents.mjs` |
+| `scripts/` | `setup.sh`, `start.sh`, `stop.sh`, `clone-all.sh`, `sync-env.mjs` (adds new settings to your `.env`), `check-system.mjs` (checks a system on the shared services: live login and fleet checks plus a scan for leftovers, spec 0014), `use-agents.mjs` |
 | `infra/gateway/` | The gateway: its settings, paths and tests |
 | `docker-compose.shared.yml` | The shared services: auth, gateway, portal |
 | `docker-compose.vrms.yml` | VRMS's services (one file per group) |
