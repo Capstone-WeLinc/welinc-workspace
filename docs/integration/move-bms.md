@@ -6,11 +6,26 @@ You change only your own repos: `welinc-backend-bms` (all its processes), `welin
 
 ## Before you start
 
+- **The first time:** clone the workspace repo, then download your repos with `sh scripts/clone-all.sh bms` (it adds the shared repos and checks yours out on `development`, or your default branch when there is none). The README's `setup.sh` step comes later, at step 1 of this checklist.
 - Work on one branch per repo (`feat/shared-services`) from the branch you push to today (`latest-bms-backend`, `latest-bms-frontend`, `main` for analytics), and open the pull requests into `development` (create it from that branch if it doesn't exist yet). Merge all three together at the end: the move is a hard switch.
 - No data is moved. Every BMS database is reseeded from the suite's seed people, because no deployment holds real users.
 - Don't run `seed:clients` or `setup.sh bms` against the shared stack until you start step 1.
 - Read [web-login.md](web-login.md) once before you start. It explains the session routes, which are most of the login work.
 - The trucks part depends on VMMS serving the [fleet API](fleet-api.md). You can finish login first (a separate tick) and the fleet part when VMMS has it.
+
+### Tools and versions
+
+Set these first, on your machine and in every repo you change. Nothing else needs upgrading.
+
+| What | Version | Where |
+|---|---|---|
+| Node | 24 | install Node 24; `.nvmrc` with `24`; `"engines": { "node": "24.x" }` in each backend's `package.json`; every Dockerfile `FROM node:24-alpine` (BMS has no Dockerfiles yet: step 1 adds them) |
+| Package manager | npm | commit `package-lock.json`; no yarn or pnpm lock files |
+| NestJS, Prisma | 11, 7 | you already use these; keep them |
+| React, Vite, Tailwind (web app) | keep yours | the login move doesn't need an upgrade: the session code you copy is plain TypeScript |
+| New packages | `jose` 6, `cookie-parser`, `@nestjs/config` | add them where you copy VRMS's `src/auth/verify/` and `src/session/` |
+
+On Windows, type every command in **Git Bash** (the workspace [README](../../README.md#where-to-type-the-commands) shows how).
 
 ## What changes in one table
 

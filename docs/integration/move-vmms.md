@@ -6,10 +6,25 @@ You change only your own repos: `welinc-backend-vmms`, `welinc-backend-vmms-anal
 
 ## Before you start
 
+- **The first time:** clone the workspace repo, then download your repos with `sh scripts/clone-all.sh vmms` (it adds the shared repos and checks yours out on `development`, or your default branch when there is none). The README's `setup.sh` step comes later, at step 1 of this checklist.
 - Work on one branch per repo (`feat/shared-services`), from `development`. Merge all four together at the end: the move is a hard switch, so the old login and the new one never run side by side.
 - No data is moved. Every VMMS database is reseeded from the suite's seed people, because no deployment holds real users.
 - Don't run `seed:clients` or `setup.sh vmms` against the shared stack until you start step 1: before that, your old login still runs.
 - Read [web-login.md](web-login.md) once before you start. It explains the session routes, which are most of the work.
+
+### Tools and versions
+
+Set these first, on your machine and in every repo you change. Nothing else needs upgrading.
+
+| What | Version | Where |
+|---|---|---|
+| Node | 24 | install Node 24; `.nvmrc` with `24`; `"engines": { "node": "24.x" }` in each backend's `package.json`; every Dockerfile `FROM node:24-alpine` (VMMS analytics: its `engines` says `>=20.19 <21` today, change it) |
+| Package manager | npm | commit `package-lock.json`; no yarn or pnpm lock files |
+| NestJS, Prisma | 11, 7 | you already use these; keep them |
+| React, Vite, Tailwind (web app) | keep yours | the login move doesn't need an upgrade: the session code you copy is plain TypeScript |
+| New packages | `jose` 6, `cookie-parser`, `@nestjs/config` | add them where you copy VRMS's `src/auth/verify/` and `src/session/` |
+
+On Windows, type every command in **Git Bash** (the workspace [README](../../README.md#where-to-type-the-commands) shows how).
 
 ## What changes in one table
 
