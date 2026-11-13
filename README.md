@@ -185,12 +185,7 @@ node scripts/use-agents.mjs vrms
 
 ## Adding your system (VMMS and BMS)
 
-| Step | What to do |
-|---|---|
-| 1. Compose file | Make `docker-compose.<group>.yml` like `docker-compose.vrms.yml`: your own database, your ports from the table above, the service names `vmms-backend`, `vmms-analytics` or `bms-gateway`, and the shared network `welinc-network` (marked `external: true`) |
-| 2. Gateway | Nothing to do. Your paths already exist and work as soon as your service runs with the right name and port |
-| 3. Login | Check tokens with auth's public keys (copy VRMS's `src/auth/verify/`), then follow [web-login.md](docs/integration/web-login.md) |
-| 4. Health | Add `GET /<group>/health` like `/vrms/health`, so `start.sh` can tell when you're ready |
+Your group's checklist is the one page to follow: [move-vmms.md](docs/integration/move-vmms.md) or [move-bms.md](docs/integration/move-bms.md). It covers the compose file, the token check, the session routes, health, your data and the checker script that tells you when you're done (`node scripts/check-system.mjs <group>`). The gateway needs nothing from you: `/vmms/` and `/bms/` already route to your service names.
 
 ## Team rules
 
@@ -232,7 +227,7 @@ node scripts/use-agents.mjs vrms
 | `docker-compose.shared.yml` | The shared services: auth, gateway, portal |
 | `docker-compose.vrms.yml` | VRMS's services (one file per group) |
 | `docs/context/` | Background on the suite and each system |
-| `docs/integration/` | Shared references: test accounts, web login, shared repo changes |
+| `docs/integration/` | What VMMS and BMS follow to move onto the shared services: one checklist per group, plus references (web login, account screens, fleet API, test accounts) |
 | `docs/scope/` | The plan: what's built and what's next |
 | `docs/specs/` | Designs for each feature, before it's built |
 | `docs/reviews/` | Code review reports |
@@ -245,8 +240,10 @@ node scripts/use-agents.mjs vrms
 | You want to... | Read |
 |---|---|
 | Understand the whole suite | [docs/context/suite-overview.md](docs/context/suite-overview.md) |
+| Move VMMS or BMS onto the shared services | [move-vmms.md](docs/integration/move-vmms.md) or [move-bms.md](docs/integration/move-bms.md) |
 | Find a test account | [docs/integration/seed-accounts.md](docs/integration/seed-accounts.md) |
 | Connect your web app to the login | [docs/integration/web-login.md](docs/integration/web-login.md) |
+| See what changed in the shared services this term | [docs/context/shared-repo-changes.md](docs/context/shared-repo-changes.md) |
 | Add or change a gateway path | [infra/gateway/README.md](infra/gateway/README.md) |
 | See the shared rules in full | [Contract 0001](docs/specs/_root/0001-shared-services-contract/index.md) |
 | Your group's own notes | `docs/context/<group>/setup.md` ([VRMS](docs/context/vrms/setup.md)) |

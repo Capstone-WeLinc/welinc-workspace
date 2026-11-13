@@ -84,10 +84,10 @@ The browser reaches BMS only at `<gateway>/bms/...`. These public paths are fixe
 ### 6. No auth database: names and activity
 
 - [ ] Approval submitter and reviewer names come from `POST /auth/directory/users/lookup` (booking holds the `bms` key and a `directory.read` token). An id in `missing` shows "Unknown user".
-- [ ] The admin activity page combines your audit rows (names from the same lookup) with sign in events from `GET /auth/activity` (the BMS Admin's own bearer token, scoped to BMS). Other roles see your rows only. [account-activity.md, BMS](account-activity.md#bms) maps every field.
+- [ ] The admin activity page combines your audit rows (names from the same lookup) with sign in events from `GET /auth/activity` (the BMS Admin's own bearer token, scoped to BMS). Other roles see your rows only. [account-screens.md, BMS](account-screens.md#bms) maps every field.
 - [ ] Profile activity is the web app's direct call to `/auth/profile/activity`.
-- [ ] Erasure: a crew member whose `user_id` comes back `erased` becomes `Deleted user` in `drivers.name` and `helpers.name`. Copy the VRMS directory reader (`welinc-backend-vrms/src/modules/vrms/directory/`, recommended) or look the linked ids up daily. See [account-deletion.md, Reading the directory after an erasure](account-deletion.md#reading-the-directory-after-an-erasure).
-- [ ] Pick lists skip `temporaryRoles` ([suite-admin.md, step 4](suite-admin.md#4-skip-temporary-roles-in-pick-lists)).
+- [ ] Erasure: a crew member whose `user_id` comes back `erased` becomes `Deleted user` in `drivers.name` and `helpers.name`. Copy the VRMS directory reader (`welinc-backend-vrms/src/modules/vrms/directory/`, recommended) or look the linked ids up daily. See [account-screens.md, After an erasure](account-screens.md#after-an-erasure).
+- [ ] Pick lists skip `temporaryRoles` ([account-screens.md, Temporary roles](account-screens.md#temporary-roles-in-pick-lists)).
 - [ ] `CUSTOMER_TRACKING_SECRET` for tracking links, required at boot, no fallback (contract rule 8).
 
 ### 7. Drivers and trucks
@@ -101,14 +101,16 @@ The browser reaches BMS only at `<gateway>/bms/...`. These public paths are fixe
 ### 8. Analytics
 
 - [ ] `bms-analytics-projection` writes its read model into `bms-analytics-db`, a database container in `docker-compose.bms.yml` on its own host port (5437, never 5433).
-- [ ] `welinc-backend-bms-analytics-ai` reads that database and the fleet API, never `welinc_db`, checks tokens itself (step 4), and runs on 3025 behind `bms-gateway`.
+- [ ] `welinc-backend-bms-analytics-ai` reads that database, checks tokens itself (step 4), and runs on 3025 behind `bms-gateway`. It never reads `welinc_db`.
+- [ ] Analytics gets trucks, drivers and helpers from dispatch (`DISPATCH_API_URL`, `http://bms-dispatch:3022` in Docker), forwarding the signed in person's token, as the Resource Planning work already does. Dispatch is the only BMS process that calls the [fleet API](fleet-api.md).
+- [ ] Remove the `user_activity_logs` mapping from analytics: sign in activity comes from welinc-auth ([account-screens.md, BMS](account-screens.md#bms)).
 
 ### 9. Web app
 
 - [ ] No password form: `/login` sends the browser to `/bms/session/start`. Forgot password is the portal's.
 - [ ] The boot sequence, the in memory token, Switch system and sign out: [web-login.md](web-login.md#web-app-the-boot-sequence). Copy `welinc-web-vrms/src/lib/session/`. Remove `jwt-decode`, every `localStorage` token and the `/auth/users/:id/password` call.
-- [ ] Delete the Users page except crew management, which stays as its own page. The menu item opens `<portal>/admin/people?system=BMS`. Handle `ADMIN_CODE_REQUIRED` and `SIGN_IN_CODE_REQUIRED` ([suite-admin.md](suite-admin.md#what-you-change)).
-- [ ] The profile page uses `reauthToken` and `GET /auth/profile/deletion-request` ([account-deletion.md](account-deletion.md#what-each-groups-screens-change)).
+- [ ] Delete the Users page except crew management, which stays as its own page. The menu item opens `<portal>/admin/people?system=BMS`. Handle `ADMIN_CODE_REQUIRED` ([account-screens.md, Admin pages](account-screens.md#admin-pages-move-to-the-portal)).
+- [ ] The profile page uses `reauthToken` and `GET /auth/profile/deletion-request` ([account-screens.md, Account deletion](account-screens.md#account-deletion)).
 - [ ] Port 8003, API at `<api>/bms/`.
 
 ### 10. People in the seed
@@ -274,6 +276,7 @@ services:
       <<: *auth
       PORT: 3025
       DATABASE_URL: postgresql://bms_user:bms_pass@bms-analytics-db:5432/bms_analytics_db
+      DISPATCH_API_URL: http://bms-dispatch:3022
     depends_on: { bms-analytics-db: { condition: service_healthy } }
 
   web-bms:

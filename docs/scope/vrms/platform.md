@@ -50,7 +50,7 @@ The VMMS and BMS groups went separate ways after Capstone 1. The integration mee
 Get ready for the first integration meeting: know what the other groups changed, what you need to ask them, and how the shared setup works now.
 **Done when:** a question list covers their repos, mobile app repo, services, auth, environments and CI; every change they made to the shared repos (welinc-auth, welinc-web-portal) is listed from a read only check; and a setup guide for the shared stack (auth, portal, gateway, docker network, CI, environments, dependency updates) is ready to hand over.
 - [x] Question list for VMMS and BMS (2026-11-03: 32 questions, kept in `docs/_private/vrms/` outside git)
-- [x] Shared repo drift check (read only) (2026-11-03: flipped to what you changed, [shared-repo-changes.md](../../integration/shared-repo-changes.md))
+- [x] Shared repo drift check (read only) (2026-11-03: flipped to what you changed, [shared-repo-changes.md](../../context/shared-repo-changes.md))
 - [x] Setup guide for the shared stack (2026-11-03; merged into the workspace [README](../../../README.md) on 2026-11-10)
 - [x] Meeting held, answers recorded for feature 56 (skipped 2026-11-10: replaced by direct talks with each group; the answers are in the notes on the [shared services](../_root/shared-services.md) rows)
 - Note (2026-10-29): add to the question list that `CHIEF_MECHANIC` now exists in the shared auth role list (spec 0007), and that the VMMS and BMS backends likely carry the same copied login module and `users` table that spec 0009 removed here.

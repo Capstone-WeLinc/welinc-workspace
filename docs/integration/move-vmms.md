@@ -61,9 +61,9 @@ Tick these in order. Each links the guide that already explains it.
 
 - [ ] Drop `users`, `user_roles`, `refresh_tokens`, `login_activities` and `password_reset_tokens`, with the foreign keys from `notifications`, `maintenance_notifications`, `mechanics` and `maintenance_schedules`. Every user id column stays as a plain uuid holding a welinc-auth id.
 - [ ] Copy the VRMS directory reader (`welinc-backend-vrms/src/modules/vrms/directory/`) with its own `directory_sync_state` table, and feed your `mechanics` rows from it (`user_id` unique). The client `vmms` already holds `directory.read`.
-- [ ] Erasure: when the feed says `erased: true`, every copied name becomes `Deleted user` and every copied email `deleted-<id>@erased.invalid`, `actorEmail` on your audit tables included. Copy `erasure-rewrite.ts` and see [account-deletion.md, Reading the directory after an erasure](account-deletion.md#reading-the-directory-after-an-erasure).
+- [ ] Erasure: when the feed says `erased: true`, every copied name becomes `Deleted user` and every copied email `deleted-<id>@erased.invalid`, `actorEmail` on your audit tables included. Copy `erasure-rewrite.ts` and see [account-screens.md, After an erasure](account-screens.md#after-an-erasure).
 - [ ] Seed: a byte for byte copy of welinc-auth's `people.json`, checked with `npm --prefix welinc-auth run seed:check -- welinc-backend-vmms/prisma/seeds/people.json`. Create no users. See [seed-accounts.md, For VMMS and BMS](seed-accounts.md#for-vmms-and-bms-in-s11-not-before).
-- [ ] Pick lists skip `temporaryRoles` ([suite-admin.md, step 4](suite-admin.md#4-skip-temporary-roles-in-pick-lists)).
+- [ ] Pick lists skip `temporaryRoles` ([account-screens.md, Temporary roles](account-screens.md#temporary-roles-in-pick-lists)).
 - [ ] Profile pictures move to welinc-auth's picture route (`POST /auth/profile/picture`).
 
 ### 6. Backend: the fleet API
@@ -81,9 +81,9 @@ Tick these in order. Each links the guide that already explains it.
 
 - [ ] The boot sequence, the in memory token, Switch system and sign out to `<portal>/login?reason=logout`: [web-login.md](web-login.md#web-app-the-boot-sequence). Copy `welinc-web-vrms/src/lib/session/`.
 - [ ] Remove the `?token=` intake and the VRMS link (Switch system replaces it; no token in a URL). See [Remove the old handoff](web-login.md#remove-the-old-handoff).
-- [ ] Delete the Users page; the menu item opens `<portal>/admin/people?system=VMMS`. Handle `ADMIN_CODE_REQUIRED` and `SIGN_IN_CODE_REQUIRED` ([suite-admin.md, steps 1 to 3](suite-admin.md#what-you-change)).
-- [ ] The profile page uses welinc-auth's routes: [account-activity.md, VMMS](account-activity.md#vmms) and [account-deletion.md](account-deletion.md#what-each-groups-screens-change). No phone verification.
-- [ ] The audit page shows sign in events from `/auth/activity` to VMMS Admins only; other roles see the business rows only ([account-activity.md](account-activity.md#vmms)).
+- [ ] Delete the Users page; the menu item opens `<portal>/admin/people?system=VMMS`. Handle `ADMIN_CODE_REQUIRED` ([account-screens.md, Admin pages](account-screens.md#admin-pages-move-to-the-portal)).
+- [ ] The profile page uses welinc-auth's routes: [account-screens.md, VMMS](account-screens.md#vmms) and [account-screens.md, Account deletion](account-screens.md#account-deletion). No phone verification.
+- [ ] The audit page shows sign in events from `/auth/activity` to VMMS Admins only; other roles see the business rows only ([account-screens.md, Activity](account-screens.md#activity)).
 - [ ] Port 8002.
 
 ### 9. Mobile app
