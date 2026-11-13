@@ -265,7 +265,7 @@ Tracer Bullet: each shared change goes end to end and is proven on VRMS (and the
 8. [x] Contract 0001 version 8 (sections 4, 7, 10 to 14, move order, gap map), satisfies **AC-11**
 
 *Slice 3, the kit, proven on VRMS*
-9. `scripts/check-system.mjs`: the live checks (VRMS set first, then the VMMS and BMS extras behind their system, the fleet checks as their own group), the static scan, exit codes; mark VRMS's `GET /auth/users` call `// check-system: allow AC-33 pending`; `check-system.mjs vrms` passes, satisfies **AC-12**, **AC-13**, **AC-14**
+9. [x] `scripts/check-system.mjs`: the live checks (VRMS set first, then the VMMS and BMS extras behind their system, the fleet checks as their own group), the static scan, exit codes; mark VRMS's `GET /auth/users` call `// check-system: allow AC-33 pending`; `check-system.mjs vrms` passes, satisfies **AC-12**, **AC-13**, **AC-14**
 10. `setup.sh` and `start.sh` for `vmms` and `bms` (compose when present, keys, migrations, seeds, health), satisfies **AC-16**
 11. `move-vmms.md`, `move-bms.md`, `fleet-api.md`, the compose templates and the README rows; tell both groups, satisfies **AC-15**
 
