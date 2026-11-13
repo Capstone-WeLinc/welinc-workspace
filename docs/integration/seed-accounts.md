@@ -4,7 +4,7 @@ The test people every WeLinc system shares, from [spec 0006](../specs/_root/0006
 
 ## The manifest
 
-- `welinc-auth/prisma/seeds/people.json` is the one list of seed people for the whole suite: 145 people, each with a fixed id (see *Ids*), one email, their roles in each system, a password and a state.
+- `welinc-auth/prisma/seeds/people.json` is the one list of seed people for the whole suite: 147 people (145, the suite admin from spec 0013 and `vmms.mech@` from spec 0014), each with a fixed id (see *Ids*), one email, their roles in each system, a password and a state.
 - `npm run seed` in welinc-auth creates those people. Every other system copies the file and links its own rows (mechanics, crew, actor ids) to the same ids. It never creates accounts of its own.
 - welinc-auth's file always wins. A copy that differs is out of date, never a second source. Need a new person or role? Ask the shared services owner to add them to the manifest.
 - An id is one person forever. A removed person's id is retired, never reused.
@@ -32,6 +32,7 @@ Every person has a fixed id: `00000000-0000-4000-8000-` plus a 12 digit number. 
 | 2101 to 2199 | VMMS Admin |
 | 2201 to 2299 | VMMS Operations |
 | 2301 to 2399 | VMMS Chief Mechanic |
+| 2401 to 2499 | VMMS Mechanic only (`vmms.mech@`, spec 0014) |
 | 3101 to 3199 | BMS Admin |
 | 3201 to 3299 | BMS Operations |
 | 3301 to 3399 | BMS Customer Support |
@@ -91,6 +92,9 @@ Every admin, this one included, confirms each portal sign in with an emailed cod
 | 2203 | `vmms.ops3@welinc.com` | Rafael Ilagan | VMMS Operations | `ops1234` | active |
 | 2204 | `vmms.ops4@welinc.com` | Josefina Dela Paz | VMMS Operations | `ops1234` | active |
 | 2205 | `vmms.ops5@welinc.com` | Noel Samonte | VMMS Operations | `ops1234` | active |
+| 2401 | `vmms.mech@welinc.com` | Ramil Aquino | VMMS Mechanic | `mechanic1234` | active |
+
+`vmms.mech@` is the one person who holds VMMS Mechanic and nothing else (suite spec 0014, AC-8). The VMMS web app admits only Admin and Operations, so the portal shows them the phone only state, and the checker uses them for the `APP_NOT_ALLOWED` checks.
 
 ### BMS office accounts
 

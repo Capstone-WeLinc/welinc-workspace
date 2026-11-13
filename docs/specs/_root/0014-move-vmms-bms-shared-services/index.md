@@ -1,7 +1,7 @@
 # 0014. Move VMMS and BMS onto the shared services
 
 **Date**: 2026-11-13
-**Status**: Proposed
+**Status**: In Progress
 **Scope row**: [S11. Move VMMS and BMS onto the shared services](../../../scope/_root/shared-services.md#s11-move-vmms-and-bms-onto-the-shared-services--in-progress)
 **Builds contract sections**: [0001](../0001-shared-services-contract/index.md) version 8 (breaking: the launcher answer for people who hold a system only on a phone app, web clients limited to office roles; additive: `mobileSystems`, `fleet.read`, the lookup limit made real, the move order) and version 9 (breaking: the bearer admin routes removed, the last slice)
 **Related**: [0002](../0002-signing-keys-service-identity/index.md) (token check, client keys), [0003](../0003-sessions-refresh-logout/index.md) (session routes, mobile login), [0004](../0004-roles-per-system/index.md) (catalog, `allowed_roles`), [0005](../0005-user-directory/index.md) (directory), [0006](../0006-suite-seed-accounts/index.md) (seed manifest), [0007](../0007-app-initiated-login-launcher/index.md) (launcher), [0008](../0008-suite-gateway/index.md) (gateway, ports, service names), [0009](../0009-email-verification/index.md) (code step), [0011](../0011-account-activity-audit/index.md) (activity), [0012](../0012-profile-extras/index.md) (deletion, erasure), [0013](../0013-suite-admin-model/index.md) (portal admin, deprecated bearer routes), VRMS feature 56 (domain contracts, which the fleet API starts)
@@ -253,16 +253,16 @@ Decided 2026-11-13 (task 13a): backend-vrms keeps a copy of every person holding
 Tracer Bullet: each shared change goes end to end and is proven on VRMS (and the portal) before the guides go out, then each group's move is its own thread, and the cleanup comes last. Tasks 1 to 13 are yours; the groups' checklists live in their guides and are tracked in the scope row.
 
 *Slice 1, the thin thread: web vs app rules end to end, proven with VRMS and the portal*
-1. welinc-auth migration `app_released` and the seed changes (`vmms` and `bms` `allowedRoles`, `app_released`, `vmms.mech@` in `people.json`, the VRMS copy and `seed-accounts.md`), satisfies **AC-1**, **AC-6**, **AC-8**
-2. Launcher split in `launcher.ts` (`systems`, `mobileSystems`, `user.systems`) and the 200 for phone only people on the three routes, satisfies **AC-4**, **AC-5**
-3. `/auth/authorize` refusal with `error_description=APP_NOT_ALLOWED`, satisfies **AC-2**
-4. VRMS reference callback, `auth-client.ts` `not_allowed` and refresh handling, satisfies **AC-3**
-5. Portal: the phone only state, the launcher line and the `APP_NOT_ALLOWED` page, satisfies **AC-7**
+1. [x] welinc-auth migration `app_released` and the seed changes (`vmms` and `bms` `allowedRoles`, `app_released`, `vmms.mech@` in `people.json`, the VRMS copy and `seed-accounts.md`), satisfies **AC-1**, **AC-6**, **AC-8**
+2. [x] Launcher split in `launcher.ts` (`systems`, `mobileSystems`, `user.systems`) and the 200 for phone only people on the three routes, satisfies **AC-4**, **AC-5**
+3. [x] `/auth/authorize` refusal with `error_description=APP_NOT_ALLOWED`, satisfies **AC-2**
+4. [x] VRMS reference callback, `auth-client.ts` `not_allowed` and refresh handling, satisfies **AC-3**
+5. [x] Portal: the phone only state, the launcher line and the `APP_NOT_ALLOWED` page, satisfies **AC-7**
 
 *Slice 2, the rest of the shared side*
-6. The lookup limit on both routes (one `lookup:<sub>` counter), satisfies **AC-9**
-7. `bms` `serviceScopes` with `VMMS: [fleet.read]`, and the unit test for a scope on a non `AUTH` audience, satisfies **AC-10**
-8. Contract 0001 version 8 (sections 4, 7, 10 to 14, move order, gap map), satisfies **AC-11**
+6. [x] The lookup limit on both routes (one `lookup:<sub>` counter), satisfies **AC-9**
+7. [x] `bms` `serviceScopes` with `VMMS: [fleet.read]`, and the unit test for a scope on a non `AUTH` audience, satisfies **AC-10**
+8. [x] Contract 0001 version 8 (sections 4, 7, 10 to 14, move order, gap map), satisfies **AC-11**
 
 *Slice 3, the kit, proven on VRMS*
 9. `scripts/check-system.mjs`: the live checks (VRMS set first, then the VMMS and BMS extras behind their system, the fleet checks as their own group), the static scan, exit codes; mark VRMS's `GET /auth/users` call `// check-system: allow AC-33 pending`; `check-system.mjs vrms` passes, satisfies **AC-12**, **AC-13**, **AC-14**
