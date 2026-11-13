@@ -38,7 +38,7 @@ Reasoning and options: see [rationale.md](rationale.md).
 *welinc-backend-vrms and welinc-web-vrms*
 
 - **AC-8**: `POST /vrms/session/refresh` passes `user.systems` through unchanged. web-vrms keeps it in the auth store with the rest of `user`. A missing `systems` (an older welinc-auth) counts as an empty list.
-- **AC-9**: web-vrms shows **Switch system** (lucide `LayoutGrid` icon) in the sidebar, the user menu and the phone sheet, in the spots the old VMMS switch held, only when `user.systems` has two or more entries. It opens `<PORTAL_URL>/?from=VRMS` in the same tab. The old `switchToVmms`, `canSwitchToVmms` and `VITE_VMMS_URL` are removed.
+- **AC-9**: web-vrms shows **Switch system** (lucide `LayoutGrid` icon) in the sidebar, the user menu and the phone sheet, in the spots the old VMMS switch held, only when `user.systems` has two or more entries (amended 2026-11-14: or the person is a VRMS Admin, a suite admin's temporary grant included, since AC-14 keeps a one system admin on the launcher with the Admin card; without it they had no way back to the portal). It opens `<PORTAL_URL>/?from=VRMS` in the same tab. The old `switchToVmms`, `canSwitchToVmms` and `VITE_VMMS_URL` are removed.
 - **AC-10**: A visit to a VRMS deep link (path, query and hash) with no VRMS session goes through the portal (the form when signed out, no form when the SSO session is live) and lands back on that exact address, for one, two and three system accounts. The launcher never shows during an app initiated login (a `request` is present).
 
 *welinc-web-portal: routing*
@@ -169,7 +169,7 @@ otherwise, /auth/sso:
 
 **Critical test scenarios**:
 - Happy path, three systems: `multi.lead@` opens `http://localhost:8000/`, signs in, sees BMS, VMMS and VRMS cards in that order with Operations, Operations and Chief Mechanic pills, opens VRMS with no password, clicks Switch system, sees "You're here" on VRMS, verifies **AC-1**, **AC-3**, **AC-9**, **AC-14** to **AC-16**
-- One system: `vrms.admin@` signs in at the portal and lands in VRMS with no launcher; reopening the portal forwards again; Switch system is hidden in VRMS, verifies **AC-9**, **AC-13**, **AC-14**
+- One system: a one system VRMS mechanic signs in at the portal and lands in VRMS with no launcher; reopening the portal forwards again; Switch system is hidden in VRMS. `vrms.admin@` instead sees the launcher with the Admin card, and Switch system shows in VRMS, verifies **AC-9**, **AC-13**, **AC-14**
 - Deep link: signed out, open `http://localhost:8001/repairs?status=open#top` as a two system mechanic, sign in, land on that address, verifies **AC-10**, **AC-12**
 - Failure, no loop: with a live session for two systems, open `http://localhost:8000/?error=LOGIN_FAILED`: the launcher with a banner, no redirect; for a one system account the same address shows its one card and doesn't forward, verifies **AC-13**
 - Failure, stale tab: open the launcher, remove the user's VMMS role in another window, return to the tab: the VMMS card is gone; sign out in VRMS, return: the form with "Your session ended", verifies **AC-18**
