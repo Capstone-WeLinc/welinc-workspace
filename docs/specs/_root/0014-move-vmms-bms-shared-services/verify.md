@@ -35,7 +35,9 @@ Before you start: the shared stack and VRMS running (`sh scripts/start.sh vrms`)
 - [ ] Plant `localStorage.setItem('token', t)` in a scratch file inside `welinc-web-vrms/src`, run `--static-only` → FAIL with that `file:line`, exit 1; add `// check-system: allow test` → listed as allowed, exit 0; delete the file → AC-13
 - [ ] `grep -n "process.env\|readFileSync.*\.env" scripts/check-system.mjs` → no read of a `.env` file → AC-14
 - [ ] `docs/integration/README.md` lists `move-vmms.md`, `move-bms.md`, `fleet-api.md`; each move guide has every *Guide contents* item, the compose template, the checker command and the sign off step → AC-15
-- [ ] `sh scripts/setup.sh vmms` with no `docker-compose.vmms.yml` → the "isn't in this workspace yet" message names `docs/integration/move-vmms.md` → AC-16
+- [ ] `sh scripts/setup.sh vmms` with no `docker-compose.vmms.yml` → the "doesn't exist yet" message names `docs/integration/move-vmms.md` → AC-16
+- [ ] Once a group adds `docker-compose.vmms.yml` (or `bms`): `sh scripts/setup.sh vmms` makes the client key once (`welinc-backend-vmms/.env` gets `AUTH_CLIENT_PRIVATE_KEY`, welinc-auth's `.env` gets `CLIENT_VMMS_JWKS`, no value printed), starts the stack, runs `migrate` and `seed` in each service container, and a second run says `keep` for the key and leaves the data; `sh scripts/start.sh vmms` waits for `/vmms/health` and `/vmms/analytics/health` (`bms`: `/bms/health`) → AC-16
+- [ ] In `welinc-backend-vrms`, `npx jest src/auth/verify/guards.spec.ts` → a person's token on a `@ServiceRoute` answers 403 `WRONG_TOKEN_USE`, a service token without the scope 403 `FORBIDDEN` (the copy VMMS's fleet routes inherit) → AC-23
 
 ## Slice 4: per group (after each PR is up)
 
