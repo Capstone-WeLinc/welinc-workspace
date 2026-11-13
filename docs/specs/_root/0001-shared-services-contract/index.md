@@ -34,7 +34,7 @@ welinc-auth stays the only owner of accounts and the only service that can sign 
 | Mobile session | 7 days rolling (each refresh extends it) | S3 |
 | Revocation | Each backend checks the session at most 30 s stale; deactivation and logout also revoke refresh tokens, so a backend that skipped the check still loses access when the 15 minute access token runs out. The automatic lock blocks new logins only (spec 0003) | S3 |
 | Service identity | Signed client assertion (`private_key_jwt`): each backend proves itself with its own ES256 key | S2 |
-| Launcher | The portal lists the systems you hold when you open it yourself and hold two or more; with one it sends you straight in. Each app's Switch system opens `<portal>/?from=<SYS>` and shows only with two or more systems. Version 8: a system held only through its phone app is listed apart (`mobileSystems`) and never opened on the web | S4 (spec 0007), S11 (spec 0014) |
+| Launcher | The portal lists the systems you hold when you open it yourself and hold two or more; with one it sends you straight in, unless you are that system's Admin (then the launcher, for the Admin card). Each app's Switch system opens `<portal>/?from=<SYS>` and shows with two or more systems, or for an Admin of that system (amended 2026-11-14, spec 0007 AC-9 and AC-14). Version 8: a system held only through its phone app is listed apart (`mobileSystems`) and never opened on the web | S4 (spec 0007), S11 (spec 0014) |
 | User directory | Batch lookup by id plus a cursor change feed; a thin webhook nudge is reserved for later | S6 |
 | Gateway paths | Each service serves under its own prefix; the gateway forwards without rewriting | S9 |
 | Gateway config | Workspace repo `infra/gateway/`, for local and hosted (as spec 0008 planned), out of `welinc-auth` | S9 |
@@ -300,7 +300,7 @@ Host only cookies keep staging and production apart: `staging-api.<domain>` neve
 3. `Sec-Fetch-Site` must be `same-origin` or `same-site` when the browser sends it.
 4. The gateway's CORS list is the outer layer.
 
-- **Switch system** in every app opens `<portal>/?from=<SYS>` in the same tab and shows only when `user.systems` has two or more entries. The launcher tags that system "You're here"; `from` never decides where the browser goes.
+- **Switch system** in every app opens `<portal>/?from=<SYS>` in the same tab and shows when `user.systems` has two or more entries, or when the person is Admin in that system, a temporary grant included (amended 2026-11-14). The launcher tags that system "You're here"; `from` never decides where the browser goes.
 - After logout the web app sends the browser to `<portal>/login?reason=logout`. Since the `sid` is gone, the old SSO cookie no longer counts and the portal asks for the password.
 - **Where an app may send a person:** only its own `/<sys>/session/start`, `<portal>/login?reason=…`, or `<portal>/?error=<code>`. Never the bare `<portal>/` for a missing session: the portal forwards a one system user straight back to their app, so that would loop.
 

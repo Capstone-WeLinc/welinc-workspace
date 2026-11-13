@@ -43,7 +43,7 @@ Copy the idea from `welinc-web-vrms/src/lib/session/` (`session.ts`, `bootGuard.
 
 ## Web app: Switch system and sign out
 
-- **Switch system:** show it only when `user.systems` (from the refresh answer) has two or more entries. It opens `<portal>/?from=<SYS>` in the same tab, where the launcher lists the person's systems and tags yours "You're here". A missing `user.systems` counts as an empty list. VRMS's version is `welinc-web-vrms/src/lib/session/switchSystem.ts` and `src/components/layout/useShellActions.ts`.
+- **Switch system:** show it when `user.systems` (from the refresh answer) has two or more entries, or when the person is Admin in your system (a suite admin's temporary Admin grant counts). A one system admin's launcher holds the Admin card, so they need the way back (spec 0007, AC-9 and AC-14). It opens `<portal>/?from=<SYS>` in the same tab, where the launcher lists the person's systems and tags yours "You're here". A missing `user.systems` counts as an empty list. VRMS's version is `welinc-web-vrms/src/lib/session/switchSystem.ts` and `src/components/layout/useShellActions.ts`.
 - **Sign out:** `POST /<sys>/session/logout`, then send the browser to `<portal>/login?reason=logout`. That ends the shared session, so every other app signs out within 30 seconds too.
 
 ## Remove the old handoff
@@ -54,7 +54,7 @@ Delete any code that reads `?token=` from the address, or that keeps a token in 
 
 Sign in with the seed accounts and check each one:
 
-1. **One system** (a plain `vmms.*` or `bms.*` account): open a deep link in your app while signed out, sign in at the portal, and land on that exact address. Switch system is hidden. Opening the portal again sends you straight back.
+1. **One system** (a plain `vmms.*` or `bms.*` account): open a deep link in your app while signed out, sign in at the portal, and land on that exact address. Switch system is hidden. Opening the portal again sends you straight back. A one system **Admin** instead sees the launcher with the Admin card, and Switch system shows in your app.
 2. **Two systems** (`multi.chief@`, `multi.admin@` or `multi.mixed@` when they hold your system): the same deep link test, then Switch system opens the launcher with your card tagged "You're here".
 3. **Three systems** (`multi.lead@`): the launcher shows BMS, VMMS and VRMS in that order.
 4. **Sign out** in your app, then open another app: it asks for the password.
