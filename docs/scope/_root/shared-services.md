@@ -267,7 +267,7 @@ Prove a person owns their email before the suite relies on it, instead of only c
 ## Cutover
 
 ### S11. Move VMMS and BMS onto the shared services · in-progress
-spec [0014](../../specs/_root/0014-move-vmms-bms-shared-services/index.md) · code in `welinc-auth` (launcher, authorize, clients seed, lookup limit), `welinc-web-portal` (phone only state), `welinc-backend-vrms` (session callback, Users page source), `scripts/check-system.mjs`, `scripts/setup.sh`, `scripts/start.sh`, `docs/integration/move-*.md`, `fleet-api.md`; the moves themselves in the VMMS and BMS repos
+spec [0014](../../specs/_root/0014-move-vmms-bms-shared-services/index.md) · code in `welinc-auth` (launcher, authorize, clients seed, lookup limit), `welinc-web-portal` (phone only state), `welinc-backend-vrms` (session callback, Users page source), `scripts/check-system.mjs`, `scripts/setup.sh`, `docs/integration/move-*.md`, `fleet-api.md`; the moves themselves in the VMMS and BMS repos
 The move itself: their users merged into welinc-auth by email, their auth copies and direct database reads removed, their apps on the portal login. Their groups change their own repos; this row gives them the migration guide, a user import script and a test plan, and tracks it to the end.
 **Done when:** every VMMS and BMS account logs in through welinc-auth with no duplicates, neither system has its own users or tokens tables or reads the auth database, all three systems run together behind one login on staging, and each group signs off.
 - Note (2026-11-07): the old `welinc-backend` repo where BMS pushed an auth copy is part of this cleanup.
@@ -289,7 +289,7 @@ The move itself: their users merged into welinc-auth by email, their auth copies
 - [ ] Build it: `/develop move VMMS and BMS onto the shared services`
   - [x] Thin thread, web vs app rules: `app_released`, the clients seed, `vmms.mech@`, the launcher split, the authorize refusal, the VRMS callback, the portal phone only state · AC-1 to AC-8
   - [x] Rest of the shared side: lookup limit, `fleet.read` on `bms`, contract 0001 version 8 · AC-9 to AC-11
-  - [ ] The kit, proven on VRMS: `check-system.mjs`, `setup.sh` and `start.sh` for vmms and bms, `move-vmms.md`, `move-bms.md`, `fleet-api.md`; tell both groups · AC-12 to AC-16
+  - [ ] The kit, proven on VRMS: `check-system.mjs` and `setup.sh` for vmms and bms (`start.sh` and `stop.sh` removed 2026-11-13: plain `docker compose` commands in the README), `move-vmms.md`, `move-bms.md`, `fleet-api.md`; tell both groups · AC-12 to AC-16
   - [ ] The moves (the groups build AC-17 to AC-30): VMMS login done [ ], VMMS fleet done [ ], BMS login done [ ], BMS fleet done [ ], `welinc-backend` archived [ ] · AC-17 to AC-31
   - [ ] Cleanup: VRMS Users page off `GET /auth/users`, the gated removal of the bearer admin routes, contract 0001 version 9 · AC-33
 - [ ] Verify it: `/check verify move VMMS and BMS onto the shared services` (the staging run, AC-32, waits for VRMS feature 26)

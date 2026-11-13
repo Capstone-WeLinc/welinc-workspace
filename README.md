@@ -6,17 +6,20 @@ This repo is the starting point. It holds the setup scripts, the Docker files, t
 
 ## Start here
 
-You need **Git**, **Docker Desktop** (open and running) and **Node 24**. On Windows, type the commands in **Git Bash**, which comes with Git. PowerShell won't work.
+You need **Git**, **Docker Desktop** (open and running) and **Node 24**.
 
-The word at the end of each command is **your group**. Type `vrms`, `vmms` or `bms`.
+### Where to type the commands
 
-| When | Run this | What it does |
-|---|---|---|
-| Once, the first time | `sh scripts/setup.sh vrms` | Downloads your group's repos, sets everything up, starts it |
-| Every day | `sh scripts/start.sh vrms` | Starts everything and tells you when it's ready |
-| When you're done | `sh scripts/stop.sh` | Stops everything. Your data stays |
+Every command in this README goes in a **terminal opened in this folder** (`welinc-workspace`):
 
-Before the first run, download this repo:
+| On | Open a terminal like this |
+|---|---|
+| Windows | **Git Bash**, which comes with Git. In VS Code: Terminal, New Terminal, then pick **Git Bash** from the dropdown next to `+`. Or right click the folder in Explorer and pick **Open Git Bash here**. PowerShell and Command Prompt can't run the `sh` scripts |
+| Mac | **Terminal**, or VS Code's terminal |
+
+Type a command, press Enter, and wait until it finishes. Where a command says `vrms`, type **your group** instead: `vrms`, `vmms` or `bms`.
+
+### The first time (once)
 
 ```bash
 git clone https://github.com/Capstone-WeLinc/welinc-workspace.git
@@ -24,9 +27,25 @@ cd welinc-workspace
 sh scripts/setup.sh vrms
 ```
 
-Then open **http://localhost:8000** and sign in, for example as `vrms.admin@welinc.com` with password `admin1234`. All test accounts are in [docs/integration/seed-accounts.md](docs/integration/seed-accounts.md).
+`setup.sh` downloads your group's repos, makes your settings files and keys, installs packages, starts everything, fills the databases with test data, and waits until it all answers. The first run takes a few minutes. When it prints **Setup finished**, open **http://localhost:8000** and sign in, for example as `vrms.admin@welinc.com` with password `admin1234`. All test accounts are in [docs/integration/seed-accounts.md](docs/integration/seed-accounts.md).
 
-> **Docker Desktop works too.** After the first setup, you can start and stop the containers with Docker Desktop's buttons. The scripts add three things: they start things in the right order, they also pick up changes your teammates pushed, and they tell you when everything is ready.
+### Every day
+
+Start the shared stack **first** (it creates the network your system joins), then yours:
+
+```bash
+docker compose -f docker-compose.shared.yml up -d
+docker compose -f docker-compose.vrms.yml up -d
+```
+
+When you're done, stop them (your data stays):
+
+```bash
+docker compose -f docker-compose.vrms.yml stop
+docker compose -f docker-compose.shared.yml stop
+```
+
+Docker Desktop's start and stop buttons do the same once setup has run: start `auth-infrastructure` (the shared stack) before your group's stack.
 
 ## Repositories
 
@@ -78,12 +97,13 @@ Run these from this folder.
 
 | I want to... | Run |
 |---|---|
-| Start everything | `sh scripts/start.sh vrms` |
-| Stop everything | `sh scripts/stop.sh` |
-| Start after pulling teammates' changes | `sh scripts/start.sh vrms --build` |
+| Start everything | `docker compose -f docker-compose.shared.yml up -d`, then `docker compose -f docker-compose.vrms.yml up -d` |
+| Stop everything | `docker compose -f docker-compose.vrms.yml stop`, then `docker compose -f docker-compose.shared.yml stop` |
+| Rebuild after a package or Dockerfile change | The two start commands with `--build` at the end |
 | See what's running | `docker ps` |
 | Read a service's log | `docker logs -f welinc_vrms_backend` |
-| Restart one service | `docker restart welinc_vrms_backend` |
+| Restart one service | `docker restart welinc_vrms_backend` (it keeps the settings it started with) |
+| Make a service read its `.env` again | `docker compose -f docker-compose.shared.yml up -d --force-recreate auth-service` (the compose file and service name it belongs to) |
 | Check a service is up | `curl localhost:3000/vrms/health` (also `/health` and `/auth/health`) |
 | Reset the VRMS test data (**deletes tickets**) | `cd welinc-backend-vrms && npm run seed` |
 | Run the gateway tests | `node infra/gateway/test/check-routes.mjs` |
@@ -122,9 +142,9 @@ Then check what changed:
 
 | If this changed | Run |
 |---|---|
-| `package.json` | `npm install` in that repo, then `sh scripts/start.sh vrms --build` |
+| `package.json` | `npm install` in that repo, then the start commands with `--build` |
 | `prisma/migrations/` | In that backend: `npx prisma migrate deploy` (in `welinc-auth`: `npm run db:deploy`) |
-| A Dockerfile, a compose file or `infra/gateway/` | `sh scripts/start.sh vrms --build` |
+| A Dockerfile, a compose file or `infra/gateway/` | The start commands with `--build` |
 | `.env.example` got a new line | `node scripts/sync-env.mjs` adds it to your `.env` for you (setup does this too) |
 | `agents/<group>/` | `node scripts/use-agents.mjs vrms` |
 
@@ -171,21 +191,34 @@ If the script stops with an error, this table shows each step, so you can run th
 | 5. Start the shared services | `docker compose -f docker-compose.shared.yml up -d --build` |
 | 6. Fill the auth database | `cd welinc-auth && npm run db:deploy && npm run seed` |
 | 7. Start VRMS and fill its database | `docker compose -f docker-compose.vrms.yml up -d --build`, then in `welinc-backend-vrms`: `npx prisma migrate deploy && npm run seed` |
-| 8. Wait until it's ready | `sh scripts/start.sh vrms` |
+| 8. Wait until it's ready | `curl localhost:3000/auth/health` and `curl localhost:3000/vrms/health` until both answer |
 
 `clone-all.sh` with no group downloads every repo. Only whoever maintains the shared services needs that.
 
+## Scripts
+
+Run them from this folder, in Git Bash on Windows or Terminal on a Mac. Scripts ending in `.sh` start with `sh`, scripts ending in `.mjs` with `node`.
+
+| Command | Who runs it, and when | What it does |
+|---|---|---|
+| `sh scripts/setup.sh vrms` | Everyone: the first time, and again when something seems off after a pull | Everything to get running (see [The first time](#the-first-time-once)). Safe to run again: it skips what's done and never wipes your data |
+| `node scripts/sync-env.mjs` | Everyone, after a pull that changed a `.env.example` (setup runs it for you) | Adds the settings your `.env` is missing, with their sample values. Never changes a line you already have |
+| `node scripts/use-agents.mjs vrms` | Only people who use an AI coding tool, once | Turns on your group's AI setup ([AI coding tools](#ai-coding-tools)) |
+| `sh scripts/clone-all.sh vrms` | Nobody by hand: setup runs it | Downloads the shared repos plus your group's repos |
+
 ## AI coding tools
 
-Each group keeps its own AI rules and skills in `agents/<group>/`. Turn on only yours, once:
+Each group keeps its AI rules (an `AGENTS.md`), skills and tool settings in `agents/<group>/`. Nothing in there is active until you turn it on:
 
 ```bash
 node scripts/use-agents.mjs vrms
 ```
 
+It copies your group's setup into places git ignores: `.claude/skills/`, `.mcp.json`, `.claude/settings.local.json`, and a `CLAUDE.local.md` that loads `agents/<group>/AGENTS.md`. Your AI tool then follows your group's rules, and nobody else's setup loads. Run it again after a pull that changes `agents/<group>/`, then restart your AI tool. If you edit a skill locally, `node scripts/use-agents.mjs vrms --save` copies it back into `agents/<group>/` so you can commit it.
+
 ## Adding your system (VMMS and BMS)
 
-Your group's checklist is the one page to follow: [move-vmms.md](docs/integration/move-vmms.md) or [move-bms.md](docs/integration/move-bms.md). It covers the compose file, the token check, the session routes, health, your data and the checker script that tells you when you're done (`node scripts/check-system.mjs <group>`). The gateway needs nothing from you: `/vmms/` and `/bms/` already route to your service names.
+Your group's checklist is the one page to follow: [move-vmms.md](docs/integration/move-vmms.md) or [move-bms.md](docs/integration/move-bms.md). It covers the compose file, the token check, the session routes, health and your data. The gateway needs nothing from you: `/vmms/` and `/bms/` already route to your service names.
 
 ## Team rules
 
@@ -216,13 +249,14 @@ Your group's checklist is the one page to follow: [move-vmms.md](docs/integratio
 | Every request gives 401 | Sign in again through the portal. If it keeps happening, your backend's `AUTH_ISSUER` doesn't match auth's |
 | Sent back to the sign in page | You were idle 30 minutes, or signed out in another app |
 | Pages are empty or tables are missing | Run `sh scripts/setup.sh vrms` again |
-| A container can't find a package | `sh scripts/start.sh vrms --build` |
+| A container can't find a package | The start commands with `--build` |
+| You changed a `.env` and nothing changed | `docker restart` keeps the old settings. Recreate the container: `docker compose -f docker-compose.shared.yml up -d --force-recreate auth-service` |
 
 ## Folder map
 
 | Folder or file | What's in it |
 |---|---|
-| `scripts/` | `setup.sh`, `start.sh`, `stop.sh`, `clone-all.sh`, `sync-env.mjs` (adds new settings to your `.env`), `check-system.mjs` (checks a system on the shared services: live login and fleet checks plus a scan for leftovers, spec 0014), `use-agents.mjs` |
+| `scripts/` | The scripts listed in [Scripts](#scripts) |
 | `infra/gateway/` | The gateway: its settings, paths and tests |
 | `docker-compose.shared.yml` | The shared services: auth, gateway, portal |
 | `docker-compose.vrms.yml` | VRMS's services (one file per group) |

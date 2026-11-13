@@ -110,7 +110,7 @@ Tick these in order. Each links the guide that already explains it.
 
 ## Compose template
 
-Save as `docker-compose.vmms.yml` at the workspace root. It follows `docker-compose.vrms.yml`. Service names (`vmms-backend`, `vmms-analytics`) and ports are fixed by contract 0001 section 2: the gateway reaches you by them. Container names are the ones `start.sh` prints in its hints. Secrets come from each repo's `.env` (`env_file`); the `environment` block holds none.
+Save as `docker-compose.vmms.yml` at the workspace root. It follows `docker-compose.vrms.yml`. Service names (`vmms-backend`, `vmms-analytics`) and ports are fixed by contract 0001 section 2: the gateway reaches you by them. Container names are the ones `setup.sh` waits for (`welinc_vmms_backend`, `welinc_vmms_analytics`). Secrets come from each repo's `.env` (`env_file`); the `environment` block holds none.
 
 ```yaml
 name: vmms-environment

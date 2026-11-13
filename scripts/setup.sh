@@ -174,10 +174,43 @@ case "$group" in
 esac
 
 step "Waiting for everything to answer"
-sh scripts/start.sh "$group"
+failed=0
+# wait_for <name> <url> <container>: up to 3 minutes for a 2xx answer through the gateway
+wait_for() {
+  printf 'Waiting for %s ' "$1"
+  tries=0
+  while [ $tries -lt 60 ]; do
+    if curl -fs -o /dev/null "$2"; then
+      echo " ok"
+      return 0
+    fi
+    printf '.'
+    sleep 3
+    tries=$((tries + 1))
+  done
+  echo " no answer after 3 minutes. Read its log: docker logs --tail 50 $3"
+  failed=1
+}
+wait_for gateway http://localhost:3000/health welinc_api_gateway
+wait_for auth http://localhost:3000/auth/health welinc_auth_service
+# Each system's health through the gateway (suite spec 0014, AC-16), once its compose file exists
+if [ -f "docker-compose.$group.yml" ]; then
+  case "$group" in
+    vrms) wait_for vrms http://localhost:3000/vrms/health welinc_vrms_backend ;;
+    vmms)
+      wait_for vmms http://localhost:3000/vmms/health welinc_vmms_backend
+      wait_for "vmms analytics" http://localhost:3000/vmms/analytics/health welinc_vmms_analytics
+      ;;
+    bms) wait_for bms http://localhost:3000/bms/health welinc_bms_gateway ;;
+  esac
+fi
+[ "$failed" = 0 ] || exit 1
 
 echo
-echo "Setup finished. From now on, start your day with: sh scripts/start.sh $group"
+echo "Setup finished. Sign in at http://localhost:8000 (seed logins: docs/integration/seed-accounts.md)."
+echo "From now on, start your day with (README, Every day):"
+echo "  docker compose -f docker-compose.shared.yml up -d"
+[ -f "docker-compose.$group.yml" ] && echo "  docker compose -f docker-compose.$group.yml up -d"
 echo "If you use an AI coding tool, turn on your group's setup once: node scripts/use-agents.mjs $group"
 [ "$group" = vrms ] && echo "Optional: add GEMINI_API_KEY to welinc-backend-vrms/.env for the AI features (README, Environment files)."
 exit 0
