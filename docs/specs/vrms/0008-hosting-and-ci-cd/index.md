@@ -223,7 +223,7 @@ Order follows Tracer Bullet: CI first because it needs nothing from Azure, then 
 - [ ] MCP servers you chose: connect the Azure MCP server and the GitHub MCP server in your own MCP settings, with read only roles where possible. They are used automatically once connected.
 - [ ] Revisit the GitHub plan if anyone pushes straight to `development` or moves `release` carelessly, since only a paid plan can enforce reviews and required checks.
 - [ ] Feature 27 (error monitoring) will decide Application Insights or similar. This spec only creates a Log Analytics workspace per environment.
-- [ ] Both NestJS services ship a Redis container locally that no code uses. Remove it from the compose files when convenient.
+- [x] Both NestJS services ship a Redis container locally that no code uses. Remove it from the compose files when convenient. (2026-11-13: removed from `docker-compose.shared.yml`; the sign in limits count in auth's memory, which is right for one auth replica.)
 - [ ] The Azure Container Apps path based routing feature could replace the nginx gateway (one fewer image). Check whether it is generally available in your region before choosing it over nginx.
 
 ## Rationale

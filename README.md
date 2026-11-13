@@ -51,7 +51,7 @@ Docker Desktop's start and stop buttons do the same once setup has run: start `a
 
 | Repo | Group | What it does | Built with | Port | GitHub |
 |---|---|---|---|---|---|
-| `welinc-auth` | Shared | Login, accounts, roles, tokens | NestJS, Prisma, PostgreSQL, Redis | 3001 | [link](https://github.com/Capstone-WeLinc/welinc-auth) |
+| `welinc-auth` | Shared | Login, accounts, roles, tokens | NestJS, Prisma, PostgreSQL | 3001 | [link](https://github.com/Capstone-WeLinc/welinc-auth) |
 | `welinc-web-portal` | Shared | The page where everyone signs in and picks a system | React, Vite, Tailwind | 8000 | [link](https://github.com/Capstone-WeLinc/welinc-web-portal) |
 | Gateway (`infra/gateway/` here) | Shared | The one address every app calls | Nginx | 3000 | this repo |
 | `welinc-backend-vrms` | VRMS | Repair tickets API | NestJS, Prisma, PostgreSQL | 3002 | [link](https://github.com/Capstone-WeLinc/welinc-backend-vrms) |
@@ -64,7 +64,7 @@ Docker Desktop's start and stop buttons do the same once setup has run: start `a
 | `welinc-backend-bms-analytics-ai` | BMS | Booking demand forecast | NestJS, Prisma, PostgreSQL | 3025 | [link](https://github.com/Capstone-WeLinc/welinc-backend-bms-analytics-ai) |
 | `welinc-web-bms` | BMS | Booking web app | React, Vite, Tailwind | 8003 | [link](https://github.com/Capstone-WeLinc/welinc-web-bms) |
 
-Other local ports: auth database 5432, auth Redis 6379, VRMS database 5433, VRMS file storage (Azurite) 10000.
+Other local ports: auth database 5432, VRMS database 5433, VRMS file storage (Azurite) 10000.
 
 VMMS and BMS use these ports once they move onto the shared login (suite row S11). Until then they also run their own way.
 
@@ -124,7 +124,7 @@ Inside a repo, before you push:
 |---|---|
 | `welinc_api_gateway` | Gateway |
 | `welinc_auth_service` | Auth |
-| `welinc_auth_db`, `welinc_auth_redis` | Auth's database and Redis |
+| `welinc_auth_db` | Auth's database |
 | `welinc_portal` | Portal |
 | `welinc_vrms_backend`, `welinc_vrms_frontend` | VRMS API and web app |
 | `welinc_vrms_db`, `welinc_vrms_azurite` | VRMS database and file storage |
