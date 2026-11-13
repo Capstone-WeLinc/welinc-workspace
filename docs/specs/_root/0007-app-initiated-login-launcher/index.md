@@ -51,7 +51,7 @@ Reasoning and options: see [rationale.md](rationale.md).
   - 200 with two or more systems, or with an `error`: the launcher, with the `error` notice as a banner above the cards. It never auto forwards while an `error` is present, so a failing app can't loop.
   - 403 `NO_SYSTEM_ACCESS`: the no access state (AC-19).
   - 429, 5xx or a network failure: the launcher's error state (AC-20).
-- **AC-14**: After a successful form sign in with no `request`, one system and no `error` in the address goes straight to its `url` with `location.replace`; two or more systems, or an `error` still in the address, show the launcher built from the login answer (with the banner), with no second `/auth/sso` call. The same holds after AC-18's 401 sends the launcher back to the form.
+- **AC-14**: After a successful form sign in with no `request`, one system and no `error` in the address goes straight to its `url` with `location.replace` (amended 2026-11-14: unless the person holds `ADMIN` in that system, who sees the launcher so the Admin card from suite spec 0013 is reachable; this applies to AC-13's direct visit too); two or more systems, or an `error` still in the address, show the launcher built from the login answer (with the banner), with no second `/auth/sso` call. The same holds after AC-18's 401 sends the launcher back to the form.
 
 *welinc-web-portal: the launcher*
 
