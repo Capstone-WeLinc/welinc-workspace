@@ -209,7 +209,7 @@ Each move guide is an ordered checklist. Every item links the existing guide tha
 
 ### VRMS Users page source
 
-Decided 2026-11-13 (task 13a): backend-vrms keeps a copy of every person holding a VRMS role from the directory feed it already polls (`id`, `name`, `email`, `picture`, `roles`, `temporaryRoles`, `isActive`, `deleted`, `erased`), not only mechanics and chiefs, and serves the Users page list from it, behind the page's existing permission (`team.manage` or `users.manage`). The page shows Active, Inactive and Deleted (grace) only. Locked, Setup pending and Email not verified live on the portal's person page, behind Manage account. The directory and contract 0001 don't change. Runner up: adding `locked`, `emailVerified` and `passwordSet` to `DirectoryUser` (a feed trigger migration, and every system would receive account state it doesn't use).
+Decided 2026-11-13 (task 13a): backend-vrms keeps a copy of every person holding a VRMS role from the directory feed it already polls (`id`, `name`, `email`, `picture`, `roles`, `temporaryRoles`, `isActive`, `deleted`, `erased`), not only mechanics and chiefs, and serves the Users page list from it, behind the page's existing permission, `team.manage` (`users.manage` no longer exists). The page shows Active, Inactive and Deleted (grace) only. Locked, Setup pending and Email not verified live on the portal's person page, behind Manage account. The directory and contract 0001 don't change. Runner up: adding `locked`, `emailVerified` and `passwordSet` to `DirectoryUser` (a feed trigger migration, and every system would receive account state it doesn't use).
 
 ### Key invariants
 
