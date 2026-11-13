@@ -802,7 +802,7 @@ async function main() {
       up = false;
     }
     if (!up) {
-      console.error(`The gateway at ${ctx.api} doesn't answer. Start the stack first: sh scripts/start.sh ${opts.system}`);
+      console.error(`The gateway at ${ctx.api} doesn't answer. Start the stack first: docker compose -f docker-compose.shared.yml up -d, then docker compose -f docker-compose.${opts.system}.yml up -d`);
       process.exit(2);
     }
     if (wants('login')) await loginGroup(ctx, report, opts.system);

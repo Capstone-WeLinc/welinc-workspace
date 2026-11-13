@@ -11,8 +11,8 @@ Your web app never sees a password, a login code or a refresh token. When someon
 | Piece | Where it is |
 |---|---|
 | Your client row | Already seeded in welinc-auth (`prisma/seeds/clients.seed.ts`): id `vmms` or `bms`, callback `<API_PUBLIC_URL>/<sys>/session/callback`, web address from `CLIENT_<ID>_WEB_ADDRESS` (local defaults `http://localhost:8002` and `http://localhost:8003`) |
-| Your client key | Make one with `npm run keys:client -- <vmms or bms> <your backend .env> <welinc-auth .env>` in welinc-auth, then `npm run seed:clients`. The steps are in `welinc-auth/docs/keys.md` |
-| The gateway route | `/vmms` and `/bms` arrive with S9. Until then, call your backend on its own port |
+| Your client key | `sh scripts/setup.sh <vmms or bms>` makes it and registers it once your compose file exists, and never prints it. The manual steps are in `welinc-auth/docs/keys.md` |
+| The gateway route | Already there: `/vmms/` goes to `vmms-backend`, `/bms/` to `bms-gateway`. Call only the gateway, never your own port |
 | Test accounts | [seed-accounts.md](seed-accounts.md): one, two and three system people (`vrms.admin@`, `multi.chief@`, `multi.lead@` and the `multi.*` rows that hold your system) |
 
 ## Backend: copy the VRMS session folder

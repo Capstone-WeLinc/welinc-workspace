@@ -21,17 +21,6 @@ services:
       timeout: 5s
       retries: 5
 
-  auth-redis:
-    image: redis:7-alpine
-    container_name: welinc_auth_redis
-    restart: unless-stopped
-    ports:
-      - "6379:6379"
-    volumes:
-      - auth_redisdata:/data
-    networks:
-      - welinc-network
-
   auth-service:
     build:
       context: ./welinc-auth
@@ -63,8 +52,6 @@ services:
     depends_on:
       auth-db:
         condition: service_healthy
-      auth-redis:
-        condition: service_started
     networks:
       - welinc-network
 
@@ -116,7 +103,6 @@ services:
 
 volumes:
   auth_pgdata:
-  auth_redisdata:
 
 networks:
   welinc-network:

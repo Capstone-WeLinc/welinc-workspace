@@ -54,9 +54,9 @@ An id is one person forever. A removed person's id is retired, never reused. A n
 
 | Id | Email | Name | Roles | Password | State |
 |---|---|---|---|---|---|
-| 9001 | `suite.admin@welinc.com` | Ramon Villanueva | none (suite admin, spec 0013) | `admin1234` | active |
+| 9001 | `suite.admin@welinc.com` | Leonora Castillo | none (suite admin, spec 0013) | `admin1234` | active |
 
-Every admin, this one included, confirms each portal sign in with an emailed code. Seed addresses get no mail, so on your machine set `ADMIN_SIGN_IN_CODE=false` in welinc-auth's `.env`, or leave `SMTP_*` blank and read the code from the auth log.
+Every admin, this one included, confirms each portal sign in with an emailed code (`ADMIN_SIGN_IN_CODE`, on by default). Seed addresses aren't real inboxes, so on your machine auth never sends mail to `@welinc.com` (or `localhost`, `test.com`, `example.com`): it prints the whole email, code included, to `docker logs welinc_auth_service`, even with `SMTP_*` set. Mail to a real address, such as an account you made with your own Gmail, goes out through SMTP as usual.
 
 ### VRMS office accounts
 
@@ -151,12 +151,12 @@ Together these give the launcher (S4) accounts with one system (most office peop
 
 | Account | Login answers |
 |---|---|
-| `state.locked@` | 403 "Account is locked. Contact your Admin to unlock." with `isLocked: true` |
-| `state.deactivated@` | 401 "Invalid credentials" |
+| `state.locked@` | 403 `ACCOUNT_LOCKED` with `isLocked: true` and `lockedUntil` (suite spec 0015: a lock runs out after 15 minutes; a reseed starts a fresh one) |
+| `state.deactivated@` | Right password: 403 `ACCOUNT_INACTIVE` "This account is deactivated." Wrong password: 401 "Invalid credentials", like any account |
 | `state.deleted@` | 401 "Invalid credentials" (soft deleted; its roles stay) |
 | `state.unverified@` | The right password answers the email step (200 `EMAIL_VERIFICATION_REQUIRED`, spec 0009), not a session: the portal and the mobile login ask for the 6 digit code emailed to it. Once the code is used it signs in like anyone else, until the next `npm run seed` makes it unverified again. Locally, run welinc-auth with SMTP blank so the code prints in its log instead of going out as real mail |
 
-They exist only on local databases, never on staging. A reseed puts them back in their state, so if you unlock `state.locked@`, it is locked again after the next `npm run seed`.
+They exist only on local databases, never on staging. A reseed puts them back in their state, so if you unlock `state.locked@` (or 15 minutes pass), it is locked again after the next `npm run seed`. A reseed also clears a lock on any active seed account you locked while testing.
 
 ## Commands
 
