@@ -130,7 +130,7 @@ Read from their clones after a fetch: VMMS backend `origin/development` 44aaae5,
 | Both | List every PostgreSQL extension your migrations create (`pgcrypto`, `uuid-ossp` and so on), so it is allowed in `azure.extensions` and created by `init.sql` before your first deploy | each `prisma/migrations/` |
 | BMS | Inner services expose `/health/live` and `/health/ready`, the gateway `/health/live`; contract 0001 needs `GET /bms/health` on `bms-gateway` | each service |
 
-What the hosted setup already allows for: `bms-projection` is defined with no ingress (it is a worker), every inner BMS service is internal and reached only by `bms-gateway`, and a group's health path or extra settings can be changed in `groupApps` without touching the Bicep.
+What the hosted setup already allows for: `bms-analytics-projection` is defined with no ingress (it is a worker), every inner BMS service is internal and reached only by `bms-gateway`, and a group's health path or extra settings can be changed in `groupApps` without touching the Bicep.
 
 ## References
 

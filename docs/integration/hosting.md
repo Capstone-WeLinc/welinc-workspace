@@ -13,20 +13,21 @@ Read this after your move checklist ([move-vmms.md](move-vmms.md) or [move-bms.m
 | By Dec 3 | Your system works on staging |
 | Nov 28 to Dec 5 | Freeze: production changes only for fixes, and only migrations that add (never drop or rename) |
 
-Until your group is turned on, your routes on the gateway (`/vmms/`, `/bms/`) answer 502 `UPSTREAM_UNAVAILABLE` and nothing else is affected.
+Until your group is turned on, your routes on the gateway (`/vmms/`, `/bms/`) answer 502 `UPSTREAM_UNAVAILABLE` and nothing else is affected. Between being turned on and your first deploy, they show Microsoft's placeholder page.
 
 ## How it fits together
 
 - **Addresses.** Production: `api.`, `portal.`, `vrms.`, `vmms.` and `bms.welinc.tech`. Staging: the same names with `staging-` in front (`staging-api.welinc.tech`). Your web app calls `https://<api>/vmms/` or `https://<api>/bms/`, as locally it calls `http://localhost:3000`.
 - **Services.** Each backend process is a Container App. Only the suite gateway is public; your services are internal, reached through the gateway's route or by each other.
 - **Internal addresses.** One service calls another at `https://<app name>.internal.<environment domain>`, on port 443, with no port in the address (for example `https://bms-booking.internal.<domain>`, not `:3021`). The lead fills these into your settings, so you only need to read them from the environment, which your code already does.
-- **Databases.** Each environment has one PostgreSQL 16 server. Your databases are already made: `vmms`; `bms_booking`, `bms_dispatch`, `bms_completion`, `bms_analytics`. Each has two logins: `<db>_owner` runs your migrations and owns every table, and `<db>_app` is what your service connects as (read and write rows, nothing else). A database's logins can't open any other database.
+- **Databases.** Each environment has one PostgreSQL 16 server, holding your databases next to ours: `vmms`; `bms_booking`, `bms_dispatch`, `bms_completion`, `bms_analytics`. They are created when staging is first set up (Nov 18 to 19) and start empty. Each has two logins: `<db>_owner` runs your migrations and owns every table, and `<db>_app` is what your service connects as (read and write rows, nothing else). A database's logins can't open any other database.
 - **Web apps.** Each web app is a Static Web App, built once per environment.
-- **Images.** One shared registry. Your workflow pushes `<app name>:<commit sha>` for the service and `<app name>-seed:<commit sha>` for its jobs.
+- **Mobile.** The VMMS app calls `https://api.welinc.tech` (staging: `https://staging-api.welinc.tech`).
+- **Images.** One shared registry. Your deploy workflow will push `<app name>:<commit sha>` for the service and `<app name>-seed:<commit sha>` for its jobs.
 
 ## Your apps
 
-These exist in the setup as code, named exactly like this. Each is a Docker service name in your compose file too (contract 0001, section 2).
+These are in the setup as code, named exactly like this, the same as the Docker service names in your compose file (contract 0001 section 2, and *Ports and names* in [move-bms.md](move-bms.md#ports-and-names)). Each gets 0.25 CPU and 0.5 GB of memory; tell the lead if one needs more.
 
 | App | Port | Health route the platform checks | Database | Stays on in staging | At most |
 |---|---|---|---|---|---|
@@ -36,7 +37,7 @@ These exist in the setup as code, named exactly like this. Each is a Docker serv
 | `bms-booking` | 3021 | `/health/ready` | `bms_booking` | no | 1 |
 | `bms-dispatch` | 3022 | `/health/ready` | `bms_dispatch` | no | 1 |
 | `bms-completion` | 3023 | `/health/ready` | `bms_completion` | no | 1 |
-| `bms-projection` | 3024 | none (a worker, no web traffic) | `bms_analytics` | yes (projection loop) | 1 |
+| `bms-analytics-projection` | 3024 | none (a worker, no web traffic) | `bms_analytics` | yes (projection loop) | 1 |
 | `bms-analytics` | 3025 | `/health/ready` | `bms_analytics` | no | 1 |
 
 Jobs (started by your deploy workflow, never on a timer): `vmms-migrate`, and `bms-booking-migrate`, `bms-dispatch-migrate`, `bms-completion-migrate`, `bms-analytics-migrate`. Each runs your seed image as the database's owner login.
@@ -51,25 +52,25 @@ Tick these in your move pull requests.
 
 ### Every backend process
 
-- [ ] A `Dockerfile.prod` on `node:24-alpine` with two targets, copied from `welinc-backend-vrms/Dockerfile.prod` (on its `development` once our hosting pull request merges; the lead tells you). The default last stage is the **runner**: built `dist/`, production dependencies only, `NODE_ENV=production`, runs as the `node` user, `CMD` starts the built app. Check the path really exists in your build output (`dist/main` and `dist/src/main` differ by tsconfig). The `seed` target is the full source image (source, `prisma/`, scripts, `tsconfig.json`) that migration and seed jobs run from.
+- [ ] A `Dockerfile.prod` on `node:24-alpine` with two targets, copied from `welinc-backend-vrms/Dockerfile.prod` (on its `development` once our hosting pull request merges; the lead tells you). The default last stage is the **runner**: built `dist/`, production dependencies only, `NODE_ENV=production`, runs as the `node` user, `CMD` starts the built app. Check the path really exists in your build output (`dist/main` and `dist/src/main` differ by tsconfig). Never start with `node --env-file=.env`: hosted, every setting comes from the environment and the image holds no `.env` file. The `seed` target is the full source image (source, `prisma/`, scripts, `tsconfig.json`) that migration and seed jobs run from.
 - [ ] Listen on all interfaces (`0.0.0.0`) and on `PORT`. Nest's `app.listen(port)` already does; a plain `server.listen(port, '127.0.0.1')` can't be reached.
-- [ ] Read `DB_POOL_MAX` into your pool size (`pg.Pool` `max`, or the Prisma adapter's pool). It is 2 for you. One server holds all seven databases with about 35 connections in total, so an uncapped pool (the default is 10) starves everyone else.
+- [ ] Read `DB_POOL_MAX` into your pool size (`pg.Pool` `max`, or the Prisma adapter's pool). It is 2 for you. One server holds all seven databases with about 35 connections in total, so an uncapped pool (the default is 10) starves everyone else. It caps the whole process: a process with two pools (Prisma plus a raw `pg.Pool`) or a `LISTEN` connection keeps their total at 2 (VMMS analytics has all three today).
 - [ ] The health route answers 200 only when the database answers (each check gives up after 2 seconds), and 503 otherwise, needing no token. The platform sends traffic to a new version only once it answers 200, and allows 240 seconds for boot. Copy `welinc-backend-vrms/src/health/`.
 - [ ] Nothing lasting on local disk. A container's disk is wiped on every deploy and restart. Anything you only cache and can rebuild (a cache file, a DuckDB datamart rebuilt at boot) is fine. Uploaded files are not: tell the lead what you store, so your group gets its own blob container.
 - [ ] Every table, trigger, function and extension comes from a migration, never from the app at boot. The app login can't create them. (VMMS analytics: `installPostgresTriggers` moves into a VMMS migration.)
 - [ ] Tell the lead every PostgreSQL extension your migrations create (`pgcrypto`, `uuid-ossp` and so on), before your first deploy. Azure allows only the extensions on its list, and VRMS's `vector` and `pg_trgm` are on it already.
 - [ ] Your migration command, run from the seed image, needs nothing but `DATABASE_URL` (for Prisma: `npx prisma migrate deploy`). Tell the lead which command it is.
-- [ ] Never seed people on production. Your seed refuses when `NODE_ENV=production` unless `SEED_ALLOW=staging` is set, as welinc-auth's and VRMS's do.
+- [ ] Make your seed refuse when `NODE_ENV=production` unless `SEED_ALLOW=staging` is set, as welinc-auth's and VRMS's do, so seed people never reach production. Your migration jobs carry `SEED_ALLOW=staging` on staging only: the lead starts each once with your seed command (tell the lead which one) to seed staging.
 - [ ] Booting with `NODE_ENV=production` refuses `http://` and `localhost` addresses, the way welinc-auth's and VRMS's startup checks do (suite spec 0010). This catches a missing setting at deploy time instead of on the first sign in.
 
 ### BMS only
 
-- [ ] `bms-projection`: drop the check that refuses any database host but localhost. Hosted, the database is `psql-welinc-<env>.postgres.database.azure.com`.
+- [ ] `bms-analytics-projection`: drop the check that refuses any database host but localhost. Hosted, the database is `psql-welinc-<env>.postgres.database.azure.com`.
 - [ ] `bms-gateway` reaches the inner services through `BOOKING_API_URL` and the others, which the lead sets to the internal addresses.
 
 ### Web app
 
-- [ ] `npm run build` (BMS: `build:prod`) with only `VITE_API_BASE_URL` and `VITE_PORTAL_URL` set, output in `dist/`. No Dockerfile is needed for hosting.
+- [ ] `npm run build` (BMS: `build:prod`) with `VITE_API_BASE_URL` and `VITE_PORTAL_URL` set (BMS also `VITE_GOOGLE_MAPS_API_KEY`, a browser key limited to your two web addresses), output in `dist/`. No Dockerfile is needed for hosting.
 - [ ] Copy `welinc-web-vrms/public/staticwebapp.config.json` into your `public/`. It sends every path to `index.html` and sets the security headers. Its `Content-Security-Policy` allows only our own sites. If your app loads anything from another site (BMS: Google Maps), add exactly those hosts to `script-src`, `img-src` and `connect-src`, and nothing broader.
 
 ## What the lead sets for you
@@ -86,7 +87,7 @@ Every app gets these without asking, for its environment:
 | `SESSION_COOKIE_SECURE` | `true` |
 | `TRUST_PROXY_HOPS` | `2` on `vmms-backend`, `vmms-analytics` and `bms-gateway` (they sit behind Azure's edge and the suite gateway); hops inside BMS are yours to set |
 
-Anything else your service reads, send the lead its name and value per environment (for example `VMMS_API_BASE_URL`, `CUSTOMER_SUPPORT_EMAIL`).
+Anything else your service reads, send the lead its name and value per environment. That includes `AUTH_CLIENT_ID` (your client id: `vmms`, `vmms-analytics`, `bms`, `bms-analytics`), `CORS_ORIGINS` (your web app's address), the addresses between your own services (`VMMS_API_BASE_URL`, `BOOKING_API_URL` and so on, which the lead turns into internal addresses), and plain values such as `CUSTOMER_SUPPORT_EMAIL`.
 
 ## Secrets
 
@@ -96,6 +97,7 @@ Anything else your service reads, send the lead its name and value per environme
 
 ## Deploying
 
+- **Branches.** Every repo deploys from `development` (staging) and `release` (production). Create `release` from `development` once in each repo. BMS: `welinc-backend-bms` and `welinc-backend-bms-analytics-ai` have no `development` yet (you work on `latest-bms-backend` and `main`), so create it there; your move pull requests go into it anyway.
 - **Staging:** a push to `development` deploys that repo by itself, the same as VRMS: build both images, run the migration job, switch to the new version only once its health route answers, then a smoke test. If a migration or the health check fails, the old version keeps serving.
 - **Production:** only a manual "Run workflow" on your `release` branch, whose commit must already be on `development` with its image built by the staging deploy.
 - **Your Azure login** is your group's own, separate for staging and production. It can update and start only your group's apps and jobs; it can't touch VRMS, the shared services or the other group.

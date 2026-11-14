@@ -384,7 +384,7 @@ var groupDefs = {
       { group: 'bms', name: 'bms-booking', port: 3021, healthPath: '/health/ready', database: 'bms_booking', timed: false, maxReplicas: 1, edge: false, ingress: true }
       { group: 'bms', name: 'bms-dispatch', port: 3022, healthPath: '/health/ready', database: 'bms_dispatch', timed: false, maxReplicas: 1, edge: false, ingress: true }
       { group: 'bms', name: 'bms-completion', port: 3023, healthPath: '/health/ready', database: 'bms_completion', timed: false, maxReplicas: 1, edge: false, ingress: true }
-      { group: 'bms', name: 'bms-projection', port: 3024, healthPath: '', database: 'bms_analytics', timed: true, maxReplicas: 1, edge: false, ingress: false }
+      { group: 'bms', name: 'bms-analytics-projection', port: 3024, healthPath: '', database: 'bms_analytics', timed: true, maxReplicas: 1, edge: false, ingress: false }
       { group: 'bms', name: 'bms-analytics', port: 3025, healthPath: '/health/ready', database: 'bms_analytics', timed: false, maxReplicas: 1, edge: false, ingress: true }
     ]
     jobs: [
@@ -450,7 +450,13 @@ module groupJob 'modules/job.bicep' = [for j in groupJobList: {
     pullIdentityId: platform.outputs.pullIdentityId
     name: j.name
     image: images[?j.name] ?? placeholderImage
-    settings: groupApps[?j.app].?settings ?? {}
+    // The same settings as the app it migrates, plus the staging seed switch: the lead starts this
+    // job once with the group's seed command to seed staging (spec 0008, Seed and bootstrap jobs)
+    settings: union(
+      groupCommon(filter(groupAppList, a => a.name == j.app)[0], url, issuer, authInternal),
+      groupApps[?j.app].?settings ?? {},
+      seedAllow
+    )
     secretSettings: union(
       { DATABASE_URL: dbUrl(dbHost, j.database, 'owner', secrets.roles[j.database].owner) },
       secrets.?groups[?j.app] ?? {}
