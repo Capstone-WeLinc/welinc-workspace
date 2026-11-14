@@ -38,6 +38,7 @@ _These are recommendations to keep the build orderly, not requirements. Skip any
 | S11 | Move VMMS and BMS onto the shared services | Cutover | in-progress |
 | S10 | Suite admin model | Admin | done |
 | S15 | Authenticator app sign in for admins | Admin | planned |
+| S16 | Temporary lockout and a clear deactivated answer | Account | done |
 
 ## Contract
 
@@ -264,6 +265,17 @@ Prove a person owns their email before the suite relies on it, instead of only c
 - [x] Document it: `/document email verification` (2026-11-11, PRs opened)
 - [ ] Polish it (optional, ask first): `web-design-guidelines` (the portal code step)
 
+### S16. Temporary lockout and a clear deactivated answer · done · Beta · from spec 0015
+spec [0015](../../specs/_root/0015-temporary-lockout/index.md) · code in `welinc-auth/src/auth/lockout.ts`, the sign in and code step routes, `welinc-web-portal` (sign in messages)
+
+Five wrong passwords now lock an account for 15 minutes instead of until an admin unlocks it, so nobody can lock someone out on purpose just by knowing their email. A deactivated account that types the right password is told it is deactivated instead of "Invalid credentials".
+**Done when:** a lock runs out on its own after 15 minutes, every `ACCOUNT_LOCKED` answer carries `lockedUntil`, the right password on a deactivated account answers `ACCOUNT_INACTIVE`, admin unlock and reset codes still end a lock at once, and the seed keeps `state.locked@` locked.
+- Note (2026-11-14, replan): found as drift (spec 0015 Accepted and merged, no scope row). Built 2026-11-13 in welinc-auth PR #33 (`f226279`, unit tests for login, admin, codes and the seed in the same commit) with the portal wording; contract 0001 version 10. No separate `verify.md` run was recorded; the Admin browser pass on 2026-11-14 used the lock states.
+- [x] Design it (spec): `/architect temporary lockout` (2026-11-13)
+- [x] Build it: `/develop temporary lockout` (2026-11-13, welinc-auth #33)
+- [x] Verify it: `/check verify temporary lockout` (not run as its own step; covered by the 2026-11-14 Admin browser pass)
+- [x] Test it: `/test temporary lockout` (unit tests shipped with the build)
+
 ## Cutover
 
 ### S11. Move VMMS and BMS onto the shared services · in-progress
@@ -289,7 +301,8 @@ The move itself: their users merged into welinc-auth by email, their auth copies
 - [ ] Build it: `/develop move VMMS and BMS onto the shared services`
   - [x] Thin thread, web vs app rules: `app_released`, the clients seed, `vmms.mech@`, the launcher split, the authorize refusal, the VRMS callback, the portal phone only state · AC-1 to AC-8
   - [x] Rest of the shared side: lookup limit, `fleet.read` on `bms`, contract 0001 version 8 · AC-9 to AC-11
-  - [ ] The kit, proven on VRMS: `check-system.mjs` and `setup.sh` for vmms and bms (`start.sh` and `stop.sh` removed 2026-11-13: plain `docker compose` commands in the README), `move-vmms.md`, `move-bms.md`, `fleet-api.md`; tell both groups · AC-12 to AC-16
+  - [x] The kit, proven on VRMS: `check-system.mjs` and `setup.sh` for vmms and bms (`start.sh` and `stop.sh` removed 2026-11-13: plain `docker compose` commands in the README), `move-vmms.md`, `move-bms.md`, `fleet-api.md`; tell both groups · AC-12 to AC-16
+    - Note (2026-11-14, replan): built and merged (spec 0014 tasks 9 to 11 ticked; the checklists and README updates landed 2026-11-14). You told VMMS and BMS on 2026-11-14; their move PRs are due Monday 2026-11-16. Hosting (VRMS feature 26) runs in parallel while they move.
   - [ ] The moves (the groups build AC-17 to AC-30): VMMS login done [ ], VMMS fleet done [ ], BMS login done [ ], BMS fleet done [ ], `welinc-backend` archived [ ] · AC-17 to AC-31
   - [ ] Cleanup: VRMS Users page off `GET /auth/users`, the gated removal of the bearer admin routes, contract 0001 version 9 · AC-33
 - [ ] Verify it: `/check verify move VMMS and BMS onto the shared services` (the staging run, AC-32, waits for VRMS feature 26)
