@@ -65,6 +65,7 @@ The browser reaches BMS only at `<gateway>/bms/...`. These public paths are fixe
 - [ ] Add `welinc-backend-bms/.env.example` with the names every process shares (step 2). Setup copies it to `.env`.
 - [ ] Run `sh scripts/setup.sh bms`. Once the compose file exists it makes BMS's client key (`npm run keys:client -- bms ...` in welinc-auth, private key into `welinc-backend-bms/.env`, public key into welinc-auth's `.env`), registers it, starts your stack, runs each service's migrations and seed, and waits for `/bms/health`. It never prints a key.
 - [ ] Each service's `npm run seed` must keep data that is already there (setup runs it on every rerun).
+- [ ] Make it hosting ready in the same pull requests: the checklist in [hosting.md](hosting.md#make-it-hosting-ready) (a `Dockerfile.prod`, the pool setting, no lasting files on local disk, every table and trigger from a migration). Added 2026-11-14.
 
 ### 2. Environment
 

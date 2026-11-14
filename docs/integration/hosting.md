@@ -1,0 +1,106 @@
+# Hosting VMMS and BMS on Azure
+
+How your system goes online next to the shared services and VRMS. Everything runs in one Azure subscription that the shared services lead operates, on `welinc.tech`. The decision behind it is [VRMS spec 0008](../specs/vrms/0008-hosting-and-ci-cd/index.md); you don't need to read it.
+
+Read this after your move checklist ([move-vmms.md](move-vmms.md) or [move-bms.md](move-bms.md)). The move makes your system work on the shared services; this page makes it run on Azure. Most of it is a few files per service, and it's easiest to do while you're already in that code for the move.
+
+## Dates
+
+| When | What |
+|---|---|
+| Now, during your move | The "Make it hosting ready" checklist below, in the same pull requests as your move |
+| As your move merges | The lead turns your group on in staging and you deploy there (the workflow files arrive here once ours are proven, around Nov 22) |
+| By Dec 3 | Your system works on staging |
+| Nov 28 to Dec 5 | Freeze: production changes only for fixes, and only migrations that add (never drop or rename) |
+
+Until your group is turned on, your routes on the gateway (`/vmms/`, `/bms/`) answer 502 `UPSTREAM_UNAVAILABLE` and nothing else is affected.
+
+## How it fits together
+
+- **Addresses.** Production: `api.`, `portal.`, `vrms.`, `vmms.` and `bms.welinc.tech`. Staging: the same names with `staging-` in front (`staging-api.welinc.tech`). Your web app calls `https://<api>/vmms/` or `https://<api>/bms/`, as locally it calls `http://localhost:3000`.
+- **Services.** Each backend process is a Container App. Only the suite gateway is public; your services are internal, reached through the gateway's route or by each other.
+- **Internal addresses.** One service calls another at `https://<app name>.internal.<environment domain>`, on port 443, with no port in the address (for example `https://bms-booking.internal.<domain>`, not `:3021`). The lead fills these into your settings, so you only need to read them from the environment, which your code already does.
+- **Databases.** Each environment has one PostgreSQL 16 server. Your databases are already made: `vmms`; `bms_booking`, `bms_dispatch`, `bms_completion`, `bms_analytics`. Each has two logins: `<db>_owner` runs your migrations and owns every table, and `<db>_app` is what your service connects as (read and write rows, nothing else). A database's logins can't open any other database.
+- **Web apps.** Each web app is a Static Web App, built once per environment.
+- **Images.** One shared registry. Your workflow pushes `<app name>:<commit sha>` for the service and `<app name>-seed:<commit sha>` for its jobs.
+
+## Your apps
+
+These exist in the setup as code, named exactly like this. Each is a Docker service name in your compose file too (contract 0001, section 2).
+
+| App | Port | Health route the platform checks | Database | Stays on in staging | At most |
+|---|---|---|---|---|---|
+| `vmms-backend` | 3010 | `/vmms/health` | `vmms` | yes (it runs timers) | 2 |
+| `vmms-analytics` | 3011 | `/vmms/analytics/health` | `vmms` | yes (sync loop) | 1 |
+| `bms-gateway` | 3020 | `/bms/health` | none | no | 1 |
+| `bms-booking` | 3021 | `/health/ready` | `bms_booking` | no | 1 |
+| `bms-dispatch` | 3022 | `/health/ready` | `bms_dispatch` | no | 1 |
+| `bms-completion` | 3023 | `/health/ready` | `bms_completion` | no | 1 |
+| `bms-projection` | 3024 | none (a worker, no web traffic) | `bms_analytics` | yes (projection loop) | 1 |
+| `bms-analytics` | 3025 | `/health/ready` | `bms_analytics` | no | 1 |
+
+Jobs (started by your deploy workflow, never on a timer): `vmms-migrate`, and `bms-booking-migrate`, `bms-dispatch-migrate`, `bms-completion-migrate`, `bms-analytics-migrate`. Each runs your seed image as the database's owner login.
+
+"Stays on in staging: no" means the app sleeps when nobody calls it, and the first call after a while may answer 504 while it wakes (about 10 to 30 seconds). Production keeps every app awake. If one of your apps runs anything on a timer, it must stay on: tell the lead.
+
+A different health path or an app this table misses is a one line change on our side, so just tell the lead.
+
+## Make it hosting ready
+
+Tick these in your move pull requests.
+
+### Every backend process
+
+- [ ] A `Dockerfile.prod` on `node:24-alpine` with two targets, copied from `welinc-backend-vrms/Dockerfile.prod` (on its `development` once our hosting pull request merges; the lead tells you). The default last stage is the **runner**: built `dist/`, production dependencies only, `NODE_ENV=production`, runs as the `node` user, `CMD` starts the built app. Check the path really exists in your build output (`dist/main` and `dist/src/main` differ by tsconfig). The `seed` target is the full source image (source, `prisma/`, scripts, `tsconfig.json`) that migration and seed jobs run from.
+- [ ] Listen on all interfaces (`0.0.0.0`) and on `PORT`. Nest's `app.listen(port)` already does; a plain `server.listen(port, '127.0.0.1')` can't be reached.
+- [ ] Read `DB_POOL_MAX` into your pool size (`pg.Pool` `max`, or the Prisma adapter's pool). It is 2 for you. One server holds all seven databases with about 35 connections in total, so an uncapped pool (the default is 10) starves everyone else.
+- [ ] The health route answers 200 only when the database answers (each check gives up after 2 seconds), and 503 otherwise, needing no token. The platform sends traffic to a new version only once it answers 200, and allows 240 seconds for boot. Copy `welinc-backend-vrms/src/health/`.
+- [ ] Nothing lasting on local disk. A container's disk is wiped on every deploy and restart. Anything you only cache and can rebuild (a cache file, a DuckDB datamart rebuilt at boot) is fine. Uploaded files are not: tell the lead what you store, so your group gets its own blob container.
+- [ ] Every table, trigger, function and extension comes from a migration, never from the app at boot. The app login can't create them. (VMMS analytics: `installPostgresTriggers` moves into a VMMS migration.)
+- [ ] Tell the lead every PostgreSQL extension your migrations create (`pgcrypto`, `uuid-ossp` and so on), before your first deploy. Azure allows only the extensions on its list, and VRMS's `vector` and `pg_trgm` are on it already.
+- [ ] Your migration command, run from the seed image, needs nothing but `DATABASE_URL` (for Prisma: `npx prisma migrate deploy`). Tell the lead which command it is.
+- [ ] Never seed people on production. Your seed refuses when `NODE_ENV=production` unless `SEED_ALLOW=staging` is set, as welinc-auth's and VRMS's do.
+- [ ] Booting with `NODE_ENV=production` refuses `http://` and `localhost` addresses, the way welinc-auth's and VRMS's startup checks do (suite spec 0010). This catches a missing setting at deploy time instead of on the first sign in.
+
+### BMS only
+
+- [ ] `bms-projection`: drop the check that refuses any database host but localhost. Hosted, the database is `psql-welinc-<env>.postgres.database.azure.com`.
+- [ ] `bms-gateway` reaches the inner services through `BOOKING_API_URL` and the others, which the lead sets to the internal addresses.
+
+### Web app
+
+- [ ] `npm run build` (BMS: `build:prod`) with only `VITE_API_BASE_URL` and `VITE_PORTAL_URL` set, output in `dist/`. No Dockerfile is needed for hosting.
+- [ ] Copy `welinc-web-vrms/public/staticwebapp.config.json` into your `public/`. It sends every path to `index.html` and sets the security headers. Its `Content-Security-Policy` allows only our own sites. If your app loads anything from another site (BMS: Google Maps), add exactly those hosts to `script-src`, `img-src` and `connect-src`, and nothing broader.
+
+## What the lead sets for you
+
+Every app gets these without asking, for its environment:
+
+| Setting | Value |
+|---|---|
+| `NODE_ENV`, `PORT`, `DB_POOL_MAX` | `production`, the port above, `2` |
+| `DATABASE_URL` | the `<db>_app` login of its database (jobs: the `<db>_owner` login), with `sslmode=require` |
+| `AUTH_ISSUER`, `AUTH_PUBLIC_URL` | `https://<api>/auth` |
+| `AUTH_INTERNAL_URL`, `AUTH_JWKS_URL` | welinc-auth's internal address, and the same plus `/auth/.well-known/jwks.json` |
+| `API_PUBLIC_URL`, `PORTAL_URL`, `WEB_APP_URL` | `https://<api>`, `https://<portal>`, your web app's address |
+| `SESSION_COOKIE_SECURE` | `true` |
+| `TRUST_PROXY_HOPS` | `2` on `vmms-backend`, `vmms-analytics` and `bms-gateway` (they sit behind Azure's edge and the suite gateway); hops inside BMS are yours to set |
+
+Anything else your service reads, send the lead its name and value per environment (for example `VMMS_API_BASE_URL`, `CUSTOMER_SUPPORT_EMAIL`).
+
+## Secrets
+
+- [ ] Make your client key once per environment, staging and production separately: `npm run keys:client -- <client id> ...` in welinc-auth, exactly as your move did locally. Never reuse the local key.
+- [ ] Send the lead each secret privately, in a direct message: your `AUTH_CLIENT_PRIVATE_KEY`, its public key set, internal keys (`BMS_INTERNAL_SERVICE_KEY`, `CUSTOMER_TRACKING_SECRET`, webhook secrets), and provider keys (Gemini, Groq). Never put one in a repo, an issue, a pull request or the group chat.
+- [ ] A changed secret reaches a running app only after a restart; the lead does both.
+
+## Deploying
+
+- **Staging:** a push to `development` deploys that repo by itself, the same as VRMS: build both images, run the migration job, switch to the new version only once its health route answers, then a smoke test. If a migration or the health check fails, the old version keeps serving.
+- **Production:** only a manual "Run workflow" on your `release` branch, whose commit must already be on `development` with its image built by the staging deploy.
+- **Your Azure login** is your group's own, separate for staging and production. It can update and start only your group's apps and jobs; it can't touch VRMS, the shared services or the other group.
+- **Workflow files.** Two files to copy into your repos (one for backends, one for the web app) and the repo variables to set will be added here once ours deploy staging by themselves (around Nov 22). Until then there is nothing to copy.
+
+## When something is wrong
+
+Ask the shared services lead: they can read your app's logs and its last deploy. `GET https://<api>/vmms/health` (or `/bms/health`) tells you at once whether the gateway reaches your service.
