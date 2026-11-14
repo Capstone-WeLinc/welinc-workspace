@@ -1,7 +1,7 @@
 # 0015. Temporary lockout and a clear deactivated answer
 
 **Date**: 2026-11-13
-**Status**: Built
+**Status**: Accepted
 **Builds contract sections**: [0001](../0001-shared-services-contract/index.md) version 10 (breaking for a client that reads the lock as permanent or an inactive account as 401; additive: `lockedUntil`)
 **Related**: [0009](../0009-email-verification/index.md) (a used code ends a lock), [0011](../0011-account-activity-audit/index.md) (sign in rows), [0012](../0012-profile-extras/index.md) (the lock on every user route), [0013](../0013-suite-admin-model/index.md) (admin unlock)
 
