@@ -1,0 +1,24 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "envName": {
+      "value": "prod"
+    },
+    "domain": {
+      "value": "welinc.tech"
+    },
+    "swaLocation": {
+      "value": "eastasia"
+    },
+    "smtpUser": {
+      "value": ""
+    },
+    "enabledGroups": {
+      "value": []
+    },
+    "groupApps": {
+      "value": {}
+    }
+  }
+}

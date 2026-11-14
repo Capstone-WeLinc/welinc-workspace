@@ -1,0 +1,33 @@
+{
+  "_readme": "Copy to infra/private/<staging|prod>.json (git ignored) and fill every value. Fake values below. Passwords: 32 hex characters each (openssl rand -hex 16), so they never need escaping in a URL. Keep a copy where a teammate can reach it (infra/RUNBOOK.md names where).",
+  "alertEmail": "you@example.com",
+  "postgresAdminPassword": "00000000000000000000000000000000",
+  "roles": {
+    "auth": { "owner": "11111111111111111111111111111111", "app": "22222222222222222222222222222222" },
+    "vrms": { "owner": "33333333333333333333333333333333", "app": "44444444444444444444444444444444" },
+    "vmms": { "owner": "55555555555555555555555555555555", "app": "66666666666666666666666666666666" },
+    "bms_booking": { "owner": "77777777777777777777777777777777", "app": "88888888888888888888888888888888" },
+    "bms_dispatch": { "owner": "99999999999999999999999999999999", "app": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" },
+    "bms_completion": { "owner": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "app": "cccccccccccccccccccccccccccccccc" },
+    "bms_analytics": { "owner": "dddddddddddddddddddddddddddddddd", "app": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee" }
+  },
+  "auth": {
+    "signingKeys": "{\"keys\":[...]} from npm run keys:rotate in welinc-auth, one fresh set per environment",
+    "smtpPass": "the Brevo SMTP key for this environment"
+  },
+  "clients": {
+    "vrms": "public JWK set from npm run keys:client vrms (yours)",
+    "vmms": "",
+    "bms": "",
+    "vmmsAnalytics": "",
+    "bmsAnalytics": ""
+  },
+  "vrms": {
+    "clientPrivateKey": "private JWK from the same npm run keys:client vrms run",
+    "geminiApiKey": ""
+  },
+  "groups": {
+    "vmms-backend": { "SOME_SECRET": "sent privately by the VMMS group" },
+    "bms-booking": { "BMS_INTERNAL_SERVICE_KEY": "sent privately by the BMS group" }
+  }
+}

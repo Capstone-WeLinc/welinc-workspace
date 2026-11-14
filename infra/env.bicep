@@ -1,0 +1,538 @@
+// One WeLinc environment (staging or production) in its own resource group (VRMS spec 0008).
+// Apply with infra/scripts/apply.sh <staging|prod> [--domains]; never by hand, because the
+// script passes the private secrets file and the images each app runs now.
+
+@allowed(['staging', 'prod'])
+param envName string
+
+param location string = resourceGroup().location
+
+@description('PostgreSQL B1ms is not offered to trial accounts in every region; may differ from location.')
+param postgresLocation string = location
+
+@description('Static Web Apps regions are limited; East Asia is the closest to the users.')
+param swaLocation string = 'eastasia'
+
+param domain string = 'welinc.tech'
+
+@description('Pass 2: bind the custom domains. Only once dns-records.sh records resolve.')
+param bindDomains bool = false
+
+@description('Set by apply.sh when the gateway managed certificate already exists, so a re-apply never unbinds it.')
+param gatewayCertExists bool = false
+
+param registryName string
+param registryResourceGroup string = 'rg-welinc-shared'
+
+@description('{app or job name: image} as each runs now (apply.sh reads them back, so an apply never rolls an app back).')
+param images object = {}
+
+@description('Groups whose apps exist here: [] until their S11 move is ready, then vmms and bms.')
+param enabledGroups array = []
+
+@description('Per group app, non secret extras: {"vmms-backend": {"settings": {...}, "healthPath": "..."}}.')
+param groupApps object = {}
+
+@description('Deploy login principal ids for this environment: {ours, vmms, bms}. Empty skips the role.')
+param logins object = {}
+
+@description('The Brevo SMTP login (not a secret; the key is).')
+param smtpUser string = ''
+
+@description('The private file for this environment (infra/private/<env>.json), see infra/private.example.json.')
+@secure()
+param secrets object
+
+var prod = envName == 'prod'
+var prefix = prod ? '' : 'staging-'
+var placeholderImage = 'mcr.microsoft.com/k8se/quickstart:latest'
+var registryServer = '${registryName}.azurecr.io'
+
+// Contract 0001 section 1
+var hosts = {
+  api: '${prefix}api.${domain}'
+  portal: '${prefix}portal.${domain}'
+  vrms: '${prefix}vrms.${domain}'
+  vmms: '${prefix}vmms.${domain}'
+  bms: '${prefix}bms.${domain}'
+}
+var url = {
+  api: 'https://${hosts.api}'
+  portal: 'https://${hosts.portal}'
+  vrms: 'https://${hosts.vrms}'
+  vmms: 'https://${hosts.vmms}'
+  bms: 'https://${hosts.bms}'
+}
+var issuer = '${url.api}/auth'
+var webOrigins = '${url.portal},${url.vrms},${url.vmms},${url.bms}'
+
+var databases = ['auth', 'vrms', 'vmms', 'bms_booking', 'bms_dispatch', 'bms_completion', 'bms_analytics']
+
+func dbUrl(host string, db string, role string, password string) string =>
+  'postgresql://${db}_${role}:${password}@${host}:5432/${db}?sslmode=require&uselibpqcompat=true'
+
+// AC-16: production keeps every app warm; staging only the gateway and timed apps
+func minReplicas(prod bool, warm bool) int => prod || warm ? 1 : 0
+
+// ---------------------------------------------------------------- foundation
+
+module platform 'modules/platform.bicep' = {
+  name: 'platform'
+  params: {
+    envName: envName
+    location: location
+    vrmsWebOrigin: url.vrms
+  }
+}
+
+module pullRole 'modules/acr-pull.bicep' = {
+  name: 'acr-pull-${envName}'
+  scope: resourceGroup(registryResourceGroup)
+  params: {
+    registryName: registryName
+    principalId: platform.outputs.pullPrincipalId
+  }
+}
+
+module postgres 'modules/postgres.bicep' = {
+  name: 'postgres'
+  params: {
+    name: 'psql-welinc-${envName}'
+    location: postgresLocation
+    adminLogin: 'welincadmin'
+    adminPassword: secrets.postgresAdminPassword
+    databases: databases
+  }
+}
+
+var dbHost = 'psql-welinc-${envName}.postgres.database.azure.com'
+var internal = 'internal.${platform.outputs.defaultDomain}'
+var authInternal = 'https://auth-service.${internal}'
+
+// ---------------------------------------------------------------- shared services and VRMS
+
+var authSettings = {
+  NODE_ENV: 'production'
+  AUTH_ISSUER: issuer
+  PORTAL_URL: url.portal
+  CORS_ORIGINS: webOrigins
+  SSO_COOKIE_SECURE: 'true'
+  TRUST_PROXY_HOPS: '2'
+  DB_POOL_MAX: '3'
+  ADMIN_SIGN_IN_CODE: 'true'
+  SMTP_HOST: 'smtp-relay.brevo.com'
+  SMTP_PORT: '587'
+  SMTP_USER: smtpUser
+  SMTP_FROM: 'WeLinc <noreply@${domain}>'
+}
+var authSecrets = {
+  AUTH_SIGNING_KEYS: secrets.auth.signingKeys
+  SMTP_PASS: secrets.auth.smtpPass
+}
+
+var vrmsSettings = {
+  NODE_ENV: 'production'
+  AUTH_CLIENT_ID: 'vrms'
+  AUTH_INTERNAL_URL: authInternal
+  AUTH_JWKS_URL: '${authInternal}/auth/.well-known/jwks.json'
+  AUTH_ISSUER: issuer
+  AUTH_PUBLIC_URL: issuer
+  API_PUBLIC_URL: url.api
+  WEB_APP_URL: url.vrms
+  PORTAL_URL: url.portal
+  CORS_ORIGINS: url.vrms
+  SESSION_COOKIE_SECURE: 'true'
+  TRUST_PROXY_HOPS: '2'
+  DB_POOL_MAX: '3'
+  STORAGE_ACCOUNT_URL: platform.outputs.blobEndpoint
+  STORAGE_PUBLIC_URL: platform.outputs.blobEndpoint
+  STORAGE_CONTAINER: 'vrms-attachments'
+}
+var vrmsSecrets = {
+  AUTH_CLIENT_PRIVATE_KEY: secrets.vrms.clientPrivateKey
+  GEMINI_API_KEY: secrets.vrms.?geminiApiKey ?? ''
+}
+
+var gatewaySettings = {
+  AUTH_UPSTREAM: authInternal
+  VRMS_UPSTREAM: 'https://vrms-backend.${internal}'
+  VMMS_UPSTREAM: 'https://vmms-backend.${internal}'
+  VMMS_ANALYTICS_UPSTREAM: 'https://vmms-analytics.${internal}'
+  BMS_UPSTREAM: 'https://bms-gateway.${internal}'
+  ALLOWED_ORIGINS: webOrigins
+  TRUST_EDGE_PROXY: '1'
+  GATEWAY_HSTS: 'max-age=86400'
+  GATEWAY_RATE_PER_SECOND: '20'
+  GATEWAY_RATE_BURST: '40'
+}
+
+module auth 'modules/container-app.bicep' = {
+  name: 'app-auth-service'
+  dependsOn: [pullRole]
+  params: {
+    name: 'auth-service'
+    location: location
+    environmentId: platform.outputs.environmentId
+    image: images[?'auth-service'] ?? placeholderImage
+    placeholderImage: placeholderImage
+    port: 3001
+    healthPath: '/auth/health'
+    // Timed (session sweeper, temporary grant sweep); at most 1 because sign in limits are in memory
+    minReplicas: minReplicas(prod, true)
+    maxReplicas: 1
+    cpu: '0.5'
+    memory: '1Gi'
+    settings: authSettings
+    secretSettings: union(authSecrets, {
+      DATABASE_URL: dbUrl(dbHost, 'auth', 'app', secrets.roles.auth.app)
+    })
+    registryServer: registryServer
+    pullIdentityId: platform.outputs.pullIdentityId
+    fileMount: {
+      storageName: platform.outputs.authFilesStorageName
+      mountPath: '/app/uploads'
+    }
+  }
+}
+
+module vrms 'modules/container-app.bicep' = {
+  name: 'app-vrms-backend'
+  dependsOn: [pullRole]
+  params: {
+    name: 'vrms-backend'
+    location: location
+    environmentId: platform.outputs.environmentId
+    image: images[?'vrms-backend'] ?? placeholderImage
+    placeholderImage: placeholderImage
+    port: 3002
+    healthPath: '/vrms/health'
+    // Timed: the directory poll, the matrix sync, the attachment sweep
+    minReplicas: minReplicas(prod, true)
+    maxReplicas: 2
+    cpu: '0.5'
+    memory: '1Gi'
+    settings: vrmsSettings
+    secretSettings: union(vrmsSecrets, {
+      DATABASE_URL: dbUrl(dbHost, 'vrms', 'app', secrets.roles.vrms.app)
+    })
+    registryServer: registryServer
+    pullIdentityId: platform.outputs.pullIdentityId
+    systemIdentity: true
+  }
+}
+
+// The two step binding: a host name first goes on with bindingType Disabled, the managed
+// certificate is issued, then it switches to SniEnabled. A re-apply with the certificate in
+// place skips straight to SniEnabled, so the gateway never loses its certificate.
+var certId = '${platform.outputs.environmentId}/managedCertificates/cert-api'
+
+module gatewayBind 'modules/container-app.bicep' = if (bindDomains && !gatewayCertExists) {
+  name: 'app-api-gateway-bind'
+  dependsOn: [pullRole]
+  params: {
+    name: 'api-gateway'
+    location: location
+    environmentId: platform.outputs.environmentId
+    image: images[?'api-gateway'] ?? placeholderImage
+    placeholderImage: placeholderImage
+    port: 3000
+    healthPath: '/health'
+    external: true
+    minReplicas: 1
+    maxReplicas: 2
+    settings: gatewaySettings
+    registryServer: registryServer
+    pullIdentityId: platform.outputs.pullIdentityId
+    customDomain: { name: hosts.api, bindingType: 'Disabled', certificateId: '' }
+  }
+}
+
+module gatewayCert 'modules/managed-cert.bicep' = if (bindDomains && !gatewayCertExists) {
+  name: 'cert-api'
+  dependsOn: [gatewayBind]
+  params: {
+    environmentName: platform.outputs.environmentName
+    location: location
+    hostName: hosts.api
+  }
+}
+
+module gateway 'modules/container-app.bicep' = {
+  name: 'app-api-gateway'
+  dependsOn: [pullRole, gatewayCert]
+  params: {
+    name: 'api-gateway'
+    location: location
+    environmentId: platform.outputs.environmentId
+    image: images[?'api-gateway'] ?? placeholderImage
+    placeholderImage: placeholderImage
+    port: 3000
+    healthPath: '/health'
+    external: true
+    minReplicas: 1
+    maxReplicas: 2
+    settings: gatewaySettings
+    registryServer: registryServer
+    pullIdentityId: platform.outputs.pullIdentityId
+    customDomain: bindDomains ? { name: hosts.api, bindingType: 'SniEnabled', certificateId: certId } : {}
+  }
+}
+
+// Jobs run from the seed image of a commit, started by deploy.yml or by hand
+var seedAllow = prod ? {} : { SEED_ALLOW: 'staging' }
+
+module authMigrate 'modules/job.bicep' = {
+  name: 'job-auth-migrate'
+  dependsOn: [pullRole]
+  params: {
+    location: location
+    environmentId: platform.outputs.environmentId
+    registryServer: registryServer
+    pullIdentityId: platform.outputs.pullIdentityId
+    name: 'auth-migrate'
+    image: images[?'auth-migrate'] ?? placeholderImage
+    settings: authSettings
+    secretSettings: union(authSecrets, {
+      DATABASE_URL: dbUrl(dbHost, 'auth', 'owner', secrets.roles.auth.owner)
+    })
+  }
+}
+
+module authSeed 'modules/job.bicep' = {
+  name: 'job-auth-seed'
+  dependsOn: [pullRole]
+  params: {
+    location: location
+    environmentId: platform.outputs.environmentId
+    registryServer: registryServer
+    pullIdentityId: platform.outputs.pullIdentityId
+    name: 'auth-seed'
+    image: images[?'auth-seed'] ?? placeholderImage
+    settings: union(authSettings, seedAllow, {
+      API_PUBLIC_URL: url.api
+      CLIENT_VRMS_WEB_ADDRESS: url.vrms
+      CLIENT_VMMS_WEB_ADDRESS: url.vmms
+      CLIENT_BMS_WEB_ADDRESS: url.bms
+    })
+    secretSettings: union(authSecrets, {
+      DATABASE_URL: dbUrl(dbHost, 'auth', 'app', secrets.roles.auth.app)
+      CLIENT_VRMS_JWKS: secrets.clients.?vrms ?? ''
+      CLIENT_VMMS_JWKS: secrets.clients.?vmms ?? ''
+      CLIENT_BMS_JWKS: secrets.clients.?bms ?? ''
+      CLIENT_VMMS_ANALYTICS_JWKS: secrets.clients.?vmmsAnalytics ?? ''
+      CLIENT_BMS_ANALYTICS_JWKS: secrets.clients.?bmsAnalytics ?? ''
+    })
+  }
+}
+
+module vrmsMigrate 'modules/job.bicep' = {
+  name: 'job-vrms-migrate'
+  dependsOn: [pullRole]
+  params: {
+    location: location
+    environmentId: platform.outputs.environmentId
+    registryServer: registryServer
+    pullIdentityId: platform.outputs.pullIdentityId
+    name: 'vrms-migrate'
+    image: images[?'vrms-migrate'] ?? placeholderImage
+    settings: vrmsSettings
+    secretSettings: union(vrmsSecrets, {
+      DATABASE_URL: dbUrl(dbHost, 'vrms', 'owner', secrets.roles.vrms.owner)
+    })
+  }
+}
+
+// Owner role: the full staging seed switches the audit_logs triggers off for its reset, which
+// only the table owner may do. --reference on production writes no audit rows.
+module vrmsSeed 'modules/job.bicep' = {
+  name: 'job-vrms-seed'
+  dependsOn: [pullRole]
+  params: {
+    location: location
+    environmentId: platform.outputs.environmentId
+    registryServer: registryServer
+    pullIdentityId: platform.outputs.pullIdentityId
+    name: 'vrms-seed'
+    image: images[?'vrms-seed'] ?? placeholderImage
+    settings: union(vrmsSettings, seedAllow)
+    secretSettings: union(vrmsSecrets, {
+      DATABASE_URL: dbUrl(dbHost, 'vrms', 'owner', secrets.roles.vrms.owner)
+    })
+  }
+}
+
+// ---------------------------------------------------------------- VMMS and BMS
+
+// From contract 0001 sections 2 and 3. Each group confirms its own in docs/integration/hosting.md;
+// groupApps overrides the health path and adds settings. edge: receives traffic through the suite
+// gateway (TRUST_PROXY_HOPS=2). database: '' for none.
+var groupDefs = {
+  vmms: {
+    web: 'vmms'
+    apps: [
+      { group: 'vmms', name: 'vmms-backend', port: 3010, healthPath: '/vmms/health', database: 'vmms', timed: true, maxReplicas: 2, edge: true, ingress: true }
+      { group: 'vmms', name: 'vmms-analytics', port: 3011, healthPath: '/vmms/analytics/health', database: 'vmms', timed: true, maxReplicas: 1, edge: true, ingress: true }
+    ]
+    jobs: [
+      { group: 'vmms', name: 'vmms-migrate', app: 'vmms-backend', database: 'vmms' }
+    ]
+  }
+  bms: {
+    web: 'bms'
+    apps: [
+      { group: 'bms', name: 'bms-gateway', port: 3020, healthPath: '/bms/health', database: '', timed: false, maxReplicas: 1, edge: true, ingress: true }
+      { group: 'bms', name: 'bms-booking', port: 3021, healthPath: '/health/ready', database: 'bms_booking', timed: false, maxReplicas: 1, edge: false, ingress: true }
+      { group: 'bms', name: 'bms-dispatch', port: 3022, healthPath: '/health/ready', database: 'bms_dispatch', timed: false, maxReplicas: 1, edge: false, ingress: true }
+      { group: 'bms', name: 'bms-completion', port: 3023, healthPath: '/health/ready', database: 'bms_completion', timed: false, maxReplicas: 1, edge: false, ingress: true }
+      { group: 'bms', name: 'bms-projection', port: 3024, healthPath: '', database: 'bms_analytics', timed: true, maxReplicas: 1, edge: false, ingress: false }
+      { group: 'bms', name: 'bms-analytics', port: 3025, healthPath: '/health/ready', database: 'bms_analytics', timed: false, maxReplicas: 1, edge: false, ingress: true }
+    ]
+    jobs: [
+      { group: 'bms', name: 'bms-booking-migrate', app: 'bms-booking', database: 'bms_booking' }
+      { group: 'bms', name: 'bms-dispatch-migrate', app: 'bms-dispatch', database: 'bms_dispatch' }
+      { group: 'bms', name: 'bms-completion-migrate', app: 'bms-completion', database: 'bms_completion' }
+      { group: 'bms', name: 'bms-analytics-migrate', app: 'bms-analytics', database: 'bms_analytics' }
+    ]
+  }
+}
+
+var groupAppList = flatten(map(enabledGroups, g => groupDefs[g].apps))
+var groupJobList = flatten(map(enabledGroups, g => groupDefs[g].jobs))
+
+// What every group service gets without asking (contract 0001 section 15)
+func groupCommon(a object, url object, issuer string, authInternal string) object => union(
+  {
+    NODE_ENV: 'production'
+    DB_POOL_MAX: '2'
+    AUTH_ISSUER: issuer
+    AUTH_INTERNAL_URL: authInternal
+    AUTH_JWKS_URL: '${authInternal}/auth/.well-known/jwks.json'
+    AUTH_PUBLIC_URL: issuer
+    API_PUBLIC_URL: url.api
+    PORTAL_URL: url.portal
+    WEB_APP_URL: url[a.group]
+    SESSION_COOKIE_SECURE: 'true'
+  },
+  a.edge ? { TRUST_PROXY_HOPS: '2' } : {}
+)
+
+module groupApp 'modules/container-app.bicep' = [for a in groupAppList: {
+  name: 'app-${a.name}'
+  dependsOn: [pullRole]
+  params: {
+    name: a.name
+    location: location
+    environmentId: platform.outputs.environmentId
+    image: images[?a.name] ?? placeholderImage
+    placeholderImage: placeholderImage
+    port: a.port
+    healthPath: groupApps[?a.name].?healthPath ?? a.healthPath
+    ingress: a.ingress
+    minReplicas: minReplicas(prod, a.timed)
+    maxReplicas: a.maxReplicas
+    settings: union(groupCommon(a, url, issuer, authInternal), groupApps[?a.name].?settings ?? {})
+    secretSettings: union(
+      empty(a.database) ? {} : { DATABASE_URL: dbUrl(dbHost, a.database, 'app', secrets.roles[a.database].app) },
+      secrets.?groups[?a.name] ?? {}
+    )
+    registryServer: registryServer
+    pullIdentityId: platform.outputs.pullIdentityId
+  }
+}]
+
+module groupJob 'modules/job.bicep' = [for j in groupJobList: {
+  name: 'job-${j.name}'
+  dependsOn: [pullRole]
+  params: {
+    location: location
+    environmentId: platform.outputs.environmentId
+    registryServer: registryServer
+    pullIdentityId: platform.outputs.pullIdentityId
+    name: j.name
+    image: images[?j.name] ?? placeholderImage
+    settings: groupApps[?j.app].?settings ?? {}
+    secretSettings: union(
+      { DATABASE_URL: dbUrl(dbHost, j.database, 'owner', secrets.roles[j.database].owner) },
+      secrets.?groups[?j.app] ?? {}
+    )
+  }
+}]
+
+// ---------------------------------------------------------------- web apps
+
+var webs = ['portal', 'vrms', 'vmms', 'bms']
+
+module web 'modules/static-web-app.bicep' = [for w in webs: {
+  name: 'web-${w}'
+  params: {
+    name: 'swa-welinc-${envName}-${w}'
+    location: swaLocation
+    customDomain: bindDomains ? hosts[w] : ''
+  }
+}]
+
+// ---------------------------------------------------------------- access
+
+var suffix = take(uniqueString(resourceGroup().id), 8)
+
+resource blobAccount 'Microsoft.Storage/storageAccounts@2023-05-01' existing = {
+  name: 'st${suffix}blob'
+}
+
+var blobContributor = subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'ba92f5b4-2d11-453d-a403-e96b0029c9fe')
+
+// backend-vrms's own identity writes blobs and signs user delegation links (spec 0017)
+resource vrmsBlob 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  scope: blobAccount
+  name: guid(blobAccount.id, 'vrms-backend', blobContributor)
+  properties: {
+    roleDefinitionId: blobContributor
+    principalId: vrms.outputs.principalId
+    principalType: 'ServicePrincipal'
+  }
+}
+
+var contributor = subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'b24988ac-6180-42a0-ab88-20f7382dd24c')
+
+// Our deploy login: Contributor on this environment's resource group only (AcrPush is in shared)
+resource oursRole 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (!empty(logins.?ours ?? '')) {
+  name: guid(resourceGroup().id, logins.?ours ?? 'none', contributor)
+  properties: {
+    roleDefinitionId: contributor
+    principalId: logins.?ours ?? ''
+    principalType: 'ServicePrincipal'
+  }
+}
+
+var groupsWithLogin = filter(enabledGroups, g => !empty(logins[?g] ?? ''))
+
+module groupAccess 'modules/group-access.bicep' = [for g in groupsWithLogin: {
+  name: 'access-${g}'
+  dependsOn: [groupApp, groupJob, web]
+  params: {
+    group: g
+    envName: envName
+    principalId: logins[g]
+    appNames: map(groupDefs[g].apps, a => a.name)
+    jobNames: map(groupDefs[g].jobs, j => j.name)
+    webNames: ['swa-welinc-${envName}-${groupDefs[g].web}']
+    environmentName: platform.outputs.environmentName
+    pullIdentityName: platform.outputs.pullIdentityName
+  }
+}]
+
+// ---------------------------------------------------------------- outputs (read by the scripts)
+
+output hosts object = hosts
+output environmentDefaultDomain string = platform.outputs.defaultDomain
+output customDomainVerificationId string = platform.outputs.customDomainVerificationId
+output gatewayFqdn string = gateway.outputs.fqdn
+output postgresFqdn string = postgres.outputs.fqdn
+output webDefaultHostnames array = [for (w, i) in webs: {
+  web: w
+  defaultHostname: web[i].outputs.defaultHostname
+}]
+output webNames object = toObject(webs, w => w, w => 'swa-welinc-${envName}-${w}')
+output appNames array = concat(['api-gateway', 'auth-service', 'vrms-backend'], map(groupAppList, a => a.name))
+output jobNames array = concat(['auth-migrate', 'auth-seed', 'vrms-migrate', 'vrms-seed'], map(groupJobList, j => j.name))
+output resourceGroup string = resourceGroup().name

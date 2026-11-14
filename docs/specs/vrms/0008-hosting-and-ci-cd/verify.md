@@ -1,5 +1,5 @@
 # Verify: hosting & CI/CD · spec 0008 · updated 2026-11-14
-_Steps derived from spec 0008 acceptance criteria. `/check verify` runs these; `/test` locks the durable ones. The CI milestone and Slice 2 (make the apps deployable) are written so far; `/develop` adds the steps for each later milestone when it lands._
+_Steps derived from spec 0008 acceptance criteria. `/check verify` runs these; `/test` locks the durable ones. The CI milestone, Slice 2 (make the apps deployable) and Slice 3 (setup as code) are written so far; `/develop` adds the steps for each later milestone when it lands._
 
 ## UI / manual
 - [ ] Open a pull request into `development` in each of web-vrms, web-portal, backend-vrms, auth and analytics-ai → a check named `CI / ci` appears on the PR and finishes green → AC-1
@@ -29,7 +29,28 @@ _Steps derived from spec 0008 acceptance criteria. `/check verify` runs these; `
 - [ ] `docker exec welinc_auth_service npm run test:db` → `admin-recover-create.db-spec.ts` passes (first suite admin with no roles, no password, `ADMIN_RECOVERY` and `SUITE_ADMIN_ACTIONED`, the setup code sent; refusals for a short reason, a bad domain, an existing admin and an existing email) → AC-15
 - [ ] `npm run build:local` in web-vrms and web-portal → `dist/staticwebapp.config.json` exists with the fallback to `/index.html` and the CSP, `nosniff` and referrer headers; `dist/index.html` has no inline `<script>` → AC-3, AC-14
 
+- [ ] Two cross check fixes: `npm run seed -- --reference` on a fresh migrated VRMS database where `seedVehicles` throws (rename the `vehicle_type` lookup values) → exits 1 and garages, vehicles and knowledge entries all count 0; fix the names, rerun → 3, 70, 23 → AC-15
+- [ ] `admin:recover --create` when the setup code can't be sent (SMTP pointed at a closed port) → prints "could not be sent", exits 1, and the account plus its suite admin row exist; a second `--create` refuses → AC-15
+
+## Commands: Slice 3, setup as code (added 2026-11-14)
+- [ ] `bicep build` on `infra/env.bicep`, `shared.bicep`, `subscription.bicep` and every `infra/modules/*.bicep` → no errors, no warnings → AC-10
+- [ ] On local PostgreSQL 16, as an admin with only `CREATEROLE` and `CREATEDB`: create a database, run `infra/db/init.sql` twice → both runs exit 0 and the database's owner is `<db>_owner` → AC-5
+- [ ] Same database: migrations as `<db>_owner`, then the `audit_logs` revoke → every table is owned by `<db>_owner`; `<db>_app` can insert and select but gets "permission denied" on `DELETE FROM audit_logs`, `DROP TABLE` and `CREATE TABLE` → AC-5
+- [ ] Two databases set up by `init.sql` → one database's app role can't connect to the other ("permission denied for database") → AC-5
+- [ ] welinc-auth: `npm run db:deploy` as `auth_owner` and `npm run seed` as `auth_app` on a database set up by `init.sql` → both succeed → AC-6, AC-13
+- [ ] After signup: `infra/scripts/apply.sh shared`, `apply.sh budget`, then `apply.sh staging --what-if` → the preview lists the server, seven databases, two storage accounts, the environment, three apps, four jobs and four Static Web Apps, and no VMMS or BMS app → AC-10, AC-19
+- [ ] `apply.sh staging` → finishes, `db-init.sh` reports "database roles ready", and the temporary firewall rule is gone afterwards (`az postgres flexible-server firewall-rule list`) → AC-5, AC-10
+- [ ] `az postgres flexible-server parameter show --name azure.extensions` and `idle_in_transaction_session_timeout` on each server → `VECTOR,PG_TRGM` and `60000`; backup retention 14 days → AC-8, AC-21
+- [ ] `dns-records.sh staging`, add the records, `dns-records.sh staging --check` → every line `ok`; then `apply.sh staging --domains` → `https://staging-api.welinc.tech/health` answers 200 with a valid certificate, and the four web names open their Static Web Apps → AC-7
+- [ ] `apply.sh staging --domains` again → the gateway keeps its certificate the whole time (curl the health route in a loop during the run), and `--what-if` before it shows no changes to images or secrets → AC-7, AC-10
+- [ ] Any app on staging other than the gateway: `az containerapp show --query properties.configuration.ingress.external` → `false`; the gateway's `GET /vmms/health` → 502 `UPSTREAM_UNAVAILABLE` while VMMS is off → AC-19
+- [ ] Replica settings: production every app min 1; staging the gateway, `auth-service` and `vrms-backend` min 1, the rest 0; `auth-service` max 1 → AC-16
+- [ ] Budget: Cost Management shows `welinc-credit` with alerts at 25, 50, 75 and 90 percent of $200 → AC-12
+- [ ] With a VMMS login filled in `env/logins.json` and `vmms` enabled: as that login, `az containerapp update -n vrms-backend` → AuthorizationFailed; `az containerapp update -n vmms-backend` → succeeds → AC-11
+- [ ] `vrms-backend` reads and signs a blob link (open a ticket photo on staging) with no connection string set → the photo loads → AC-14
+
 ## Acceptance-criteria coverage
 - AC-1 … covered by steps 1, 4, 5, 6 and the first, second and third commands · AC-2 … covered by steps 2, 3 and the first two commands · AC-11 … covered by the last command (the OpenID login part comes with the Azure milestones)
 - Slice 2 … AC-5, AC-6, AC-13, AC-14, AC-15, AC-21 partly covered by the Slice 2 commands (their hosted halves come with the Azure milestones)
-- AC-3, AC-4, AC-7 to AC-10, AC-12, AC-16 to AC-20 … not written yet, they belong to later milestones
+- Slice 3 … AC-5, AC-7, AC-8, AC-10, AC-11, AC-12, AC-16, AC-19 covered by the Slice 3 commands (most need the subscription; the init.sql and compile steps run now)
+- AC-3, AC-4, AC-9, AC-17, AC-18, AC-20 … not written yet, they belong to later milestones
