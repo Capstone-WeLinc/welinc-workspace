@@ -96,6 +96,42 @@ Three amendments after the Slice 2 build (2026-11-14). The picture policy first 
 
 The 2026-10-25 independent review (13 unsourced values, uploads lost on restart, connection limits, localhost origins, cold start smoke tests, the Host header on internal ingress) remains folded in.
 
+### Corrections from the Slice 3 build (2026-11-14)
+
+Building the Bicep and testing `init.sql` on local PostgreSQL 16 (an admin with only `CREATEROLE` and `CREATEDB`, like Azure's) found four things the spec had wrong or left out. None changes the decision; each is the only way the decided design works.
+
+- **`PG_TRGM` in `azure.extensions`.** Azure only lets a database create the extensions this server parameter lists. The spec named `VECTOR` alone, but the VRMS baseline migration runs `CREATE EXTENSION IF NOT EXISTS pg_trgm`, so the first VRMS deploy would have failed. welinc-auth creates no extension.
+- **The VRMS seed job as `vrms_owner`.** The full seed's reset runs `ALTER TABLE audit_logs DISABLE TRIGGER USER` (spec 0021), which PostgreSQL allows only the table owner, and the app role loses `DELETE` on that table after the migration job's revoke. Keeping the app role would mean a seed that can never run. The other option, a separate reset path for hosted staging, adds code to protect a database that only holds test data; the owner role is the smaller change.
+- **`DATABASE_URL` built by Bicep.** Each role password is needed twice: by `init.sql` to set it, and by the apps to connect. Storing full URLs too would put each password in two places that can drift. Bicep builds the URL from the one stored password, in the form under Connection strings.
+- **`init.sql` details.** Proven on PostgreSQL 16: without `GRANT <db>_owner TO CURRENT_USER`, a non superuser admin can't run `ALTER DATABASE … OWNER TO` or `ALTER DEFAULT PRIVILEGES FOR ROLE`. Without revoking `CONNECT` from `PUBLIC`, any role on the server can open any of the seven databases; with it, one database's app role gets "permission denied" on another. Granting through default privileges only (never `ON ALL TABLES`) keeps a rerun from giving `vrms_app` back `DELETE` on `audit_logs`. The test also ran welinc-auth's `db:deploy` as `auth_owner` and its seed as `auth_app`: both work, triggers included, and its directory feed migration's own `ALTER ROLE CURRENT_USER SET idle_in_transaction_session_timeout` works for a non superuser owner (`init.sql` sets no timeout; the server parameter covers every role).
+
+## VMMS and BMS readiness (read only check, 2026-11-14)
+
+Read from their clones after a fetch: VMMS backend `origin/development` 44aaae5, VMMS analytics `origin/development` aa4602a3, VMMS web `origin/development` 39b8a9e, BMS backend `origin/latest-bms-backend` 367ff76, BMS web `origin/latest-bms-frontend` d2ba433, BMS analytics `origin/main` 586f2f5. Neither group can deploy to the hosted setup yet. These are the gaps their S11 moves must close; they are the groups' to fix in their own repos.
+
+| Group | Gap | Where |
+|---|---|---|
+| Both | No service listens on its contract 0001 port (3010, 3011, 3020 to 3025); the code defaults are 3000 to 3005 | each service's `main.ts` or `server.mjs` |
+| Both | Only the VMMS core has a production Dockerfile; VMMS analytics has only `Dockerfile.dev` (`start:dev`), BMS services and BMS analytics have none | repo roots |
+| VMMS | The core has no health route (`GET /` answers a string); contract 0001 needs `GET /vmms/health` | `welinc-backend-vmms/src/` |
+| VMMS | `Dockerfile.prod` runs `node dist/main`, but the build writes `dist/src/main` (likely, from the tsconfig) | `welinc-backend-vmms/Dockerfile.prod` |
+| VMMS | Still reads `JWT_SECRET` (required); the suite has none since suite spec 0002 | `welinc-backend-vmms/src/` |
+| VMMS | Uploads go to local disk (`uploads/`, `private-uploads/`), lost on every new revision; needs blob storage or a mounted share | `welinc-backend-vmms` |
+| VMMS | Analytics keeps a DuckDB file on local disk and creates triggers on the VMMS database at boot; it needs a mounted share for the file (the triggers, next row) | `welinc-backend-vmms-analytics-ai/src/analytics/` |
+| VMMS | Analytics must not create its triggers and functions at boot: they move into a VMMS migration (run as `vmms_owner` by the migration job), so analytics runs as `vmms_app` like every app | `installPostgresTriggers` in `welinc-backend-vmms-analytics-ai/src/analytics/` |
+| VMMS | Analytics `GET /analytics/health` doesn't match the route `/vmms/analytics/health` and checks no database | `analytics.controller.ts` |
+| VMMS | Web `Dockerfile.prod` copies an `nginx.conf` that isn't in the repo; on Static Web Apps only `npm run build` and `dist/` matter | `welinc-web-vmms` |
+| BMS | `bms-gateway` binds `127.0.0.1`, so no other container can reach it | `bms-gateway/server.mjs:161` |
+| BMS | `bms-gateway`, booking and BMS analytics read the auth database directly (`AUTH_DATABASE_URL`); no system reads another's database, so this must move to the directory API (contract 0001 section 9) | `auth-integration.mjs`, booking |
+| BMS | Dispatch reads vehicles, drivers and garages from the old shared `welinc_db` (`BMS_PARTNER_DATABASE_URL`) | `bms-dispatch-service/src/fleet/local-fleet.provider.ts` |
+| BMS | The analytics projection refuses any database host but localhost | `bms-analytics-projection/worker.mjs:3` |
+| BMS | Services still read `JWT_SECRET`; BMS analytics needs it to equal the main backend's | booking, dispatch, completion, analytics |
+| BMS | BMS analytics needs MySQL (`MYSQL_*`), which the hosted setup doesn't provide (it answers 503 without it) | `welinc-backend-bms-analytics-ai` |
+| Both | List every PostgreSQL extension your migrations create (`pgcrypto`, `uuid-ossp` and so on), so it is allowed in `azure.extensions` and created by `init.sql` before your first deploy | each `prisma/migrations/` |
+| BMS | Inner services expose `/health/live` and `/health/ready`, the gateway `/health/live`; contract 0001 needs `GET /bms/health` on `bms-gateway` | each service |
+
+What the hosted setup already allows for: `bms-projection` is defined with no ingress (it is a worker), every inner BMS service is internal and reached only by `bms-gateway`, and a group's health path or extra settings can be changed in `groupApps` without touching the Bicep.
+
 ## References
 
 **Project sources** (verifiable, in this repo):
