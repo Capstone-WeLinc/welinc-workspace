@@ -250,11 +250,11 @@ Order follows Tracer Bullet: CI first (built), then everything that needs no Azu
 2. [x] `.github/workflows/ci.yml` in the five repos, satisfies **AC-1**, **AC-2**, **AC-11**
 
 **Slice 2: make the apps deployable (no Azure; by Nov 18)**
-3. Fix `Dockerfile.prod` in auth and backend-vrms: `EXPOSE` and read `PORT` (3001, 3002), copy `prisma.config.ts` into the runner, run as a non root user, run `npm run geo:fetch` in the auth build, and add a `seed` target that is a full source image (`src/`, `scripts/`, `prisma/`, `tsconfig.json`, `prisma.config.ts`) for every job, satisfies **AC-6**, **AC-13**, **AC-15**
+3. [x] Fix `Dockerfile.prod` in auth and backend-vrms: `EXPOSE` and read `PORT` (3001, 3002), copy `prisma.config.ts` into the runner, run as a non root user, run `npm run geo:fetch` in the auth build, and add a `seed` target that is a full source image (`src/`, `scripts/`, `prisma/`, `tsconfig.json`, `prisma.config.ts`) for every job, satisfies **AC-6**, **AC-13**, **AC-15**
 4. [x] `/auth/health` and `/vrms/health` (built in suite spec 0008), satisfies **AC-6**, **AC-9**
-5. In both services read `DB_POOL_MAX` into the `pg.Pool` `max`, confirm localhost origins are refused when `NODE_ENV=production`, and confirm auth's session and temporary grant sweeps are safe to run twice at once. In backend-vrms add the seed guard (same message and rule as welinc-auth) and the `--reference` mode (garages, vehicles, knowledge base, settings only), satisfies **AC-5**, **AC-13**, **AC-15**, **AC-16**, **AC-21**
-6. In welinc-auth add `admin:recover --create` (suite spec 0013 AC-12b) with its tests, satisfies **AC-15**
-7. Add `staticwebapp.config.json` to web-vrms and web-portal with the fallback and the headers in Design, satisfies **AC-3**, **AC-14**
+5. [x] In both services read `DB_POOL_MAX` into the `pg.Pool` `max`, confirm localhost origins are refused when `NODE_ENV=production`, and confirm auth's session and temporary grant sweeps are safe to run twice at once. In backend-vrms add the seed guard (same message and rule as welinc-auth) and the `--reference` mode (garages, vehicles, knowledge base, settings only), satisfies **AC-5**, **AC-13**, **AC-15**, **AC-16**, **AC-21**
+6. [x] In welinc-auth add `admin:recover --create` (suite spec 0013 AC-12b) with its tests, satisfies **AC-15**
+7. [x] Add `staticwebapp.config.json` to web-vrms and web-portal with the fallback and the headers in Design, satisfies **AC-3**, **AC-14**
 8. [x] `infra/gateway/` with every system's routes (suite spec 0008), satisfies **AC-3**, **AC-19**
 
 **Slice 3: setup as code, domain and mail (Bicep written by Nov 18; applied Nov 18 to 19)**
