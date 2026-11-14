@@ -79,7 +79,7 @@ Reasoning and options: see [rationale.md](rationale.md).
 | `actor_id` | uuid | yes | FK `users`, restrict. Null: nobody acted (idle end, automatic lock). Equal to `user_id`: the person did it |
 | `category` | `AccountEventCategory` | no | `SIGN_IN`, `SESSION`, `CODE`, `ACCOUNT` |
 | `type` | `AccountEventType` | no | list below |
-| `reason` | varchar(40) | yes | fail reason, session end reason, or code purpose |
+| `reason` | varchar(500) | yes | fail reason, session end reason, or code purpose (amended 2026-11-14: also the admin's written reason, 10 to 500 characters, on suite spec 0013's `SUITE_ADMIN_ACTIONED`, `SUITE_ADMIN_REMOVED`, `TEMP_ACCESS_STARTED` and `ADMIN_RECOVERY`; was varchar(40), which failed those writes) |
 | `system` | `SystemType` | yes | the system the event belongs to; null means account wide |
 | `session_id` | uuid | yes | plain `sid`, no FK (sessions are purged after 90 days) |
 | `client_id` | text | yes | the login client, plain value |

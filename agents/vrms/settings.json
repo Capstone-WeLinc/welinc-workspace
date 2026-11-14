@@ -8,7 +8,10 @@
       "Edit(/welinc-web-bms/**)",
       "Edit(/welinc-web-vmms/**)",
       "Edit(/welinc-backend-bms/**)",
-      "Edit(/welinc-backend-vmms/**)"
+      "Edit(/welinc-backend-vmms/**)",
+      "Edit(/welinc-backend-vmms-analytics-ai/**)",
+      "Edit(/welinc-backend-bms-analytics-ai/**)",
+      "Edit(/welinc-mobile-vrms_vmms/**)"
     ]
   },
   "enabledMcpjsonServers": ["playwright", "shadcn", "atlassian"],
