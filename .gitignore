@@ -38,3 +38,6 @@ Thumbs.db
 /.claude/agents/
 # Skill engine binaries download on first run; never commit them (impeccable's is 24 MB)
 agents/*/skills/*/scripts/bin/
+
+# Hosting secrets, one private file per environment (VRMS spec 0008); only the example is committed
+/infra/private/

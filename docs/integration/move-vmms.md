@@ -50,6 +50,7 @@ Tick these in order. Each links the guide that already explains it.
 - [ ] Copy `.env.example` to `.env` in `welinc-backend-vmms` and `welinc-backend-vmms-analytics-ai` (setup does this for you). The names are in step 2.
 - [ ] Run `sh scripts/setup.sh vmms`. Once the compose file exists it makes VMMS's client key (`npm run keys:client -- vmms ...` in welinc-auth, private key into `welinc-backend-vmms/.env`, public key into welinc-auth's `.env`), registers it, starts your stack, runs each service's migrations and seed, and waits for your health routes. It never prints a key.
 - [ ] Each service's `npm run seed` must keep data that is already there (setup runs it on every rerun). Skip when your tables hold rows, the way VRMS's setup does.
+- [ ] Make it hosting ready in the same pull requests: the checklist in [hosting.md](hosting.md#make-it-hosting-ready) (a `Dockerfile.prod`, the pool setting, no lasting files on local disk, every table and trigger from a migration). Added 2026-11-14.
 
 ### 2. Environment
 

@@ -19,5 +19,6 @@ That checklist is the only page you need to read through. Each item links the ex
 | [account-screens.md](account-screens.md) | Your Users page moving to the portal, the admin code answer, temporary roles, profile and admin activity, account deletion, erasure |
 | [fleet-api.md](fleet-api.md) | The trucks and garages API: VMMS serves it, BMS dispatch reads it |
 | [seed-accounts.md](seed-accounts.md) | Every test login and password, and how your seed copies the shared people |
+| [hosting.md](hosting.md) | Going online on Azure: your apps, what makes a service hosting ready, secrets, deploying |
 
 The rules behind all of this are in the shared services contract, [suite spec 0001](../specs/_root/0001-shared-services-contract/index.md); the move itself is [suite spec 0014](../specs/_root/0014-move-vmms-bms-shared-services/index.md). What changed in the shared repos this term is in [docs/context/shared-repo-changes.md](../context/shared-repo-changes.md).

@@ -1,0 +1,42 @@
+name: CI
+
+# The workspace's own checks: the setup as code compiles, the shell scripts pass shellcheck,
+# and the gateway answers every route the way suite spec 0008 says.
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  infra:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      # az ships on the runner and installs Bicep on first use
+      - name: Bicep compiles
+        run: |
+          for f in infra/*.bicep infra/modules/*.bicep; do
+            echo "bicep build $f"
+            az bicep build --file "$f" --stdout > /dev/null
+          done
+      - name: Shellcheck
+        run: shellcheck -x -S warning infra/scripts/*.sh scripts/*.sh
+
+  gateway:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      - run: node infra/gateway/test/check-routes.mjs
