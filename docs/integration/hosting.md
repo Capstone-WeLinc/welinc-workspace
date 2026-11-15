@@ -14,7 +14,7 @@ Read this after your move checklist ([move-vmms.md](move-vmms.md) or [move-bms.m
 | Thu Nov 19 | The workflow files arrive here. You copy them, the lead turns your group on, and your first push to `development` deploys staging |
 | Fri Nov 20 | Production goes live: you click "Run workflow" on `main` once in each repo |
 | Nov 21 to 27 | Keep building on `development` (staging); promote to production when it's stable |
-| Nov 28 to Dec 5 | Freeze: production changes only for fixes, and only migrations that add (never drop or rename) |
+| Before the defenses (dates not set yet, likely December) | Freeze: production changes only for fixes, and only migrations that add (never drop or rename). The lead announces the dates |
 
 Until your group is turned on, your routes on the gateway (`/vmms/`, `/bms/`) answer 502 `UPSTREAM_UNAVAILABLE` and nothing else is affected. Between being turned on and your first deploy, they show Microsoft's placeholder page.
 
