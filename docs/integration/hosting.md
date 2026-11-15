@@ -12,7 +12,7 @@ Read this after your move checklist ([move-vmms.md](move-vmms.md) or [move-bms.m
 | Tue Nov 17 | The lead checks your move (the checker) and sets up Azure and staging. You start the checklist below and add CI |
 | Wed Nov 18 | Your hosting ready pull requests are merged, and you've sent the lead what's listed in "What the lead needs from you" |
 | Thu Nov 19 | The workflow files arrive here. You copy them, the lead turns your group on, and your first push to `development` deploys staging |
-| Fri Nov 20 | Production goes live: you bring `main` up to `development` and run the production workflow once |
+| Fri Nov 20 | Production goes live: you click "Run workflow" on `main` once in each repo |
 | Nov 21 to 27 | Keep building on `development` (staging); promote to production when it's stable |
 | Nov 28 to Dec 5 | Freeze: production changes only for fixes, and only migrations that add (never drop or rename) |
 
@@ -132,10 +132,13 @@ You send only keys from outside providers, which only your accounts can issue: G
 ## Deploying
 
 - **Branches.** Every repo has two long lived branches: `development` (your daily branch, deploys staging) and `main` (production). Feature branches come off `development` and go back into it by pull request. `staging` is an environment, not a branch: delete any old `staging` branch. Set `development` as each repo's default branch (Settings, General), so pull requests and Dependabot target it.
-- **One time branch cleanup** (before Nov 20). VMMS: your `main` and `staging` are old copies of `development`; in `welinc-web-vmms` each has one commit `development` doesn't, so check that it's already in `development` in another form or bring it over, then replace `main` once with `git push --force-with-lease origin development:main`. BMS: `welinc-backend-bms` and `welinc-backend-bms-analytics-ai` have no `development` yet (you work on `latest-bms-backend` and `main`), and `welinc-web-bms`'s `development` is from May; create or refresh them from your newest work, since your move pull requests go into them. Then make `main` equal to `development` in every repo. After this one cleanup, never force push `main` again.
+- **Never touch `main`.** No pull requests into it, no commits, no pushes. The production workflow moves it for you.
+- **One time branch cleanup** (before Nov 20).
+  - VMMS: in every repo but one, `main` is just behind `development`, so there is nothing to do; the first production run moves it up. The exception is `welinc-web-vmms`: its `main` holds only GitHub's "Initial commit" README from May, which `development` doesn't have. Replace it once: `git push --force-with-lease origin origin/development:main`. Delete the old `staging` branches.
+  - BMS: `welinc-backend-bms` and `welinc-backend-bms-analytics-ai` have no `development` yet, and `welinc-web-bms`'s is from May. Create or refresh them from your newest work (your move pull requests go into them). Your `main` is behind that work in all three, so nothing else to do.
 - **Staging:** a push to `development` deploys that repo by itself, the same as VRMS: build both images, run the migration job, switch to the new version only once its health route answers, then a smoke test. If a migration or the health check fails, the old version keeps serving.
 - **CI first, always.** Every deploy runs your `ci.yml` on the commit first and deploys only if it passes. A push straight to `development` with a red check deploys nothing. Still, always go through a pull request.
-- **Production:** move `main` forward to a commit that staging already deployed (it needs that commit's images), without a merge commit: `git push origin <commit>:main` (or `git checkout main && git merge --ff-only origin/development && git push`). A pull request from `development` into `main` makes a new merge commit that staging never built, so the production run refuses it. Then click "Run workflow" on `main`.
+- **Production:** Actions, the deploy workflow, "Run workflow", branch `main`, leave `sha` empty. It takes the newest `development` commit that staging deployed successfully, moves `main` up to it, runs CI and deploys. If someone committed to `main` by hand, the move fails and nothing deploys.
 - **Rollback:** run the production workflow again with its `sha` input set to an older `main` commit (the full 40 character SHA). It skips migrations, so your migrations must only add, never drop or rename. Never force push `main`.
 - **Your Azure login** is your group's own, separate for staging and production. It can update and start only your group's apps and jobs; it can't touch VRMS, the shared services or the other group.
 - **Workflow files.** Two files to copy into your repos (one for backends, one for the web app) and the repo variables to set will be added here once ours deploy staging by themselves (Nov 19). Until then there is nothing to copy.
