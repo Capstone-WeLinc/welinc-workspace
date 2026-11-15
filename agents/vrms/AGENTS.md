@@ -37,6 +37,9 @@ node scripts/check-system.mjs vrms   # suite spec 0014 checker: live login check
 
 # Gateway checks (needs Docker; starts and removes its own containers)
 node infra/gateway/test/check-routes.mjs
+
+# Azure setup as code (VRMS spec 0008; order and gotchas in infra/README.md; needs az, jq, psql, dig, gh)
+bash infra/scripts/apply.sh <shared|budget|staging|prod> [--what-if] [--domains]
 ```
 
 ## Specs
