@@ -67,7 +67,7 @@ Product backlog lives in Jira (read it through the Atlassian MCP); Jira wins whe
 
 Reference skills load on their own when the work matches (say "Using skill: <name>"). Audit and polish skills never run on their own, not even as a step of `/develop` or `/check verify`: offer them in one line and wait for a yes. Never run more than one taste skill on a change.
 
-- **Load on match:** `prisma-client-api`, `prisma-cli`, `nestjs-best-practices`, `tailwind-4-docs` (its docs snapshot is not downloaded yet), `vercel-composition-patterns`, `react-hook-form`, `ask-sonner`, `web-dnd-dnd-kit` (classic `@dnd-kit/core` and `@dnd-kit/sortable`). Only for substantial work, not copy or class tweaks: `shadcn` and `vercel-react-best-practices`.
+- **Load on match:** `prisma-client-api`, `prisma-cli`, `nestjs-best-practices`, `tailwind-4-docs` (its docs snapshot is not downloaded yet), `vercel-composition-patterns`, `react-hook-form`, `ask-sonner`, `web-dnd-dnd-kit` (classic `@dnd-kit/core` and `@dnd-kit/sortable`), `sentry-nestjs-sdk`, `sentry-react-sdk` and `sentry-setup-releases` (Sentry setup and releases, spec 0025). Only for substantial work, not copy or class tweaks: `shadcn` and `vercel-react-best-practices`.
 - **Ask first (demanding or writes extra code):**
   - `web-design-guidelines`: offer after a UI change.
   - `break-ui`: offer on pages with lists, tables or typed text.
@@ -76,7 +76,7 @@ Reference skills load on their own when the work matches (say "Using skill: <nam
   - Azure hosting (suite spec 0008): `azure-container-apps`, `azure-container-registry`, `azure-static-web-apps`, and `azure-deployment-preflight` before a Bicep deploy. Never `azure-prepare` or `azure-deploy` (they assume azd).
   - `emil-design-eng`: offer when animations, dialogs, popovers or tabs change; the effect rules in `welinc-web-vrms/AGENTS.md` win.
 
-MCP servers (from `agents/vrms/mcp.json`): playwright, shadcn, atlassian (Jira; needs a one time sign in through `/mcp`)
+MCP servers (from `agents/vrms/mcp.json`): playwright, shadcn, atlassian (Jira; needs a one time sign in through `/mcp`), sentry (read real issues; sign in through `/mcp` once the Sentry org exists)
 
 ## Context files
 
