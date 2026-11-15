@@ -304,6 +304,7 @@ The move itself: their users merged into welinc-auth by email, their auth copies
   - [x] The kit, proven on VRMS: `check-system.mjs` and `setup.sh` for vmms and bms (`start.sh` and `stop.sh` removed 2026-11-13: plain `docker compose` commands in the README), `move-vmms.md`, `move-bms.md`, `fleet-api.md`; tell both groups · AC-12 to AC-16
     - Note (2026-11-14, replan): built and merged (spec 0014 tasks 9 to 11 ticked; the checklists and README updates landed 2026-11-14). You told VMMS and BMS on 2026-11-14; their move PRs are due Monday 2026-11-16. Hosting (VRMS feature 26) runs in parallel while they move.
   - [ ] The moves (the groups build AC-17 to AC-30): VMMS login done [ ], VMMS fleet done [ ], BMS login done [ ], BMS fleet done [ ], `welinc-backend` archived [ ] · AC-17 to AC-31
+    - Note (2026-11-16, replan): VMMS opened `feat/shared-services` PRs in all four repos (backend #1, web #2, analytics #1, mobile #1); next, run `node scripts/check-system.mjs vmms` against them, read only. BMS has pushed nothing for the move yet, and `welinc-backend-bms` and `welinc-backend-bms-analytics-ai` still have no `development` branch.
   - [ ] Cleanup: VRMS Users page off `GET /auth/users`, the gated removal of the bearer admin routes, contract 0001 version 9 · AC-33
 - [ ] Verify it: `/check verify move VMMS and BMS onto the shared services` (the staging run, AC-32, waits for VRMS feature 26)
 - [ ] Test it: `/test move VMMS and BMS onto the shared services`
