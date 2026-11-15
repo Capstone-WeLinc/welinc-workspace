@@ -151,6 +151,24 @@
       "skillPath": "skills/scope/SKILL.md",
       "computedHash": "737c19451b3d0e08edf9560b195a864d1a4006e4f70760339ddc3b2d9b6b6447"
     },
+    "sentry-nestjs-sdk": {
+      "source": "getsentry/sentry-for-ai",
+      "sourceType": "github",
+      "skillPath": "skills-legacy/sentry-nestjs-sdk/SKILL.md",
+      "computedHash": "d25ea85ceb5f689076df9d78e0c9368c07fcb8eeecdd9e2d5b8c93527a5b014f"
+    },
+    "sentry-react-sdk": {
+      "source": "getsentry/sentry-for-ai",
+      "sourceType": "github",
+      "skillPath": "skills-legacy/sentry-react-sdk/SKILL.md",
+      "computedHash": "cf4d17449c009700c27a84c8c7fd7a2fbdaa96b259addb2a064ce0d22c5f73d7"
+    },
+    "sentry-setup-releases": {
+      "source": "getsentry/sentry-for-ai",
+      "sourceType": "github",
+      "skillPath": "src/skills/sentry-setup-releases/SKILL.md",
+      "computedHash": "564dca77e5723e948438871b58f1660d9cadb2ec73990896fdb50d2ea79641cc"
+    },
     "shadcn": {
       "source": "shadcn-ui/ui",
       "sourceType": "github",
