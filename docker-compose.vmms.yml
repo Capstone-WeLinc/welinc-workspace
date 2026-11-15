@@ -1,0 +1,109 @@
+name: vmms-environment
+
+services:
+  vmms-db:
+    image: postgres:16
+    container_name: welinc_vmms_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: welinc_vmms_user
+      POSTGRES_PASSWORD: welinc_vmms_pass
+      POSTGRES_DB: welinc_vmms_db
+    ports:
+      - "5438:5432"
+    volumes:
+      - vmms_pgdata:/var/lib/postgresql/data
+    networks:
+      - welinc-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U welinc_vmms_user -d welinc_vmms_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  vmms-backend:
+    build:
+      context: ./welinc-backend-vmms
+      dockerfile: Dockerfile.dev
+    container_name: welinc_vmms_backend
+    restart: unless-stopped
+    ports:
+      - "3010:3010"
+    volumes:
+      - ./welinc-backend-vmms:/app
+      - /app/node_modules
+    env_file:
+      - path: ./welinc-backend-vmms/.env
+        required: false
+    environment:
+      PORT: 3010
+      DATABASE_URL: postgresql://welinc_vmms_user:welinc_vmms_pass@vmms-db:5432/welinc_vmms_db?schema=public
+      AUTH_ISSUER: http://localhost:3000/auth
+      AUTH_JWKS_URL: http://auth-service:3001/auth/.well-known/jwks.json
+      AUTH_INTERNAL_URL: http://auth-service:3001
+      AUTH_CLIENT_ID: vmms
+      CORS_ORIGINS: http://localhost:8000,http://localhost:8002
+      WEB_APP_URL: http://localhost:8002
+      PORTAL_URL: http://localhost:8000
+      AUTH_PUBLIC_URL: http://localhost:3000/auth
+      API_PUBLIC_URL: http://localhost:3000
+      SESSION_COOKIE_SECURE: "false"
+      TRUST_PROXY_HOPS: "1"
+      NODE_ENV: development
+    depends_on:
+      vmms-db:
+        condition: service_healthy
+    networks:
+      - welinc-network
+
+  vmms-analytics:
+    build:
+      context: ./welinc-backend-vmms-analytics-ai
+      dockerfile: Dockerfile.dev
+    container_name: welinc_vmms_analytics
+    restart: unless-stopped
+    ports:
+      - "3011:3011"
+    volumes:
+      - ./welinc-backend-vmms-analytics-ai:/app
+      - /app/node_modules
+    env_file:
+      - path: ./welinc-backend-vmms-analytics-ai/.env
+        required: false
+    environment:
+      PORT: 3011
+      DATABASE_URL: postgresql://welinc_vmms_user:welinc_vmms_pass@vmms-db:5432/welinc_vmms_db?schema=public
+      AUTH_ISSUER: http://localhost:3000/auth
+      AUTH_JWKS_URL: http://auth-service:3001/auth/.well-known/jwks.json
+      AUTH_INTERNAL_URL: http://auth-service:3001
+      VMMS_API_BASE_URL: http://vmms-backend:3010/vmms
+      NODE_ENV: development
+    depends_on:
+      - vmms-backend
+    networks:
+      - welinc-network
+
+  web-vmms:
+    build:
+      context: ./welinc-web-vmms
+      dockerfile: Dockerfile.dev
+    container_name: welinc_vmms_frontend
+    restart: unless-stopped
+    ports:
+      - "8002:8002"
+    volumes:
+      - ./welinc-web-vmms:/app
+      - /app/node_modules
+    environment:
+      VITE_API_BASE_URL: http://localhost:3000
+      VITE_PORTAL_URL: http://localhost:8000
+    networks:
+      - welinc-network
+
+volumes:
+  vmms_pgdata:
+
+networks:
+  welinc-network:
+    name: welinc-network
+    external: true
