@@ -132,6 +132,19 @@ Read from their clones after a fetch: VMMS backend `origin/development` 44aaae5,
 
 What the hosted setup already allows for: `bms-analytics-projection` is defined with no ingress (it is a worker), every inner BMS service is internal and reached only by `bms-gateway`, and a group's health path or extra settings can be changed in `groupApps` without touching the Bicep.
 
+## Branch model and deploy guard (2026-11-16)
+
+**Production branch.** The spec first used a new long lived `release` branch for production and left `main` alone. On 2026-11-16 every repo still had a `main` (and VMMS's a `staging`) that nobody kept current: 10 to 93 commits behind `development`, and the VMMS and BMS repos still had `main` as their default branch. Two options:
+
+- **`main` is production** (chosen by Samuel). The common split: `development` is integration and goes to staging, `main` is what production runs. No new branch to explain, and it matches what people already expect. Cost: once per repo, bring `main` up to `development` and delete the old `staging` branches.
+- **A new `release` branch.** No cleanup, but four long lived names (`development`, `release`, plus stale `main` and `staging`) that mean different things in different repos.
+
+**Promotion fast forwards.** Production deploys the exact image staging built for that commit, tagged with its SHA. A pull request merge from `development` into `main` makes a new merge commit whose SHA has no image and isn't on `development`, so the guard would refuse it. Promotion therefore moves `main` to a `development` commit without a merge: `git push origin <sha>:main` (or `git merge --ff-only`). Rollback is a `sha` input on the production run, so `main` never moves back and is never force pushed.
+
+**Deploy guard.** GitHub Free can't protect branches on private organization repos, so nobody can be stopped from pushing straight to `development`. Instead of relying only on the "always a pull request" rule, each deploy workflow runs `ci.yml` (through `workflow_call`) as its first job, and the deploy job needs it. A red push changes nothing on Azure. Cost: CI runs twice for a merged pull request (once on the pull request, once in the deploy), a few minutes of the 2,000 free minutes a month.
+
+**Workspace.** The workspace keeps `main` as its only branch: its CI and the gateway's staging deploy run on pushes to `main`, and the gateway's production deploy is a manual run on `main`. Both of its logins trust `main`; only the manual production run uses the production login.
+
 ## References
 
 **Project sources** (verifiable, in this repo):
