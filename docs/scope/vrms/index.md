@@ -7,7 +7,7 @@ VRMS (Vehicle Repair Management System) lets WeLinc Logistics log, assign, track
 
 _These are recommendations to keep your build orderly, not requirements. Skip anything that does not fit: if you already know how to build a feature, use `/develop` and skip `/architect`. You decide when a feature is `done`._
 
-**Deadline:** deployed by the end of November 2026, about 5 weeks from this plan. The whole plan is in scope; nothing is set aside for trimming. Documentation and QA tasks (WL-E10, WL-E11) stay in Jira, not here.
+**Deadline:** the final defense on 2026-12-05 ends the project; nothing is planned after it. Production goes live 2026-11-20 (spec 0008), the mock defense is Nov 28 and the integration defense Dec 4; the freeze date is not set yet. The whole plan is in scope; nothing is set aside for trimming. VRMS features are built in the gaps while hosting and the VMMS and BMS moves wait on the other groups, starting now rather than after Nov 20, as many as fit (your call, 2026-11-16). Documentation and QA tasks (WL-E10, WL-E11) stay in Jira, not here.
 
 **Shared services:** the auth, portal and gateway rework the other groups need lives in the suite epic [_root/shared-services.md](../_root/shared-services.md) (rows S1 to S13, from 2026-11-07; S1 to S3 done on 2026-11-08, S5, S6 and S12 on 2026-11-09, S4 on 2026-11-10, S9, S13 and S14 on 2026-11-11, S7 and S8 on 2026-11-12, S10 and S16 on 2026-11-13; S11 is the row left, its kit built 2026-11-14 and the groups' moves due 2026-11-16, plus S15, an optional extra). It replaces features 60 and 61 and takes the auth and gateway half of feature 56. It started after feature 65 task 10; the verify runs for 58 and 65 are still open.
 
@@ -20,7 +20,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | Foundations | [foundations.md](foundations.md) | 8 existing, 7 done, 1 planned |
 | UI refresh | [ui-refresh.md](ui-refresh.md) | 3 done, 6 in-progress, 2 planned, 1 dropped |
 | Repair workflow | [repair-workflow.md](repair-workflow.md) | 12 done, 1 in-progress, 9 planned, 1 dropped |
-| Platform | [platform.md](platform.md) | 1 done, 1 in-progress, 5 planned, 3 dropped |
+| Platform | [platform.md](platform.md) | 1 done, 2 in-progress, 6 planned, 3 dropped |
 | Outsourcing | [outsourcing.md](outsourcing.md) | 4 planned |
 | Operations | [operations.md](operations.md) | 5 planned, 1 dropped |
 | Reports & AI | [reports-ai.md](reports-ai.md) | 4 planned |
@@ -76,7 +76,9 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 58 | Per ticket checklist edits | Slice 1 | in-progress |
 | 63 | Chief dashboard rework with a Team section | Slice 1 | done |
 | 26 | Hosting, CI/CD & environments | Release | in-progress |
-| 27 | Error monitoring | Release | planned |
+| 27 | Error monitoring | Release | in-progress |
+| 68 | API docs | Release | planned |
+| 69 | Security checks | Release | planned |
 | 66 | Workflow review against real shops | Slice 2 | planned |
 | 67 | Describe first issue picker | Slice 2 | planned |
 | 28 | In-app notifications | Slice 2 | planned |

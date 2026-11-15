@@ -41,10 +41,31 @@ spec [0008](../../specs/vrms/0008-hosting-and-ci-cd/index.md) · code in `infra/
 - Note (2026-11-08, replan): from suite specs 0001 and 0002, spec 0008 is now out of date. Before the Azure milestones, update it through `/architect`: register the custom domain (working name `welinc.tech`, note the renewal date) and put it on every Static Web App and the gateway Container App; gateway config from `infra/gateway/`; the new routes and ports; replace the `JWT_SECRET` row and the "rotating the JWT secret" step with `AUTH_SIGNING_KEYS`, `CLIENT_VRMS_JWKS`, `AUTH_CLIENT_PRIVATE_KEY` and a link to `docs/keys.md`. The staging key rotation check (spec 0002 AC-24 and AC-26) runs once staging exists.
 - Note (2026-11-03, replan): the gateway change from spec 0017 (26 MB uploads and a 120 second read timeout on the VRMS routes, commit `1803092`) was pushed straight to welinc-auth `development` on 2026-11-03. Add it to the feature 55 list of changes you made to the shared repos.
 
-### 27. Error monitoring · planned · needs a decision
+### 27. Error monitoring · in-progress
 Catch errors in production before users report them.
 **Done when:** frontend and backend errors from staging and production reach one place with the release and user role attached, and no secrets or personal data are sent.
-- [ ] Design it (spec): `/architect error monitoring`
+spec [0025](../../specs/vrms/0025-error-monitoring/index.md) · code in `welinc-backend-vrms`, `welinc-web-vrms`, `welinc-auth`, `welinc-web-portal`, `infra/gateway/`, `infra/`
+- Note (2026-11-16, `/architect`): Sentry in your four apps (student offer, free plan fallback, US region), browser reports through two gateway tunnel routes, one cron monitor (directory poll) and one uptime check (`/vrms/health`), Azure metric alerts in Bicep, a crash screen with a reference code, staging only test routes. Milestones 3 and 4 wait for feature 26's `deploy.yml`. Cross checked on another model, 17 gaps closed.
+- [x] Design it (spec): `/architect error monitoring`
+- [ ] Build it: `/develop error monitoring`
+  - [ ] Thin thread in VRMS: the Sentry org and projects, backend-vrms and web-vrms SDKs, scrubbing, crash screen, test route and page, proven from your laptop (AC-1 to AC-3, AC-6 to AC-9, AC-12, AC-14 to AC-16)
+  - [ ] The shared side: welinc-auth (with `CodeErrorFilter`), the portal, the gateway tunnel and CORS headers, contract 0001 (AC-1 to AC-9, AC-14 to AC-16)
+  - [ ] Jobs and releases: job failure reports, the directory poll monitor, release tags, source map upload and removal in `deploy.yml` (AC-1, AC-3, AC-10, AC-17)
+  - [ ] Alerts and hand off: Bicep settings and Azure alert rules, the uptime and cron alerts, the VMMS and BMS how to page (AC-10 to AC-14, AC-18)
+- [ ] Verify it: `/check verify error monitoring`
+- [ ] Test it: `/test error monitoring` (Testmail is not needed here; it is for the email code flows)
+
+### 68. API docs · planned · needs a decision
+Interactive API docs generated from the NestJS controllers (`@nestjs/swagger`), so VMMS and BMS can read the auth API without the code, and the panel can see the API. Added 2026-11-16, after hosting and before the integration defense (Dec 4).
+**Done when:** backend-vrms and welinc-auth each serve generated docs listing every route with its inputs, outputs and errors, kept in step with the code by the build, and production exposes them only as decided in the spec.
+- [ ] Design it (spec): `/architect API docs` (which backends, whether production shows them, contract 0001 vs the generated docs as the source of truth, how much DTO decorating)
+
+### 69. Security checks · planned
+Free checks that catch leaks and weaknesses, with reports to cite in the papers. Added 2026-11-16. No spec needed: the tools and their place are settled.
+**Done when:** every repo's CI fails a pull request that contains a secret (gitleaks), an OWASP ZAP baseline scan runs against staging weekly and on demand with its report kept, and production's Mozilla Observatory and SSL Labs grades are recorded in the runbook.
+- [ ] Build it: `/develop security checks` (gitleaks any time; ZAP after staging exists)
+- [ ] Verify it: `/check verify security checks`
+- [ ] Test it: `/test security checks`
 
 ## Integration
 
