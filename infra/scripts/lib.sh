@@ -1,3 +1,4 @@
+# shellcheck shell=bash disable=SC2034  # its variables are used by the scripts that source it
 # Shared by infra/scripts/*.sh (VRMS spec 0008). Sourced, never run.
 # Needs: az (logged in to the WeLinc subscription), jq; psql for db-init.sh.
 
