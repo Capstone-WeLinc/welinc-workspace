@@ -8,6 +8,7 @@ You change only your own repos: `welinc-backend-vmms`, `welinc-backend-vmms-anal
 
 Newest first. The shared services lead posts each one in your group chat when it lands.
 
+- **2026-11-17:** the live checker passed on your PR branches (login 19 of 19, fleet 5 of 5, scan clean); the output is on your PRs. New open item on the hosting box: analytics' image needs `DATABASE_URL` to build.
 - **2026-11-16:** only the shared services lead ticks this checklist (see Checklist).
 - **2026-11-14:** step 1 gained the hosting ready box.
 
@@ -52,7 +53,7 @@ On Windows, type every command in **Git Bash** (the workspace [README](../../REA
 
 Work through these in order. **Only the shared services lead ticks a box**, after checking it on your pull requests, so a tick means verified, not claimed. Keep your own working notes in `docs/context/vmms/`.
 
-**Last checked:** 2026-11-16, on the `feat/shared-services` pull requests. Open before the live check: red tests (backend 13 suites, mobile 10 tests, analytics `test:auth`) and the open boxes below.
+**Last checked:** 2026-11-17, on the `feat/shared-services` pull requests; the live checker passed. Open before the live check: red tests (backend 13 suites, mobile 10 tests, analytics `test:auth`) and the open boxes below.
 
 ### 1. Stack and keys
 
@@ -62,6 +63,7 @@ Work through these in order. **Only the shared services lead ticks a box**, afte
 - [x] Each service's `npm run seed` must keep data that is already there (setup runs it on every rerun). Skip when your tables hold rows, the way VRMS's setup does.
 - [ ] Make it hosting ready in the same pull requests: the checklist in [hosting.md](hosting.md#make-it-hosting-ready) (a `Dockerfile.prod`, the pool setting, no lasting files on local disk, every table and trigger from a migration). Added 2026-11-14.
   - **Open (2026-11-16):** analytics has no `Dockerfile.prod`; the backend one runs `dist/main` but the build writes `dist/src/main.js`; no `DB_POOL_MAX`; uploads on local disk; triggers and `CREATE EXTENSION vector` at boot instead of migrations; no `SEED_ALLOW` guard.
+  - **Open (2026-11-17):** analytics' image doesn't build from a clean checkout: `prisma generate` needs `DATABASE_URL` at build time (it works locally only because `.env` is copied into the image). Give the build a placeholder value, or make `prisma.config.ts` not require it during `generate`.
 
 ### 2. Environment
 
