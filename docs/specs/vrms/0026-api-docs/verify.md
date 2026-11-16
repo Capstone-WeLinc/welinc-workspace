@@ -30,5 +30,23 @@ _Steps derived from spec 0026 acceptance criteria. `/check verify` runs these; `
 - [ ] `info.title` is `WeLinc auth API`, `info.version` is `0.0.1`, and the description links contract 0001 → info rows
 - [ ] Scalar "Try it" on staging sends to the page's own origin (`servers: [{ url: '/' }]`), never to a proxy, and the pasted token is gone after a reload → Try it out rows
 
+## Contract and workspace (milestone 3, added 2026-11-16)
+- [ ] `node scripts/check-contract-routes.mjs welinc-auth/docs/openapi.json` → `ok: all 86 rows of contract 0001 section 16 are documented`, exit 0 → AC-10
+- [ ] Drop `DELETE /auth/me/sessions/{sid}` and the 200 schema of `GET /auth/systems` from a copy of that file and run the script on it → exit 1, one `missing:` line and one `no reply schema:` line; add a path with no row → a `note:` line that doesn't fail → AC-10
+- [ ] Section 16 has 12 `yes` rows under *Reply schema*, exactly the AC-5 integration routes → AC-10, AC-5
+- [ ] With `AUTH_REPO_READ_TOKEN` unset, the `contract-routes` job on a workspace PR fails at "AUTH_REPO_READ_TOKEN is set" with the named message; with it set, it checks out welinc-auth `development` and passes. Run it once by hand (Actions, Run workflow) → AC-11
+- [ ] The workspace `infra` job compiles `infra/env.bicep`; `az bicep build` output shows `API_DOCS_ENABLED` `true` for staging and `false` for prod on both apps (`apply.sh staging --what-if` and `prod --what-if`) → AC-2
+- [ ] `docs/integration/README.md`, `move-vmms.md` and `move-bms.md` link `/auth/docs` and the committed file → AC-1
+
+## backend-vrms (milestone 4, added 2026-11-16, local stack up)
+- [ ] Restart `welinc_vrms_backend` (it needs `npm ci` for the new packages, so rebuild with `-V`), open `http://localhost:3000/vrms/docs` and `http://localhost:3002/vrms/docs` → the Scalar page lists every route with one tag each (`Repair Tickets`, `Operations`, `Session` and so on); `GET /` is absent; `/vrms/docs/openapi.json` equals the committed `docs/openapi.json` → AC-1, AC-4, AC-7
+- [ ] The page's network log shows only same origin requests (`/vrms/docs/scalar.js`, the JSON), no jsdelivr or fonts → AC-3
+- [ ] `API_DOCS_ENABLED=false`, restart → `/vrms/docs`, `/vrms/docs/openapi.json` and `/vrms/docs/scalar.js` answer 404; `NODE_ENV=production` with it blank, the same → AC-2
+- [ ] Paste a token from a signed in VRMS session into Scalar's auth panel, send `GET /vrms/repairs` → 200 with your tickets; `POST /vrms/session/refresh` from the page → 403 `CSRF_REJECTED`, and its description says so → AC-8
+- [ ] `npm run openapi` twice → identical bytes; change a DTO without regenerating → `npm run openapi:check` exits 1 with the hint; CI runs it after the build → AC-9
+- [ ] `npx jest src/openapi` → 6 pass; add a field to the fixture in `ticket-replies.spec.ts` or remove one from `repairs.response.ts` and regenerate → the test fails naming the field → AC-5, AC-6
+- [ ] `API_DOCS_ENABLED=maybe npm run env:check` → `API_DOCS_ENABLED: must be true or false`; blank and `true` pass → AC-12
+- [ ] The ticket replies come from `RepairsService.formatTicket` and `present`: a caller without the total cost permission gets no `isLumpSum` or `repairParts`, and the schema marks them optional → Value sourcing, the four VRMS ticket replies
+
 ## Acceptance-criteria coverage
-- AC-1 … the first UI step · AC-2 … the first two command steps · AC-3 … the network log step · AC-4 … the tag, error code and generic set steps · AC-5 … the mobile, 304 and test steps · AC-6 … the drift and test steps · AC-7 … the first and tag steps · AC-8 … the token, CSRF and session steps · AC-9 … the two `openapi` steps · AC-10, AC-11 … milestone 3, not built yet · AC-12 … the `env:check` and blank switch steps
+- AC-1 … the first UI step and both docs page steps · AC-2 … the first two command steps, the Bicep step and the backend-vrms switch step · AC-3 … both network log steps · AC-4 … the tag, error code and generic set steps · AC-5 … the mobile, 304 and test steps, the `yes` rows and the ticket test step · AC-6 … the drift and test steps, the ticket test step · AC-7 … the first and tag steps, `GET /` absent · AC-8 … the token, CSRF and session steps, the VRMS token step · AC-9 … the two `openapi` steps in each repo · AC-10 … the three contract steps · AC-11 … the CI job step · AC-12 … the `env:check` steps in each repo
