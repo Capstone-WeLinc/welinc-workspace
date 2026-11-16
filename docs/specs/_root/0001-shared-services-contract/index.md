@@ -4,7 +4,7 @@
 **Status**: Accepted
 **Scope row**: [S1. Shared services contract](../../../scope/_root/shared-services.md#s1-shared-services-contract--done)
 **Contract version**: 8
-**Amended**: 2026-11-09, additive, from spec [0004](../0004-roles-per-system/index.md) (sections 4, 8, 10, 11, 12, 13) · 2026-11-09, version 2 (breaking), from spec [0005](../0005-user-directory/index.md) (sections 5, 9, 10, 11, 12, 14, 15 and the gap map) · 2026-11-11, version 3 (breaking, no caller affected), from spec [0008](../0008-suite-gateway/index.md) (sections 2, 3, 11, 12, 14) · 2026-11-11, version 4 (breaking), from spec [0009](../0009-email-verification/index.md) (sections 8, 10, 11, 12, 14) · 2026-11-12, version 5 (breaking), from spec [0011](../0011-account-activity-audit/index.md) (sections 10, 11, 12, 14 and the gap map) · 2026-11-12, version 6 (breaking), from spec [0012](../0012-profile-extras/index.md) (sections 7, 9, 10, 11, 12, 14 and the gap map) · 2026-11-13, version 7 (breaking), from spec [0013](../0013-suite-admin-model/index.md) (sections 4 to 15 and the gap map; the new section 10a) · 2026-11-13, version 8 (breaking), from spec [0014](../0014-move-vmms-bms-shared-services/index.md) (sections 4, 7, 10, 11, 12, 14, the gap map and the move order)
+**Amended**: 2026-11-09, additive, from spec [0004](../0004-roles-per-system/index.md) (sections 4, 8, 10, 11, 12, 13) · 2026-11-09, version 2 (breaking), from spec [0005](../0005-user-directory/index.md) (sections 5, 9, 10, 11, 12, 14, 15 and the gap map) · 2026-11-11, version 3 (breaking, no caller affected), from spec [0008](../0008-suite-gateway/index.md) (sections 2, 3, 11, 12, 14) · 2026-11-11, version 4 (breaking), from spec [0009](../0009-email-verification/index.md) (sections 8, 10, 11, 12, 14) · 2026-11-12, version 5 (breaking), from spec [0011](../0011-account-activity-audit/index.md) (sections 10, 11, 12, 14 and the gap map) · 2026-11-12, version 6 (breaking), from spec [0012](../0012-profile-extras/index.md) (sections 7, 9, 10, 11, 12, 14 and the gap map) · 2026-11-13, version 7 (breaking), from spec [0013](../0013-suite-admin-model/index.md) (sections 4 to 15 and the gap map; the new section 10a) · 2026-11-13, version 8 (breaking), from spec [0014](../0014-move-vmms-bms-shared-services/index.md) (sections 4, 7, 10, 11, 12, 14, the gap map and the move order) · 2026-11-16, additive, from VRMS spec [0026](../../vrms/0026-api-docs/index.md) (section 14 and the new section 16, the route index)
 
 ## Summary
 
@@ -553,6 +553,7 @@ S rows may tighten these and must note it here.
 - **Additive** (a new route, an optional field, a new claim, a new error code): update this spec in the same change.
 - **Breaking** (removing or renaming a route, claim or field, or changing what one means): bump the contract version, list each system's change here, and tell the affected groups before it lands. The shared services owner decides; the other groups don't review this spec.
 - Each S row spec links back here and states which sections it builds.
+- welinc-auth's generated API docs (`/auth/docs`, its `docs/openapi.json`) show the shapes the code really accepts and answers. This contract wins on behavior; where the two disagree, the gap is settled here or in the code, then the docs are regenerated (VRMS spec 0026). Section 16 lists the routes the docs are checked against.
 
 **Versions:**
 - **8** (2026-11-13, spec 0014, S11).
@@ -607,6 +608,107 @@ S rows may tighten these and must note it here.
 - `AUTH_PUBLIC_URL` (welinc-auth as the browser sees it, for `/auth/authorize`), `API_PUBLIC_URL` (its callback is `<API_PUBLIC_URL>/<sys>/session/callback`), `SESSION_COOKIE_SECURE`, `TRUST_PROXY_HOPS` (spec 0003).
 
 **Each web app:** `VITE_API_BASE_URL` and `VITE_PORTAL_URL` only. No secret, no token setting.
+
+### 16. Route index
+
+Every welinc-auth route this contract promises, one row per method, from sections 3 and 5 to 10a (routes marked removed are left out). Added by VRMS spec [0026](../../vrms/0026-api-docs/index.md), additive.
+
+- **What it is for.** welinc-auth's generated API docs (`/auth/docs` locally and on staging, and the committed [`docs/openapi.json`](https://github.com/Capstone-WeLinc/welinc-auth/blob/development/docs/openapi.json) in welinc-auth) show each route's inputs, replies and error codes. This index is the list those docs are held to: `node scripts/check-contract-routes.mjs <openapi.json>` fails when a row here is missing from the document, or when a row marked `yes` under *Reply schema* has no 200 or 201 reply schema there. It also prints, without failing, any documented `/auth/*` route with no row here. The workspace CI runs it against welinc-auth's `development` branch on every workspace change, daily and on demand.
+- **Security** uses the scheme names of the generated docs: `userToken` (a user access token as `Authorization: Bearer`), `serviceToken` (a client credentials token as `Authorization: Bearer`), `ssoCookie` (welinc-auth's SSO cookie, portal and browser routes), `clientAssertion` (a `private_key_jwt` in the form body). `none` means no token or cookie.
+- **Reply schema** `yes` marks the integration routes: the ones another system calls to plug in. Their success reply is described field by field in the docs and checked by a test in welinc-auth. The other routes show inputs, errors and the reply status, and the sections above describe their bodies.
+- **Changing it.** Adding a route to the contract adds its row here in the same change (section 14). Removing one removes its row in the same change as the code. A path writes parameters as `:param`; the check turns them into the document's `{param}`.
+
+| Method | Path | Security | Section | Reply schema |
+|---|---|---|---|---|
+| GET | `/auth/health` | none | 3 | |
+| GET | `/auth/.well-known/jwks.json` | none | 5, 10 | yes |
+| GET | `/auth/.well-known/oauth-authorization-server` | none | 10 | yes |
+| POST | `/auth/token` | `clientAssertion` | 5, 7, 8, 10 | yes |
+| GET | `/auth/session` | `userToken` | 6, 10 | yes |
+| POST | `/auth/session/activity` | `ssoCookie`, `clientAssertion` | 6, 10 | |
+| GET | `/auth/authorize` | `ssoCookie` | 7, 10 | |
+| GET | `/auth/authorize/resume` | `ssoCookie` | 7, 10 | |
+| POST | `/auth/login` | none | 7, 10 | |
+| POST | `/auth/login/verify-email` | none | 7, 10 | |
+| POST | `/auth/login/verify-email/resend` | none | 7, 10 | |
+| GET | `/auth/sso` | `ssoCookie` | 7, 10 | |
+| POST | `/auth/mobile/login` | none | 8, 10 | yes |
+| POST | `/auth/mobile/login/verify-email` | none | 8, 10 | yes |
+| POST | `/auth/mobile/login/verify-email/resend` | none | 8, 10 | |
+| POST | `/auth/logout` | `ssoCookie`, `clientAssertion` | 8, 10 | |
+| GET | `/auth/directory/users` | `serviceToken` | 9 | yes |
+| POST | `/auth/directory/users/lookup` | `serviceToken` | 9 | yes |
+| GET | `/auth/directory/changes` | `serviceToken` | 9 | yes |
+| GET | `/auth/systems` | none | 10 | yes |
+| GET | `/auth/me` | `userToken` | 10 | yes |
+| GET | `/auth/me/sessions` | `userToken` | 10 | |
+| DELETE | `/auth/me/sessions/:sid` | `userToken` | 10 | |
+| POST | `/auth/forgot-password` | none | 10 | |
+| POST | `/auth/verify-otp` | none | 10 | |
+| POST | `/auth/reset-password` | none | 10 | |
+| PATCH | `/auth/profile` | `userToken` | 10 | |
+| PATCH | `/auth/profile/password` | `userToken` | 10 | |
+| POST | `/auth/profile/picture` | `userToken` | 10 | |
+| GET | `/auth/profile/summary` | `userToken` | 10 | |
+| POST | `/auth/profile/email` | `userToken` | 10 | |
+| POST | `/auth/profile/email/verify` | `userToken` | 10 | |
+| DELETE | `/auth/profile/email` | `userToken` | 10 | |
+| GET | `/auth/profile/activity` | `userToken` | 10 | |
+| POST | `/auth/profile/verify-password` | `userToken` | 10 | |
+| POST | `/auth/profile/deletion-request` | `userToken` | 10 | |
+| GET | `/auth/profile/deletion-request` | `userToken` | 10 | |
+| DELETE | `/auth/profile/deletion-request` | `userToken` | 10 | |
+| GET | `/auth/users` | `userToken` | 10 | |
+| POST | `/auth/users` | `userToken` | 10 | |
+| GET | `/auth/users/lookup` | `userToken` | 10, 12 | |
+| PATCH | `/auth/users/:id` | `userToken` | 10 | |
+| DELETE | `/auth/users/:id` | `userToken` | 10 | |
+| PATCH | `/auth/users/:id/status` | `userToken` | 10 | |
+| PATCH | `/auth/users/:id/unlock` | `userToken` | 10 | |
+| GET | `/auth/users/:id/sessions` | `userToken` | 10 | |
+| DELETE | `/auth/users/:id/sessions` | `userToken` | 10 | |
+| GET | `/auth/users/:id/activity` | `userToken` | 10 | |
+| POST | `/auth/users/:id/restore` | `userToken` | 10 | |
+| GET | `/auth/activity` | `userToken` | 10 | |
+| GET | `/auth/activity/catalog` | none | 10 | |
+| GET | `/auth/deletion-requests` | `userToken` | 10 | |
+| POST | `/auth/deletion-requests/:id/approve` | `userToken` | 10 | |
+| POST | `/auth/deletion-requests/:id/reject` | `userToken` | 10 | |
+| GET | `/auth/admin/me` | `ssoCookie` | 10a | |
+| POST | `/auth/admin/code` | `ssoCookie` | 10a | |
+| POST | `/auth/admin/code/verify` | `ssoCookie` | 10a | |
+| POST | `/auth/admin/verify-password` | `ssoCookie` | 10a | |
+| GET | `/auth/admin/users` | `ssoCookie` | 10a | |
+| GET | `/auth/admin/users/lookup` | `ssoCookie` | 10a, 12 | |
+| GET | `/auth/admin/users/:id` | `ssoCookie` | 10a | |
+| POST | `/auth/admin/users` | `ssoCookie` | 10a | |
+| PATCH | `/auth/admin/users/:id` | `ssoCookie` | 10a | |
+| PATCH | `/auth/admin/users/:id/status` | `ssoCookie` | 10a | |
+| PATCH | `/auth/admin/users/:id/unlock` | `ssoCookie` | 10a | |
+| POST | `/auth/admin/users/:id/reset-code` | `ssoCookie` | 10a | |
+| GET | `/auth/admin/users/:id/sessions` | `ssoCookie` | 10a | |
+| DELETE | `/auth/admin/users/:id/sessions` | `ssoCookie` | 10a | |
+| GET | `/auth/admin/users/:id/activity` | `ssoCookie` | 10a | |
+| DELETE | `/auth/admin/users/:id` | `ssoCookie` | 10a | |
+| POST | `/auth/admin/users/:id/restore` | `ssoCookie` | 10a | |
+| GET | `/auth/admin/activity` | `ssoCookie` | 10a | |
+| GET | `/auth/admin/deletion-requests` | `ssoCookie` | 10a | |
+| POST | `/auth/admin/deletion-requests/:id/approve` | `ssoCookie` | 10a | |
+| POST | `/auth/admin/deletion-requests/:id/reject` | `ssoCookie` | 10a | |
+| GET | `/auth/admin/suite-admins` | `ssoCookie` | 10a | |
+| POST | `/auth/admin/suite-admins` | `ssoCookie` | 10a | |
+| POST | `/auth/admin/suite-admins/:userId/remove` | `ssoCookie` | 10a | |
+| GET | `/auth/admin/temporary-grants` | `ssoCookie` | 10a | |
+| POST | `/auth/admin/temporary-grants` | `ssoCookie` | 10a | |
+| DELETE | `/auth/admin/temporary-grants/:id` | `ssoCookie` | 10a | |
+| GET | `/auth/admin/report` | `ssoCookie` | 10a | |
+| GET | `/auth/admin/permissions/:system` | `ssoCookie` | 10a | |
+| PATCH | `/auth/admin/permissions/:system` | `ssoCookie` | 10a | |
+| GET | `/auth/admin/permissions/:system/changes` | `ssoCookie` | 10a | |
+| GET | `/auth/permissions/:system` | `serviceToken` | 10a | yes |
+
+- `/auth/users` "as today" in section 10 is written here as the methods the code serves (`PATCH` and `DELETE` on `/auth/users/:id`, no `GET`), and the section 10 profile row as one method per path. Both readings are on spec 0026's Follow-up list until the section 10 rows say so themselves.
+- The bearer admin routes (`/auth/users*`, `/auth/activity`, `/auth/deletion-requests*`) are deprecated (section 10). Spec 0014's cleanup removes their rows here in the same change that removes the routes.
 
 ## Gap map
 

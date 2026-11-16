@@ -11,6 +11,7 @@ You change only your own repos: `welinc-backend-vmms`, `welinc-backend-vmms-anal
 - No data is moved. Every VMMS database is reseeded from the suite's seed people, because no deployment holds real users.
 - You can run `sh scripts/setup.sh vmms` any time. Until `docker-compose.vmms.yml` exists it only starts the shared stack (auth, portal, gateway) and fills auth with the test people; it makes your client key and starts your stack only after step 1 adds the compose file. If your old stack is still running and a port clashes, stop it first.
 - Read [web-login.md](web-login.md) once before you start. It explains the session routes, which are most of the work.
+- For the exact inputs, replies and error codes of every welinc-auth route, open the API docs: `http://localhost:3000/auth/docs` with the shared stack running (and on staging), or the committed [`docs/openapi.json`](https://github.com/Capstone-WeLinc/welinc-auth/blob/development/docs/openapi.json) in welinc-auth. The contract ([suite spec 0001](../specs/_root/0001-shared-services-contract/index.md)) still wins on behavior; tell Samuel when the two disagree.
 
 ### Tools and versions
 

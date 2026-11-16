@@ -20,5 +20,6 @@ That checklist is the only page you need to read through. Each item links the ex
 | [fleet-api.md](fleet-api.md) | The trucks and garages API: VMMS serves it, BMS dispatch reads it |
 | [seed-accounts.md](seed-accounts.md) | Every test login and password, and how your seed copies the shared people |
 | [hosting.md](hosting.md) | Going online on Azure: your apps, what makes a service hosting ready, secrets, deploying |
+| API docs: `/auth/docs` ([`openapi.json`](https://github.com/Capstone-WeLinc/welinc-auth/blob/development/docs/openapi.json)) | Every welinc-auth route with its exact inputs, replies and error codes, generated from the code. Served locally (`http://localhost:3000/auth/docs`) and on staging, never in production. You can paste an access token and try a request |
 
 The rules behind all of this are in the shared services contract, [suite spec 0001](../specs/_root/0001-shared-services-contract/index.md); the move itself is [suite spec 0014](../specs/_root/0014-move-vmms-bms-shared-services/index.md). What changed in the shared repos this term is in [docs/context/shared-repo-changes.md](../context/shared-repo-changes.md).

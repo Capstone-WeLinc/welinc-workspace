@@ -120,6 +120,8 @@ var authSettings = {
   TRUST_PROXY_HOPS: '2'
   DB_POOL_MAX: '3'
   ADMIN_SIGN_IN_CODE: 'true'
+  // API docs at /auth/docs on staging only, worked out here so no parameter can turn them on in prod (VRMS spec 0026)
+  API_DOCS_ENABLED: prod ? 'false' : 'true'
   SMTP_HOST: 'smtp-relay.brevo.com'
   SMTP_PORT: '587'
   SMTP_USER: smtpUser
@@ -147,6 +149,8 @@ var vrmsSettings = {
   STORAGE_ACCOUNT_URL: platform.outputs.blobEndpoint
   STORAGE_PUBLIC_URL: platform.outputs.blobEndpoint
   STORAGE_CONTAINER: 'vrms-attachments'
+  // API docs at /vrms/docs on staging only, as for auth above (VRMS spec 0026)
+  API_DOCS_ENABLED: prod ? 'false' : 'true'
 }
 var vrmsSecrets = {
   AUTH_CLIENT_PRIVATE_KEY: secrets.vrms.clientPrivateKey

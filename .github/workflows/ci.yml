@@ -1,12 +1,17 @@
 name: CI
 
 # The workspace's own checks: the setup as code compiles, the shell scripts pass shellcheck,
-# and the gateway answers every route the way suite spec 0008 says.
+# the gateway answers every route the way suite spec 0008 says, and welinc-auth's generated
+# API docs still hold every route of contract 0001 section 16 (VRMS spec 0026).
 on:
   pull_request:
     branches: [main]
   push:
     branches: [main]
+  schedule:
+    # daily at 06:00 Manila, so an auth change that drops a contract route shows within a day
+    - cron: '0 22 * * *'
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -40,3 +45,29 @@ jobs:
         with:
           node-version: 24
       - run: node infra/gateway/test/check-routes.mjs
+
+  contract-routes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+      # A missing secret (a fork's pull request gets none) fails here by name, never passes silently.
+      - name: AUTH_REPO_READ_TOKEN is set
+        env:
+          TOKEN: ${{ secrets.AUTH_REPO_READ_TOKEN }}
+        run: |
+          if [ -z "$TOKEN" ]; then
+            echo "::error::The workspace secret AUTH_REPO_READ_TOKEN is missing. Add a read only token for welinc-auth (Contents: read) under Settings > Secrets and variables > Actions."
+            exit 1
+          fi
+      - uses: actions/checkout@v7
+        with:
+          repository: Capstone-WeLinc/welinc-auth
+          ref: development
+          path: welinc-auth
+          token: ${{ secrets.AUTH_REPO_READ_TOKEN }}
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      - run: node scripts/check-contract-routes.mjs welinc-auth/docs/openapi.json
