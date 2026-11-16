@@ -9,6 +9,7 @@ You change only your own repos: `welinc-backend-bms` (all its processes), `welin
 Newest first. The shared services lead posts each one in your group chat when it lands.
 
 - **2026-11-16:** analytics is its own client `bms-analytics` with its own key in `welinc-backend-bms-analytics-ai/.env` (step 2, compose template, setup).
+- **2026-11-17:** the live checker passed on your PR branches with VMMS on the same stack (login 16 of 16, fleet 5 of 5, scan clean); the output is on your PRs. The fleet box in step 7 is ticked.
 - **2026-11-16:** only the shared services lead ticks this checklist (see Checklist).
 - **2026-11-14:** step 1 gained the hosting ready box.
 
@@ -69,7 +70,7 @@ The browser reaches BMS only at `<gateway>/bms/...`. These public paths are fixe
 
 Work through these in order. **Only the shared services lead ticks a box**, after checking it on your pull requests, so a tick means verified, not claimed. Keep your own working notes in `docs/context/bms/`.
 
-**Last checked:** 2026-11-16, on the `BMS/shared-services` pull requests. Open before the live check: each pull request rebased so it holds only the move (your `development` branches are stubs) and the open boxes below.
+**Last checked:** 2026-11-17, on the `BMS/shared-services` pull requests; the live checker passed. Open before the live check: each pull request rebased so it holds only the move (your `development` branches are stubs) and the open boxes below.
 
 ### 1. Stack and keys
 
@@ -128,8 +129,7 @@ Work through these in order. **Only the shared services lead ticks a box**, afte
 - [x] Move `drivers` from `welinc_db` into dispatch's database next to `helpers`, with the columns in spec 0014's data model plus `user_id uuid null unique`. `helpers` gains the same `user_id`.
 - [x] Seed `user_id` from `people.json`: driver n (`DRV-00n`) is the nth `"group": "driver"` row in file order (ids `...3401` up), helper n (`HLP-00n`) the nth `"group": "helper"` row. The seed fails when your crew counts differ from the manifest's (12 drivers, 20 helpers).
 - [x] Add `vehicle_dispatch_profiles` (dispatch) for the dispatch only fields, keyed by the VMMS `vehicle_id` with no foreign key.
-- [ ] Read vehicles and garages from VMMS with a `fleet.read` service token: every rule (30 s list cache, fresh read at assignment, 409 `VEHICLE_UNAVAILABLE`, 503 `FLEET_UNAVAILABLE`, one retry on `TOKEN_EXPIRED`, "Unavailable vehicle") is in [fleet-api.md](fleet-api.md#bms-rules).
-  - **Open (2026-11-16):** built and unit tested; proven only by the live fleet check, which needs VMMS's fleet API.
+- [x] Read vehicles and garages from VMMS with a `fleet.read` service token: every rule (30 s list cache, fresh read at assignment, 409 `VEHICLE_UNAVAILABLE`, 503 `FLEET_UNAVAILABLE`, one retry on `TOKEN_EXPIRED`, "Unavailable vehicle") is in [fleet-api.md](fleet-api.md#bms-rules).
 - [x] Two assignments racing for one truck keep dispatch's existing guard: the unique index `dispatch_active_vehicle_slot_key` on `dispatch_assignments (vehicle_id, service_date, dispatch_time)`, which `confirmAssignment` turns from a Prisma `P2002` into a 409. Keep it: `vehicle_id` now holds a VMMS vehicle id.
 
 ### 8. Analytics
