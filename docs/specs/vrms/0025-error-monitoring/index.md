@@ -2,7 +2,7 @@
 
 **Date**: 2026-11-16
 **Status**: In Progress
-**Updated**: 2026-11-16, cross checked on another model; 17 gaps closed (health and filter reporting, the gateway tunnel mechanics, every config source, the role tag, double reporting, trace linking, map files) and 3 wording fixes.
+**Updated**: 2026-11-16, cross checked on another model; 17 gaps closed (health and filter reporting, the gateway tunnel mechanics, every config source, the role tag, double reporting, trace linking, map files) and 3 wording fixes. 2026-11-17, from the first live test: Sentry stores a location worked out from the sender's address, so `city` and `region` join the sensitive fields and AC-6 covers the location; the gateway's two trace headers moved into milestone 1.
 
 ## Summary
 
@@ -21,7 +21,7 @@ Every crash and server error in your four apps (backend-vrms, web-vrms, welinc-a
 - **AC-3**: A React render crash, an unhandled error or a rejected promise in web-vrms or the portal creates exactly one issue in that app's project with the same tags, and its stack trace shows the original TypeScript file and line.
 - **AC-4**: Browser reports go to `https://<api>/monitoring/vrms-web` and `https://<api>/monitoring/portal` on the gateway. The browser never calls a `sentry.io` host, and the CSP `connect-src` stays as it is.
 - **AC-5**: Each tunnel route answers `OPTIONS` with 204 and CORS headers, accepts `POST` up to 1 MB, and answers 405 to any other method and 413 to a larger body. It is rate limited per client (1 request a second, burst 10; 429 beyond), forwards only to its own fixed Sentry project, and sends Sentry no cookies, no `Authorization` header and no client IP address. With the tunnel settings blank, both routes answer 404.
-- **AC-6**: No personal data or secret leaves any app: no request bodies, cookies, headers (other than `user-agent`) or query strings, and no email address, name, IP address, sign in code, token or password in any event. Checked on a test event from each app sent while seeded values are in play.
+- **AC-6**: No personal data or secret leaves any app: no request bodies, cookies, headers (other than `user-agent`) or query strings, and no email address, name, IP address, location worked out from an address (country, city, region), sign in code, token or password in any event. Checked on a test event from each app sent while seeded values are in play.
 - **AC-7**: A page crash inside the app shell keeps the sidebar and top bar and shows the crash screen in the page area: a short message, **Reload**, **Back to dashboard** (portal: **Back to apps**), and a reference code (the first 8 characters of the Sentry event id; no code is shown when Sentry is off). A crash outside the shell (the login page, the shell itself) shows the full page version. Moving to another page clears it.
 - **AC-8**: When a lazy loaded file fails to load (typically after a deploy), the page reloads once by itself and nothing is reported. A second failure in the same tab, or any failure while the browser is offline, shows the crash screen without reloading again, and is reported when online.
 - **AC-9**: The browser does not report network failures, cancelled requests, offline errors, `ResizeObserver` noise, or API error answers (the server reports its own). API calls carry `sentry-trace` and `baggage` headers, so when a crash follows a failing API call, the browser event and the backend event share one trace id.
@@ -51,7 +51,7 @@ Reasoning and options: see [rationale.md](rationale.md).
 
 **Data model sketch**: none. No table changes. All state lives in Sentry and Azure Monitor (and one in memory timestamp for the poll's check in throttle).
 
-**Sentry layout** (one US org, set up by hand once, steps in `infra/RUNBOOK.md`):
+**Sentry layout** (one US org, `welinc`, set up by hand once on 2026-11-17, steps in `infra/RUNBOOK.md`; project slugs as in the table, so a project Sentry's onboarding names after the repo is renamed to match):
 
 | Project | App | Platform |
 |---|---|---|
@@ -60,7 +60,7 @@ Reasoning and options: see [rationale.md](rationale.md).
 | `welinc-auth` | welinc-auth | NestJS |
 | `welinc-portal` | welinc-web-portal | React |
 
-Staging and production share each project and are told apart by `environment`. Org settings: *Prevent storing of IP addresses* on, *Data scrubber* on, and *Additional sensitive fields* `code, otp, setupCode, reauthToken, refreshToken, accessToken, password, email, name, phone`. That list also blanks harmless fields with those names (a stack local called `name`, for example); accepted, because privacy wins over a slightly poorer stack view. Per project alert rules: a new issue and a regression, both environments, emailing the alert address. The cron monitor and the uptime monitor email the same address for production only.
+Staging and production share each project and are told apart by `environment`. Org settings: *Prevent storing of IP addresses* on, *Data scrubber* on, and *Additional sensitive fields* `code, otp, setupCode, reauthToken, refreshToken, accessToken, password, email, name, phone, city, region`. Sentry works out `user.geo` from the address an event arrives from, even with IP storage off and with no IP in the event (the SDK's `infer_ip` hint is ignored for server events), and it does this before the scrubbers run; `city` and `region` blank that location, and `code` already catches `countryCode`. That list also blanks harmless fields with those names (a stack local called `name`, for example); accepted, because privacy wins over a slightly poorer stack view. Per project alert rules: a new issue and a regression, both environments, emailing the alert address. The cron monitor and the uptime monitor email the same address for production only.
 
 **Backend setup (backend-vrms and welinc-auth)**:
 - `src/instrument.ts` calls `Sentry.init` and is the first import in `main.ts`. `SentryModule.forRoot()` in the root module. Follow `sentry-nestjs-sdk` for the exact wiring.
@@ -156,7 +156,7 @@ Staging and production share each project and are told apart by `environment`. O
 - Happy path: on staging, an admin hits each test route and test page; four issues arrive with the right environment, release, role and a readable TypeScript stack, one issue per crash, verifies **AC-1**, **AC-3**, **AC-16**, **AC-17**
 - Hidden paths: a mail failure in auth (handled by `CodeErrorFilter`) creates an issue; a validation 400, a wrong password 401 and a failing health 503 create none, verifies **AC-1**, **AC-2**
 - Noise and linking: a page with no network creates nothing; an API call carries `sentry-trace`, and a crash after a forced backend 500 shows the same trace id on both events, verifies **AC-9**
-- Privacy: trigger the test error while signed in with a seeded account and a reset link with a code in its URL; the event holds no email, name, IP, code, token, header or query string, verifies **AC-6**
+- Privacy: trigger the test error while signed in with a seeded account and a reset link with a code in its URL; the event holds no email, name, IP, code, token, header or query string, and `user.geo` reads `[Filtered]` throughout, verifies **AC-6**
 - Crash screen: a crash inside the shell keeps the sidebar and shows the reference code that matches the Sentry event; navigating away clears it; with the DSN blank, no code shows, verifies **AC-7**, **AC-14**
 - Stale deploy: delete a lazy chunk on staging; the page reloads once silently; delete it again and the crash screen appears; offline, no reload happens, verifies **AC-8**
 - Tunnel: GET gets 405, OPTIONS 204, a 2 MB body 413, a burst 429, a half set config stops the gateway at boot, and the stub upstream sees no cookie or client address, verifies **AC-4**, **AC-5**
@@ -173,12 +173,13 @@ Tracer Bullet: one thin thread through backend-vrms and web-vrms first, proven a
 1. Create the Sentry org (US), the 4 projects, the org scrubbing settings and the per project alert rules; record the steps in `infra/RUNBOOK.md`, satisfies **AC-6**, **AC-12**
 2. backend-vrms: `instrument.ts`, `SentryModule`, `SentryGlobalFilter` (and the 5xx `HttpException` check), the allowlist `beforeSend` with the 4xx and health drops, `redact()` with unit tests, user context in the JWT guard, the env variables with the `superRefine` rules, satisfies **AC-1**, **AC-2**, **AC-6**, **AC-14**, **AC-15**
 3. backend-vrms: `POST /vrms/debug/sentry-test` behind `settings.manage` and `SENTRY_TEST_ROUTES`, satisfies **AC-16**
+   Also pulled forward from task 7 (workspace commit `efc94f9`): `sentry-trace, baggage` in the gateway's `$cors_request_headers`, its `check-routes.mjs` case and contract 0001 section 3, because the browser's API calls fail their preflight without them once `VITE_SENTRY_DSN` is set.
 4. web-vrms: `Sentry.init` with `browserTracingIntegration`, the React 19 handlers, the custom boundaries with the crash screen, the ignore list, API answer filter and per page cap, user context from the `VRMS` role entry, the `vite:preloadError` reload, the build flagged test page, satisfies **AC-3**, **AC-7**, **AC-8**, **AC-9**, **AC-16**
 
 **Milestone 2: the shared side**
 5. welinc-auth: the same backend setup as tasks 2 and 3, plus `captureException` in `CodeErrorFilter` for its 5xx answers, and `POST /auth/admin/debug/sentry-test` behind the admin session and a suite admin check, satisfies **AC-1**, **AC-2**, **AC-6**, **AC-14**, **AC-15**, **AC-16**
 6. web-portal: the same browser setup as task 4 (**Back to apps**, role from `suiteAdmin` and `adminOf`, test page for suite admins), satisfies **AC-3**, **AC-7**, **AC-8**, **AC-9**, **AC-16**
-7. Gateway: `tunnel.conf.template`, the generated `monitoring.conf` with the on, off and refuse rules in `05-check-env.sh`, `sentry-trace, baggage` in the CORS allow list, the new `check-routes.mjs` cases, a live check that Sentry rejects a mismatched envelope; contract 0001 next version, satisfies **AC-4**, **AC-5**, **AC-9**
+7. Gateway: `tunnel.conf.template`, the generated `monitoring.conf` with the on, off and refuse rules in `05-check-env.sh`, the new `check-routes.mjs` cases (the CORS headers already landed in milestone 1), a live check that Sentry rejects a mismatched envelope; contract 0001 next version, satisfies **AC-4**, **AC-5**, **AC-9**
 
 **Milestone 3: jobs and releases**
 8. Jobs: `reportJobFailure` in both backends, called from all 6 jobs; the throttled directory poll check ins, satisfies **AC-10**
@@ -211,6 +212,7 @@ Tracer Bullet: one thin thread through backend-vrms and web-vrms first, proven a
 
 ## Follow-up
 
+- [ ] Suite spec 0008's **CORS values** line still lists three request headers; `/sync` brings it in line with contract 0001 section 3.
 - [ ] Claim the Sentry student offer through the GitHub Student Pack before task 1; if it fails, use the free Developer plan (the design fits it). Save the login in your password manager.
 - [ ] `/sync` adds `sentry-nestjs-sdk`, `sentry-react-sdk` and `sentry-setup-releases` to the *Load on match* list and `sentry` to the MCP servers line in `agents/vrms/AGENTS.md`.
 - [ ] `sentry-fix-issues` (`getsentry/sentry-for-ai`) is worth installing after go live, to triage real issues through the MCP server.

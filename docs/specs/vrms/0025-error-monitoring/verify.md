@@ -15,7 +15,7 @@ Setup for the live steps: put the `vrms-backend` DSN in `welinc-backend-vrms/.en
 - [ ] `/debug/sentry` as a mechanic → sent to the dashboard; in a build without the flag the address is Page not found → AC-16
 - [ ] With `VITE_SENTRY_DSN` blank, crash the page again → crash screen without a reference code, nothing sent → AC-7, AC-14
 - [ ] Turn the network off in DevTools and use a page → no issue; an API call (with the gateway change) carries `sentry-trace` and `baggage` → AC-9
-- [ ] Open both test events in Sentry → no email, name, IP, cookie, `Authorization`, query string or request body; `request.headers` has only the user agent → AC-6
+- [ ] Open both test events in Sentry → no email, name, IP, cookie, `Authorization`, query string or request body; `request.headers` has only the user agent; `user.geo` shows `[Filtered]` for country, city and region → AC-6
 - [ ] Delete a lazy chunk from a built `dist` served locally, then click the dev or test page link → one silent reload; again in the same tab → crash screen; offline → no reload → AC-8
 
 ### Commands
