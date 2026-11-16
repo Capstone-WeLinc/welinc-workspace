@@ -61,11 +61,11 @@ Interactive API docs generated from the NestJS controllers (`@nestjs/swagger`), 
 spec [0026](../../specs/vrms/0026-api-docs/index.md) · code in `welinc-auth/src/openapi/`, `welinc-backend-vrms/src/openapi/`, `docs/openapi.json` in both, `scripts/check-contract-routes.mjs`, `infra/env.bicep`, contract 0001 section 16
 - Note (2026-11-16, `/architect`): Scalar at `/auth/docs` and `/vrms/docs`, served by each app (no CDN), on locally and on staging, never in production (Bicep sets `API_DOCS_ENABLED` from `prod`). Response classes and reply tests only for the contract routes and four ticket routes. A committed `openapi.json` checked in CI, and a contract route index checked by the workspace CI with a read only `AUTH_REPO_READ_TOKEN` you make. Cross checked on another model, 11 gaps closed.
 - [x] Design it (spec): `/architect API docs`
-- [ ] Build it: `/develop API docs`
+- [x] Build it: `/develop API docs`
   - [x] Thin thread on welinc-auth: packages, plugin, `API_DOCS_ENABLED`, Scalar mount, `openapi` scripts, the first `docs/openapi.json`, CI check (AC-1 to AC-3, AC-7, AC-9, AC-12)
   - [x] welinc-auth thickened: tags, the five security schemes, error codes on contract routes, response classes and reply tests for the 12 integration routes (AC-4 to AC-8)
   - [x] Contract and workspace, after the auth PR merges: contract 0001 section 16, `check-contract-routes.mjs` and its CI job, the Bicep switch, links in `docs/integration/` (AC-1, AC-2, AC-10, AC-11)
-  - [ ] backend-vrms: the same setup copied, tags, schemes, generic errors, the four ticket response classes and tests (AC-1 to AC-9, AC-12)
+  - [x] backend-vrms: the same setup copied, tags, schemes, generic errors, the four ticket response classes and tests (AC-1 to AC-9, AC-12)
 - [ ] Verify it: `/check verify API docs`
 - [ ] Test it: `/test API docs`
 
