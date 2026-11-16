@@ -1,7 +1,7 @@
 # 0026. Generated API docs for welinc-auth and backend-vrms
 
 **Date**: 2026-11-16
-**Status**: In Progress
+**Status**: Accepted
 **Scope row**: [68. API docs](../../../scope/vrms/platform.md#68-api-docs--planned--needs-a-decision)
 **Touches**: `welinc-auth` (shared), `welinc-backend-vrms`, contract [0001](../../_root/0001-shared-services-contract/index.md) (additive), `infra/` and the workspace CI
 
