@@ -116,7 +116,7 @@ Setup, order and gotchas: [infra/README.md](../../infra/README.md).
 
 | Service | What for | Where |
 |---|---|---|
-| Sentry | errors from `vrms-backend`, `vrms-web`, `welinc-auth`, `welinc-portal` (spec 0025) | https://sentry.io (US region org, once it exists) |
+| Sentry | errors from `vrms-backend`, `vrms-web`, `welinc-auth`, `welinc-portal` (spec 0025) | https://welinc.sentry.io (org `welinc`, US region; how it was set up: [infra/RUNBOOK.md](../../infra/RUNBOOK.md)) |
 | Brevo | the email welinc-auth sends (sign in codes, resets) | https://app.brevo.com (*Transactional*, then *Logs*) |
 | Name.com | the `welinc.app` domain and its DNS records | https://www.name.com/account/domain |
 | Jira | the backlog, the source of truth | the team's Atlassian site |

@@ -128,7 +128,7 @@ Each bare prefix gets an exact location that answers the 404 (`location = /vmms 
 | Gateway errors and 404 | Yes, `error-headers.conf` | Yes | Yes | 429 only, always 1 |
 | `GET /health` | No | Yes | Yes | No |
 
-**CORS values**: methods `GET, POST, PUT, PATCH, DELETE, OPTIONS`; request headers `Authorization, Content-Type, X-Request-Id`; exposed headers `X-Request-Id, Retry-After`; max age 600. Each of these, and the credentials value, comes from a map on `$cors_origin` that is empty for an unlisted origin, so nginx leaves the header out. `X-VMMS-Client` isn't allowed (S11 drops it). `proxy_hide_header` covers `Access-Control-Allow-Origin`, `-Credentials`, `-Methods`, `-Headers`, `-Expose-Headers`, `-Max-Age`, `Vary`, `X-Request-Id` and `Strict-Transport-Security`: the gateway owns those, so a service setting them itself can't break AC-18 or AC-21.
+**CORS values**: methods `GET, POST, PUT, PATCH, DELETE, OPTIONS`; request headers `Authorization, Content-Type, X-Request-Id, sentry-trace, baggage` (the last two added by VRMS spec 0025, contract 0001 section 3); exposed headers `X-Request-Id, Retry-After`; max age 600. Each of these, and the credentials value, comes from a map on `$cors_origin` that is empty for an unlisted origin, so nginx leaves the header out. `X-VMMS-Client` isn't allowed (S11 drops it). `proxy_hide_header` covers `Access-Control-Allow-Origin`, `-Credentials`, `-Methods`, `-Headers`, `-Expose-Headers`, `-Max-Age`, `Vary`, `X-Request-Id` and `Strict-Transport-Security`: the gateway owns those, so a service setting them itself can't break AC-18 or AC-21.
 
 **The resolver, the flood limit and the maps** (at `http` level, except `limit_req`):
 

@@ -43,8 +43,9 @@ map $cors_origin $cors_methods {
     default "GET, POST, PUT, PATCH, DELETE, OPTIONS";
     "" "";
 }
+# sentry-trace and baggage link a browser crash to the API error behind it (VRMS spec 0025, AC-9)
 map $cors_origin $cors_request_headers {
-    default "Authorization, Content-Type, X-Request-Id";
+    default "Authorization, Content-Type, X-Request-Id, sentry-trace, baggage";
     "" "";
 }
 map $cors_origin $cors_expose_headers {
