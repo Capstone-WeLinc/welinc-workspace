@@ -4,7 +4,7 @@
 **Status**: Accepted
 **Scope row**: [S1. Shared services contract](../../../scope/_root/shared-services.md#s1-shared-services-contract--done)
 **Contract version**: 8
-**Amended**: 2026-11-09, additive, from spec [0004](../0004-roles-per-system/index.md) (sections 4, 8, 10, 11, 12, 13) · 2026-11-09, version 2 (breaking), from spec [0005](../0005-user-directory/index.md) (sections 5, 9, 10, 11, 12, 14, 15 and the gap map) · 2026-11-11, version 3 (breaking, no caller affected), from spec [0008](../0008-suite-gateway/index.md) (sections 2, 3, 11, 12, 14) · 2026-11-11, version 4 (breaking), from spec [0009](../0009-email-verification/index.md) (sections 8, 10, 11, 12, 14) · 2026-11-12, version 5 (breaking), from spec [0011](../0011-account-activity-audit/index.md) (sections 10, 11, 12, 14 and the gap map) · 2026-11-12, version 6 (breaking), from spec [0012](../0012-profile-extras/index.md) (sections 7, 9, 10, 11, 12, 14 and the gap map) · 2026-11-13, version 7 (breaking), from spec [0013](../0013-suite-admin-model/index.md) (sections 4 to 15 and the gap map; the new section 10a) · 2026-11-13, version 8 (breaking), from spec [0014](../0014-move-vmms-bms-shared-services/index.md) (sections 4, 7, 10, 11, 12, 14, the gap map and the move order) · 2026-11-16, additive, from VRMS spec [0026](../../vrms/0026-api-docs/index.md) (section 14 and the new section 16, the route index)
+**Amended**: 2026-11-09, additive, from spec [0004](../0004-roles-per-system/index.md) (sections 4, 8, 10, 11, 12, 13) · 2026-11-09, version 2 (breaking), from spec [0005](../0005-user-directory/index.md) (sections 5, 9, 10, 11, 12, 14, 15 and the gap map) · 2026-11-11, version 3 (breaking, no caller affected), from spec [0008](../0008-suite-gateway/index.md) (sections 2, 3, 11, 12, 14) · 2026-11-11, version 4 (breaking), from spec [0009](../0009-email-verification/index.md) (sections 8, 10, 11, 12, 14) · 2026-11-12, version 5 (breaking), from spec [0011](../0011-account-activity-audit/index.md) (sections 10, 11, 12, 14 and the gap map) · 2026-11-12, version 6 (breaking), from spec [0012](../0012-profile-extras/index.md) (sections 7, 9, 10, 11, 12, 14 and the gap map) · 2026-11-13, version 7 (breaking), from spec [0013](../0013-suite-admin-model/index.md) (sections 4 to 15 and the gap map; the new section 10a) · 2026-11-13, version 8 (breaking), from spec [0014](../0014-move-vmms-bms-shared-services/index.md) (sections 4, 7, 10, 11, 12, 14, the gap map and the move order) · 2026-11-16, additive, from VRMS spec [0026](../../vrms/0026-api-docs/index.md) (section 14 and the new section 16, the route index) · 2026-11-17, additive, the domain is `welinc.app` instead of the working name `welinc.tech` (section 1 and Follow-up; no caller held the old name)
 
 ## Summary
 
@@ -58,7 +58,7 @@ Everything in this section is the promise. Paths are as seen through the gateway
 | BMS web | `http://localhost:8003` | `https://bms.<domain>` | `https://staging-bms.<domain>` |
 | Token issuer (`iss`) | `http://localhost:3000/auth` | `https://api.<domain>/auth` | `https://staging-api.<domain>/auth` |
 
-- `<domain>` is one registered domain, working name `welinc.tech` (see Follow-up). Every web app and the gateway share it, so the browser treats them as one site and the refresh cookie counts as first party. Locally, `localhost` on any port is also one site.
+- `<domain>` is one registered domain, `welinc.app` (registered 2026-11-17, see Follow-up). Every web app and the gateway share it, so the browser treats them as one site and the refresh cookie counts as first party. Locally, `localhost` on any port is also one site.
 - All services sit behind the gateway. Only the gateway has a public address; every other container has internal ingress (reachable only inside the Azure environment), as spec 0008 already does for VRMS.
 
 ### 2. Port map
@@ -779,7 +779,7 @@ The per group guides, the checker and the cross system steps belong to S11 (spec
 
 ## Follow-up
 
-- [ ] Register the domain (working name `welinc.tech`; the GitHub Student Developer Pack has offered a free year of `.tech`, check the current offer) and note the renewal date.
+- [x] Register the domain: `welinc.app`, bought 2026-11-17 with Name.com's GitHub Student Developer Pack offer (free first year, then $26.99 a year); the renewal date goes in spec 0008 (VRMS) once the domain sits in the lead's Name.com account.
 - [ ] Update spec 0008 (VRMS hosting): custom domain on every Static Web App and on the gateway Container App, the `infra/gateway/` local config, and the new routes and ports. A new VRMS spec or an update, through `/architect`.
 - [ ] Add a line to `docs/_private/vrms/shared-services-questions.md` for BMS: HS256 tokens and `JWT_SECRET` go away when S2 lands, so they shouldn't build more on them; the contract is this spec.
 - [ ] VRMS feature 56 (domain contracts) uses section 5's service tokens for calls between systems and lists each system's scopes there.

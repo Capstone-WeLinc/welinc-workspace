@@ -13,7 +13,7 @@ param postgresLocation string = location
 @description('Static Web Apps regions are limited; East Asia is the closest to the users.')
 param swaLocation string = 'eastasia'
 
-param domain string = 'welinc.tech'
+param domain string = 'welinc.app'
 
 @description('Pass 2: bind the custom domains. Only once dns-records.sh records resolve.')
 param bindDomains bool = false

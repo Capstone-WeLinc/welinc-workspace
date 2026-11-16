@@ -1,6 +1,6 @@
 # Hosting VMMS and BMS on Azure
 
-How your system goes online next to the shared services and VRMS. Everything runs in one Azure subscription that the shared services lead operates, on `welinc.tech`. The decision behind it is [VRMS spec 0008](../specs/vrms/0008-hosting-and-ci-cd/index.md); you don't need to read it.
+How your system goes online next to the shared services and VRMS. Everything runs in one Azure subscription that the shared services lead operates, on `welinc.app`. The decision behind it is [VRMS spec 0008](../specs/vrms/0008-hosting-and-ci-cd/index.md); you don't need to read it.
 
 Read this after your move checklist ([move-vmms.md](move-vmms.md) or [move-bms.md](move-bms.md)). The move makes your system work on the shared services; this page makes it run on Azure. Most of it is a few files per service, and it's easiest to do while you're already in that code for the move.
 
@@ -20,12 +20,12 @@ Until your group is turned on, your routes on the gateway (`/vmms/`, `/bms/`) an
 
 ## How it fits together
 
-- **Addresses.** Production: `api.`, `portal.`, `vrms.`, `vmms.` and `bms.welinc.tech`. Staging: the same names with `staging-` in front (`staging-api.welinc.tech`). Your web app calls `https://<api>/vmms/` or `https://<api>/bms/`, as locally it calls `http://localhost:3000`.
+- **Addresses.** Production: `api.`, `portal.`, `vrms.`, `vmms.` and `bms.welinc.app`. Staging: the same names with `staging-` in front (`staging-api.welinc.app`). Your web app calls `https://<api>/vmms/` or `https://<api>/bms/`, as locally it calls `http://localhost:3000`.
 - **Services.** Each backend process is a Container App. Only the suite gateway is public; your services are internal, reached through the gateway's route or by each other.
 - **Internal addresses.** One service calls another at `https://<app name>.internal.<environment domain>`, on port 443, with no port in the address (for example `https://bms-booking.internal.<domain>`, not `:3021`). The lead fills these into your settings, so you only need to read them from the environment, which your code already does.
 - **Databases.** Each environment has one PostgreSQL 16 server, holding your databases next to ours: `vmms`; `bms_booking`, `bms_dispatch`, `bms_completion`, `bms_analytics`. They are created when staging is first set up (Nov 18 to 19) and start empty. Each has two logins: `<db>_owner` runs your migrations and owns every table, and `<db>_app` is what your service connects as (read and write rows, nothing else). A database's logins can't open any other database.
 - **Web apps.** Each web app is a Static Web App, built once per environment.
-- **Mobile.** The VMMS app calls `https://api.welinc.tech` (staging: `https://staging-api.welinc.tech`).
+- **Mobile.** The VMMS app calls `https://api.welinc.app` (staging: `https://staging-api.welinc.app`).
 - **Images.** One shared registry. Your deploy workflow will push `<app name>:<commit sha>` for the service and `<app name>-seed:<commit sha>` for its jobs.
 
 ## Your apps
@@ -124,7 +124,7 @@ The lead makes every key that only our own services use, once per environment (s
 - your client keys (`keys:client` in welinc-auth): the private key goes on your app, the public half into auth;
 - internal keys shared between your own services (`BMS_INTERNAL_SERVICE_KEY`, `CUSTOMER_TRACKING_SECRET`, the inbound booking webhook secret and API key). Where an outside sender needs one of these, the lead gives it to you directly.
 
-You send only keys from outside providers, which only your accounts can issue: Gemini (VMMS analytics), Groq (BMS analytics), Google Maps and Geocoding (BMS). One key per provider is fine for both environments. Restrict the browser Maps key to `bms.welinc.tech` and `staging-bms.welinc.tech`.
+You send only keys from outside providers, which only your accounts can issue: Gemini (VMMS analytics), Groq (BMS analytics), Google Maps and Geocoding (BMS). One key per provider is fine for both environments. Restrict the browser Maps key to `bms.welinc.app` and `staging-bms.welinc.app`.
 
 - [ ] Send them privately, in a direct message. Never put one in a repo, an issue, a pull request or the group chat.
 - [ ] A changed secret reaches a running app only after a restart; the lead does both.
