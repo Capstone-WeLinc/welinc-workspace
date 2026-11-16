@@ -4,6 +4,13 @@ The VMMS checklist for [suite spec 0014](../specs/_root/0014-move-vmms-bms-share
 
 You change only your own repos: `welinc-backend-vmms`, `welinc-backend-vmms-analytics-ai`, `welinc-web-vmms` and `welinc-mobile-vrms_vmms`. Nothing in welinc-auth, the portal or the gateway needs a change from you. If something there looks wrong, tell the shared services lead.
 
+## Changes
+
+Newest first. The shared services lead posts each one in your group chat when it lands.
+
+- **2026-11-16:** only the shared services lead ticks this checklist (see Checklist).
+- **2026-11-14:** step 1 gained the hosting ready box.
+
 ## Before you start
 
 - **The first time:** clone the workspace repo, then download your repos with `sh scripts/clone-all.sh vmms` (it adds the shared repos and checks yours out on `development`, or your default branch when there is none). Then run `sh scripts/clone-all.sh vrms` too: the VRMS repos are where you copy the login code from, and you only read them, never change them.
@@ -43,85 +50,89 @@ On Windows, type every command in **Git Bash** (the workspace [README](../../REA
 
 ## Checklist
 
-Tick these in order. Each links the guide that already explains it.
+Work through these in order. **Only the shared services lead ticks a box**, after checking it on your pull requests, so a tick means verified, not claimed. Keep your own working notes in `docs/context/vmms/`.
+
+**Last checked:** 2026-11-16, on the `feat/shared-services` pull requests. Open before the live check: red tests (backend 13 suites, mobile 10 tests, analytics `test:auth`) and the open boxes below.
 
 ### 1. Stack and keys
 
-- [ ] Add `docker-compose.vmms.yml` at the workspace root from the template at the end of this guide (service names, ports and `welinc-network` filled in). Open a pull request for it into the workspace `main`.
+- [x] Add `docker-compose.vmms.yml` at the workspace root from the template at the end of this guide (service names, ports and `welinc-network` filled in). Open a pull request for it into the workspace `main`.
 - [ ] Copy `.env.example` to `.env` in `welinc-backend-vmms` and `welinc-backend-vmms-analytics-ai` (setup does this for you). The names are in step 2.
 - [ ] Run `sh scripts/setup.sh vmms`. Once the compose file exists it makes VMMS's client key (`npm run keys:client -- vmms ...` in welinc-auth, private key into `welinc-backend-vmms/.env`, public key into welinc-auth's `.env`), registers it, starts your stack, runs each service's migrations and seed, and waits for your health routes. It never prints a key.
-- [ ] Each service's `npm run seed` must keep data that is already there (setup runs it on every rerun). Skip when your tables hold rows, the way VRMS's setup does.
+- [x] Each service's `npm run seed` must keep data that is already there (setup runs it on every rerun). Skip when your tables hold rows, the way VRMS's setup does.
 - [ ] Make it hosting ready in the same pull requests: the checklist in [hosting.md](hosting.md#make-it-hosting-ready) (a `Dockerfile.prod`, the pool setting, no lasting files on local disk, every table and trigger from a migration). Added 2026-11-14.
+  - **Open (2026-11-16):** analytics has no `Dockerfile.prod`; the backend one runs `dist/main` but the build writes `dist/src/main.js`; no `DB_POOL_MAX`; uploads on local disk; triggers and `CREATE EXTENSION vector` at boot instead of migrations; no `SEED_ALLOW` guard.
 
 ### 2. Environment
 
-- [ ] Backend names (contract 0001 [section 15](../specs/_root/0001-shared-services-contract/index.md#15-configuration)): `AUTH_ISSUER`, `AUTH_JWKS_URL`, `AUTH_INTERNAL_URL`, `AUTH_CLIENT_ID=vmms`, `AUTH_CLIENT_PRIVATE_KEY` (secret), `WEB_APP_URL`, `PORTAL_URL`, `AUTH_PUBLIC_URL`, `API_PUBLIC_URL`, `SESSION_COOKIE_SECURE`, `TRUST_PROXY_HOPS`, `PORT=3010`.
-- [ ] Remove `JWT_SECRET`, `JWT_ACCESS_EXPIRY`, `JWT_REFRESH_EXPIRY` and every `SEMAPHORE_*`.
-- [ ] Analytics: `AUTH_ISSUER`, `AUTH_JWKS_URL`, `AUTH_INTERNAL_URL`, `VMMS_API_BASE_URL` (internal, `http://vmms-backend:3010/vmms`), `PORT=3011`.
-- [ ] Web app: `VITE_API_BASE_URL` and `VITE_PORTAL_URL` only. `VITE_ANALYTICS_API_URL` goes: analytics is `<VITE_API_BASE_URL>/vmms/analytics/`.
-- [ ] Mobile: `EXPO_PUBLIC_API_BASE_URL`, the gateway (your computer's LAN address locally, so a phone can reach it).
-- [ ] Every name in `.env.example`, never a value.
+- [x] Backend names (contract 0001 [section 15](../specs/_root/0001-shared-services-contract/index.md#15-configuration)): `AUTH_ISSUER`, `AUTH_JWKS_URL`, `AUTH_INTERNAL_URL`, `AUTH_CLIENT_ID=vmms`, `AUTH_CLIENT_PRIVATE_KEY` (secret), `WEB_APP_URL`, `PORTAL_URL`, `AUTH_PUBLIC_URL`, `API_PUBLIC_URL`, `SESSION_COOKIE_SECURE`, `TRUST_PROXY_HOPS`, `PORT=3010`.
+- [x] Remove `JWT_SECRET`, `JWT_ACCESS_EXPIRY`, `JWT_REFRESH_EXPIRY` and every `SEMAPHORE_*`.
+- [x] Analytics: `AUTH_ISSUER`, `AUTH_JWKS_URL`, `AUTH_INTERNAL_URL`, `VMMS_API_BASE_URL` (internal, `http://vmms-backend:3010/vmms`), `PORT=3011`.
+- [x] Web app: `VITE_API_BASE_URL` and `VITE_PORTAL_URL` only. `VITE_ANALYTICS_API_URL` goes: analytics is `<VITE_API_BASE_URL>/vmms/analytics/`.
+- [x] Mobile: `EXPO_PUBLIC_API_BASE_URL`, the gateway (your computer's LAN address locally, so a phone can reach it).
+- [x] Every name in `.env.example`, never a value.
 
 ### 3. Backend: prefix, health and token check
 
-- [ ] Global prefix `vmms` (`app.setGlobalPrefix('vmms')`), port 3010, `trust proxy` from `TRUST_PROXY_HOPS`, `cookie-parser`.
-- [ ] `GET /vmms/health`, public, answering `{ status: 'ok', checks: { database: 'ok' } }` and 503 `HEALTH_CHECK_FAILED` when a check fails. Copy `welinc-backend-vrms/src/health/`.
-- [ ] Copy `welinc-backend-vrms/src/auth/verify/` whole, tests included, and follow its [README](../../welinc-backend-vrms/src/auth/verify/README.md) (set `SERVICE_AUDIENCE` to `VMMS`, `jose` 6, the Jest setting).
-- [ ] Copy `welinc-backend-vrms/src/auth/account-check.ts` (the 30 s session check) and use `src/auth/guards/jwt-auth.guard.ts` as the model for your guard: `checkPerson`, then the account check, roles from the token. Rename `VRMS` to `VMMS` in both.
-- [ ] Delete the auth module, the `/users` controller, `client-platform.ts`, the phone and Semaphore code, and every log line that prints an OTP or a password.
+- [x] Global prefix `vmms` (`app.setGlobalPrefix('vmms')`), port 3010, `trust proxy` from `TRUST_PROXY_HOPS`, `cookie-parser`.
+- [x] `GET /vmms/health`, public, answering `{ status: 'ok', checks: { database: 'ok' } }` and 503 `HEALTH_CHECK_FAILED` when a check fails. Copy `welinc-backend-vrms/src/health/`.
+- [x] Copy `welinc-backend-vrms/src/auth/verify/` whole, tests included, and follow its [README](../../welinc-backend-vrms/src/auth/verify/README.md) (set `SERVICE_AUDIENCE` to `VMMS`, `jose` 6, the Jest setting).
+- [x] Copy `welinc-backend-vrms/src/auth/account-check.ts` (the 30 s session check) and use `src/auth/guards/jwt-auth.guard.ts` as the model for your guard: `checkPerson`, then the account check, roles from the token. Rename `VRMS` to `VMMS` in both.
+- [x] Delete the auth module, the `/users` controller, `client-platform.ts`, the phone and Semaphore code, and every log line that prints an OTP or a password.
 
 ### 4. Backend: session routes
 
-- [ ] Copy `welinc-backend-vrms/src/session/` and rename the prefix: routes under `/vmms/session/*`, cookies `vmms_rt` and `vmms_login_<state prefix>` on path `/vmms/session`, callback `<API_PUBLIC_URL>/vmms/session/callback`, and the `system` value in the callback's portal errors `VMMS` (upper case). The `APP_NOT_ALLOWED` handling is already in there: keep it. [web-login.md, Backend](web-login.md#backend-copy-the-vrms-session-folder) has the details.
+- [x] Copy `welinc-backend-vrms/src/session/` and rename the prefix: routes under `/vmms/session/*`, cookies `vmms_rt` and `vmms_login_<state prefix>` on path `/vmms/session`, callback `<API_PUBLIC_URL>/vmms/session/callback`, and the `system` value in the callback's portal errors `VMMS` (upper case). The `APP_NOT_ALLOWED` handling is already in there: keep it. [web-login.md, Backend](web-login.md#backend-copy-the-vrms-session-folder) has the details.
 
 ### 5. Backend: people and data
 
-- [ ] Drop `users`, `user_roles`, `refresh_tokens`, `login_activities` and `password_reset_tokens`, with the foreign keys from `notifications`, `maintenance_notifications`, `mechanics` and `maintenance_schedules`. Every user id column stays as a plain uuid holding a welinc-auth id.
-- [ ] Copy the VRMS directory reader (`welinc-backend-vrms/src/modules/vrms/directory/`) with its own `directory_sync_state` table, and feed your `mechanics` rows from it (`user_id` unique). The client `vmms` already holds `directory.read`.
-- [ ] Erasure: when the feed says `erased: true`, every copied name becomes `Deleted user` and every copied email `deleted-<id>@erased.invalid`, `actorEmail` on your audit tables included. Copy `erasure-rewrite.ts` and see [account-screens.md, After an erasure](account-screens.md#after-an-erasure).
-- [ ] Seed: a byte for byte copy of welinc-auth's `people.json`, checked with `npm --prefix welinc-auth run seed:check -- welinc-backend-vmms/prisma/seeds/people.json`. Create no users. See [seed-accounts.md, For VMMS and BMS](seed-accounts.md#for-vmms-and-bms-in-s11-not-before).
-- [ ] Pick lists skip `temporaryRoles` ([account-screens.md, Temporary roles](account-screens.md#temporary-roles-in-pick-lists)).
+- [x] Drop `users`, `user_roles`, `refresh_tokens`, `login_activities` and `password_reset_tokens`, with the foreign keys from `notifications`, `maintenance_notifications`, `mechanics` and `maintenance_schedules`. Every user id column stays as a plain uuid holding a welinc-auth id.
+- [x] Copy the VRMS directory reader (`welinc-backend-vrms/src/modules/vrms/directory/`) with its own `directory_sync_state` table, and feed your `mechanics` rows from it (`user_id` unique). The client `vmms` already holds `directory.read`.
+- [x] Erasure: when the feed says `erased: true`, every copied name becomes `Deleted user` and every copied email `deleted-<id>@erased.invalid`, `actorEmail` on your audit tables included. Copy `erasure-rewrite.ts` and see [account-screens.md, After an erasure](account-screens.md#after-an-erasure).
+- [x] Seed: a byte for byte copy of welinc-auth's `people.json`, checked with `npm --prefix welinc-auth run seed:check -- welinc-backend-vmms/prisma/seeds/people.json`. Create no users. See [seed-accounts.md, For VMMS and BMS](seed-accounts.md#for-vmms-and-bms-in-s11-not-before).
+- [x] Pick lists skip `temporaryRoles` ([account-screens.md, Temporary roles](account-screens.md#temporary-roles-in-pick-lists)).
 - [ ] Profile pictures move to welinc-auth's picture route (`POST /auth/profile/picture`).
 
 ### 6. Backend: the fleet API
 
-- [ ] Serve `GET /vmms/fleet/vehicles`, `GET /vmms/fleet/vehicles/:id` and `GET /vmms/fleet/garages` for BMS, exactly as [fleet-api.md](fleet-api.md) says, with `@ServiceRoute('fleet.read')`.
-- [ ] A unit test that a service token without `fleet.read` answers 403 `FORBIDDEN` (the checker can't make one).
+- [x] Serve `GET /vmms/fleet/vehicles`, `GET /vmms/fleet/vehicles/:id` and `GET /vmms/fleet/garages` for BMS, exactly as [fleet-api.md](fleet-api.md) says, with `@ServiceRoute('fleet.read')`.
+- [x] A unit test that a service token without `fleet.read` answers 403 `FORBIDDEN` (the checker can't make one).
 
 ### 7. Analytics
 
 - [ ] Global prefix `vmms/analytics`, port 3011, Docker service `vmms-analytics`, `GET /vmms/analytics/health`.
-- [ ] Check user tokens yourself (`aud: VMMS`, the session check, roles from the token) with the copied `token-verifier.ts`, `key-set.ts`, `guards.ts`, `errors.ts` and `account-check.ts`. Analytics never calls welinc-auth as a client, so it needs no client key: build the verifier without `AuthVerifyModule`'s assertion signer, or give it the module and skip the key settings it doesn't use.
-- [ ] Never call a VMMS `/auth/me`. The "assigned" rule keeps calling VMMS core with the user's own token.
+  - **Open (2026-11-16):** analytics health doesn't check its database (hosting needs 200 only when it answers).
+- [x] Check user tokens yourself (`aud: VMMS`, the session check, roles from the token) with the copied `token-verifier.ts`, `key-set.ts`, `guards.ts`, `errors.ts` and `account-check.ts`. Analytics never calls welinc-auth as a client, so it needs no client key: build the verifier without `AuthVerifyModule`'s assertion signer, or give it the module and skip the key settings it doesn't use.
+- [x] Never call a VMMS `/auth/me`. The "assigned" rule keeps calling VMMS core with the user's own token.
 
 ### 8. Web app
 
-- [ ] The boot sequence, the in memory token, Switch system and sign out to `<portal>/login?reason=logout`: [web-login.md](web-login.md#web-app-the-boot-sequence). Copy `welinc-web-vrms/src/lib/session/`.
-- [ ] Remove the `?token=` intake and the VRMS link (Switch system replaces it; no token in a URL). See [Remove the old handoff](web-login.md#remove-the-old-handoff).
-- [ ] Delete the Users page; the menu item opens `<portal>/admin/people?system=VMMS`. Handle `ADMIN_CODE_REQUIRED` ([account-screens.md, Admin pages](account-screens.md#admin-pages-move-to-the-portal)).
-- [ ] The profile page uses welinc-auth's routes: [account-screens.md, VMMS](account-screens.md#vmms) and [account-screens.md, Account deletion](account-screens.md#account-deletion). No phone verification.
-- [ ] The audit page shows sign in events from `/auth/activity` to VMMS Admins only; other roles see the business rows only ([account-screens.md, Activity](account-screens.md#activity)).
-- [ ] Port 8002.
+- [x] The boot sequence, the in memory token, Switch system and sign out to `<portal>/login?reason=logout`: [web-login.md](web-login.md#web-app-the-boot-sequence). Copy `welinc-web-vrms/src/lib/session/`.
+- [x] Remove the `?token=` intake and the VRMS link (Switch system replaces it; no token in a URL). See [Remove the old handoff](web-login.md#remove-the-old-handoff).
+- [x] Delete the Users page; the menu item opens `<portal>/admin/people?system=VMMS`. Handle `ADMIN_CODE_REQUIRED` ([account-screens.md, Admin pages](account-screens.md#admin-pages-move-to-the-portal)).
+- [x] The profile page uses welinc-auth's routes: [account-screens.md, VMMS](account-screens.md#vmms) and [account-screens.md, Account deletion](account-screens.md#account-deletion). No phone verification.
+- [x] The audit page shows sign in events from `/auth/activity` to VMMS Admins only; other roles see the business rows only ([account-screens.md, Activity](account-screens.md#activity)).
+- [x] Port 8002.
 
 ### 9. Mobile app
 
-- [ ] Sign in through `POST /auth/mobile/login` with `clientId: vmms-mobile`, and show the code screen for `EMAIL_VERIFICATION_REQUIRED` (contract 0001 [section 8](../specs/_root/0001-shared-services-contract/index.md#8-mobile-login-vmms-mobile)).
-- [ ] Refresh through `POST /auth/token` (store the new refresh token each time: it rotates), log out with `{ refreshToken, clientId }`.
+- [x] Sign in through `POST /auth/mobile/login` with `clientId: vmms-mobile`, and show the code screen for `EMAIL_VERIFICATION_REQUIRED` (contract 0001 [section 8](../specs/_root/0001-shared-services-contract/index.md#8-mobile-login-vmms-mobile)).
+- [x] Refresh through `POST /auth/token` (store the new refresh token each time: it rotates), log out with `{ refreshToken, clientId }`.
 - [ ] Show the `APP_NOT_ALLOWED` message as welinc-auth gives it.
-- [ ] Call the API at `<api>/vmms/`. Remove `X-VMMS-Client` and `getMobileAccessRole`.
-- [ ] The VRMS tab is not part of this move (scope feature 48).
+- [x] Call the API at `<api>/vmms/`. Remove `X-VMMS-Client` and `getMobileAccessRole`.
+- [x] The VRMS tab is not part of this move (scope feature 48).
 
 ### 10. Prove it
 
-- [ ] When everything above is ticked, tell the shared services lead. They run `node scripts/check-system.mjs vmms` from the workspace root against your stack. Every line must say `ok`. It checks:
+- [ ] When you have done everything above, tell the shared services lead. They run `node scripts/check-system.mjs vmms` from the workspace root against your stack. Every line must say `ok`. It checks:
   - **login**: `/vmms/health`; a protected route refusing no token, a tampered token and a VRMS token; `session/start`, the callback cookie, the CSRF check, refresh, logout and the 31 s session end; `vmms.mech@` landing on the `APP_NOT_ALLOWED` page on the web and signing in on the phone app; analytics health and its token check.
   - **fleet**: the fleet routes refusing no token and a user token, and (once BMS has moved) BMS listing the same plates as VMMS.
   - **static**: a scan of your four repos for leftovers (`JWT_SECRET`, `HS256`, `X-VMMS-Client`, a token in `localStorage` or a URL, `SEMAPHORE_`, calls to `/auth/users`). Each hit prints `file:line`. A line that must stay (a test proving `HS256` is refused, say) ends in `// check-system: allow <reason>`.
-- [ ] While you work you may run `node scripts/check-system.mjs vmms --static-only` yourselves: it only scans your repos for leftovers, so it finds old login code early. The full run is the shared services lead's.
+- [x] While you work you may run `node scripts/check-system.mjs vmms --static-only` yourselves: it only scans your repos for leftovers, so it finds old login code early. The full run is the shared services lead's.
 
 ### 11. Pull requests and sign off
 
-- [ ] One pull request per repo into `development`. The shared services lead posts the checker's output on them.
+- [x] One pull request per repo into `development`. The shared services lead posts the checker's output on them.
 - [ ] Your group lead confirms in writing that the checklist is done.
 - [ ] The shared services lead runs the cross system steps (one sign in across three apps, sign out everywhere within 30 s, a deactivation and an erasure reaching VMMS) and ticks VMMS in the scope row. Login done and fleet done are separate ticks, so you can finish login first.
 
