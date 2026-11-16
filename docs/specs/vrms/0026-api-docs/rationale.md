@@ -75,6 +75,16 @@ The contract check runs in the workspace, where the contract lives, and reads we
 
 welinc-auth goes first because VMMS and BMS need it during their move and the contract check depends on it; backend-vrms copies a setup that is already proven.
 
+## Narrowing the reply schemas (update, 2026-11-16)
+
+The first version gave a response class and a reply test to every route in the contract route index. Sourcing that index during the build showed it holds 85 of welinc-auth's 86 routes, because sections 10 and 10a cover nearly the whole API. That meant about 85 classes and 85 tests, several days of work mostly on routes no other group reads about.
+
+Options weighed: the 6 backend to backend routes only; the 12 *integration routes* (what another system calls to plug in: discovery, tokens, mobile sign in, session, `me`, systems, directory, the permission read); or those 12 plus the account screen routes (about 24).
+
+Chosen: the 12. They are what VMMS and BMS build against during their move, and nothing else describes their replies. The account screen routes are already written up in `docs/integration/account-screens.md`, and the groups already call them from working pages, so docs there would mostly repeat a guide. The set is easy to widen (one class and one test per route, no rework), so the account screen routes are a Follow-up if time allows before Dec 4. The set lives in contract section 16's *Reply schema* column, so the contract stays the one place that says which replies are guaranteed.
+
+The same pass found places where contract 0001 and the code disagree on error codes. The docs follow the code: a reference that promises an error code the API never sends is worse than one with a gap, because a client built from it breaks. Each disagreement is listed in the index's Follow-up to be settled in the contract or the code.
+
 ## Tool discovery (2026-11-16)
 
 A registry search for `@nestjs/swagger` and Scalar found the vendor's `scalar/scalar@scalar-api-reference` (installed, saved to `agents/vrms/skills/`) and `scalar/scalar@scalar-docs` (declined: covers Scalar's hosted docs product). The only `@nestjs/swagger` skill was `davidcastagnetoa/skills@openapi-swagger-nestjs` with 10 installs from an unknown author (declined; `nestjs-best-practices` and the package docs cover it). MCP servers found turn an OpenAPI file into agent tools at runtime; not useful for building this (declined).
