@@ -46,6 +46,7 @@ Catch errors in production before users report them.
 **Done when:** frontend and backend errors from staging and production reach one place with the release and user role attached, and no secrets or personal data are sent.
 spec [0025](../../specs/vrms/0025-error-monitoring/index.md) · code in `welinc-backend-vrms`, `welinc-web-vrms`, `welinc-auth`, `welinc-web-portal`, `infra/gateway/`, `infra/`
 - Note (2026-11-16, `/architect`): Sentry in your four apps (student offer, free plan fallback, US region), browser reports through two gateway tunnel routes, one cron monitor (directory poll) and one uptime check (`/vrms/health`), Azure metric alerts in Bicep, a crash screen with a reference code, staging only test routes. Milestones 3 and 4 wait for feature 26's `deploy.yml`. Cross checked on another model, 17 gaps closed.
+- Note (2026-11-17, replan, from spec 0026 follow up): when milestone 1 adds the staging only test routes, hide them from the API docs in the same change (spec 0026 AC-7), then regenerate `docs/openapi.json`.
 - [x] Design it (spec): `/architect error monitoring`
 - [ ] Build it: `/develop error monitoring`
   - [ ] Thin thread in VRMS: the Sentry org and projects, backend-vrms and web-vrms SDKs, scrubbing, crash screen, test route and page, proven from your laptop (AC-1 to AC-3, AC-6 to AC-9, AC-12, AC-14 to AC-16)

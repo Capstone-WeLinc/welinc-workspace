@@ -39,6 +39,7 @@ _These are recommendations to keep the build orderly, not requirements. Skip any
 | S10 | Suite admin model | Admin | done |
 | S15 | Authenticator app sign in for admins | Admin | planned |
 | S16 | Temporary lockout and a clear deactivated answer | Account | done |
+| S17 | Contract and code agree on errors | Contract | planned |
 
 ## Contract
 
@@ -305,6 +306,7 @@ The move itself: their users merged into welinc-auth by email, their auth copies
     - Note (2026-11-14, replan): built and merged (spec 0014 tasks 9 to 11 ticked; the checklists and README updates landed 2026-11-14). You told VMMS and BMS on 2026-11-14; their move PRs are due Monday 2026-11-16. Hosting (VRMS feature 26) runs in parallel while they move.
   - [ ] The moves (the groups build AC-17 to AC-30): VMMS login done [ ], VMMS fleet done [ ], BMS login done [ ], BMS fleet done [ ], `welinc-backend` archived [ ] · AC-17 to AC-31
     - Note (2026-11-16, replan): VMMS opened `feat/shared-services` PRs in all four repos (backend #1, web #2, analytics #1, mobile #1); next, run `node scripts/check-system.mjs vmms` against them, read only. BMS has pushed nothing for the move yet, and `welinc-backend-bms` and `welinc-backend-bms-analytics-ai` still have no `development` branch.
+    - Note (2026-11-17, replan): the live checker passed on both groups' PR branches on the same stack (VMMS login 19 of 19, BMS login 16 of 16, fleet 5 of 5 each, scan clean), and the BMS fleet box in `move-bms.md` step 7 is ticked. Each guide still has 9 open boxes: VMMS has red tests and the hosting ready gaps (analytics' image needs `DATABASE_URL` to build), BMS has its PRs to rebase onto the move only. The login and fleet ticks here wait for those boxes, then your cross system steps in spec 0014 `verify.md` (AC-31).
   - [ ] Cleanup: VRMS Users page off `GET /auth/users`, the gated removal of the bearer admin routes, contract 0001 version 9 · AC-33
 - [ ] Verify it: `/check verify move VMMS and BMS onto the shared services` (the staging run, AC-32, waits for VRMS feature 26)
 - [ ] Test it: `/test move VMMS and BMS onto the shared services`
@@ -357,6 +359,12 @@ An optional authenticator app code (TOTP, a 6 digit code from an app on your pho
 **Done when:** an admin can turn on an authenticator app, sign in with it instead of the emailed code, use recovery codes if the phone is lost, and a suite admin can reset a lost one; the secret is stored encrypted; and every one of these events is logged.
 - Note (2026-11-13, replan): after S11 and hosting; it blocks nothing before go live. You tell the groups when it is ready. A break glass account stays dropped (spec 0013 AC-12); revisit only if the suite grows past one small team.
 - [ ] Design it (spec): `/architect authenticator app sign in for admins`
+
+### S17. Contract and code agree on errors · planned · needs a decision · from spec 0026
+Settle every place where contract 0001 and welinc-auth disagree, found while building the API docs: errors with no `code`, codes the contract leaves out, wrong status codes, and routes the contract names but the code doesn't serve. For each one, either the contract or the code changes, then `docs/openapi.json` is regenerated. The full list is in spec 0026 `## Follow-up`.
+**Done when:** every item on that list is settled in the contract or the code, `POST /auth/profile/picture` answers a coded 400 instead of 500 for a wrong or missing file, `openapi:check` and the contract route check pass, and the contract version goes up with a Changes line.
+- Note (2026-11-17, replan): before the integration defense (Dec 4), after hosting goes live. Most items are contract wording; the code changes are small. The picture 500 is a real bug and can go first through `/debug` without waiting for the spec. Do it with or before S11's cleanup (contract version 9), so the contract moves once.
+- [ ] Design it (spec): `/architect contract and code agree on errors`
 
 ## Why this order
 
