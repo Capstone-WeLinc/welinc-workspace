@@ -1,8 +1,8 @@
-name: vmms-environment
+﻿name: vmms-environment
 
 services:
   vmms-db:
-    image: postgres:16
+    image: pgvector/pgvector:pg16
     container_name: welinc_vmms_db
     restart: unless-stopped
     environment:
@@ -38,6 +38,8 @@ services:
     environment:
       PORT: 3010
       DATABASE_URL: postgresql://welinc_vmms_user:welinc_vmms_pass@vmms-db:5432/welinc_vmms_db?schema=public
+      STORAGE_CONNECTION_STRING: "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://vmms-azurite:10000/devstoreaccount1;"
+      STORAGE_CONTAINER: vmms-uploads
       AUTH_ISSUER: http://localhost:3000/auth
       AUTH_JWKS_URL: http://auth-service:3001/auth/.well-known/jwks.json
       AUTH_INTERNAL_URL: http://auth-service:3001
@@ -53,6 +55,20 @@ services:
     depends_on:
       vmms-db:
         condition: service_healthy
+      vmms-azurite:
+        condition: service_started
+    networks:
+      - welinc-network
+
+  vmms-azurite:
+    image: mcr.microsoft.com/azure-storage/azurite:3.35.0
+    container_name: welinc_vmms_azurite
+    restart: unless-stopped
+    command: azurite-blob --blobHost 0.0.0.0 --blobPort 10000 --location /data --loose --skipApiVersionCheck
+    ports:
+      - "10000:10000"
+    volumes:
+      - vmms_azurite:/data
     networks:
       - welinc-network
 
@@ -102,6 +118,7 @@ services:
 
 volumes:
   vmms_pgdata:
+  vmms_azurite:
 
 networks:
   welinc-network:
