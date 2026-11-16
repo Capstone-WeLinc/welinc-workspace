@@ -120,6 +120,17 @@ if [ -n "$client_env" ] && [ -f "docker-compose.$group.yml" ]; then
   else
     (cd welinc-auth && npm run keys:client --silent -- "$group" "../$client_env" .env --force)
   fi
+  # Analytics signs as its own client (<sys>-analytics, contract 0001 section 3), never with the
+  # system's key. Only when its .env.example names AUTH_CLIENT_PRIVATE_KEY: an analytics service
+  # that never calls welinc-auth as a client needs no key.
+  analytics_env="welinc-backend-$group-analytics-ai/.env"
+  if [ -f "$analytics_env" ] && grep -q '^AUTH_CLIENT_PRIVATE_KEY=' "$analytics_env"; then
+    if has_value "$analytics_env" AUTH_CLIENT_PRIVATE_KEY; then
+      echo "keep  the $group-analytics client key already in $analytics_env"
+    else
+      (cd welinc-auth && npm run keys:client --silent -- "$group-analytics" "../$analytics_env" .env --force)
+    fi
+  fi
 fi
 
 # Spec 0011: country and network provider for account activity (DB-IP Lite, free). A failed download
