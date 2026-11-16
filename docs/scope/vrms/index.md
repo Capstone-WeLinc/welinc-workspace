@@ -77,7 +77,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 63 | Chief dashboard rework with a Team section | Slice 1 | done |
 | 26 | Hosting, CI/CD & environments | Release | in-progress |
 | 27 | Error monitoring | Release | in-progress |
-| 68 | API docs | Release | in-progress |
+| 68 | API docs | Release | done |
 | 69 | Security checks | Release | planned |
 | 66 | Workflow review against real shops | Slice 2 | planned |
 | 67 | Describe first issue picker | Slice 2 | planned |

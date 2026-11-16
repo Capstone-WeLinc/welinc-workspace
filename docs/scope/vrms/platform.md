@@ -55,7 +55,7 @@ spec [0025](../../specs/vrms/0025-error-monitoring/index.md) · code in `welinc-
 - [ ] Verify it: `/check verify error monitoring`
 - [ ] Test it: `/test error monitoring` (Testmail is not needed here; it is for the email code flows)
 
-### 68. API docs · in-progress
+### 68. API docs · done
 Interactive API docs generated from the NestJS controllers (`@nestjs/swagger`), so VMMS and BMS can read the auth API without the code, and the panel can see the API. Added 2026-11-16, after hosting and before the integration defense (Dec 4).
 **Done when:** backend-vrms and welinc-auth each serve generated docs listing every route with its inputs, outputs and errors, kept in step with the code by the build, and production exposes them only as decided in the spec.
 spec [0026](../../specs/vrms/0026-api-docs/index.md) · code in `welinc-auth/src/openapi/`, `welinc-backend-vrms/src/openapi/`, `docs/openapi.json` in both, `scripts/check-contract-routes.mjs`, `infra/env.bicep`, contract 0001 section 16
