@@ -34,6 +34,7 @@ docker compose -f docker-compose.shared.yml stop
 # Scripts (run in Git Bash from the workspace root)
 sh scripts/setup.sh vrms   # first time setup: clones, .env files, keys, packages, migrations, seeds; safe to run again
 node scripts/check-system.mjs vrms   # suite spec 0014 checker: live login checks plus the leftovers scan (exit 0 passes)
+node scripts/check-contract-routes.mjs <openapi.json>   # VRMS spec 0026: welinc-auth's docs against contract 0001 section 16 (exit 0 passes)
 
 # Gateway checks (needs Docker; starts and removes its own containers)
 node infra/gateway/test/check-routes.mjs
