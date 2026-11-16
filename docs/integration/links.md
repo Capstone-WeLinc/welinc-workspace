@@ -2,7 +2,7 @@
 
 Every place to open, check or manage the suite, per system: local addresses, databases, API docs, hosted apps, and the outside accounts. It holds no passwords or keys: local database logins are in each compose file, hosted secrets in the password manager.
 
-Hosted addresses use `welinc.app` (the domain moves from `welinc.tech`, see [hosting.md](hosting.md)). Staging is the same name with `staging-` in front.
+Hosted addresses use `welinc.app` (see [hosting.md](hosting.md)). Staging is the same name with `staging-` in front.
 
 ## Quick health check
 

@@ -340,7 +340,7 @@ try {
     const base = {
       AUTH_UPSTREAM: 'http://auth-service:3001', VRMS_UPSTREAM: 'http://vrms-backend:3002', VMMS_UPSTREAM: 'http://vmms-backend:3010',
       VMMS_ANALYTICS_UPSTREAM: 'http://vmms-analytics:3011', BMS_UPSTREAM: 'https://bms.example.com',
-      ALLOWED_ORIGINS: 'http://localhost:8000 , https://vrms.welinc.tech', TRUST_EDGE_PROXY: '0',
+      ALLOWED_ORIGINS: 'http://localhost:8000 , https://vrms.welinc.app', TRUST_EDGE_PROXY: '0',
       GATEWAY_RATE_PER_SECOND: '20', GATEWAY_RATE_BURST: '40', GATEWAY_HSTS: '',
     };
     const start = (env) => {

@@ -21,7 +21,7 @@ _Steps derived from spec 0008 acceptance criteria. `/check verify` runs these; `
 - [ ] Start the auth runner in development mode on `welinc-network` with a throwaway key → `/auth/health` answers `{"status":"ok","checks":{"database":"ok"}}`, `geo/` holds both DB-IP files, `uploads/` is owned by `node` → AC-6, AC-14
 - [ ] Upload a profile picture locally, then open `/uploads/profiles/<file>` through the gateway → the image loads (the static route reads the same `uploads/` the upload writes) → AC-14
 - [ ] On a throwaway VRMS database, from the seed image: `npx prisma migrate deploy`, then `npm run seed` with no `SEED_ALLOW` → exits 1 with "Seeding is off in production…" and writes nothing → AC-13
-- [ ] Same database: `npm run seed -- --reference` → exits 0; garages 3, vehicles 70, knowledge entries 23 all by `setup@welinc.tech` ("WeLinc setup"), and 0 tickets, mechanics, drivers and suggestions → AC-15
+- [ ] Same database: `npm run seed -- --reference` → exits 0; garages 3, vehicles 70, knowledge entries 23 all by `setup@welinc.app` ("WeLinc setup"), and 0 tickets, mechanics, drivers and suggestions → AC-15
 - [ ] Run `npm run seed -- --reference` again → exits 1 with "--reference fills an empty database only…", nothing written → AC-15
 - [ ] Same database with `SEED_ALLOW=staging`: `npm run seed` → "Database seeded successfully!" → AC-13
 - [ ] `DB_POOL_MAX=3` set on either service → `SELECT count(*) FROM pg_stat_activity WHERE usename = '<role>'` never passes 3 under load; leaving it blank uses 5; `0` or `51` fails the boot check → AC-21
@@ -41,7 +41,7 @@ _Steps derived from spec 0008 acceptance criteria. `/check verify` runs these; `
 - [ ] After signup: `infra/scripts/apply.sh shared`, `apply.sh budget`, then `apply.sh staging --what-if` → the preview lists the server, seven databases, two storage accounts, the environment, three apps, four jobs and four Static Web Apps, and no VMMS or BMS app → AC-10, AC-19
 - [ ] `apply.sh staging` → finishes, `db-init.sh` reports "database roles ready", and the temporary firewall rule is gone afterwards (`az postgres flexible-server firewall-rule list`) → AC-5, AC-10
 - [ ] `az postgres flexible-server parameter show --name azure.extensions` and `idle_in_transaction_session_timeout` on each server → `VECTOR,PG_TRGM` and `60000`; backup retention 14 days → AC-8, AC-21
-- [ ] `dns-records.sh staging`, add the records, `dns-records.sh staging --check` → every line `ok`; then `apply.sh staging --domains` → `https://staging-api.welinc.tech/health` answers 200 with a valid certificate, and the four web names open their Static Web Apps → AC-7
+- [ ] `dns-records.sh staging`, add the records, `dns-records.sh staging --check` → every line `ok`; then `apply.sh staging --domains` → `https://staging-api.welinc.app/health` answers 200 with a valid certificate, and the four web names open their Static Web Apps → AC-7
 - [ ] `apply.sh staging --domains` again → the gateway keeps its certificate the whole time (curl the health route in a loop during the run), and `--what-if` before it shows no changes to images or secrets → AC-7, AC-10
 - [ ] Any app on staging other than the gateway: `az containerapp show --query properties.configuration.ingress.external` → `false`; the gateway's `GET /vmms/health` → 502 `UPSTREAM_UNAVAILABLE` while VMMS is off → AC-19
 - [ ] Replica settings: production every app min 1; staging the gateway, `auth-service` and `vrms-backend` min 1, the rest 0; `auth-service` max 1 → AC-16
