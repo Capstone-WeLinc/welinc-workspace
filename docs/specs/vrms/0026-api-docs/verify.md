@@ -34,8 +34,8 @@ _Steps derived from spec 0026 acceptance criteria. `/check verify` runs these; `
 - [x] `node scripts/check-contract-routes.mjs welinc-auth/docs/openapi.json` → `ok: all 86 rows of contract 0001 section 16 are documented`, exit 0 → AC-10
 - [x] Drop `DELETE /auth/me/sessions/{sid}` and the 200 schema of `GET /auth/systems` from a copy of that file and run the script on it → exit 1, one `missing:` line and one `no reply schema:` line; add a path with no row → a `note:` line that doesn't fail → AC-10
 - [x] Section 16 has 12 `yes` rows under *Reply schema*, exactly the AC-5 integration routes → AC-10, AC-5
-- [ ] With `AUTH_REPO_READ_TOKEN` unset, the `contract-routes` job on a workspace PR fails at "AUTH_REPO_READ_TOKEN is set" with the named message; with it set, it checks out welinc-auth `development` and passes. Run it once by hand (Actions, Run workflow) → AC-11
-- [ ] The workspace `infra` job compiles `infra/env.bicep`; `az bicep build` output shows `API_DOCS_ENABLED` `true` for staging and `false` for prod on both apps (`apply.sh staging --what-if` and `prod --what-if`) → AC-2
+- [x] With `AUTH_REPO_READ_TOKEN` unset, the `contract-routes` job on a workspace PR fails at "AUTH_REPO_READ_TOKEN is set" with the named message; with it set, it checks out welinc-auth `development` and passes. Run it once by hand (Actions, Run workflow) → AC-11 (2026-11-16: the secret set half passed in CI on `main`; the secret missing half was not run)
+- [x] The workspace `infra` job compiles `infra/env.bicep`; `az bicep build` output shows `API_DOCS_ENABLED` `true` for staging and `false` for prod on both apps (`apply.sh staging --what-if` and `prod --what-if`) → AC-2 (2026-11-16: it compiles in CI on `main`; the staging `true` and prod `false` values were read from the code, not from a `--what-if` run)
 - [x] `docs/integration/README.md`, `move-vmms.md` and `move-bms.md` link `/auth/docs` and the committed file → AC-1
 
 ## backend-vrms (milestone 4, added 2026-11-16, local stack up)
