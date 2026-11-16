@@ -19,6 +19,7 @@ That checklist is the only page you need to read through. Each item links the ex
 | [account-screens.md](account-screens.md) | Your Users page moving to the portal, the admin code answer, temporary roles, profile and admin activity, account deletion, erasure |
 | [fleet-api.md](fleet-api.md) | The trucks and garages API: VMMS serves it, BMS dispatch reads it |
 | [seed-accounts.md](seed-accounts.md) | Every test login and password, and how your seed copies the shared people |
+| [links.md](links.md) | Every address to open or check, per system: health routes, ports, databases, API docs, Azure resources, logs and outside accounts |
 | [hosting.md](hosting.md) | Going online on Azure: your apps, what makes a service hosting ready, secrets, deploying |
 | API docs: `/auth/docs` ([`openapi.json`](https://github.com/Capstone-WeLinc/welinc-auth/blob/development/docs/openapi.json)) | Every welinc-auth route with its exact inputs, replies and error codes, generated from the code. Served locally (`http://localhost:3000/auth/docs`) and on staging, never in production. You can paste an access token and try a request |
 
