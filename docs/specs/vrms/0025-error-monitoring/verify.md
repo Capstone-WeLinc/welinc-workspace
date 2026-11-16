@@ -3,7 +3,7 @@ _Steps derived from spec 0025 acceptance criteria. `/check verify` runs these; `
 
 ## Milestone 1 (backend-vrms and web-vrms, proven from the laptop)
 
-Setup for the live steps: put the `vrms-backend` DSN in `welinc-backend-vrms/.env` with `SENTRY_ENVIRONMENT=staging` and `SENTRY_TEST_ROUTES=true`, then recreate the container (`docker compose -f docker-compose.vrms.yml up -d vrms-backend`). Put the `vrms-web` DSN in `welinc-web-vrms/.env.development.local` with `VITE_SENTRY_ENVIRONMENT=staging` and `VITE_SENTRY_TEST_ROUTES=true`, then restart `welinc_vrms_frontend`. Until milestone 2 adds `sentry-trace, baggage` to the gateway's CORS headers, browser API calls fail their preflight while `VITE_SENTRY_DSN` is set, so test the browser parts with the gateway change in place.
+Setup for the live steps: put the `vrms-backend` DSN in `welinc-backend-vrms/.env` with `SENTRY_ENVIRONMENT=staging` and `SENTRY_TEST_ROUTES=true`, then recreate the container (`docker compose -f docker-compose.vrms.yml up -d vrms-backend`). Put the `vrms-web` DSN in `welinc-web-vrms/.env.development.local` with `VITE_SENTRY_ENVIRONMENT=staging` and `VITE_SENTRY_TEST_ROUTES=true`, then restart `welinc_vrms_frontend`. The gateway allows `sentry-trace` and `baggage` since commit `efc94f9` (pulled forward from milestone 2), so browser API calls pass their preflight while `VITE_SENTRY_DSN` is set; restart `welinc_api_gateway` once to load it.
 
 ### UI / manual
 - [ ] Signed in as `vrms.admin@welinc.com`, `POST /vrms/debug/sentry-test` → 500, and one issue in `vrms-backend` within a minute with `environment: staging`, `system: vrms`, user id only, `role: ADMIN` → AC-1, AC-16
