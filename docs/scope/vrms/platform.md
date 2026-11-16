@@ -49,7 +49,7 @@ spec [0025](../../specs/vrms/0025-error-monitoring/index.md) · code in `welinc-
 - Note (2026-11-17, replan, from spec 0026 follow up): when milestone 1 adds the staging only test routes, hide them from the API docs in the same change (spec 0026 AC-7), then regenerate `docs/openapi.json`.
 - [x] Design it (spec): `/architect error monitoring`
 - [ ] Build it: `/develop error monitoring`
-  - [ ] Thin thread in VRMS: the Sentry org and projects, backend-vrms and web-vrms SDKs, scrubbing, crash screen, test route and page, proven from your laptop (AC-1 to AC-3, AC-6 to AC-9, AC-12, AC-14 to AC-16)
+  - [x] Thin thread in VRMS: the Sentry org and projects, backend-vrms and web-vrms SDKs, scrubbing, crash screen, test route and page, proven from your laptop (AC-1 to AC-3, AC-6 to AC-9, AC-12, AC-14 to AC-16)
   - [ ] The shared side: welinc-auth (with `CodeErrorFilter`), the portal, the gateway tunnel and CORS headers, contract 0001 (AC-1 to AC-9, AC-14 to AC-16)
   - [ ] Jobs and releases: job failure reports, the directory poll monitor, release tags, source map upload and removal in `deploy.yml` (AC-1, AC-3, AC-10, AC-17)
   - [ ] Alerts and hand off: Bicep settings and Azure alert rules, the uptime and cron alerts, the VMMS and BMS how to page (AC-10 to AC-14, AC-18)
