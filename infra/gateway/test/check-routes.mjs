@@ -179,7 +179,7 @@ try {
       res.status === 204 && res.headers['access-control-allow-origin'] === LISTED &&
         res.headers['access-control-allow-credentials'] === 'true' &&
         res.headers['access-control-allow-methods'] === 'GET, POST, PUT, PATCH, DELETE, OPTIONS' &&
-        res.headers['access-control-allow-headers'] === 'Authorization, Content-Type, X-Request-Id' &&
+        res.headers['access-control-allow-headers'] === 'Authorization, Content-Type, X-Request-Id, sentry-trace, baggage' &&
         res.headers['access-control-max-age'] === '600', JSON.stringify(res.headers));
     const bad = await request(GW, { method: 'OPTIONS', url: `/vrms/x?m=${m9}`, headers: { Origin: UNLISTED, ...pre } });
     check('AC-9', 'an unlisted preflight answers 204 with no Access-Control-* header', bad.status === 204 && corsHeaderNames(bad).length === 0,

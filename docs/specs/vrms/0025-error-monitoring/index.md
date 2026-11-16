@@ -1,7 +1,7 @@
 # 0025. Error monitoring with Sentry and Azure alerts
 
 **Date**: 2026-11-16
-**Status**: Proposed
+**Status**: In Progress
 **Updated**: 2026-11-16, cross checked on another model; 17 gaps closed (health and filter reporting, the gateway tunnel mechanics, every config source, the role tag, double reporting, trace linking, map files) and 3 wording fixes.
 
 ## Summary
