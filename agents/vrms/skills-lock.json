@@ -145,6 +145,12 @@
       "skillPath": "skills/.curated/react-hook-form/SKILL.md",
       "computedHash": "c32b9536b64b2bbfb26ecadac5caf9ac85697f319edffe6f77c9ecd00db51d14"
     },
+    "scalar-api-reference": {
+      "source": "scalar/scalar",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/scalar-api-reference/SKILL.md",
+      "computedHash": "fb512ea6ed4896323a9d54b35e23c390a6367747e237af641a90abdb4a8e2d4d"
+    },
     "scope": {
       "source": "jsmastery-pro/skills",
       "sourceType": "github",
