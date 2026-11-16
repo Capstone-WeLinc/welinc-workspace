@@ -55,12 +55,11 @@ region
 
 Check after any change: send a test error (below) and open it. The user should show only an id, and `geo` should read `[Filtered]` throughout.
 
-### Alert rules (per project)
+### Alert rules
 
-Each project needs two issue alert rules that email the alert address, for both environments:
+One alert covers all four projects: **New or regressed issue (spec 0025)** (https://welinc.sentry.io/monitors/alerts/6357875/). It fires on a new issue and on a regression (a resolved issue comes back), in every environment, and emails the issue owners, falling back to the active members (you). The email names the environment.
 
-1. **A new issue:** created when the project was made ("Alert me on every new issue"). Check it under Alerts.
-2. **A regression** (a resolved issue comes back): Alerts → Create Alert → Issues, condition "The issue changes state from resolved to unresolved", action "Send a notification to" the alert address, every environment.
+Sentry also makes a "Send a notification for high priority issues" rule for each new project. Those are disabled so one problem sends one email. A project added later gets one too: disable it, and add the project to the alert above (Alerts → the alert → Edit → Connected projects).
 
 The cron monitor (`vrms-directory-poll`) and the uptime monitor (`/vrms/health`) alert for **production only**. They come with spec 0025's milestones 3 and 4.
 
