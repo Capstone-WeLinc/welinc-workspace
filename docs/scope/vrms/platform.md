@@ -66,7 +66,7 @@ spec [0026](../../specs/vrms/0026-api-docs/index.md) · code in `welinc-auth/src
   - [x] welinc-auth thickened: tags, the five security schemes, error codes on contract routes, response classes and reply tests for the 12 integration routes (AC-4 to AC-8)
   - [x] Contract and workspace, after the auth PR merges: contract 0001 section 16, `check-contract-routes.mjs` and its CI job, the Bicep switch, links in `docs/integration/` (AC-1, AC-2, AC-10, AC-11)
   - [x] backend-vrms: the same setup copied, tags, schemes, generic errors, the four ticket response classes and tests (AC-1 to AC-9, AC-12)
-- [ ] Verify it: `/check verify API docs`
+- [x] Verify it: `/check verify API docs`
 - [x] Test it: `/test API docs`
 
 ### 69. Security checks · planned
