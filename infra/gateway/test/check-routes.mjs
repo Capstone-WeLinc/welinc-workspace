@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Gateway checks for spec 0008, AC-1 to AC-21, and the Sentry tunnel of VRMS spec 0025 (AC-4, AC-5;
-// labelled S-AC4 and S-AC5). Run from the workspace root (Node 24, Docker and openssl):
+// labelled S-AC4 and S-AC5, the envelope DSN check included). Run from the workspace root (Node 24, Docker and openssl):
 //   node infra/gateway/test/check-routes.mjs          start the harness, check, remove it
 //   node infra/gateway/test/check-routes.mjs --keep   leave the harness running afterwards
 // Exits non zero when any check fails.
@@ -10,7 +10,8 @@ import http from 'node:http';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { randomBytes } from 'node:crypto';
+import { createHash, randomBytes } from 'node:crypto';
+import { gzipSync } from 'node:zlib';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const composeFile = path.join(here, 'compose.yml');
@@ -22,6 +23,9 @@ const UNLISTED = 'http://evil.example';
 const STUBS = ['auth-service', 'vrms-backend', 'vmms-backend', 'vmms-analytics', 'bms-gateway'];
 const MB = 1024 * 1024;
 const keep = process.argv.includes('--keep');
+// The tunnel's two DSNs, as test/compose.yml sets them on the plain gateway (VRMS spec 0025)
+const DSN_VRMS_WEB = 'https://0123456789abcdef0123456789abcdef@o1.ingest.us.sentry.io/11';
+const DSN_PORTAL = 'https://fedcba9876543210fedcba9876543210@o1.ingest.us.sentry.io/12';
 
 // ---------- helpers ----------
 
@@ -203,7 +207,11 @@ try {
   // ---------- VRMS spec 0025, AC-4, AC-5: the Sentry tunnel ----------
   {
     const TUNNEL = '/monitoring/vrms-web';
-    const envelope = '{"dsn":"https://k@o1.ingest.us.sentry.io/11"}\n{"type":"event"}\n{}';
+    const envelope = (dsn, item = '{}') => `${JSON.stringify({ event_id: marker(), dsn })}\n{"type":"event"}\n${item}`;
+    const right = envelope(DSN_VRMS_WEB);
+    const sha = (body) => createHash('sha256').update(body).digest('hex');
+    const reached = (body) => logsOf('sentry-ingest').includes(`sha256=${sha(body)}`);
+
     const mt = marker();
     const pre = await request(GW, { method: 'OPTIONS', url: `${TUNNEL}?m=${mt}`, headers: { Origin: LISTED, 'Access-Control-Request-Method': 'POST' } });
     check('S-AC5', 'OPTIONS answers 204 with CORS for a listed origin',
@@ -216,42 +224,130 @@ try {
 
     const planted = {
       Origin: LISTED, 'Content-Type': 'text/plain;charset=UTF-8', Cookie: 'welinc_sso=secretcookie',
-      Authorization: 'Bearer secrettoken', 'X-Forwarded-For': '6.6.6.6', 'X-Real-IP': '6.6.6.6',
-      Forwarded: 'for=6.6.6.6', Referer: 'http://localhost:8001/reset?code=topsecret', 'X-Request-Id': 'tunnel-1',
+      Authorization: 'Bearer secrettoken', 'X-Sentry-Auth': 'Sentry sentry_key=secretkey', 'X-Forwarded-For': '6.6.6.6',
+      'X-Real-IP': '6.6.6.6', Forwarded: 'for=6.6.6.6', Referer: 'http://localhost:8001/reset?code=topsecret',
+      'Accept-Encoding': 'gzip', 'X-Request-Id': 'tunnel-1', 'User-Agent': 'tunnel-test/1',
     };
-    const res = await request(GW, { method: 'POST', url: `${TUNNEL}?m=${mt}`, headers: planted, body: envelope });
+    const res = await request(GW, { method: 'POST', url: `${TUNNEL}?m=${mt}`, headers: planted, body: right });
     const sent = res.json?.headers ?? {};
-    check('S-AC4', 'POST /monitoring/vrms-web reaches its own project, without the query',
+    check('S-AC4', 'POST /monitoring/vrms-web with its own DSN reaches its project, without the query',
       res.status === 200 && res.json?.service === 'sentry-ingest' && res.json?.url === '/api/11/envelope/' &&
-        res.json?.bytes === Buffer.byteLength(envelope), brief(res));
+        res.json?.sha256 === sha(right), brief(res));
     check('S-AC4', 'Sentry is called by its own host name', sent.host === 'o1.ingest.us.sentry.io', sent.host);
     check('S-AC5', 'Sentry gets no cookie, Authorization, client address, page address or request id',
-      ['cookie', 'authorization', 'x-forwarded-for', 'x-real-ip', 'forwarded', 'referer', 'x-request-id'].every((h) => !(h in sent)),
+      ['cookie', 'authorization', 'x-sentry-auth', 'x-forwarded-for', 'x-real-ip', 'forwarded', 'referer', 'accept-encoding', 'x-request-id']
+        .every((h) => !(h in sent)), JSON.stringify(sent));
+    check('S-AC5', 'Origin, User-Agent and Content-Type pass through to Sentry',
+      sent.origin === LISTED && sent['content-type'] === 'text/plain;charset=UTF-8' && sent['user-agent'] === 'tunnel-test/1',
       JSON.stringify(sent));
-    check('S-AC5', 'a listed origin gets its allow origin header on the POST',
-      headerValues(res, 'access-control-allow-origin').join() === LISTED, JSON.stringify(res.headers));
-    const portal = await request(GW, { method: 'POST', url: '/monitoring/portal', headers: { Origin: 'http://localhost:8000' }, body: envelope });
-    check('S-AC4', 'POST /monitoring/portal reaches the portal project', portal.json?.url === '/api/12/envelope/', brief(portal));
-    const unlisted = await request(GW, { method: 'POST', url: TUNNEL, headers: { Origin: UNLISTED }, body: envelope });
+    check('S-AC5', "Sentry's Retry-After and X-Sentry-Rate-Limits come back",
+      res.headers['retry-after'] === '7' && res.headers['x-sentry-rate-limits'] === '60:error:organization', JSON.stringify(res.headers));
+    check('S-AC5', 'a listed origin gets exactly one allow origin header on the POST, and the gateway request id',
+      headerValues(res, 'access-control-allow-origin').join() === LISTED && headerValues(res, 'x-request-id').join() === 'tunnel-1' &&
+        headerValues(res, 'vary').join() === 'Origin', JSON.stringify(res.raw));
+
+    // A body with binary items (invalid UTF-8 included) and a \r\n header line reaches Sentry byte for byte
+    const binary = Buffer.concat([
+      Buffer.from(`${JSON.stringify({ dsn: DSN_VRMS_WEB })}\r\n{"type":"attachment","length":512}\n`),
+      randomBytes(512), Buffer.from([0x00, 0xff, 0xfe, 0xc3, 0x28, 0x0a]),
+    ]);
+    const bin = await request(GW, { method: 'POST', url: TUNNEL, headers: { Origin: LISTED }, body: binary });
+    check('S-AC5', 'a binary envelope reaches Sentry byte for byte',
+      bin.status === 200 && bin.json?.bytes === binary.length && bin.json?.sha256 === sha(binary), brief(bin));
+
+    const portalRight = envelope(DSN_PORTAL);
+    const portal = await request(GW, { method: 'POST', url: '/monitoring/portal', headers: { Origin: 'http://localhost:8000' }, body: portalRight });
+    check('S-AC4', 'POST /monitoring/portal with its own DSN reaches the portal project',
+      portal.json?.url === '/api/12/envelope/' && portal.json?.sha256 === sha(portalRight), brief(portal));
+
+    // Every body that isn't this route's own DSN: 403 TUNNEL_REJECTED, nothing reaches Sentry
+    const key = DSN_VRMS_WEB.slice(8, 40);
+    const header = (h) => `${h}\n{"type":"event"}\n{"m":"${marker()}"}`;
+    const rejects = [
+      ['another project on the same host', envelope('https://' + key + '@o1.ingest.us.sentry.io/99')],
+      ["another organization's host", envelope('https://' + key + '@o2.ingest.us.sentry.io/11')],
+      ["the other route's DSN", envelope(DSN_PORTAL)],
+      ['a different key for the same project', envelope('https://' + 'a'.repeat(32) + '@o1.ingest.us.sentry.io/11')],
+      ['an uppercase key', envelope(DSN_VRMS_WEB.replace(key, key.toUpperCase()))],
+      ['a port', envelope(DSN_VRMS_WEB.replace('.io/', '.io:443/'))],
+      ['a trailing slash', envelope(`${DSN_VRMS_WEB}/`)],
+      ['a trailing newline in the dsn', envelope(`${DSN_VRMS_WEB}\n`)],
+      ['a password', envelope(DSN_VRMS_WEB.replace('@', ':secret@'))],
+      ['http instead of https', envelope(DSN_VRMS_WEB.replace('https:', 'http:'))],
+      ['a duplicate dsn key', header(`{"dsn":"${DSN_VRMS_WEB}","dsn":"https://${key}@o1.ingest.us.sentry.io/99"}`)],
+      ['an escaped dsn key', header(`{"d\\u0073n":"https://${key}@o1.ingest.us.sentry.io/99","x":"${DSN_VRMS_WEB}"}`)],
+      ['no dsn', header(`{"event_id":"${marker()}"}`)],
+      ['a dsn that is not a string', header('{"dsn":11}')],
+      ['a header that is an array', header(`["dsn","${DSN_VRMS_WEB}"]`)],
+      ['no newline in the first 8 KB', header(`{"dsn":"${DSN_VRMS_WEB}","pad":"${'a'.repeat(9000)}"}`)],
+      ['a header that is not JSON', header(`dsn "dsn" ${DSN_VRMS_WEB}`)],
+      ['an empty body', ''],
+    ];
+    for (const [name, body] of rejects) {
+      const r = await request(GW, { method: 'POST', url: TUNNEL, headers: { Origin: LISTED }, body });
+      check('S-AC5', `${name} answers 403 TUNNEL_REJECTED with CORS and never reaches Sentry`,
+        isGatewayError(r, 403, 'TUNNEL_REJECTED') && headerValues(r, 'access-control-allow-origin').join() === LISTED &&
+          /^[A-Za-z0-9._-]{1,64}$/.test(r.headers?.['x-request-id'] ?? '') && !(body && reached(body)), brief(r));
+      await sleep(1000); // stay under the tunnel limit of 1 a second
+    }
+    await sleep(1000);
+    const gz = gzipSync(right);
+    const gzRes = await request(GW, { method: 'POST', url: TUNNEL, headers: { Origin: LISTED, 'Content-Encoding': 'gzip' }, body: gz });
+    check('S-AC5', 'a gzip body (even with the right DSN) answers 403 TUNNEL_REJECTED and never reaches Sentry',
+      isGatewayError(gzRes, 403, 'TUNNEL_REJECTED') && !reached(gz), brief(gzRes));
+    await sleep(1000);
+    const identity = envelope(DSN_VRMS_WEB);
+    const idRes = await request(GW, { method: 'POST', url: TUNNEL, headers: { Origin: LISTED, 'Content-Encoding': 'identity' }, body: identity });
+    check('S-AC5', 'Content-Encoding: identity with the right DSN is forwarded', idRes.status === 200 && reached(identity), brief(idRes));
+
+    await sleep(1000);
+    const unlisted = await request(GW, { method: 'POST', url: TUNNEL, headers: { Origin: UNLISTED }, body: envelope(DSN_VRMS_WEB) });
     check('S-AC5', 'an unlisted origin gets no Access-Control-* header', unlisted.status === 200 && corsHeaderNames(unlisted).length === 0,
       corsHeaderNames(unlisted).join());
     const big = await request(GW, { method: 'POST', url: TUNNEL, headers: { Origin: LISTED }, body: Buffer.alloc(2 * MB) });
     check('S-AC5', 'a 2 MB body answers the JSON 413', big.error !== undefined || isGatewayError(big, 413, 'PAYLOAD_TOO_LARGE'), brief(big));
-    for (const p of ['/monitoring/vrms-web/', '/monitoring/other', '/monitoring']) {
-      const other = await request(GW, { method: 'POST', url: p, body: envelope });
-      check('S-AC4', `${p} is not a tunnel route`, isGatewayError(other, 404, 'NOT_FOUND'), brief(other));
+    await sleep(1200);
+    const full = Buffer.concat([Buffer.from(`${JSON.stringify({ dsn: DSN_VRMS_WEB })}\n`), Buffer.alloc(MB - 100, 0x61)]);
+    const fullRes = await request(GW, { method: 'POST', url: TUNNEL, headers: { Origin: LISTED }, body: full });
+    check('S-AC5', 'a body just under 1 MB is checked in memory and forwarded whole',
+      fullRes.status === 200 && fullRes.json?.bytes === full.length && fullRes.json?.sha256 === sha(full), brief(fullRes));
+    for (const p of ['/monitoring/vrms-web/', '/monitoring/other', '/monitoring', '/_tunnel/vrms-web', '/_tunnel/portal']) {
+      const other = await request(GW, { method: 'POST', url: p, body: right });
+      check('S-AC4', `${p} is not a public route`, isGatewayError(other, 404, 'NOT_FOUND'), brief(other));
     }
 
+    // One access log line per report, and none of the body in the log
+    await sleep(1000);
+    const logged = envelope(DSN_VRMS_WEB, '{"secret":"bodysecret"}');
+    await request(GW, { method: 'POST', url: TUNNEL, headers: { Origin: LISTED, 'X-Request-Id': 'tunnel-log-1' }, body: logged });
+    await sleep(1000);
+    const rejectedLogged = envelope('https://' + key + '@o1.ingest.us.sentry.io/99', '{"secret":"bodysecret"}');
+    await request(GW, { method: 'POST', url: TUNNEL, headers: { Origin: LISTED, 'X-Request-Id': 'tunnel-log-2' }, body: rejectedLogged });
+    await sleep(500);
+    const lines = logsOf('gateway').split('\n').map((l) => { try { return JSON.parse(l); } catch { return undefined; } }).filter(Boolean);
+    const forwardedLines = lines.filter((l) => l.request_id === 'tunnel-log-1');
+    const rejectedLines = lines.filter((l) => l.request_id === 'tunnel-log-2');
+    check('S-AC5', 'a forwarded report logs one line, with Sentry as the upstream',
+      forwardedLines.length === 1 && forwardedLines[0].status === 200 && forwardedLines[0].upstream !== '', JSON.stringify(forwardedLines));
+    check('S-AC5', 'a refused report logs one line with status 403 and no upstream',
+      rejectedLines.length === 1 && rejectedLines[0].status === 403 && rejectedLines[0].upstream === '', JSON.stringify(rejectedLines));
+    check('S-AC5', 'no envelope body reaches the gateway log', !/bodysecret|secretkey/.test(logsOf('gateway')));
+
     await sleep(1500); // let the tunnel's bucket refill after the posts above
-    const burst = await Promise.all(Array.from({ length: 30 }, () => request(GW, { method: 'POST', url: TUNNEL, headers: { Origin: LISTED }, body: envelope })));
+    const burst = await Promise.all(Array.from({ length: 30 }, () => request(GW, { method: 'POST', url: TUNNEL, headers: { Origin: LISTED }, body: right })));
     const limited = burst.filter((r) => r.status === 429);
     const passed = burst.filter((r) => r.status === 200).length;
     check('S-AC5', 'a burst past 1 a second (burst 10) gets the JSON 429',
       limited.length > 0 && passed <= 12 && limited.every((r) => isGatewayError(r, 429, 'RATE_LIMITED')),
       `${passed} passed, ${limited.length} limited`);
+    await sleep(1500);
+    const refusedBurst = await Promise.all(Array.from({ length: 30 }, () => request(GW, { method: 'POST', url: TUNNEL, headers: { Origin: LISTED }, body: rejectedLogged })));
+    check('S-AC5', 'refused reports count against the tunnel limit too',
+      refusedBurst.some((r) => r.status === 429) && refusedBurst.filter((r) => r.status === 403).length <= 12,
+      refusedBurst.map((r) => r.status).join(','));
 
     const off = await Promise.all(['/monitoring/vrms-web', '/monitoring/portal'].map((url) =>
-      request(EDGE, { method: 'POST', url, headers: { Origin: LISTED }, body: envelope })));
+      request(EDGE, { method: 'POST', url, headers: { Origin: LISTED }, body: right })));
     check('S-AC5', 'with the tunnel settings blank both routes answer the JSON 404',
       off.every((r) => isGatewayError(r, 404, 'NOT_FOUND')), off.map(brief).join(' / '));
     await sleep(500);
@@ -436,19 +532,31 @@ try {
         r.code !== 0 && r.out.includes(`gateway: ${name}`), `exit ${r.code}: ${r.out.split('\n').filter((l) => l.includes('gateway:')).join(' ')}`);
     }
 
-    // VRMS spec 0025: the tunnel settings start all set or all blank, and refuse a half set or bad one
-    const tunnel = { SENTRY_INGEST_HOST: 'o4507.ingest.us.sentry.io', SENTRY_PROJECT_VRMS_WEB: '45', SENTRY_PROJECT_PORTAL: '46' };
+    // VRMS spec 0025: the tunnel's two DSNs start both set or both blank, and refuse a half set or bad one
+    const tunnel = { SENTRY_DSN_VRMS_WEB: 'https://' + 'a1'.repeat(16) + '@o4507.ingest.us.sentry.io/45',
+      SENTRY_DSN_PORTAL: 'https://' + 'b2'.repeat(16) + '@o4507.ingest.sentry.io/46' };
     const on = start({ ...base, ...tunnel });
-    check('S-AC5', 'valid tunnel settings start', on.code === 0 && on.out.includes('Sentry tunnel on'), on.out.slice(-300));
+    check('S-AC5', 'valid tunnel settings start and nginx -t passes on the built image', on.code === 0 && on.out.includes('Sentry tunnel on'),
+      on.out.slice(-300));
     check('S-AC5', 'blank tunnel settings start with the tunnel off', good.out.includes('Sentry tunnel off'), good.out.slice(-300));
+    const okKey = 'a1'.repeat(16);
     const tunnelCases = [
-      ['SENTRY_PROJECT_PORTAL', undefined], ['SENTRY_PROJECT_VRMS_WEB', ''], ['SENTRY_INGEST_HOST', ''],
-      ['SENTRY_INGEST_HOST', 'evil.example.com'], ['SENTRY_INGEST_HOST', 'o1.ingest.sentry.io.evil.com'],
-      ['SENTRY_INGEST_HOST', 'https://o1.ingest.us.sentry.io'], ['SENTRY_PROJECT_VRMS_WEB', '0'], ['SENTRY_PROJECT_PORTAL', '12/x'],
+      ['SENTRY_DSN_PORTAL', undefined], ['SENTRY_DSN_VRMS_WEB', ''],
+      ['SENTRY_DSN_VRMS_WEB', `https://${okKey.toUpperCase()}@o4507.ingest.us.sentry.io/45`],
+      ['SENTRY_DSN_VRMS_WEB', `https://${okKey}@o4507.ingest.us.sentry.io:443/45`],
+      ['SENTRY_DSN_VRMS_WEB', `https://${okKey}@o4507.ingest.us.sentry.io/45/`],
+      ['SENTRY_DSN_VRMS_WEB', `https://${okKey}@o4507.ingest.us.sentry.io/x/45`],
+      ['SENTRY_DSN_VRMS_WEB', `https://${okKey}@o4507.ingest.us.sentry.io/45?x=1`],
+      ['SENTRY_DSN_VRMS_WEB', `http://${okKey}@o4507.ingest.us.sentry.io/45`],
+      ['SENTRY_DSN_VRMS_WEB', `https://${okKey}:secret@o4507.ingest.us.sentry.io/45`],
+      ['SENTRY_DSN_VRMS_WEB', `https://${okKey}@o4507.ingest.us.sentry.io.evil.com/45`],
+      ['SENTRY_DSN_PORTAL', `https://${okKey}@evil.example.com/46`],
+      ['SENTRY_DSN_PORTAL', `https://${okKey}@o4507.ingest.us.sentry.io/0`],
+      ['SENTRY_DSN_PORTAL', 'https://short@o4507.ingest.us.sentry.io/46'],
     ];
     for (const [name, value] of tunnelCases) {
       const r = start({ ...base, ...tunnel, [name]: value });
-      check('S-AC5', `${name}=${value === undefined ? '(unset)' : JSON.stringify(value)} with the others set stops the start and names it`,
+      check('S-AC5', `${name}=${value === undefined ? '(unset)' : JSON.stringify(value)} with the other set stops the start and names it`,
         r.code !== 0 && r.out.includes(`gateway: ${name}`), `exit ${r.code}: ${r.out.split('\n').filter((l) => l.includes('gateway:')).join(' ')}`);
     }
   }

@@ -1,7 +1,7 @@
 #!/bin/sh
 # Spec 0008, AC-13: refuse to start on a missing or malformed setting, naming it, before nginx
 # reads a template. Also writes the CORS origin map from ALLOWED_ORIGINS, and the Sentry tunnel
-# routes from the SENTRY_* settings (VRMS spec 0025).
+# routes from SENTRY_DSN_VRMS_WEB and SENTRY_DSN_PORTAL (VRMS spec 0025).
 set -eu
 
 fail() {
@@ -71,12 +71,15 @@ set +f
 
 mv "$tmp_file" "$map_file"
 
-# VRMS spec 0025, AC-4, AC-5: the Sentry tunnel. All three blank: both routes answer 404. All
-# three set and valid: each route forwards to its own project's envelope address. Anything else
-# stops the start, naming the setting.
+# VRMS spec 0025, AC-4, AC-5: the Sentry tunnel. Both DSNs blank: both routes answer 404. Both set
+# and valid: each route checks every envelope's DSN against its own (njs/tunnel.js) and forwards to
+# that DSN's envelope address. One set without the other, or a DSN not matching the pattern, stops
+# the start, naming the setting.
 tunnel_file=/etc/nginx/generated/monitoring.conf
-tunnel_host=${SENTRY_INGEST_HOST-}
-tunnel_names="SENTRY_INGEST_HOST SENTRY_PROJECT_VRMS_WEB SENTRY_PROJECT_PORTAL"
+# The one DSN pattern, the same literal as in njs/tunnel.js. It refuses uppercase keys, a password,
+# a port, a trailing slash, extra path parts, a query and http.
+dsn_pattern='https://([0-9a-f]{32})@(o[0-9]+\.ingest(\.[a-z]{2})?\.sentry\.io)/([1-9][0-9]*)'
+tunnel_names="SENTRY_DSN_VRMS_WEB SENTRY_DSN_PORTAL"
 tunnel_set=0
 for name in $tunnel_names; do
   eval "value=\${$name-}"
@@ -91,24 +94,30 @@ if [ "$tunnel_set" -eq 0 ]; then
 else
   for name in $tunnel_names; do
     eval "value=\${$name-}"
-    [ -n "$value" ] || fail "$name is required when any SENTRY_* tunnel setting is set (set all three, or none)"
+    [ -n "$value" ] || fail "$name is required when the other SENTRY_DSN_* tunnel setting is set (set both, or neither)"
+    matches "$dsn_pattern" "$value" \
+      || fail "$name must be a Sentry DSN like https://<32 lowercase hex>@o123.ingest.us.sentry.io/456, with no port, path or trailing slash"
   done
-  matches 'o[0-9]+\.ingest(\.[a-z]{2})?\.sentry\.io' "$tunnel_host" \
-    || fail "SENTRY_INGEST_HOST must be a Sentry ingest host like o123.ingest.us.sentry.io (got '$tunnel_host')"
-  for name in SENTRY_PROJECT_VRMS_WEB SENTRY_PROJECT_PORTAL; do
-    eval "value=\$$name"
-    matches '[1-9][0-9]*' "$value" || fail "$name must be a Sentry project id, a positive whole number (got '$value')"
-  done
-  # One exact route forwarding to one project: $1 the route name, $2 the project id
+  # One public route and its internal forwarding location: $1 the route name, $2 its DSN
   tunnel_route() {
+    key=$(printf '%s' "$2" | sed -E "s#^$dsn_pattern\$#\\1#")
+    host=$(printf '%s' "$2" | sed -E "s#^$dsn_pattern\$#\\2#")
+    project=$(printf '%s' "$2" | sed -E "s#^$dsn_pattern\$#\\4#")
     echo "location = /monitoring/$1 {"
-    echo "    set \$upstream https://$tunnel_host/api/$2/envelope/;"
+    echo "    set \$tunnel_key $key;"
+    echo "    set \$tunnel_host $host;"
+    echo "    set \$tunnel_project $project;"
+    echo "    set \$tunnel_target /_tunnel/$1;"
     echo "    include /etc/nginx/conf.d/snippets/tunnel.conf;"
+    echo "}"
+    echo "location = /_tunnel/$1 {"
+    echo "    set \$upstream https://$host/api/$project/envelope/;"
+    echo "    include /etc/nginx/conf.d/snippets/tunnel-forward.conf;"
     echo "}"
   }
   {
-    tunnel_route vrms-web "$SENTRY_PROJECT_VRMS_WEB"
-    tunnel_route portal "$SENTRY_PROJECT_PORTAL"
+    tunnel_route vrms-web "$SENTRY_DSN_VRMS_WEB"
+    tunnel_route portal "$SENTRY_DSN_PORTAL"
   } > "$tunnel_file"
   tunnel_state=on
 fi

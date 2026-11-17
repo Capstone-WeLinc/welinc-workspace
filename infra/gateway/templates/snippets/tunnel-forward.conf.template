@@ -1,0 +1,45 @@
+# VRMS spec 0025, AC-4, AC-5: what both internal Sentry tunnel locations share. njs reaches one with
+# an internal redirect once the envelope's DSN checks out; the browser never can (internal). Each
+# location sets $upstream to its one project's envelope address, then includes this file. nginx
+# reuses the body it already read, and Sentry's answer (Retry-After and X-Sentry-Rate-Limits too)
+# streams straight back.
+
+internal;
+
+# $upstream is the whole envelope address, so nginx sends exactly that path and never the query
+proxy_pass $upstream;
+proxy_ssl_server_name on;
+proxy_connect_timeout 5s;
+# The SDK doesn't wait on the answer
+proxy_read_timeout 10s;
+
+# AC-5: Sentry gets no cookie, Authorization, client address, page address or request id. An empty
+# value stops nginx sending the header at all. Origin, User-Agent and Content-Type pass through
+# (Sentry checks Origin against the project's allowed domains).
+proxy_set_header Host $proxy_host;
+proxy_set_header Cookie "";
+proxy_set_header Authorization "";
+proxy_set_header X-Sentry-Auth "";
+proxy_set_header X-Forwarded-For "";
+proxy_set_header X-Real-IP "";
+proxy_set_header Forwarded "";
+proxy_set_header Referer "";
+proxy_set_header Accept-Encoding "";
+proxy_set_header X-Request-Id "";
+
+# The gateway owns these answers; Sentry's copy never reaches the browser
+proxy_hide_header Access-Control-Allow-Origin;
+proxy_hide_header Access-Control-Allow-Credentials;
+proxy_hide_header Access-Control-Allow-Methods;
+proxy_hide_header Access-Control-Allow-Headers;
+proxy_hide_header Access-Control-Expose-Headers;
+proxy_hide_header Access-Control-Max-Age;
+proxy_hide_header Vary;
+proxy_hide_header Set-Cookie;
+proxy_hide_header Strict-Transport-Security;
+
+# The internal redirect left the public location, so its headers are added again here
+add_header Access-Control-Allow-Origin $cors_origin always;
+add_header Vary Origin always;
+add_header X-Request-Id $gateway_request_id always;
+add_header Strict-Transport-Security "${GATEWAY_HSTS}" always;

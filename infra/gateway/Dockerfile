@@ -10,6 +10,8 @@ RUN rm -f /etc/nginx/conf.d/default.conf && mkdir -p /etc/nginx/generated
 
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY templates/ /etc/nginx/templates/
+# The Sentry tunnel's envelope check (VRMS spec 0025), imported by default.conf.template
+COPY njs/ /etc/nginx/njs/
 COPY docker-entrypoint.d/05-check-env.sh /docker-entrypoint.d/05-check-env.sh
 # The image silently skips a start script that isn't executable
 RUN chmod +x /docker-entrypoint.d/05-check-env.sh

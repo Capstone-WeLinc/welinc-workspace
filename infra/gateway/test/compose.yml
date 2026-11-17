@@ -60,9 +60,8 @@ services:
       GATEWAY_RATE_BURST: "1000"
       GATEWAY_HSTS: ""
       # The Sentry tunnel on (VRMS spec 0025); gateway-edge leaves it off
-      SENTRY_INGEST_HOST: o1.ingest.us.sentry.io
-      SENTRY_PROJECT_VRMS_WEB: "11"
-      SENTRY_PROJECT_PORTAL: "12"
+      SENTRY_DSN_VRMS_WEB: https://0123456789abcdef0123456789abcdef@o1.ingest.us.sentry.io/11
+      SENTRY_DSN_PORTAL: https://fedcba9876543210fedcba9876543210@o1.ingest.us.sentry.io/12
     networks:
       - gateway-test
 

@@ -8,6 +8,9 @@
 # - A route location never calls add_header: nginx drops every inherited header from a block that
 #   sets its own. Headers live in snippets/route.conf and snippets/error-headers.conf.
 
+# The Sentry tunnel's envelope check (VRMS spec 0025), used by snippets/tunnel.conf
+js_import tunnel from /etc/nginx/njs/tunnel.js;
+
 resolver ${NGINX_LOCAL_RESOLVERS} valid=5s ipv6=off;
 resolver_timeout 2s;
 
@@ -145,8 +148,9 @@ server {
         include /etc/nginx/conf.d/snippets/route.conf;
     }
 
-    # VRMS spec 0025: the two Sentry tunnel routes, POST /monitoring/vrms-web and /monitoring/portal.
-    # 05-check-env.sh writes them from the SENTRY_* settings, or as 404s when those are blank.
+    # VRMS spec 0025: the two Sentry tunnel routes, POST /monitoring/vrms-web and /monitoring/portal,
+    # and their internal forwarding locations. 05-check-env.sh writes them from SENTRY_DSN_VRMS_WEB
+    # and SENTRY_DSN_PORTAL, or as 404s when those are blank.
     include /etc/nginx/generated/monitoring.conf;
 
     # A bare prefix answers 404 here, so nginx's automatic 301 to the slash form never fires
