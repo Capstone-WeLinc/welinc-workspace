@@ -79,6 +79,7 @@ Free checks that catch leaks and weaknesses, with reports to cite in the papers.
   - [ ] Require the `gitleaks` check in branch protection on `development` (service repos) and `main` (workspace), after the branches merge
   - [ ] OWASP ZAP baseline against staging, weekly and on demand, report kept as a run artifact (after staging exists)
   - [ ] Mozilla Observatory and SSL Labs grades for production in the runbook (after production is live)
+- Note (2026-11-18): welinc-auth and backend-vrms CI now audit with `audit-ci` (`audit-ci.jsonc`), allowing only GHSA-fc5q-39xc-vjpf (picomatch ReDoS, no patched version yet, reached through the Scalar docs page). Review it on 2026-12-01 and remove the entry from both repos once picomatch ships a fix.
 - [ ] Verify it: `/check verify security checks`
 - [ ] Test it: `/test security checks`
 
