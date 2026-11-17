@@ -4,20 +4,6 @@ The BMS checklist for [suite spec 0014](../specs/_root/0014-move-vmms-bms-shared
 
 You change only your own repos: `welinc-backend-bms` (all its processes), `welinc-backend-bms-analytics-ai` and `welinc-web-bms`. Nothing in welinc-auth, the portal or the gateway needs a change from you. If something there looks wrong, tell the shared services lead.
 
-## Local progress — 16 November 2026
-
-Checked boxes record completed BMS implementation and local verification. They
-do not replace the group/shared leads' acceptance. Evidence and remaining gates
-are in [BMS verification](../context/bms/verification.md) and the
-[BMS progress tracker](../context/bms/integration-checklist.md).
-
-BMS builds, automated tests, real portal login and the static scan pass. The
-shared login slice has 15 passes and one unmet VRMS-runtime prerequisite. The
-BMS fleet consumer is implemented; live fleet acceptance awaits VMMS's API.
-Implementing VMMS endpoints belongs to VMMS. Delivery PRs and written sign-off
-remain open. Local BMS source copies have no Git metadata; a personal backup
-repository does not count as the coordinated suite PRs.
-
 ## Before you start
 
 - **The first time:** clone the workspace repo, then download your repos with `sh scripts/clone-all.sh bms` (it adds the shared repos and checks yours out on `development`, or your default branch when there is none). Then run `sh scripts/clone-all.sh vrms` too: the VRMS repos are where you copy the login code from, and you only read them, never change them.
@@ -75,88 +61,78 @@ The browser reaches BMS only at `<gateway>/bms/...`. These public paths are fixe
 
 ### 1. Stack and keys
 
-- [x] Add `docker-compose.bms.yml` at the workspace root from the template at the end of this guide.
-- [ ] Open a pull request for it into the workspace `main`.
-- [x] A Dockerfile for every process on Node 24 (`Dockerfile.dev`, like `welinc-backend-vrms`'s).
-- [x] Add `welinc-backend-bms/.env.example` with the names every process shares (step 2). Setup copies it to `.env`.
+- [ ] Add `docker-compose.bms.yml` at the workspace root from the template at the end of this guide. Open a pull request for it into the workspace `main`.
+- [ ] A Dockerfile for every process on Node 24 (`Dockerfile.dev`, like `welinc-backend-vrms`'s).
+- [ ] Add `welinc-backend-bms/.env.example` with the names every process shares (step 2). Setup copies it to `.env`.
 - [ ] Run `sh scripts/setup.sh bms`. Once the compose file exists it makes BMS's client key (`npm run keys:client -- bms ...` in welinc-auth, private key into `welinc-backend-bms/.env`, public key into welinc-auth's `.env`), registers it, starts your stack, runs each service's migrations and seed, and waits for `/bms/health`. It never prints a key.
-  **Local evidence:** the full script was not run over these plain source
-  copies. Its key registration, stack startup, migration, seed and health
-  outcomes were completed using the equivalent shipped commands.
-- [x] Local setup outcomes: BMS client key generated/registered, shared stack
-  started first, BMS migrations/seeds applied, and `/bms/health` healthy.
-- [x] Each service's `npm run seed` must keep data that is already there (setup runs it on every rerun).
+- [ ] Each service's `npm run seed` must keep data that is already there (setup runs it on every rerun).
 - [ ] Make it hosting ready in the same pull requests: the checklist in [hosting.md](hosting.md#make-it-hosting-ready) (a `Dockerfile.prod`, the pool setting, no lasting files on local disk, every table and trigger from a migration). Added 2026-11-14.
 
 ### 2. Environment
 
-- [x] `welinc-backend-bms/.env` (secrets, shared by the processes through `env_file`): `AUTH_CLIENT_PRIVATE_KEY`, `CUSTOMER_TRACKING_SECRET`, `BMS_INTERNAL_SERVICE_KEY`.
-- [x] Every process that serves people: `AUTH_ISSUER`, `AUTH_JWKS_URL`, `AUTH_INTERNAL_URL`.
-- [x] The gateway also: `AUTH_CLIENT_ID=bms`, `WEB_APP_URL`, `PORTAL_URL`, `AUTH_PUBLIC_URL`, `API_PUBLIC_URL`, `SESSION_COOKIE_SECURE`, `TRUST_PROXY_HOPS`, and the internal address of each process.
-- [x] Booking and dispatch also: `AUTH_CLIENT_ID=bms`. Dispatch also `VMMS_INTERNAL_URL` (`http://vmms-backend:3010`).
-- [x] Remove `JWT_SECRET`, `JWT_ACCESS_EXPIRY`, `AUTH_DATABASE_URL`, `BMS_PARTNER_DATABASE_URL`, `PARTNER_BRIDGE_URL` and the analytics `MYSQL_*` names.
-- [x] Web app: `VITE_API_BASE_URL` (replaces `VITE_BMS_API_BASE_URL`) and `VITE_PORTAL_URL` for the API and login. `VITE_GOOGLE_MAPS_API_KEY` may stay: it is a browser key, so restrict it to your web addresses in Google Cloud.
-- [x] Every name in `.env.example`, never a value. Contract 0001 [section 15](../specs/_root/0001-shared-services-contract/index.md#15-configuration) has the meanings.
+- [ ] `welinc-backend-bms/.env` (secrets, shared by the processes through `env_file`): `AUTH_CLIENT_PRIVATE_KEY`, `CUSTOMER_TRACKING_SECRET`, `BMS_INTERNAL_SERVICE_KEY`.
+- [ ] Every process that serves people: `AUTH_ISSUER`, `AUTH_JWKS_URL`, `AUTH_INTERNAL_URL`.
+- [ ] The gateway also: `AUTH_CLIENT_ID=bms`, `WEB_APP_URL`, `PORTAL_URL`, `AUTH_PUBLIC_URL`, `API_PUBLIC_URL`, `SESSION_COOKIE_SECURE`, `TRUST_PROXY_HOPS`, and the internal address of each process.
+- [ ] Booking and dispatch also: `AUTH_CLIENT_ID=bms`. Dispatch also `VMMS_INTERNAL_URL` (`http://vmms-backend:3010`).
+- [ ] Remove `JWT_SECRET`, `JWT_ACCESS_EXPIRY`, `AUTH_DATABASE_URL`, `BMS_PARTNER_DATABASE_URL`, `PARTNER_BRIDGE_URL` and the analytics `MYSQL_*` names.
+- [ ] Web app: `VITE_API_BASE_URL` (replaces `VITE_BMS_API_BASE_URL`) and `VITE_PORTAL_URL` for the API and login. `VITE_GOOGLE_MAPS_API_KEY` may stay: it is a browser key, so restrict it to your web addresses in Google Cloud.
+- [ ] Every name in `.env.example`, never a value. Contract 0001 [section 15](../specs/_root/0001-shared-services-contract/index.md#15-configuration) has the meanings.
 
 ### 3. The BMS gateway in NestJS
 
-- [x] Port `bms-gateway` to NestJS on 3020, listening on all interfaces, everything under `/bms`, `trust proxy` from `TRUST_PROXY_HOPS`, `cookie-parser`.
-- [x] Keep the `owner()` route table and the raw proxy loop. Turn Nest's body parser off on proxied routes, stream bodies as they are, and cap them at 10 MB (the suite gateway's limit for `/bms/`). Keep `X-Request-Id`.
-- [x] Add analytics to the route table: `/bms/reports` and the forecast routes to `bms-analytics` on 3025.
-- [x] Forward no `/auth/*` path: the web app calls welinc-auth through the suite gateway. Delete `auth-integration.mjs` and its test, and any database code.
-- [x] Forward the user's bearer token unchanged to every process.
-- [x] `GET /bms/health`, public: `{ status: 'ok', checks: { ... } }`, 503 `HEALTH_CHECK_FAILED` when a check fails. Copy `welinc-backend-vrms/src/health/`.
-- **Fallback (not used):** if the port can't land in time: the booking service hosts the session routes and `/bms/health` instead, and `bms-gateway` stays a plain proxy. Tell the shared services lead before you take it.
+- [ ] Port `bms-gateway` to NestJS on 3020, listening on all interfaces, everything under `/bms`, `trust proxy` from `TRUST_PROXY_HOPS`, `cookie-parser`.
+- [ ] Keep the `owner()` route table and the raw proxy loop. Turn Nest's body parser off on proxied routes, stream bodies as they are, and cap them at 10 MB (the suite gateway's limit for `/bms/`). Keep `X-Request-Id`.
+- [ ] Add analytics to the route table: `/bms/reports` and the forecast routes to `bms-analytics` on 3025.
+- [ ] Forward no `/auth/*` path: the web app calls welinc-auth through the suite gateway. Delete `auth-integration.mjs` and its test, and any database code.
+- [ ] Forward the user's bearer token unchanged to every process.
+- [ ] `GET /bms/health`, public: `{ status: 'ok', checks: { ... } }`, 503 `HEALTH_CHECK_FAILED` when a check fails. Copy `welinc-backend-vrms/src/health/`.
+- [ ] **Fallback** if the port can't land in time: the booking service hosts the session routes and `/bms/health` instead, and `bms-gateway` stays a plain proxy. Tell the shared services lead before you take it.
 
 ### 4. Token check in every process
 
-- [x] Copy `welinc-backend-vrms/src/auth/verify/` whole, tests included, into each process that serves people (gateway, booking, dispatch, completion, `welinc-backend-bms-analytics-ai`), and follow its [README](../../welinc-backend-vrms/src/auth/verify/README.md) (`SERVICE_AUDIENCE` `BMS`, `jose` 6, the Jest setting).
-- [x] Copy `welinc-backend-vrms/src/auth/account-check.ts` (the 30 s session check) and use `src/auth/guards/jwt-auth.guard.ts` as the model: `checkPerson`, then the account check, roles from the token.
-- [x] The internal service key between BMS processes stays your business.
+- [ ] Copy `welinc-backend-vrms/src/auth/verify/` whole, tests included, into each process that serves people (gateway, booking, dispatch, completion, `welinc-backend-bms-analytics-ai`), and follow its [README](../../welinc-backend-vrms/src/auth/verify/README.md) (`SERVICE_AUDIENCE` `BMS`, `jose` 6, the Jest setting).
+- [ ] Copy `welinc-backend-vrms/src/auth/account-check.ts` (the 30 s session check) and use `src/auth/guards/jwt-auth.guard.ts` as the model: `checkPerson`, then the account check, roles from the token.
+- [ ] The internal service key between BMS processes stays your business.
 
 ### 5. Session routes (in the gateway)
 
-- [x] Copy `welinc-backend-vrms/src/session/` and rename the prefix: routes under `/bms/session/*`, cookies `bms_rt` and `bms_login_<state prefix>` on path `/bms/session`, callback `<API_PUBLIC_URL>/bms/session/callback`, and the `system` value in the callback's portal errors `BMS`. Keep the `APP_NOT_ALLOWED` handling. [web-login.md, Backend](web-login.md#backend-copy-the-vrms-session-folder) has the details.
+- [ ] Copy `welinc-backend-vrms/src/session/` and rename the prefix: routes under `/bms/session/*`, cookies `bms_rt` and `bms_login_<state prefix>` on path `/bms/session`, callback `<API_PUBLIC_URL>/bms/session/callback`, and the `system` value in the callback's portal errors `BMS`. Keep the `APP_NOT_ALLOWED` handling. [web-login.md, Backend](web-login.md#backend-copy-the-vrms-session-folder) has the details.
 
 ### 6. No auth database: names and activity
 
-- [x] Approval submitter and reviewer names come from `POST /auth/directory/users/lookup` (booking holds the `bms` key and a `directory.read` token). An id in `missing` shows "Unknown user".
-- [x] The admin activity page combines your audit rows (names from the same lookup) with sign in events from `GET /auth/activity` (the BMS Admin's own bearer token, scoped to BMS). Other roles see your rows only. [account-screens.md, BMS](account-screens.md#bms) maps every field.
-- [x] Profile activity is the web app's direct call to `/auth/profile/activity`.
-- [x] Erasure: a crew member whose `user_id` comes back `erased` becomes `Deleted user` in `drivers.name` and `helpers.name`. Copy the VRMS directory reader (`welinc-backend-vrms/src/modules/vrms/directory/`, recommended) or look the linked ids up daily. See [account-screens.md, After an erasure](account-screens.md#after-an-erasure).
-- [x] Pick lists skip `temporaryRoles` ([account-screens.md, Temporary roles](account-screens.md#temporary-roles-in-pick-lists)).
-- [x] `CUSTOMER_TRACKING_SECRET` for tracking links, required at boot, no fallback (contract rule 8).
+- [ ] Approval submitter and reviewer names come from `POST /auth/directory/users/lookup` (booking holds the `bms` key and a `directory.read` token). An id in `missing` shows "Unknown user".
+- [ ] The admin activity page combines your audit rows (names from the same lookup) with sign in events from `GET /auth/activity` (the BMS Admin's own bearer token, scoped to BMS). Other roles see your rows only. [account-screens.md, BMS](account-screens.md#bms) maps every field.
+- [ ] Profile activity is the web app's direct call to `/auth/profile/activity`.
+- [ ] Erasure: a crew member whose `user_id` comes back `erased` becomes `Deleted user` in `drivers.name` and `helpers.name`. Copy the VRMS directory reader (`welinc-backend-vrms/src/modules/vrms/directory/`, recommended) or look the linked ids up daily. See [account-screens.md, After an erasure](account-screens.md#after-an-erasure).
+- [ ] Pick lists skip `temporaryRoles` ([account-screens.md, Temporary roles](account-screens.md#temporary-roles-in-pick-lists)).
+- [ ] `CUSTOMER_TRACKING_SECRET` for tracking links, required at boot, no fallback (contract rule 8).
 
 ### 7. Drivers and trucks
 
-- [x] Move `drivers` from `welinc_db` into dispatch's database next to `helpers`, with the columns in spec 0014's data model plus `user_id uuid null unique`. `helpers` gains the same `user_id`.
-- [x] Seed `user_id` from `people.json`: driver n (`DRV-00n`) is the nth `"group": "driver"` row in file order (ids `...3401` up), helper n (`HLP-00n`) the nth `"group": "helper"` row. The seed fails when your crew counts differ from the manifest's (12 drivers, 20 helpers).
-- [x] Add `vehicle_dispatch_profiles` (dispatch) for the dispatch only fields, keyed by the VMMS `vehicle_id` with no foreign key.
-- [x] Read vehicles and garages from VMMS with a `fleet.read` service token: every rule (30 s list cache, fresh read at assignment, 409 `VEHICLE_UNAVAILABLE`, 503 `FLEET_UNAVAILABLE`, one retry on `TOKEN_EXPIRED`, "Unavailable vehicle") is in [fleet-api.md](fleet-api.md#bms-rules).
-  **Local evidence:** BMS consumer tests pass; VMMS unavailability correctly
-  returns `503 FLEET_UNAVAILABLE`. Live plate parity and assignment checks
-  remain pending because the VMMS fleet endpoints are unavailable locally.
-- [ ] Shared lead verifies live fleet integration once VMMS provides its API.
-- [x] Two assignments racing for one truck keep dispatch's existing guard: the unique index `dispatch_active_vehicle_slot_key` on `dispatch_assignments (vehicle_id, service_date, dispatch_time)`, which `confirmAssignment` turns from a Prisma `P2002` into a 409. Keep it: `vehicle_id` now holds a VMMS vehicle id.
+- [ ] Move `drivers` from `welinc_db` into dispatch's database next to `helpers`, with the columns in spec 0014's data model plus `user_id uuid null unique`. `helpers` gains the same `user_id`.
+- [ ] Seed `user_id` from `people.json`: driver n (`DRV-00n`) is the nth `"group": "driver"` row in file order (ids `...3401` up), helper n (`HLP-00n`) the nth `"group": "helper"` row. The seed fails when your crew counts differ from the manifest's (12 drivers, 20 helpers).
+- [ ] Add `vehicle_dispatch_profiles` (dispatch) for the dispatch only fields, keyed by the VMMS `vehicle_id` with no foreign key.
+- [ ] Read vehicles and garages from VMMS with a `fleet.read` service token: every rule (30 s list cache, fresh read at assignment, 409 `VEHICLE_UNAVAILABLE`, 503 `FLEET_UNAVAILABLE`, one retry on `TOKEN_EXPIRED`, "Unavailable vehicle") is in [fleet-api.md](fleet-api.md#bms-rules).
+- [ ] Two assignments racing for one truck keep dispatch's existing guard: the unique index `dispatch_active_vehicle_slot_key` on `dispatch_assignments (vehicle_id, service_date, dispatch_time)`, which `confirmAssignment` turns from a Prisma `P2002` into a 409. Keep it: `vehicle_id` now holds a VMMS vehicle id.
 
 ### 8. Analytics
 
-- [x] `bms-analytics-projection` writes its read model into `bms-analytics-db`, a database container in `docker-compose.bms.yml` on its own host port (5437, never 5433).
-- [x] `welinc-backend-bms-analytics-ai` reads that database, checks tokens itself (step 4), and runs on 3025 behind `bms-gateway`. It never reads `welinc_db`.
-- [x] Analytics gets trucks, drivers and helpers from dispatch (`DISPATCH_API_URL`, `http://bms-dispatch:3022` in Docker), forwarding the signed in person's token, as the Resource Planning work already does. Dispatch is the only BMS process that calls the [fleet API](fleet-api.md).
-- [x] Remove the `user_activity_logs` mapping from analytics: sign in activity comes from welinc-auth ([account-screens.md, BMS](account-screens.md#bms)).
+- [ ] `bms-analytics-projection` writes its read model into `bms-analytics-db`, a database container in `docker-compose.bms.yml` on its own host port (5437, never 5433).
+- [ ] `welinc-backend-bms-analytics-ai` reads that database, checks tokens itself (step 4), and runs on 3025 behind `bms-gateway`. It never reads `welinc_db`.
+- [ ] Analytics gets trucks, drivers and helpers from dispatch (`DISPATCH_API_URL`, `http://bms-dispatch:3022` in Docker), forwarding the signed in person's token, as the Resource Planning work already does. Dispatch is the only BMS process that calls the [fleet API](fleet-api.md).
+- [ ] Remove the `user_activity_logs` mapping from analytics: sign in activity comes from welinc-auth ([account-screens.md, BMS](account-screens.md#bms)).
 
 ### 9. Web app
 
-- [x] No password form: `/login` sends the browser to `/bms/session/start`. Forgot password is the portal's.
-- [x] The boot sequence, the in memory token, Switch system and sign out: [web-login.md](web-login.md#web-app-the-boot-sequence). Copy `welinc-web-vrms/src/lib/session/`. Remove `jwt-decode`, every `localStorage` token and the `/auth/users/:id/password` call.
-- [x] Delete the Users page except crew management, which stays as its own page. The menu item opens `<portal>/admin/people?system=BMS`. Handle `ADMIN_CODE_REQUIRED` ([account-screens.md, Admin pages](account-screens.md#admin-pages-move-to-the-portal)).
-- [x] The profile page uses `reauthToken` and `GET /auth/profile/deletion-request` ([account-screens.md, Account deletion](account-screens.md#account-deletion)).
-- [x] Port 8003, API at `<api>/bms/`.
+- [ ] No password form: `/login` sends the browser to `/bms/session/start`. Forgot password is the portal's.
+- [ ] The boot sequence, the in memory token, Switch system and sign out: [web-login.md](web-login.md#web-app-the-boot-sequence). Copy `welinc-web-vrms/src/lib/session/`. Remove `jwt-decode`, every `localStorage` token and the `/auth/users/:id/password` call.
+- [ ] Delete the Users page except crew management, which stays as its own page. The menu item opens `<portal>/admin/people?system=BMS`. Handle `ADMIN_CODE_REQUIRED` ([account-screens.md, Admin pages](account-screens.md#admin-pages-move-to-the-portal)).
+- [ ] The profile page uses `reauthToken` and `GET /auth/profile/deletion-request` ([account-screens.md, Account deletion](account-screens.md#account-deletion)).
+- [ ] Port 8003, API at `<api>/bms/`.
 
 ### 10. People in the seed
 
-- [x] A byte for byte copy of welinc-auth's `people.json` wherever a BMS seed needs people, checked with `npm --prefix welinc-auth run seed:check -- <your copy>`. Create no users. See [seed-accounts.md, For VMMS and BMS](seed-accounts.md#for-vmms-and-bms-in-s11-not-before).
+- [ ] A byte for byte copy of welinc-auth's `people.json` wherever a BMS seed needs people, checked with `npm --prefix welinc-auth run seed:check -- <your copy>`. Create no users. See [seed-accounts.md, For VMMS and BMS](seed-accounts.md#for-vmms-and-bms-in-s11-not-before).
 
 ### 11. Prove it
 
@@ -164,8 +140,7 @@ The browser reaches BMS only at `<gateway>/bms/...`. These public paths are fixe
   - **login**: `/bms/health`; a protected route refusing no token, a tampered token and a VRMS token; `session/start`, the callback cookie, the CSRF check, refresh, logout and the 31 s session end; `driver.ramon@` landing on the `APP_NOT_ALLOWED` page; a 5 MB body to `POST /bms/booking` passing your gateway and answering 400 from booking's validation (a 413 means a body limit below 10 MB somewhere).
   - **fleet**: VMMS's fleet routes refusing no token and a user token, and `GET /bms/config/vehicles` listing the same plates as VMMS.
   - **static**: a scan of your three repos for leftovers (`JWT_SECRET`, `AUTH_DATABASE_URL`, `BMS_PARTNER_DATABASE_URL`, `5433/welinc_db`, `HS256`, `jwt-decode`, a token in `localStorage` or a URL, calls to `/auth/users`). Each hit prints `file:line`. A line that must stay ends in `// check-system: allow <reason>`.
-- [x] While you work you may run `node scripts/check-system.mjs bms --static-only` yourselves: it only scans your repos for leftovers, so it finds old login code early. The full run is the shared services lead's.
-  **Local result:** all three BMS repositories `ok`, zero static failures.
+- [ ] While you work you may run `node scripts/check-system.mjs bms --static-only` yourselves: it only scans your repos for leftovers, so it finds old login code early. The full run is the shared services lead's.
 
 ### 12. Pull requests and sign off
 
