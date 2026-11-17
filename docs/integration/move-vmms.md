@@ -8,6 +8,7 @@ You change only your own repos: `welinc-backend-vmms`, `welinc-backend-vmms-anal
 
 Newest first. The shared services lead posts each one in your group chat when it lands.
 
+- **2026-11-17 (afternoon):** rechecked on your 13:47 push: the hosting leftovers (`start:prod`, analytics building without `DATABASE_URL`) and the workspace PR #46 fixes (Azurite host port, BOM) are done, and the live checker passed again (login 19 of 19, fleet 4 of 4). Only the two sign off boxes are left.
 - **2026-11-17:** the live checker passed on your PR branches (login 19 of 19, fleet 5 of 5, scan clean); the output is on your PRs. New open item on the hosting box: analytics' image needs `DATABASE_URL` to build.
 - **2026-11-16:** only the shared services lead ticks this checklist (see Checklist).
 - **2026-11-14:** step 1 gained the hosting ready box.
@@ -53,7 +54,7 @@ On Windows, type every command in **Git Bash** (the workspace [README](../../REA
 
 Work through these in order. **Only the shared services lead ticks a box**, after checking it on your pull requests, so a tick means verified, not claimed. Keep your own working notes in `docs/context/vmms/`.
 
-**Last checked:** 2026-11-17, on the `feat/shared-services` pull requests at their 04:28 push. Static checker, builds and tests green (backend 49 of 49 suites, mobile 43 of 43, analytics `test:auth` 8 of 8); the live checker passed (login 19 of 19, fleet 4 of 4, BMS read skipped until BMS is on the stack). Open: the boxes below and the workspace PR #46 fixes (drop vmms-azurite's host port `10000`, it clashes with VRMS's Azurite; remove the BOM at the top of the file).
+**Last checked:** 2026-11-17, on the `feat/shared-services` pull requests at their 13:47 push, with the stack started from workspace PR #46's compose file. Static checker, builds and tests green (backend 49 of 49 suites, mobile 43 of 43, analytics `test:auth` passing); the live checker passed (login 19 of 19, fleet 4 of 4, BMS read skipped until BMS is on the stack). The hosting leftovers and the PR #46 fixes are done. Open: the two sign off boxes in step 11.
 
 ### 1. Stack and keys
 
@@ -62,7 +63,6 @@ Work through these in order. **Only the shared services lead ticks a box**, afte
 - [x] Run `sh scripts/setup.sh vmms`. Once the compose file exists it makes VMMS's client key (`npm run keys:client -- vmms ...` in welinc-auth, private key into `welinc-backend-vmms/.env`, public key into welinc-auth's `.env`), registers it, starts your stack, runs each service's migrations and seed, and waits for your health routes. It never prints a key.
 - [x] Each service's `npm run seed` must keep data that is already there (setup runs it on every rerun). Skip when your tables hold rows, the way VRMS's setup does.
 - [x] Make it hosting ready in the same pull requests: the checklist in [hosting.md](hosting.md#make-it-hosting-ready) (a `Dockerfile.prod`, the pool setting, no lasting files on local disk, every table and trigger from a migration). Added 2026-11-14.
-  - Small leftover: `start:prod` in the backend's `package.json` still says `dist/main` (the image runs `dist/src/main.js`).
 
 ### 2. Environment
 
