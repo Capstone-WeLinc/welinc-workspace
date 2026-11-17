@@ -347,7 +347,7 @@ Order follows Tracer Bullet: CI first (built), then everything that needs no Azu
 - [ ] Auth's profile pictures could move from the file share to Blob Storage later (a welinc-auth decision); the share works for now.
 - [ ] Container Apps path based routing could replace the nginx gateway one day; not before the defenses.
 - [ ] Task 18: give each group its readiness gaps from rationale.md (*VMMS and BMS readiness*) as soon as their S11 move starts, not when they first deploy; the gaps are theirs to fix in their own repos.
-- [ ] Add the Azure skills in Decision to the VRMS `AGENTS.md` skill list if missing (`/sync` owns that).
+- [x] Add the Azure skills in Decision to the VRMS `AGENTS.md` skill list if missing (`/sync` owns that).
 
 ## Rationale
 

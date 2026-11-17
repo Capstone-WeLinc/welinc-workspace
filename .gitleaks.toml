@@ -1,0 +1,8 @@
+# gitleaks settings (VRMS scope feature 69). Keeps every default rule and allows only the values below.
+# Add a value here only when it is public by design. A real leaked secret gets rotated, never allowed.
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Azurite's well known development key, published by Microsoft; it only opens the local emulator"
+regexes = ['''Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==''']

@@ -8,8 +8,8 @@ You change only your own repos: `welinc-backend-bms` (all its processes), `welin
 
 Newest first. The shared services lead posts each one in your group chat when it lands.
 
-- **2026-11-16:** analytics is its own client `bms-analytics` with its own key in `welinc-backend-bms-analytics-ai/.env` (step 2, compose template, setup).
 - **2026-11-17:** the live checker passed on your PR branches with VMMS on the same stack (login 16 of 16, fleet 5 of 5, scan clean); the output is on your PRs. The fleet box in step 7 is ticked.
+- **2026-11-16:** analytics is its own client `bms-analytics` with its own key in `welinc-backend-bms-analytics-ai/.env` (step 2, compose template, setup).
 - **2026-11-16:** only the shared services lead ticks this checklist (see Checklist).
 - **2026-11-14:** step 1 gained the hosting ready box.
 
@@ -20,7 +20,7 @@ Newest first. The shared services lead posts each one in your group chat when it
 - No data is moved. Every BMS database is reseeded from the suite's seed people, because no deployment holds real users.
 - You can run `sh scripts/setup.sh bms` any time. Until `docker-compose.bms.yml` exists it only starts the shared stack (auth, portal, gateway) and fills auth with the test people; it makes your client key and starts your stack only after step 1 adds the compose file. If your old stack is still running and a port clashes, stop it first.
 - Read [web-login.md](web-login.md) once before you start. It explains the session routes, which are most of the login work.
-- For the exact inputs, replies and error codes of every welinc-auth route, open the API docs: `http://localhost:3000/auth/docs` with the shared stack running (and on staging), or the committed [`docs/openapi.json`](https://github.com/Capstone-WeLinc/welinc-auth/blob/development/docs/openapi.json) in welinc-auth. The contract ([suite spec 0001](../specs/_root/0001-shared-services-contract/index.md)) still wins on behavior; tell Samuel when the two disagree.
+- For the exact inputs, replies and error codes of every welinc-auth route, open the API docs: `http://localhost:3000/auth/docs` with the shared stack running (and on staging), or the committed [`docs/openapi.json`](https://github.com/Capstone-WeLinc/welinc-auth/blob/development/docs/openapi.json) in welinc-auth. The contract ([suite spec 0001](../specs/_root/0001-shared-services-contract/index.md)) still wins on behavior; tell the shared services lead when the two disagree.
 - The trucks part depends on VMMS serving the [fleet API](fleet-api.md). You can finish login first (a separate tick) and the fleet part when VMMS has it.
 
 ### Tools and versions
@@ -70,7 +70,7 @@ The browser reaches BMS only at `<gateway>/bms/...`. These public paths are fixe
 
 Work through these in order. **Only the shared services lead ticks a box**, after checking it on your pull requests, so a tick means verified, not claimed. Keep your own working notes in `docs/context/bms/`.
 
-**Last checked:** 2026-11-17, on the `BMS/shared-services` pull requests; the live checker passed. Open before the live check: each pull request rebased so it holds only the move (your `development` branches are stubs) and the open boxes below.
+**Last checked:** 2026-11-17, on the `BMS/shared-services` pull requests at their 2026-11-16 22:11 push (no push since); the live checker passed. Open before the live check: each pull request rebased so it holds only the move (your `development` branches are stubs) and the open boxes below.
 
 ### 1. Stack and keys
 

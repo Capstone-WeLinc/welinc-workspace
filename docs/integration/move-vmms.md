@@ -8,6 +8,8 @@ You change only your own repos: `welinc-backend-vmms`, `welinc-backend-vmms-anal
 
 Newest first. The shared services lead posts each one in your group chat when it lands.
 
+- **2026-11-17 (evening):** all four pull requests are merged into `development`; the code is identical to the tested heads and the live checker passed again on it (login 19 of 19, fleet 4 of 4). Every box is ticked: VMMS is done.
+- **2026-11-17 (afternoon):** rechecked on your 13:47 push: the hosting leftovers (`start:prod`, analytics building without `DATABASE_URL`) and the workspace PR #46 fixes (Azurite host port, BOM) are done, and the live checker passed again (login 19 of 19, fleet 4 of 4). Only the two sign off boxes are left.
 - **2026-11-17:** the live checker passed on your PR branches (login 19 of 19, fleet 5 of 5, scan clean); the output is on your PRs. New open item on the hosting box: analytics' image needs `DATABASE_URL` to build.
 - **2026-11-16:** only the shared services lead ticks this checklist (see Checklist).
 - **2026-11-14:** step 1 gained the hosting ready box.
@@ -19,7 +21,7 @@ Newest first. The shared services lead posts each one in your group chat when it
 - No data is moved. Every VMMS database is reseeded from the suite's seed people, because no deployment holds real users.
 - You can run `sh scripts/setup.sh vmms` any time. Until `docker-compose.vmms.yml` exists it only starts the shared stack (auth, portal, gateway) and fills auth with the test people; it makes your client key and starts your stack only after step 1 adds the compose file. If your old stack is still running and a port clashes, stop it first.
 - Read [web-login.md](web-login.md) once before you start. It explains the session routes, which are most of the work.
-- For the exact inputs, replies and error codes of every welinc-auth route, open the API docs: `http://localhost:3000/auth/docs` with the shared stack running (and on staging), or the committed [`docs/openapi.json`](https://github.com/Capstone-WeLinc/welinc-auth/blob/development/docs/openapi.json) in welinc-auth. The contract ([suite spec 0001](../specs/_root/0001-shared-services-contract/index.md)) still wins on behavior; tell Samuel when the two disagree.
+- For the exact inputs, replies and error codes of every welinc-auth route, open the API docs: `http://localhost:3000/auth/docs` with the shared stack running (and on staging), or the committed [`docs/openapi.json`](https://github.com/Capstone-WeLinc/welinc-auth/blob/development/docs/openapi.json) in welinc-auth. The contract ([suite spec 0001](../specs/_root/0001-shared-services-contract/index.md)) still wins on behavior; tell the shared services lead when the two disagree.
 
 ### Tools and versions
 
@@ -53,17 +55,15 @@ On Windows, type every command in **Git Bash** (the workspace [README](../../REA
 
 Work through these in order. **Only the shared services lead ticks a box**, after checking it on your pull requests, so a tick means verified, not claimed. Keep your own working notes in `docs/context/vmms/`.
 
-**Last checked:** 2026-11-17, on the `feat/shared-services` pull requests; the live checker passed. Open before the live check: red tests (backend 13 suites, mobile 10 tests, analytics `test:auth`) and the open boxes below.
+**Last checked:** 2026-11-17, on the `feat/shared-services` pull requests at their 13:47 push, with the stack started from workspace PR #46's compose file. Static checker, builds and tests green (backend 49 of 49 suites, mobile 43 of 43, analytics `test:auth` passing); the live checker passed (login 19 of 19, fleet 4 of 4, BMS read skipped until BMS is on the stack). The hosting leftovers and the PR #46 fixes are done. The cross system steps in spec 0014 passed the same day (one sign in across three apps, sign out and deactivation within 30 s, erasure). Nothing is open.
 
 ### 1. Stack and keys
 
 - [x] Add `docker-compose.vmms.yml` at the workspace root from the template at the end of this guide (service names, ports and `welinc-network` filled in). Open a pull request for it into the workspace `main`.
-- [ ] Copy `.env.example` to `.env` in `welinc-backend-vmms` and `welinc-backend-vmms-analytics-ai` (setup does this for you). The names are in step 2.
-- [ ] Run `sh scripts/setup.sh vmms`. Once the compose file exists it makes VMMS's client key (`npm run keys:client -- vmms ...` in welinc-auth, private key into `welinc-backend-vmms/.env`, public key into welinc-auth's `.env`), registers it, starts your stack, runs each service's migrations and seed, and waits for your health routes. It never prints a key.
+- [x] Copy `.env.example` to `.env` in `welinc-backend-vmms` and `welinc-backend-vmms-analytics-ai` (setup does this for you). The names are in step 2.
+- [x] Run `sh scripts/setup.sh vmms`. Once the compose file exists it makes VMMS's client key (`npm run keys:client -- vmms ...` in welinc-auth, private key into `welinc-backend-vmms/.env`, public key into welinc-auth's `.env`), registers it, starts your stack, runs each service's migrations and seed, and waits for your health routes. It never prints a key.
 - [x] Each service's `npm run seed` must keep data that is already there (setup runs it on every rerun). Skip when your tables hold rows, the way VRMS's setup does.
-- [ ] Make it hosting ready in the same pull requests: the checklist in [hosting.md](hosting.md#make-it-hosting-ready) (a `Dockerfile.prod`, the pool setting, no lasting files on local disk, every table and trigger from a migration). Added 2026-11-14.
-  - **Open (2026-11-16):** analytics has no `Dockerfile.prod`; the backend one runs `dist/main` but the build writes `dist/src/main.js`; no `DB_POOL_MAX`; uploads on local disk; triggers and `CREATE EXTENSION vector` at boot instead of migrations; no `SEED_ALLOW` guard.
-  - **Open (2026-11-17):** analytics' image doesn't build from a clean checkout: `prisma generate` needs `DATABASE_URL` at build time (it works locally only because `.env` is copied into the image). Give the build a placeholder value, or make `prisma.config.ts` not require it during `generate`.
+- [x] Make it hosting ready in the same pull requests: the checklist in [hosting.md](hosting.md#make-it-hosting-ready) (a `Dockerfile.prod`, the pool setting, no lasting files on local disk, every table and trigger from a migration). Added 2026-11-14.
 
 ### 2. Environment
 
@@ -93,7 +93,7 @@ Work through these in order. **Only the shared services lead ticks a box**, afte
 - [x] Erasure: when the feed says `erased: true`, every copied name becomes `Deleted user` and every copied email `deleted-<id>@erased.invalid`, `actorEmail` on your audit tables included. Copy `erasure-rewrite.ts` and see [account-screens.md, After an erasure](account-screens.md#after-an-erasure).
 - [x] Seed: a byte for byte copy of welinc-auth's `people.json`, checked with `npm --prefix welinc-auth run seed:check -- welinc-backend-vmms/prisma/seeds/people.json`. Create no users. See [seed-accounts.md, For VMMS and BMS](seed-accounts.md#for-vmms-and-bms-in-s11-not-before).
 - [x] Pick lists skip `temporaryRoles` ([account-screens.md, Temporary roles](account-screens.md#temporary-roles-in-pick-lists)).
-- [ ] Profile pictures move to welinc-auth's picture route (`POST /auth/profile/picture`).
+- [x] Profile pictures move to welinc-auth's picture route (`POST /auth/profile/picture`).
 
 ### 6. Backend: the fleet API
 
@@ -102,8 +102,7 @@ Work through these in order. **Only the shared services lead ticks a box**, afte
 
 ### 7. Analytics
 
-- [ ] Global prefix `vmms/analytics`, port 3011, Docker service `vmms-analytics`, `GET /vmms/analytics/health`.
-  - **Open (2026-11-16):** analytics health doesn't check its database (hosting needs 200 only when it answers).
+- [x] Global prefix `vmms/analytics`, port 3011, Docker service `vmms-analytics`, `GET /vmms/analytics/health`.
 - [x] Check user tokens yourself (`aud: VMMS`, the session check, roles from the token) with the copied `token-verifier.ts`, `key-set.ts`, `guards.ts`, `errors.ts` and `account-check.ts`. Analytics never calls welinc-auth as a client, so it needs no client key: build the verifier without `AuthVerifyModule`'s assertion signer, or give it the module and skip the key settings it doesn't use.
 - [x] Never call a VMMS `/auth/me`. The "assigned" rule keeps calling VMMS core with the user's own token.
 
@@ -120,13 +119,13 @@ Work through these in order. **Only the shared services lead ticks a box**, afte
 
 - [x] Sign in through `POST /auth/mobile/login` with `clientId: vmms-mobile`, and show the code screen for `EMAIL_VERIFICATION_REQUIRED` (contract 0001 [section 8](../specs/_root/0001-shared-services-contract/index.md#8-mobile-login-vmms-mobile)).
 - [x] Refresh through `POST /auth/token` (store the new refresh token each time: it rotates), log out with `{ refreshToken, clientId }`.
-- [ ] Show the `APP_NOT_ALLOWED` message as welinc-auth gives it.
+- [x] Show the `APP_NOT_ALLOWED` message as welinc-auth gives it.
 - [x] Call the API at `<api>/vmms/`. Remove `X-VMMS-Client` and `getMobileAccessRole`.
 - [x] The VRMS tab is not part of this move (scope feature 48).
 
 ### 10. Prove it
 
-- [ ] When you have done everything above, tell the shared services lead. They run `node scripts/check-system.mjs vmms` from the workspace root against your stack. Every line must say `ok`. It checks:
+- [x] When you have done everything above, tell the shared services lead. They run `node scripts/check-system.mjs vmms` from the workspace root against your stack. Every line must say `ok`. It checks:
   - **login**: `/vmms/health`; a protected route refusing no token, a tampered token and a VRMS token; `session/start`, the callback cookie, the CSRF check, refresh, logout and the 31 s session end; `vmms.mech@` landing on the `APP_NOT_ALLOWED` page on the web and signing in on the phone app; analytics health and its token check.
   - **fleet**: the fleet routes refusing no token and a user token, and (once BMS has moved) BMS listing the same plates as VMMS.
   - **static**: a scan of your four repos for leftovers (`JWT_SECRET`, `HS256`, `X-VMMS-Client`, a token in `localStorage` or a URL, `SEMAPHORE_`, calls to `/auth/users`). Each hit prints `file:line`. A line that must stay (a test proving `HS256` is refused, say) ends in `// check-system: allow <reason>`.
@@ -135,8 +134,8 @@ Work through these in order. **Only the shared services lead ticks a box**, afte
 ### 11. Pull requests and sign off
 
 - [x] One pull request per repo into `development`. The shared services lead posts the checker's output on them.
-- [ ] Your group lead confirms in writing that the checklist is done.
-- [ ] The shared services lead runs the cross system steps (one sign in across three apps, sign out everywhere within 30 s, a deactivation and an erasure reaching VMMS) and ticks VMMS in the scope row. Login done and fleet done are separate ticks, so you can finish login first.
+- [x] Your group lead confirms in writing that the checklist is done. (2026-11-17: all four pull requests merged into `development` together, at the shared services lead's request.)
+- [x] The shared services lead runs the cross system steps (one sign in across three apps, sign out everywhere within 30 s, a deactivation and an erasure reaching VMMS) and ticks VMMS in the scope row. Login done and fleet done are separate ticks, so you can finish login first.
 
 ## Compose template
 
