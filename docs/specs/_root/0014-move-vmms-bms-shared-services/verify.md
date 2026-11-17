@@ -42,9 +42,9 @@ Before you start: the shared stack and VRMS running (`sh scripts/start.sh vrms`)
 ## Slice 4: per group (after each PR is up)
 
 ### VMMS
-- [ ] `node scripts/check-system.mjs vmms` → every live and static check `ok` (health, analytics health, 401s, authorize redirect, headless sign in, cookie flags, CSRF, logout and `SESSION_ENDED` within 31 s, `vmms.mech@` refused on the web, mobile login token on `/vmms/maintenance-schedules`, analytics `aud`, fleet 401 and `WRONG_TOKEN_USE`) → AC-12, AC-13, AC-17, AC-18, AC-21, AC-22, AC-23
+- [x] `node scripts/check-system.mjs vmms` → every live and static check `ok` (health, analytics health, 401s, authorize redirect, headless sign in, cookie flags, CSRF, logout and `SESSION_ENDED` within 31 s, `vmms.mech@` refused on the web, mobile login token on `/vmms/maintenance-schedules`, analytics `aud`, fleet 401 and `WRONG_TOKEN_USE`) → AC-12, AC-13, AC-17, AC-18, AC-21, AC-22, AC-23
 - [ ] `sh scripts/start.sh vmms` → `ok` for `/vmms/health` and `/vmms/analytics/health` → AC-16, AC-17, AC-22
-- [ ] `npm --prefix welinc-auth run seed:check -- welinc-backend-vmms/prisma/seeds/people.json` → matches; the VMMS database has no `users` table → AC-19
+- [x] `npm --prefix welinc-auth run seed:check -- welinc-backend-vmms/prisma/seeds/people.json` → matches; the VMMS database has no `users` table → AC-19
 - [x] On a phone or emulator: sign in as `mech.juan@` in the VMMS app, see the code screen for `state.unverified@`, sign out → AC-21
 
 ### BMS

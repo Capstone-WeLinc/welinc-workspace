@@ -8,6 +8,7 @@ You change only your own repos: `welinc-backend-vmms`, `welinc-backend-vmms-anal
 
 Newest first. The shared services lead posts each one in your group chat when it lands.
 
+- **2026-11-17 (evening):** all four pull requests are merged into `development`; the code is identical to the tested heads and the live checker passed again on it (login 19 of 19, fleet 4 of 4). Every box is ticked: VMMS is done.
 - **2026-11-17 (afternoon):** rechecked on your 13:47 push: the hosting leftovers (`start:prod`, analytics building without `DATABASE_URL`) and the workspace PR #46 fixes (Azurite host port, BOM) are done, and the live checker passed again (login 19 of 19, fleet 4 of 4). Only the two sign off boxes are left.
 - **2026-11-17:** the live checker passed on your PR branches (login 19 of 19, fleet 5 of 5, scan clean); the output is on your PRs. New open item on the hosting box: analytics' image needs `DATABASE_URL` to build.
 - **2026-11-16:** only the shared services lead ticks this checklist (see Checklist).
@@ -54,7 +55,7 @@ On Windows, type every command in **Git Bash** (the workspace [README](../../REA
 
 Work through these in order. **Only the shared services lead ticks a box**, after checking it on your pull requests, so a tick means verified, not claimed. Keep your own working notes in `docs/context/vmms/`.
 
-**Last checked:** 2026-11-17, on the `feat/shared-services` pull requests at their 13:47 push, with the stack started from workspace PR #46's compose file. Static checker, builds and tests green (backend 49 of 49 suites, mobile 43 of 43, analytics `test:auth` passing); the live checker passed (login 19 of 19, fleet 4 of 4, BMS read skipped until BMS is on the stack). The hosting leftovers and the PR #46 fixes are done. The cross system steps in spec 0014 passed the same day (one sign in across three apps, sign out and deactivation within 30 s, erasure). Open: your group lead's written OK, then the VMMS tick in the scope row.
+**Last checked:** 2026-11-17, on the `feat/shared-services` pull requests at their 13:47 push, with the stack started from workspace PR #46's compose file. Static checker, builds and tests green (backend 49 of 49 suites, mobile 43 of 43, analytics `test:auth` passing); the live checker passed (login 19 of 19, fleet 4 of 4, BMS read skipped until BMS is on the stack). The hosting leftovers and the PR #46 fixes are done. The cross system steps in spec 0014 passed the same day (one sign in across three apps, sign out and deactivation within 30 s, erasure). Nothing is open.
 
 ### 1. Stack and keys
 
@@ -133,8 +134,8 @@ Work through these in order. **Only the shared services lead ticks a box**, afte
 ### 11. Pull requests and sign off
 
 - [x] One pull request per repo into `development`. The shared services lead posts the checker's output on them.
-- [ ] Your group lead confirms in writing that the checklist is done.
-- [ ] The shared services lead runs the cross system steps (one sign in across three apps, sign out everywhere within 30 s, a deactivation and an erasure reaching VMMS) and ticks VMMS in the scope row. Login done and fleet done are separate ticks, so you can finish login first.
+- [x] Your group lead confirms in writing that the checklist is done. (2026-11-17: all four pull requests merged into `development` together, at the shared services lead's request.)
+- [x] The shared services lead runs the cross system steps (one sign in across three apps, sign out everywhere within 30 s, a deactivation and an erasure reaching VMMS) and ticks VMMS in the scope row. Login done and fleet done are separate ticks, so you can finish login first.
 
 ## Compose template
 
