@@ -45,7 +45,7 @@ Before you start: the shared stack and VRMS running (`sh scripts/start.sh vrms`)
 - [ ] `node scripts/check-system.mjs vmms` → every live and static check `ok` (health, analytics health, 401s, authorize redirect, headless sign in, cookie flags, CSRF, logout and `SESSION_ENDED` within 31 s, `vmms.mech@` refused on the web, mobile login token on `/vmms/maintenance-schedules`, analytics `aud`, fleet 401 and `WRONG_TOKEN_USE`) → AC-12, AC-13, AC-17, AC-18, AC-21, AC-22, AC-23
 - [ ] `sh scripts/start.sh vmms` → `ok` for `/vmms/health` and `/vmms/analytics/health` → AC-16, AC-17, AC-22
 - [ ] `npm --prefix welinc-auth run seed:check -- welinc-backend-vmms/prisma/seeds/people.json` → matches; the VMMS database has no `users` table → AC-19
-- [ ] On a phone or emulator: sign in as `mech.juan@` in the VMMS app, see the code screen for `state.unverified@`, sign out → AC-21
+- [x] On a phone or emulator: sign in as `mech.juan@` in the VMMS app, see the code screen for `state.unverified@`, sign out → AC-21
 
 ### BMS
 - [ ] `node scripts/check-system.mjs bms` → login and static groups `ok` (health, 401s, authorize redirect, headless sign in, cookie flags, CSRF, logout, `driver.ramon@` refused on the web, a 5 MB booking POST answered 400 by booking) → login done → AC-12, AC-13, AC-24, AC-25, AC-27
@@ -58,12 +58,12 @@ Before you start: the shared stack and VRMS running (`sh scripts/start.sh vrms`)
 
 ## Cross system (AC-31; again on staging for AC-32)
 
-- [ ] Signed out, open a VMMS deep link → portal → sign in as `multi.lead@` → back on that exact VMMS address → AC-31
-- [ ] Switch system from VMMS → launcher with "You're here" on VMMS → open BMS, then VRMS, with no password asked → AC-31
-- [ ] Sign out in BMS → VMMS and VRMS tabs open in the same browser ask for sign in within 30 s → AC-31
-- [ ] Deactivate `multi.lead@` in the portal admin section → requests in all three apps fail within 30 s → reactivate → AC-31
+- [x] Signed out, open a VMMS deep link → portal → sign in as `multi.lead@` → back on that exact VMMS address → AC-31
+- [x] Switch system from VMMS → launcher with "You're here" on VMMS → open BMS, then VRMS, with no password asked → AC-31
+- [x] Sign out in BMS → VMMS and VRMS tabs open in the same browser ask for sign in within 30 s → AC-31
+- [x] Deactivate `multi.lead@` in the portal admin section → requests in all three apps fail within 30 s → reactivate → AC-31
 - [ ] Remove `multi.lead@`'s BMS role → at the next BMS refresh (15 minutes at most, or sign in again) BMS refuses and the launcher drops BMS → put it back → AC-31
-- [ ] Erase a test person who appears in VMMS audit rows and BMS approvals (local only: soft delete, then run the erasure sweep with the grace set to 0) → VMMS `actorEmail` copies and BMS names show "Deleted user" → AC-19, AC-26, AC-31
+- [x] Erase a test person who appears in VMMS audit rows and BMS approvals (local only: soft delete, then backdate that user's `deleted_at` past `ACCOUNT_ERASURE_GRACE_DAYS` (1 day at least) and wait for the hourly sweep) → VMMS `actorEmail` copies and BMS names show "Deleted user" → AC-19, AC-26, AC-31
 - [ ] Each group lead's written OK is noted in the scope row with the date → AC-31
 
 ## Slice 5: cleanup
