@@ -230,11 +230,11 @@ Tracer Bullet: one thin thread through backend-vrms and web-vrms first, proven a
 
 ## Follow-up
 
-- [ ] Suite spec 0008's **CORS values** line still lists three request headers; `/sync` brings it in line with contract 0001 section 3.
+- [x] Suite spec 0008's **CORS values** line still lists three request headers; `/sync` brings it in line with contract 0001 section 3.
 - [ ] Claim the Sentry student offer through the GitHub Student Pack before task 1; if it fails, use the free Developer plan (the design fits it). Save the login in your password manager.
-- [ ] `/sync` adds `sentry-nestjs-sdk`, `sentry-react-sdk` and `sentry-setup-releases` to the *Load on match* list and `sentry` to the MCP servers line in `agents/vrms/AGENTS.md`.
+- [x] `/sync` adds `sentry-nestjs-sdk`, `sentry-react-sdk` and `sentry-setup-releases` to the *Load on match* list and `sentry` to the MCP servers line in `agents/vrms/AGENTS.md`.
 - [ ] `sentry-fix-issues` (`getsentry/sentry-for-ai`) is worth installing after go live, to triage real issues through the MCP server.
 - [ ] Spec 0008: add the new variables, secrets and private fields to its tables, `GIT_SHA` to the image build, and the map steps to `deploy.yml`.
 - [ ] Spec 0010: accept the optional `SENTRY_*` and `VITE_SENTRY_*` values and the AC-15 refusals.
 - [ ] Later, if money allows: cron monitors for the other 5 jobs, an uptime check for `/auth/health`.
-- [ ] The domain rename to `welinc.app` lands before this is built; every address here is written as `<api>`, so it is unaffected.
+- [x] The domain rename to `welinc.app` lands before this is built; every address here is written as `<api>`, so it is unaffected.
