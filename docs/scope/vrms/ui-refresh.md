@@ -170,5 +170,6 @@ spec [0024](../../specs/vrms/0024-ticket-detail-redesign/index.md) · code in `w
   - [x] Fifth refinements: Status card rows and `dueValue`, shared `MoreMenu` with Copy ticket link, late Before tile with the warning notice, softer pills everywhere (AC-7, AC-13, AC-17 to AC-20)
   - [x] Sixth refinements: progress as the first part of line 2 with a bar strip below 768px, wrapping line 2, no change from 768px (AC-2, AC-3, AC-20)
 - [ ] Verify it: `/check verify ticket detail redesign`
+  - Note (2026-11-17, replan): partial pass, 12 more steps ticked in `verify.md` (row states, Returned, open rows kept on reload and refresh, `#issue-N`, the AI card). Still open among the major flows: the default open rule on an In progress ticket (AC-4, AC-6), Activity's 5 newest and Show all (AC-15), keyboard folding (AC-1), and axe (AC-19, AC-20). The other open steps wait for the full verify run after the build out.
 - [ ] Test it: `/test ticket detail redesign`
 - [ ] Polish it (optional, ask first): `impeccable` · `web-design-guidelines` · `break-ui` (10 issues with 20 steps each, long issue text, no known fix, returned issues)

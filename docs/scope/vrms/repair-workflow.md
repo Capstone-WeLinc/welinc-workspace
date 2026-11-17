@@ -209,7 +209,7 @@ spec [0023](../../specs/vrms/0023-per-ticket-checklist-edits/index.md) · code i
   - [x] Own checklists and the shared lock: Add steps, the 0 step save, the version bump on relink, issue edit and approved suggestions, the relink prompt, knowledge switch (AC-4, AC-5, AC-7, AC-14, AC-16)
   - [x] Sweep: diff and service tests, catalog tests, web logic tests, axe at 375px and 1280px, lint, typecheck, build (AC-3, AC-6 to AC-11, AC-14, AC-15, AC-18) (axe at 375px and 1280px not run yet; left for `/check verify`)
   - [x] Lighter sheet with drag: the `longestRun` tie rule and its tests, the suggestion keeps own steps test, the four `@dnd-kit` packages, inline rows with handle, `DragOverlay`, announcements, Enter and Backspace, Move up and Move down removed (AC-4, AC-4a, AC-4b, AC-10, AC-14, AC-18) (2026-11-06: the suggestion test already existed from slice 3; the packages add about 18 KB gzipped; axe with a drag in progress and the touch checks left for `/check verify`)
-- [ ] Verify it: `/check verify per ticket checklist edits`
+- [x] Verify it: `/check verify per ticket checklist edits` (2026-11-17: 33 of 34 steps in `verify.md` passed, every major flow, permissions and the lock included; only the Japanese or Chinese input method step is left, for the full verify run after the build out)
 - [ ] Test it: `/test per ticket checklist edits`
 - [ ] Polish it (optional, ask first): `emil-design-eng` (the edit sheet) · `web-design-guidelines` · `break-ui` (long step text, 20 steps, empty checklist)
 
