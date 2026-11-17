@@ -35,6 +35,17 @@ services:
   bms-gateway:
     <<: *stub
     environment: { SERVICE: bms, PORT: "3020" }
+  # Sentry's ingest host for the tunnel routes (VRMS spec 0025): https on 443 under the real name
+  # pattern, with a throwaway cert check-routes.mjs makes (nginx doesn't verify upstream certs)
+  sentry-ingest:
+    <<: *stub
+    environment: { SERVICE: sentry-ingest, PORT: "443", TLS_DIR: /tls }
+    volumes:
+      - ./stub.mjs:/stub/stub.mjs:ro
+      - ${TUNNEL_CERT_DIR:?run check-routes.mjs, which makes the cert}:/tls:ro
+    networks:
+      gateway-test:
+        aliases: [o1.ingest.us.sentry.io]
 
   # Routes, CORS, errors and limits, as local runs it. No bind mounts: the image runs from settings alone.
   gateway:
@@ -48,6 +59,9 @@ services:
       GATEWAY_RATE_PER_SECOND: "1000"
       GATEWAY_RATE_BURST: "1000"
       GATEWAY_HSTS: ""
+      # The Sentry tunnel on (VRMS spec 0025); gateway-edge leaves it off
+      SENTRY_DSN_VRMS_WEB: https://0123456789abcdef0123456789abcdef@o1.ingest.us.sentry.io/11
+      SENTRY_DSN_PORTAL: https://fedcba9876543210fedcba9876543210@o1.ingest.us.sentry.io/12
     networks:
       - gateway-test
 

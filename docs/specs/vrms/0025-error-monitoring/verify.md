@@ -35,6 +35,20 @@ Setup for the live steps: put the `vrms-backend` DSN in `welinc-backend-vrms/.en
 - [ ] Browser user and role come from the refresh answer's `VRMS` roles entry: a person with no VRMS role entry gets no `role` tag (never the `MECHANIC` fallback)
 - [ ] Reference code is the first 8 characters of the event id the boundary got back
 
+## Milestone 2, task 7a (the gateway's envelope DSN check)
+
+### Commands
+- [ ] `node infra/gateway/test/check-routes.mjs` → every check passes (164 on 2026-11-17), the S-AC4 and S-AC5 tunnel cases included → AC-4, AC-5
+- [ ] In that run, each of these answers 403 `TUNNEL_REJECTED` with CORS and never reaches the stand in: another project on the same host, another organization's host, the other route's DSN, a different key, an uppercase key, a port, a trailing slash, a trailing newline, a password, `http`, a duplicate `dsn`, an escaped `dsn`, no `dsn`, a `dsn` that isn't a string, an array header, no newline in the first 8 KB, a header that isn't JSON, an empty body, and a gzip body → AC-5
+- [ ] In that run, a binary envelope and a body just under 1 MB arrive byte for byte, Sentry's `Retry-After` and `X-Sentry-Rate-Limits` come back, a forwarded and a refused report each log exactly one line with nothing from the body, refused reports count against the tunnel limit, and `/_tunnel/*` answers 404 from outside → AC-5
+- [ ] In that run, `SENTRY_DSN_VRMS_WEB` or `SENTRY_DSN_PORTAL` set alone, or malformed (uppercase, port, slash, extra path, query, `http`, password, foreign host, project 0, short key), stops the start and names the setting → AC-5
+
+### Live (from your laptop, real `welinc` org)
+- [ ] Start the gateway image with both real DSNs, then post an envelope with the `vrms-web` DSN to `/monitoring/vrms-web` with `environment: development` → 200, and exactly one event lands in `vrms-web` (done 2026-11-17, event `b8a42313`) → AC-4, AC-5
+- [ ] Post the portal DSN to `/monitoring/vrms-web` and the `vrms-web` DSN to `/monitoring/portal` → both 403 `TUNNEL_REJECTED`, and a Sentry search for their messages finds nothing (done 2026-11-17) → AC-5
+- [ ] On staging (after milestone 3), repeat the cross project post against the hosted gateway → 403 → AC-5
+
 ## Acceptance-criteria coverage
 - AC-1 test route issue, 503 path, unit tests · AC-2 4xx and health steps, unit tests · AC-3 test page issue (readable TypeScript stack waits for milestone 3's maps) · AC-6 event inspection, unit tests · AC-7 crash screen steps · AC-8 lazy chunk step, unit tests · AC-9 offline and trace header step (needs milestone 2's gateway CORS) · AC-14 blank DSN step · AC-15 env:check steps · AC-16 route and page steps, build search
-- AC-4, AC-5, AC-10 to AC-13, AC-17, AC-18 belong to milestones 2 to 4
+- AC-4, AC-5 the task 7a harness and live steps (the staging repeat waits for milestone 3)
+- AC-10 to AC-13, AC-17, AC-18 belong to milestones 3 and 4

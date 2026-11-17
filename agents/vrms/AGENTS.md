@@ -36,7 +36,7 @@ sh scripts/setup.sh vrms   # first time setup: clones, .env files, keys, package
 node scripts/check-system.mjs vrms   # suite spec 0014 checker: live login checks plus the leftovers scan (exit 0 passes)
 node scripts/check-contract-routes.mjs <openapi.json>   # VRMS spec 0026: welinc-auth's docs against contract 0001 section 16 (exit 0 passes)
 
-# Gateway checks (needs Docker; starts and removes its own containers)
+# Gateway checks (needs Docker and openssl; starts and removes its own containers)
 node infra/gateway/test/check-routes.mjs
 
 # Azure setup as code (VRMS spec 0008; order and gotchas in infra/README.md; needs az, jq, psql, dig, gh)

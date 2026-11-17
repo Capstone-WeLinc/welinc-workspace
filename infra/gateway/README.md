@@ -13,8 +13,11 @@ The gateway routes and answers; it never checks tokens. Each service does its ow
 | `templates/default.conf.template` | Everything else: resolver, maps, flood limit, log format, the routes, the error answers |
 | `templates/snippets/route.conf.template` | What every route shares: proxy, forwarded headers, CORS, preflight, flood limit |
 | `templates/snippets/error-headers.conf.template` | The headers every gateway error carries |
-| `docker-entrypoint.d/05-check-env.sh` | Refuses to start on a bad setting, naming it, and writes the CORS origin map |
-| `test/` | The test harness: `compose.yml`, `stub.mjs`, `check-routes.mjs` |
+| `templates/snippets/tunnel.conf.template` | What both public Sentry tunnel routes share (VRMS spec 0025): their own rate limit, CORS, the method checks, and the envelope DSN check |
+| `templates/snippets/tunnel-forward.conf.template` | What both internal tunnel locations share: the forward to Sentry and the headers stripped before it |
+| `njs/tunnel.js` | The envelope DSN check (njs): forwards a report only when its DSN is the route's own |
+| `docker-entrypoint.d/05-check-env.sh` | Refuses to start on a bad setting, naming it, and writes the CORS origin map and the tunnel routes with their DSN parts (`/etc/nginx/generated/monitoring.conf`) |
+| `test/` | The test harness: `compose.yml`, `stub.mjs` (also the https Sentry stand in), `check-routes.mjs` (needs `openssl` for that stand in's throwaway cert) |
 
 At start the nginx image fills every `${SETTING}` in `templates/` and writes the result to `/etc/nginx/conf.d/`. Words like `$upstream` or `$uri` are nginx's own variables and stay as they are.
 
@@ -29,6 +32,17 @@ At start the nginx image fills every `${SETTING}` in `templates/` and writes the
 | `/bms/` | `BMS_UPSTREAM` | 10 MB | 60 s |
 
 Paths pass through unchanged: each service serves its own prefix. `GET /health` is the gateway's own check. Anything else, including a bare `/vrms` with no slash, answers a JSON 404.
+
+### Sentry tunnel (VRMS spec 0025)
+
+| Path | Goes to | Body limit | Read timeout |
+|---|---|---|---|
+| `POST /monitoring/vrms-web` | the envelope address of `SENTRY_DSN_VRMS_WEB`, `https://<host>/api/<project id>/envelope/` | 1 MB | 10 s |
+| `POST /monitoring/portal` | the envelope address of `SENTRY_DSN_PORTAL` | 1 MB | 10 s |
+
+Exact paths only. The browser SDKs send their crash reports here, so the browser never calls a `sentry.io` host. `OPTIONS` answers 204 with CORS, any method but `POST` a JSON 405 with `Allow: POST, OPTIONS`. Each client gets 1 request a second with a burst of 10 (its own limit, not the flood limit). Sentry gets no `Cookie`, `Authorization`, `Referer`, `X-Request-Id` or client address. With both `SENTRY_DSN_*` settings blank (local) both routes answer the JSON 404.
+
+Sentry files a report under the DSN in the envelope's first line and ignores the project in the address, so the gateway checks that DSN itself (`njs/tunnel.js`). It forwards only when the envelope's header line (within the first 8 KB, uncompressed, one `"dsn"` and no `\u` escape) is JSON whose `dsn` is exactly the route's own DSN. Anything else answers a JSON 403 `TUNNEL_REJECTED` and never reaches Sentry. Each report logs one access line; nothing from the body is logged. `/_tunnel/vrms-web` and `/_tunnel/portal` are internal and answer 404 from outside.
 
 ## Add a route
 
@@ -54,7 +68,7 @@ Two rules keep it working:
 
 ## Settings
 
-All required. None of them is a secret.
+All required except the two `SENTRY_DSN_*` ones. None of them is a secret.
 
 | Setting | Local | Hosted | What it does |
 |---|---|---|---|
@@ -63,6 +77,7 @@ All required. None of them is a secret.
 | `TRUST_EDGE_PROXY` | `0` | `1` | `1` takes the client address from the last `X-Forwarded-For` entry. Only safe behind a proxy that appends it (Azure's ingress) |
 | `GATEWAY_RATE_PER_SECOND`, `GATEWAY_RATE_BURST` | `20`, `40` | `20`, `40` | Flood limit per client address. Preflights and `/health` never count |
 | `GATEWAY_HSTS` | empty | `max-age=86400` | The `Strict-Transport-Security` value; empty leaves the header out |
+| `SENTRY_DSN_VRMS_WEB`, `SENTRY_DSN_PORTAL` | empty (tunnel off) | the `vrms-web` and `welinc-portal` DSNs (the same values the web builds get as `VITE_SENTRY_DSN`) | The Sentry tunnel (VRMS spec 0025). Optional, but both or neither. Each must be `https://<32 lowercase hex>@o123.ingest.us.sentry.io/456`: no port, password, path or trailing slash |
 
 A bad setting stops the container at start with a line naming it: read it with `docker logs welinc_api_gateway`.
 
@@ -72,9 +87,11 @@ Each is JSON in the suite error shape (`statusCode`, `message`, `error`, `code`)
 
 | Status | `code` | When |
 |---|---|---|
+| 403 | `TUNNEL_REJECTED` | A Sentry tunnel report whose envelope DSN isn't that route's own |
 | 404 | `NOT_FOUND` | The path isn't in the route table |
+| 405 | `METHOD_NOT_ALLOWED` | Anything but `POST` or `OPTIONS` on a Sentry tunnel route (with `Allow: POST, OPTIONS`) |
 | 413 | `PAYLOAD_TOO_LARGE` | The body is over the route's limit |
-| 429 | `RATE_LIMITED` | Over the flood limit (with `Retry-After: 1`) |
+| 429 | `RATE_LIMITED` | Over the flood limit (with `Retry-After: 1`), or the tunnel's own limit |
 | 502 | `UPSTREAM_UNAVAILABLE` | The service isn't running or its name doesn't resolve |
 | 504 | `UPSTREAM_TIMEOUT` | The service took longer than the route's read timeout, or 5 s to connect |
 

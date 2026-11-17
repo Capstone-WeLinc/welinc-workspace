@@ -2,21 +2,34 @@
 //   ?delay=<ms>   wait before answering (the timeout check)
 //   ?status=<n>   answer with that status and this same JSON body (the passthrough check)
 //   ?cors=1       send its own CORS, Vary, X-Request-Id and HSTS headers (the gateway must hide them)
-// A path ending in /session/refresh also sets a cookie. Each request is logged as "METHOD URL", so the
-// script can prove a request never reached an upstream.
+// A path ending in /session/refresh also sets a cookie. Each request is logged as
+// "METHOD URL sha256=<body hash>", so the script can prove a request (or one exact body) never
+// reached an upstream; the answer carries the same hash. With TLS_DIR set it serves https from the
+// cert.pem and key.pem there and answers with Sentry's two rate limit headers (the Sentry ingest
+// stand in, VRMS spec 0025).
+import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
 import http from 'node:http';
+import https from 'node:https';
 
 const service = process.env.SERVICE ?? 'stub';
 const port = Number(process.env.PORT ?? 3000);
 
-http
-  .createServer((req, res) => {
+const tlsDir = process.env.TLS_DIR;
+const server = tlsDir
+  ? (handler) => https.createServer({ cert: readFileSync(`${tlsDir}/cert.pem`), key: readFileSync(`${tlsDir}/key.pem`) }, handler)
+  : (handler) => http.createServer(handler);
+
+server((req, res) => {
     let bytes = 0;
+    const hash = createHash('sha256');
     req.on('data', (chunk) => {
       bytes += chunk.length;
+      hash.update(chunk);
     });
     req.on('end', () => {
-      console.log(`${req.method} ${req.url}`);
+      const sha256 = hash.digest('hex');
+      console.log(`${req.method} ${req.url} sha256=${sha256}`);
       const url = new URL(req.url, 'http://stub');
       const headers = { 'Content-Type': 'application/json' };
       if (url.searchParams.get('cors') === '1') {
@@ -32,16 +45,19 @@ http
           'Strict-Transport-Security': 'max-age=999',
         });
       }
+      if (tlsDir) {
+        headers['Retry-After'] = '7';
+        headers['X-Sentry-Rate-Limits'] = '60:error:organization';
+      }
       if (url.pathname.endsWith('/session/refresh')) {
         headers['Set-Cookie'] = 'stub_rt=1; Path=/; HttpOnly';
       }
       const send = () => {
         res.writeHead(Number(url.searchParams.get('status') ?? 200), headers);
-        res.end(JSON.stringify({ service, method: req.method, url: req.url, headers: req.headers, bytes }));
+        res.end(JSON.stringify({ service, method: req.method, url: req.url, headers: req.headers, bytes, sha256 }));
       };
       const delay = Number(url.searchParams.get('delay') ?? 0);
       if (delay > 0) setTimeout(send, delay);
       else send();
     });
-  })
-  .listen(port, () => console.log(`stub ${service} listening on ${port}`));
+}).listen(port, () => console.log(`stub ${service} listening on ${port}`));
