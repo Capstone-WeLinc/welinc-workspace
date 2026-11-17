@@ -71,10 +71,14 @@ spec [0026](../../specs/vrms/0026-api-docs/index.md) · code in `welinc-auth/src
 - [x] Verify it: `/check verify API docs`
 - [x] Test it: `/test API docs`
 
-### 69. Security checks · planned
+### 69. Security checks · in-progress
 Free checks that catch leaks and weaknesses, with reports to cite in the papers. Added 2026-11-16. No spec needed: the tools and their place are settled.
 **Done when:** every repo's CI fails a pull request that contains a secret (gitleaks), an OWASP ZAP baseline scan runs against staging weekly and on demand with its report kept, and production's Mozilla Observatory and SSL Labs grades are recorded in the runbook.
 - [ ] Build it: `/develop security checks` (gitleaks any time; ZAP after staging exists)
+  - [x] gitleaks: `.github/workflows/secrets.yml` in the workspace and the four service repos (a pull request scans its own commits, a push scans the whole history; v8.30.1 pinned by checksum). Every history scanned clean on 2026-11-17; the only hits were public by design (Azurite's emulator key, the NestJS starter's CircleCI badge), allowed in `.gitleaks.toml`
+  - [ ] Require the `gitleaks` check in branch protection on `development` (service repos) and `main` (workspace), after the branches merge
+  - [ ] OWASP ZAP baseline against staging, weekly and on demand, report kept as a run artifact (after staging exists)
+  - [ ] Mozilla Observatory and SSL Labs grades for production in the runbook (after production is live)
 - [ ] Verify it: `/check verify security checks`
 - [ ] Test it: `/test security checks`
 
