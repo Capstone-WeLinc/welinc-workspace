@@ -1,10 +1,13 @@
 #!/usr/bin/env node
-// Gateway checks for spec 0008, AC-1 to AC-21. Run from the workspace root (Node 24 and Docker):
+// Gateway checks for spec 0008, AC-1 to AC-21, and the Sentry tunnel of VRMS spec 0025 (AC-4, AC-5;
+// labelled S-AC4 and S-AC5). Run from the workspace root (Node 24, Docker and openssl):
 //   node infra/gateway/test/check-routes.mjs          start the harness, check, remove it
 //   node infra/gateway/test/check-routes.mjs --keep   leave the harness running afterwards
 // Exits non zero when any check fails.
 import { spawnSync } from 'node:child_process';
+import { mkdtempSync, rmSync } from 'node:fs';
 import http from 'node:http';
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { randomBytes } from 'node:crypto';
@@ -101,6 +104,16 @@ async function waitFor(fn, timeoutMs) {
 
 // ---------- start ----------
 
+// The Sentry ingest stand in serves https with a throwaway one day cert, made here and never kept
+const certDir = mkdtempSync(path.join(os.tmpdir(), 'gateway-tunnel-'));
+const cert = run('openssl', ['req', '-x509', '-newkey', 'rsa:2048', '-nodes', '-days', '1', '-subj', '/CN=o1.ingest.us.sentry.io',
+  '-keyout', path.join(certDir, 'key.pem'), '-out', path.join(certDir, 'cert.pem')]);
+if (cert.status !== 0) {
+  console.error(`openssl could not make the test cert: ${cert.error?.message ?? cert.stderr}`);
+  process.exit(1);
+}
+process.env.TUNNEL_CERT_DIR = certDir;
+
 console.log('Starting the gateway harness (first run builds the image)...');
 compose('down', '-v', '--remove-orphans');
 const up = compose('up', '-d', '--build');
@@ -116,7 +129,7 @@ try {
       ...['/auth/', '/vrms/', '/vmms/', '/vmms/analytics/', '/bms/'].map((p) => request(GW, { url: `${p}ready` })),
       request(EDGE, { url: '/vrms/ready' }),
     ]);
-    return probes.every((r) => r.status === 200);
+    return probes.every((r) => r.status === 200) && logsOf('sentry-ingest').includes('listening');
   }, 60_000);
   if (!ready) throw new Error('The harness did not come up within 60 seconds');
 
@@ -185,6 +198,64 @@ try {
     check('AC-9', 'an unlisted preflight answers 204 with no Access-Control-* header', bad.status === 204 && corsHeaderNames(bad).length === 0,
       `${bad.status} ${corsHeaderNames(bad).join()}`);
     check('AC-9', 'preflights reach no upstream', !logsOf('vrms-backend').includes(m9));
+  }
+
+  // ---------- VRMS spec 0025, AC-4, AC-5: the Sentry tunnel ----------
+  {
+    const TUNNEL = '/monitoring/vrms-web';
+    const envelope = '{"dsn":"https://k@o1.ingest.us.sentry.io/11"}\n{"type":"event"}\n{}';
+    const mt = marker();
+    const pre = await request(GW, { method: 'OPTIONS', url: `${TUNNEL}?m=${mt}`, headers: { Origin: LISTED, 'Access-Control-Request-Method': 'POST' } });
+    check('S-AC5', 'OPTIONS answers 204 with CORS for a listed origin',
+      pre.status === 204 && pre.headers['access-control-allow-origin'] === LISTED &&
+        pre.headers['access-control-allow-methods'] === 'POST, OPTIONS', JSON.stringify(pre.headers));
+    const get = await request(GW, { url: `${TUNNEL}?m=${mt}`, headers: { Origin: LISTED } });
+    check('S-AC5', 'GET answers the JSON 405 with Allow: POST, OPTIONS',
+      isGatewayError(get, 405, 'METHOD_NOT_ALLOWED') && get.headers.allow === 'POST, OPTIONS', brief(get));
+    check('S-AC5', 'OPTIONS and GET never reach Sentry', !logsOf('sentry-ingest').includes(mt));
+
+    const planted = {
+      Origin: LISTED, 'Content-Type': 'text/plain;charset=UTF-8', Cookie: 'welinc_sso=secretcookie',
+      Authorization: 'Bearer secrettoken', 'X-Forwarded-For': '6.6.6.6', 'X-Real-IP': '6.6.6.6',
+      Forwarded: 'for=6.6.6.6', Referer: 'http://localhost:8001/reset?code=topsecret', 'X-Request-Id': 'tunnel-1',
+    };
+    const res = await request(GW, { method: 'POST', url: `${TUNNEL}?m=${mt}`, headers: planted, body: envelope });
+    const sent = res.json?.headers ?? {};
+    check('S-AC4', 'POST /monitoring/vrms-web reaches its own project, without the query',
+      res.status === 200 && res.json?.service === 'sentry-ingest' && res.json?.url === '/api/11/envelope/' &&
+        res.json?.bytes === Buffer.byteLength(envelope), brief(res));
+    check('S-AC4', 'Sentry is called by its own host name', sent.host === 'o1.ingest.us.sentry.io', sent.host);
+    check('S-AC5', 'Sentry gets no cookie, Authorization, client address, page address or request id',
+      ['cookie', 'authorization', 'x-forwarded-for', 'x-real-ip', 'forwarded', 'referer', 'x-request-id'].every((h) => !(h in sent)),
+      JSON.stringify(sent));
+    check('S-AC5', 'a listed origin gets its allow origin header on the POST',
+      headerValues(res, 'access-control-allow-origin').join() === LISTED, JSON.stringify(res.headers));
+    const portal = await request(GW, { method: 'POST', url: '/monitoring/portal', headers: { Origin: 'http://localhost:8000' }, body: envelope });
+    check('S-AC4', 'POST /monitoring/portal reaches the portal project', portal.json?.url === '/api/12/envelope/', brief(portal));
+    const unlisted = await request(GW, { method: 'POST', url: TUNNEL, headers: { Origin: UNLISTED }, body: envelope });
+    check('S-AC5', 'an unlisted origin gets no Access-Control-* header', unlisted.status === 200 && corsHeaderNames(unlisted).length === 0,
+      corsHeaderNames(unlisted).join());
+    const big = await request(GW, { method: 'POST', url: TUNNEL, headers: { Origin: LISTED }, body: Buffer.alloc(2 * MB) });
+    check('S-AC5', 'a 2 MB body answers the JSON 413', big.error !== undefined || isGatewayError(big, 413, 'PAYLOAD_TOO_LARGE'), brief(big));
+    for (const p of ['/monitoring/vrms-web/', '/monitoring/other', '/monitoring']) {
+      const other = await request(GW, { method: 'POST', url: p, body: envelope });
+      check('S-AC4', `${p} is not a tunnel route`, isGatewayError(other, 404, 'NOT_FOUND'), brief(other));
+    }
+
+    await sleep(1500); // let the tunnel's bucket refill after the posts above
+    const burst = await Promise.all(Array.from({ length: 30 }, () => request(GW, { method: 'POST', url: TUNNEL, headers: { Origin: LISTED }, body: envelope })));
+    const limited = burst.filter((r) => r.status === 429);
+    const passed = burst.filter((r) => r.status === 200).length;
+    check('S-AC5', 'a burst past 1 a second (burst 10) gets the JSON 429',
+      limited.length > 0 && passed <= 12 && limited.every((r) => isGatewayError(r, 429, 'RATE_LIMITED')),
+      `${passed} passed, ${limited.length} limited`);
+
+    const off = await Promise.all(['/monitoring/vrms-web', '/monitoring/portal'].map((url) =>
+      request(EDGE, { method: 'POST', url, headers: { Origin: LISTED }, body: envelope })));
+    check('S-AC5', 'with the tunnel settings blank both routes answer the JSON 404',
+      off.every((r) => isGatewayError(r, 404, 'NOT_FOUND')), off.map(brief).join(' / '));
+    await sleep(500);
+    check('S-AC5', 'tunnel secrets never reach the gateway log', !/topsecret|secrettoken|secretcookie/.test(logsOf('gateway')));
   }
 
   // ---------- AC-11: upstream errors pass through ----------
@@ -364,6 +435,22 @@ try {
       check('AC-13', `${name}=${value === undefined ? '(unset)' : JSON.stringify(value)} stops the start and names it`,
         r.code !== 0 && r.out.includes(`gateway: ${name}`), `exit ${r.code}: ${r.out.split('\n').filter((l) => l.includes('gateway:')).join(' ')}`);
     }
+
+    // VRMS spec 0025: the tunnel settings start all set or all blank, and refuse a half set or bad one
+    const tunnel = { SENTRY_INGEST_HOST: 'o4507.ingest.us.sentry.io', SENTRY_PROJECT_VRMS_WEB: '45', SENTRY_PROJECT_PORTAL: '46' };
+    const on = start({ ...base, ...tunnel });
+    check('S-AC5', 'valid tunnel settings start', on.code === 0 && on.out.includes('Sentry tunnel on'), on.out.slice(-300));
+    check('S-AC5', 'blank tunnel settings start with the tunnel off', good.out.includes('Sentry tunnel off'), good.out.slice(-300));
+    const tunnelCases = [
+      ['SENTRY_PROJECT_PORTAL', undefined], ['SENTRY_PROJECT_VRMS_WEB', ''], ['SENTRY_INGEST_HOST', ''],
+      ['SENTRY_INGEST_HOST', 'evil.example.com'], ['SENTRY_INGEST_HOST', 'o1.ingest.sentry.io.evil.com'],
+      ['SENTRY_INGEST_HOST', 'https://o1.ingest.us.sentry.io'], ['SENTRY_PROJECT_VRMS_WEB', '0'], ['SENTRY_PROJECT_PORTAL', '12/x'],
+    ];
+    for (const [name, value] of tunnelCases) {
+      const r = start({ ...base, ...tunnel, [name]: value });
+      check('S-AC5', `${name}=${value === undefined ? '(unset)' : JSON.stringify(value)} with the others set stops the start and names it`,
+        r.code !== 0 && r.out.includes(`gateway: ${name}`), `exit ${r.code}: ${r.out.split('\n').filter((l) => l.includes('gateway:')).join(' ')}`);
+    }
   }
 
   // ---------- AC-14: one image from settings alone ----------
@@ -383,7 +470,10 @@ try {
 } catch (error) {
   check('setup', String(error.message ?? error), false);
 } finally {
-  if (!keep) compose('down', '-v', '--remove-orphans');
+  if (!keep) {
+    compose('down', '-v', '--remove-orphans');
+    rmSync(certDir, { recursive: true, force: true });
+  }
 }
 
 const failed = results.filter((r) => !r.ok);

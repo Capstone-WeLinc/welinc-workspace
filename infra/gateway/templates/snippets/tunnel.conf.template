@@ -1,0 +1,68 @@
+# VRMS spec 0025, AC-4, AC-5: what both Sentry tunnel routes share. 05-check-env.sh writes the two
+# locations (generated/monitoring.conf); each sets $upstream to its one fixed Sentry project, then
+# includes this file. Not the shared route.conf: this one forwards no client address and has its
+# own rate limit (zone tunnel, 1 a second per client, burst 10).
+
+limit_req zone=tunnel burst=10 nodelay;
+client_max_body_size 1m;
+
+# Bodies nginx writes itself (the 405) are JSON; Sentry's own answer keeps its type
+types { }
+default_type application/json;
+
+# The gateway owns these answers; Sentry's copy never reaches the browser
+proxy_hide_header Access-Control-Allow-Origin;
+proxy_hide_header Access-Control-Allow-Credentials;
+proxy_hide_header Access-Control-Allow-Methods;
+proxy_hide_header Access-Control-Allow-Headers;
+proxy_hide_header Access-Control-Expose-Headers;
+proxy_hide_header Access-Control-Max-Age;
+proxy_hide_header Vary;
+proxy_hide_header Set-Cookie;
+proxy_hide_header Strict-Transport-Security;
+
+# The SDK posts text/plain with no preflight, so only the allow origin header matters on a POST;
+# an origin outside ALLOWED_ORIGINS gets none
+add_header Access-Control-Allow-Origin $cors_origin always;
+add_header Vary Origin always;
+add_header X-Request-Id $gateway_request_id always;
+add_header Strict-Transport-Security "${GATEWAY_HSTS}" always;
+
+# Both answered here, before the tunnel limit and without Sentry. An if block drops the headers
+# above, so each repeats them on purpose.
+if ($request_method = OPTIONS) {
+    add_header Access-Control-Allow-Origin $cors_origin always;
+    add_header Access-Control-Allow-Methods $tunnel_methods always;
+    add_header Access-Control-Allow-Headers $tunnel_request_headers always;
+    add_header Access-Control-Max-Age $cors_max_age always;
+    add_header Vary Origin always;
+    add_header X-Request-Id $gateway_request_id always;
+    add_header Strict-Transport-Security "${GATEWAY_HSTS}" always;
+    return 204;
+}
+if ($request_method != POST) {
+    add_header Allow "POST, OPTIONS" always;
+    add_header Access-Control-Allow-Origin $cors_origin always;
+    add_header Vary Origin always;
+    add_header X-Request-Id $gateway_request_id always;
+    add_header Strict-Transport-Security "${GATEWAY_HSTS}" always;
+    return 405 '{"statusCode":405,"message":"Only POST is allowed here","error":"Method Not Allowed","code":"METHOD_NOT_ALLOWED"}';
+}
+
+# $upstream is the whole envelope address, so nginx sends exactly that path and never the query
+proxy_pass $upstream;
+proxy_ssl_server_name on;
+proxy_connect_timeout 5s;
+# The SDK doesn't wait on the answer
+proxy_read_timeout 10s;
+
+# AC-5: Sentry gets no cookie, no Authorization, no client address and no page address. An empty
+# value stops nginx sending the header at all.
+proxy_set_header Host $proxy_host;
+proxy_set_header Cookie "";
+proxy_set_header Authorization "";
+proxy_set_header X-Forwarded-For "";
+proxy_set_header X-Real-IP "";
+proxy_set_header Forwarded "";
+proxy_set_header Referer "";
+proxy_set_header X-Request-Id "";

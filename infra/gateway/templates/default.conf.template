@@ -56,10 +56,21 @@ map $cors_origin $cors_max_age {
     default "600";
     "" "";
 }
+# The Sentry tunnel's preflight (VRMS spec 0025, snippets/tunnel.conf)
+map $cors_origin $tunnel_methods {
+    default "POST, OPTIONS";
+    "" "";
+}
+map $cors_origin $tunnel_request_headers {
+    default "Content-Type";
+    "" "";
+}
 
 # Flood guard per client. Counted only in snippets/route.conf, so preflights, /health and 404s are free.
 limit_req_zone $client_addr zone=flood:10m rate=${GATEWAY_RATE_PER_SECOND}r/s;
 limit_req_status 429;
+# The Sentry tunnel's own limit per client (VRMS spec 0025, AC-5), counted in snippets/tunnel.conf
+limit_req_zone $client_addr zone=tunnel:1m rate=1r/s;
 
 # One JSON line per request. $uri, never $request_uri: query strings can hold secrets (?code=...).
 log_format gateway_json escape=json
@@ -133,6 +144,10 @@ server {
         set $upstream ${BMS_UPSTREAM};
         include /etc/nginx/conf.d/snippets/route.conf;
     }
+
+    # VRMS spec 0025: the two Sentry tunnel routes, POST /monitoring/vrms-web and /monitoring/portal.
+    # 05-check-env.sh writes them from the SENTRY_* settings, or as 404s when those are blank.
+    include /etc/nginx/generated/monitoring.conf;
 
     # A bare prefix answers 404 here, so nginx's automatic 301 to the slash form never fires
     location = /auth { return 404; }

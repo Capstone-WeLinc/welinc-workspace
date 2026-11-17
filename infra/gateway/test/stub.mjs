@@ -3,14 +3,21 @@
 //   ?status=<n>   answer with that status and this same JSON body (the passthrough check)
 //   ?cors=1       send its own CORS, Vary, X-Request-Id and HSTS headers (the gateway must hide them)
 // A path ending in /session/refresh also sets a cookie. Each request is logged as "METHOD URL", so the
-// script can prove a request never reached an upstream.
+// script can prove a request never reached an upstream. With TLS_DIR set it serves https from the
+// cert.pem and key.pem there (the Sentry ingest stand in, VRMS spec 0025).
+import { readFileSync } from 'node:fs';
 import http from 'node:http';
+import https from 'node:https';
 
 const service = process.env.SERVICE ?? 'stub';
 const port = Number(process.env.PORT ?? 3000);
 
-http
-  .createServer((req, res) => {
+const tlsDir = process.env.TLS_DIR;
+const server = tlsDir
+  ? (handler) => https.createServer({ cert: readFileSync(`${tlsDir}/cert.pem`), key: readFileSync(`${tlsDir}/key.pem`) }, handler)
+  : (handler) => http.createServer(handler);
+
+server((req, res) => {
     let bytes = 0;
     req.on('data', (chunk) => {
       bytes += chunk.length;
@@ -43,5 +50,4 @@ http
       if (delay > 0) setTimeout(send, delay);
       else send();
     });
-  })
-  .listen(port, () => console.log(`stub ${service} listening on ${port}`));
+}).listen(port, () => console.log(`stub ${service} listening on ${port}`));

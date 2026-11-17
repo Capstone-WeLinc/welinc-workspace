@@ -1,6 +1,7 @@
 #!/bin/sh
 # Spec 0008, AC-13: refuse to start on a missing or malformed setting, naming it, before nginx
-# reads a template. Also writes the CORS origin map from ALLOWED_ORIGINS.
+# reads a template. Also writes the CORS origin map from ALLOWED_ORIGINS, and the Sentry tunnel
+# routes from the SENTRY_* settings (VRMS spec 0025).
 set -eu
 
 fail() {
@@ -69,4 +70,47 @@ IFS=$old_ifs
 set +f
 
 mv "$tmp_file" "$map_file"
-echo "gateway: settings checked, $(wc -l < "$map_file" | tr -d ' ') CORS origins"
+
+# VRMS spec 0025, AC-4, AC-5: the Sentry tunnel. All three blank: both routes answer 404. All
+# three set and valid: each route forwards to its own project's envelope address. Anything else
+# stops the start, naming the setting.
+tunnel_file=/etc/nginx/generated/monitoring.conf
+tunnel_host=${SENTRY_INGEST_HOST-}
+tunnel_names="SENTRY_INGEST_HOST SENTRY_PROJECT_VRMS_WEB SENTRY_PROJECT_PORTAL"
+tunnel_set=0
+for name in $tunnel_names; do
+  eval "value=\${$name-}"
+  [ -z "$value" ] || tunnel_set=$((tunnel_set + 1))
+done
+if [ "$tunnel_set" -eq 0 ]; then
+  {
+    echo 'location = /monitoring/vrms-web { return 404; }'
+    echo 'location = /monitoring/portal { return 404; }'
+  } > "$tunnel_file"
+  tunnel_state=off
+else
+  for name in $tunnel_names; do
+    eval "value=\${$name-}"
+    [ -n "$value" ] || fail "$name is required when any SENTRY_* tunnel setting is set (set all three, or none)"
+  done
+  matches 'o[0-9]+\.ingest(\.[a-z]{2})?\.sentry\.io' "$tunnel_host" \
+    || fail "SENTRY_INGEST_HOST must be a Sentry ingest host like o123.ingest.us.sentry.io (got '$tunnel_host')"
+  for name in SENTRY_PROJECT_VRMS_WEB SENTRY_PROJECT_PORTAL; do
+    eval "value=\$$name"
+    matches '[1-9][0-9]*' "$value" || fail "$name must be a Sentry project id, a positive whole number (got '$value')"
+  done
+  # One exact route forwarding to one project: $1 the route name, $2 the project id
+  tunnel_route() {
+    echo "location = /monitoring/$1 {"
+    echo "    set \$upstream https://$tunnel_host/api/$2/envelope/;"
+    echo "    include /etc/nginx/conf.d/snippets/tunnel.conf;"
+    echo "}"
+  }
+  {
+    tunnel_route vrms-web "$SENTRY_PROJECT_VRMS_WEB"
+    tunnel_route portal "$SENTRY_PROJECT_PORTAL"
+  } > "$tunnel_file"
+  tunnel_state=on
+fi
+
+echo "gateway: settings checked, $(wc -l < "$map_file" | tr -d ' ') CORS origins, Sentry tunnel $tunnel_state"
