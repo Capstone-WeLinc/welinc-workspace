@@ -1,4 +1,4 @@
-﻿name: vmms-environment
+name: vmms-environment
 
 services:
   vmms-db:
@@ -65,8 +65,6 @@ services:
     container_name: welinc_vmms_azurite
     restart: unless-stopped
     command: azurite-blob --blobHost 0.0.0.0 --blobPort 10000 --location /data --loose --skipApiVersionCheck
-    ports:
-      - "10000:10000"
     volumes:
       - vmms_azurite:/data
     networks:
