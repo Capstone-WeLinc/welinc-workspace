@@ -12,12 +12,24 @@ on:
     # daily at 06:00 Manila, so an auth change that drops a contract route shows within a day
     - cron: '0 22 * * *'
   workflow_dispatch:
+  # The gateway deploy runs these checks on exactly the commit it deploys (VRMS spec 0008 AC-22)
+  workflow_call:
+    inputs:
+      ref:
+        description: The full commit SHA to check
+        type: string
+        required: false
+        default: ''
+    secrets:
+      AUTH_REPO_READ_TOKEN:
+        required: true
 
 permissions:
   contents: read
 
+# A called run carries the caller's workflow name and event, so it never shares a group with a PR run
 concurrency:
-  group: ci-${{ github.ref }}
+  group: ci-${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
@@ -26,6 +38,8 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.ref }}
       # az ships on the runner and installs Bicep on first use
       - name: Bicep compiles
         run: |
@@ -41,6 +55,8 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.ref }}
       - uses: actions/setup-node@v7
         with:
           node-version: 24
@@ -51,6 +67,8 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.ref }}
       # A missing secret (a fork's pull request gets none) fails here by name, never passes silently.
       - name: AUTH_REPO_READ_TOKEN is set
         env:

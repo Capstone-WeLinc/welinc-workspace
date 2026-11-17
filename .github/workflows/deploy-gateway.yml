@@ -1,0 +1,183 @@
+name: Deploy gateway
+
+# VRMS spec 0008, Gateway CD. The workspace repo has only main, so nothing is promoted here.
+#
+#   Staging:    every push to main that changes infra/gateway/.
+#   Production: Actions > Deploy gateway > Run workflow, on main. With no sha it deploys the newest
+#               main commit that changed infra/gateway/ (only those commits have a gateway image);
+#               with a sha it deploys that older main commit (a rollback).
+#
+# Every run passes the workspace checks on the exact commit first (the deploy guard, AC-22).
+on:
+  push:
+    branches: [main]
+    paths: ['infra/gateway/**']
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: 'Rollback only: an older main commit that changed infra/gateway (all 40 characters). Leave empty for the newest.'
+        type: string
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-${{ github.repository }}-gateway-${{ github.event_name == 'push' && 'staging' || 'production' }}
+  cancel-in-progress: false
+
+jobs:
+  target:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      environment: ${{ steps.pick.outputs.environment }}
+      sha: ${{ steps.pick.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - id: pick
+        env:
+          EVENT: ${{ github.event_name }}
+          REF: ${{ github.ref }}
+          HEAD_SHA: ${{ github.sha }}
+          INPUT_SHA: ${{ inputs.sha }}
+        run: |
+          set -euo pipefail
+          out() { printf '%s=%s\n' "$1" "$2" >> "$GITHUB_OUTPUT"; }
+          if [ "$EVENT" = push ]; then
+            out environment staging; out sha "$HEAD_SHA"
+            exit 0
+          fi
+          if [ "$REF" != refs/heads/main ]; then
+            echo "::error::Production runs only from main: pick 'Use workflow from: main'."
+            exit 1
+          fi
+          if [ -n "$INPUT_SHA" ]; then
+            if ! [[ "$INPUT_SHA" =~ ^[0-9a-f]{40}$ ]]; then
+              echo "::error::sha must be a full commit id: 40 characters, 0 to 9 and a to f."
+              exit 1
+            fi
+            sha="$INPUT_SHA"
+          else
+            sha="$(git log -1 --format=%H -- infra/gateway)"
+          fi
+          out environment production; out sha "$sha"
+
+  # The deploy guard (AC-22): the workspace checks (Bicep, shellcheck, gateway routes, contract
+  # routes) on exactly the commit being deployed
+  ci:
+    needs: target
+    uses: ./.github/workflows/ci.yml
+    with:
+      ref: ${{ needs.target.outputs.sha }}
+    secrets:
+      AUTH_REPO_READ_TOKEN: ${{ secrets.AUTH_REPO_READ_TOKEN }}
+
+  deploy:
+    needs: [target, ci]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      ENVIRONMENT: ${{ needs.target.outputs.environment }}
+      SHA: ${{ needs.target.outputs.sha }}
+      APP: ${{ vars.CONTAINER_APP }}
+      ACR: ${{ vars.ACR_NAME }}
+      RG: ${{ needs.target.outputs.environment == 'staging' && vars.RESOURCE_GROUP_STAGING || vars.RESOURCE_GROUP_PROD }}
+      API_URL: ${{ needs.target.outputs.environment == 'staging' && vars.STAGING_API_URL || vars.PROD_API_URL }}
+      PORTAL_URL: ${{ needs.target.outputs.environment == 'staging' && vars.STAGING_PORTAL_URL || vars.PROD_PORTAL_URL }}
+      VRMS_URL: ${{ needs.target.outputs.environment == 'staging' && vars.STAGING_VRMS_URL || vars.PROD_VRMS_URL }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.target.outputs.sha }}
+          fetch-depth: 0
+
+      - name: Production only deploys a commit that is on main
+        if: env.ENVIRONMENT == 'production'
+        run: |
+          set -euo pipefail
+          git fetch -q origin main
+          git merge-base --is-ancestor "$SHA" origin/main \
+            || { echo "::error::$SHA is not on main."; exit 1; }
+
+      # The workspace's staging and production logins both trust main; only this manual run uses
+      # the production one (AC-11)
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ env.ENVIRONMENT == 'staging' && vars.AZURE_CLIENT_ID_STAGING || vars.AZURE_CLIENT_ID_PROD }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Image name
+        run: |
+          set -euo pipefail
+          server="$(az acr show -n "$ACR" --query loginServer -o tsv)"
+          {
+            echo "IMAGE=$server/$APP:$SHA"
+            echo "SUFFIX=r${SHA:0:7}-${{ github.run_attempt }}"
+          } >> "$GITHUB_ENV"
+
+      - name: Build and push the image
+        if: env.ENVIRONMENT == 'staging'
+        run: |
+          set -euo pipefail
+          az acr login -n "$ACR"
+          docker build -t "$IMAGE" infra/gateway
+          docker push "$IMAGE"
+
+      - name: The image exists
+        if: env.ENVIRONMENT == 'production'
+        run: |
+          az acr repository show -n "$ACR" --image "$APP:$SHA" -o none \
+            || { echo "::error::$APP:$SHA is not in the registry. Only a commit that changed infra/gateway has one."; exit 1; }
+
+      - name: New revision
+        run: az containerapp update -n "$APP" -g "$RG" --image "$IMAGE" --revision-suffix "$SUFFIX" -o none
+
+      # Ready and holding all traffic, or the deploy fails and the old revision keeps serving
+      - name: Wait for the revision
+        run: |
+          set -euo pipefail
+          revision="$APP--$SUFFIX"
+          for _ in $(seq 1 36); do
+            app="$(az containerapp show -n "$APP" -g "$RG" -o json)"
+            ready="$(jq -r '.properties.latestReadyRevisionName // ""' <<<"$app")"
+            latest="$(jq -r '.properties.latestRevisionName // ""' <<<"$app")"
+            if [ "$ready" = "$revision" ]; then
+              weight="$(az containerapp revision show -n "$APP" -g "$RG" --revision "$revision" \
+                --query properties.trafficWeight -o tsv)"
+              [ "$weight" = 100 ] && { echo "$revision is ready and holds 100% of traffic."; exit 0; }
+            fi
+            state="$(az containerapp revision show -n "$APP" -g "$RG" --revision "$revision" \
+              --query properties.runningState -o tsv 2>/dev/null || true)"
+            if [ "$latest" = "$revision" ] && [ "$state" = Failed ]; then
+              echo "::error::$revision failed to start. The previous revision keeps serving."
+              exit 1
+            fi
+            sleep 10
+          done
+          echo "::error::$revision was not ready with all traffic after 6 minutes. The previous revision keeps serving."
+          exit 1
+
+      # AC-9: every health route (each checks its database) and both web apps, for up to 3 minutes
+      - name: Smoke test
+        run: |
+          set -euo pipefail
+          urls=("$API_URL/health" "$API_URL/auth/health" "$API_URL/vrms/health" "$PORTAL_URL/" "$VRMS_URL/")
+          deadline=$((SECONDS + 180))
+          for url in "${urls[@]}"; do
+            until code="$(curl -s -o /dev/null -w '%{http_code}' --max-time 15 "$url")" && [ "$code" = 200 ]; do
+              if [ "$SECONDS" -ge "$deadline" ]; then
+                echo "::error::$url answered ${code:-nothing}, not 200."
+                exit 1
+              fi
+              sleep 10
+            done
+            echo "ok  $url"
+          done
