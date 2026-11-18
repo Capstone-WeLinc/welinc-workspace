@@ -1,0 +1,46 @@
+name: Purge images
+
+# The trial subscription blocks ACR Tasks, so the registry's weekly cleanup runs here instead:
+# infra/scripts/purge-images.sh keeps the newest 15 tags of every image and deletes the rest.
+# Its login (welinc-registry-purge) holds only Reader and AcrDelete on the registry.
+on:
+  schedule:
+    # Sundays 03:00 UTC (11:00 Manila), the slot the ACR task would have used
+    - cron: '0 3 * * 0'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: List what would be deleted, delete nothing
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: purge-images
+  cancel-in-progress: false
+
+jobs:
+  purge:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID_PURGE }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      - name: Purge
+        env:
+          DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
+        run: |
+          if [ "$DRY_RUN" = true ]; then
+            bash infra/scripts/purge-images.sh --dry-run
+          else
+            bash infra/scripts/purge-images.sh
+          fi

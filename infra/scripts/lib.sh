@@ -19,6 +19,10 @@ need() { command -v "$1" >/dev/null 2>&1 || die "$1 is not installed"; }
 
 env_rg() { echo "rg-welinc-$1"; }
 
+# The region of one environment's resources (region.env): production has its own.
+env_location() { if [ "$1" = prod ]; then echo "$PROD_LOCATION"; else echo "$LOCATION"; fi; }
+env_postgres_location() { if [ "$1" = prod ]; then echo "$PROD_POSTGRES_LOCATION"; else echo "$POSTGRES_LOCATION"; fi; }
+
 check_env() {
   case "${1:-}" in staging|prod) ;; *) die "environment must be staging or prod" ;; esac
 }
@@ -50,14 +54,14 @@ open_firewall() {
   ip="$(curl -fsS https://api.ipify.org)" || die "could not find this machine's public address"
   FIREWALL_ENV="$env"
   note "opening psql-welinc-$env to $ip for this run"
-  az postgres flexible-server firewall-rule create -g "$(env_rg "$env")" -n "psql-welinc-$env" \
-    --rule-name laptop-temporary --start-ip-address "$ip" --end-ip-address "$ip" -o none
+  az postgres flexible-server firewall-rule create -g "$(env_rg "$env")" --server-name "psql-welinc-$env" \
+    --name laptop-temporary --start-ip-address "$ip" --end-ip-address "$ip" -o none
   trap close_firewall EXIT
 }
 
 close_firewall() {
   [ -n "${FIREWALL_ENV:-}" ] || return 0
   note "closing the temporary firewall rule"
-  az postgres flexible-server firewall-rule delete -g "$(env_rg "$FIREWALL_ENV")" -n "psql-welinc-$FIREWALL_ENV" \
-    --rule-name laptop-temporary --yes -o none || echo "warning: remove rule laptop-temporary by hand" >&2
+  az postgres flexible-server firewall-rule delete -g "$(env_rg "$FIREWALL_ENV")" --server-name "psql-welinc-$FIREWALL_ENV" \
+    --name laptop-temporary --yes -o none || echo "warning: remove rule laptop-temporary by hand" >&2
 }

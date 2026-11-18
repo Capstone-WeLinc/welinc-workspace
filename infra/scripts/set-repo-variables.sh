@@ -32,7 +32,10 @@ common() {
   set_var "$1" "AZURE_CLIENT_ID_$ENV" "$client"
   set_var "$1" ACR_NAME "$(registry_name)"
   set_var "$1" "RESOURCE_GROUP_$ENV" "$(env_rg "$env")"
+  # Every deploy's smoke test calls all three (spec 0008 AC-9); the web builds read the first two
   set_var "$1" "${ENV}_API_URL" "https://$(host api)"
+  set_var "$1" "${ENV}_PORTAL_URL" "https://$(host portal)"
+  set_var "$1" "${ENV}_VRMS_URL" "https://$(host vrms)"
 }
 
 note "writing $env variables"
@@ -49,10 +52,11 @@ for pair in welinc-web-portal:portal welinc-web-vrms:vrms; do
   w="${pair##*:}"
   common "$repo"
   set_var "$repo" "STATIC_WEB_APP_$ENV" "$(web "$w")"
-  set_var "$repo" "${ENV}_PORTAL_URL" "https://$(host portal)"
-  set_var "$repo" "${ENV}_WEB_URL" "https://$(host "$w")"
 done
 
 common welinc-workspace
 set_var welinc-workspace CONTAINER_APP api-gateway
+# The weekly image cleanup (.github/workflows/purge-images.yml); one login for both environments
+purge="$(jq -r '.purge.clientId // ""' "$INFRA/env/logins.json")"
+[ -z "$purge" ] || set_var welinc-workspace AZURE_CLIENT_ID_PURGE "$purge"
 note "done"
