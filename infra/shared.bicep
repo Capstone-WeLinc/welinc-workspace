@@ -9,7 +9,7 @@ param pushPrincipalIds array = []
 @description('Principal id of the weekly image cleanup login (.github/workflows/purge-images.yml in the workspace). It gets Reader on the registry (to list repositories and tags) and AcrDelete to remove old ones, nothing else.')
 param purgePrincipalId string = ''
 
-@description('ACR Tasks can be paused on free credit subscriptions; set false and run infra/scripts/purge-images.sh weekly instead.')
+@description('ACR Tasks can be paused on free credit subscriptions; set false and .github/workflows/purge-images.yml runs infra/scripts/purge-images.sh weekly instead.')
 param purgeTask bool = true
 
 resource registry 'Microsoft.ContainerRegistry/registries@2023-07-01' = {

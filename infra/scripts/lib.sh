@@ -35,6 +35,8 @@ private_file() {
 
 # The shared registry's name (created by `apply.sh shared`)
 registry_name() {
+  # ACR_NAME wins when set: the purge login can read only the registry, not list its resource group
+  if [ -n "${ACR_NAME:-}" ]; then echo "$ACR_NAME"; return; fi
   az acr list -g "$SHARED_RG" --query '[0].name' -o tsv 2>/dev/null | grep . \
     || die "no registry in $SHARED_RG yet: run apply.sh shared first"
 }

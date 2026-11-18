@@ -147,6 +147,25 @@ What the hosted setup already allows for: `bms-analytics-projection` is defined 
 
 **Workspace.** The workspace keeps `main` as its only branch: its CI and the gateway's staging deploy run on pushes to `main`, and the gateway's production deploy is a manual run on `main`. Both of its logins trust `main`; only the manual production run uses the production login.
 
+## Trial subscription findings (2026-11-19)
+
+Task 13 ran on the real subscription, a teammate's $200 trial, and three things differed from what the Bicep assumed.
+
+**One Container Apps environment per region.** `ManagedEnvironmentCount` is 1 in Southeast Asia, East Asia, Japan East, Korea Central, Australia East and Central India. Options:
+- **Production in a second region (chosen).** Pros: staging and production keep separate environments, the same app names and the AC-11 login boundary; one setting (`PROD_LOCATION`). Cons: a second region to remember; production pulls images across regions (cents).
+- **One environment for both.** Pros: one region, a few dollars less. Cons: no network wall between staging and production, every app renamed (contract 0001 fixes the names), group logins with join rights next to production, a spec change days before Nov 20.
+- **Ask for a quota increase.** Pros: nothing changes. Cons: trials are usually refused or slow, and production goes live Nov 20.
+
+**ACR Tasks blocked** (`TasksOperationsNotAllowed`). Options:
+- **A scheduled workspace workflow with its own login (chosen).** Pros: automatic; the login can only list and delete images. Cons: a seventh login, a minute of Actions a week.
+- **Run `purge-images.sh` by hand weekly.** Pros: nothing new. Cons: easy to forget. Basic's 10 GB makes forgetting harmless for weeks, but automation costs almost nothing.
+
+The purge login gets Reader, not AcrPull: listing a registry's repositories needs a read role on it, and AcrPull only pulls.
+
+**Azure CLI 2.93** renamed the firewall rule arguments (`--server-name` for the server, `--name` for the rule), so `db-init.sh` failed until `lib.sh` changed.
+
+**Two corrections found on the way.** `set-repo-variables.sh` gave `STAGING_PORTAL_URL` only to the web repos and named the VRMS address `STAGING_WEB_URL`, while every deploy's smoke test reads `STAGING_PORTAL_URL` and `STAGING_VRMS_URL`; fixed in #58 (and #49). Task 13 said the first production run would move `main` up, but a manual run reads the workflow file on `main`, which has none until `main` is fast forwarded once.
+
 ## References
 
 **Project sources** (verifiable, in this repo):
@@ -161,7 +180,7 @@ What the hosted setup already allows for: `bms-analytics-projection` is defined 
 - Additive database migrations so a rollback stays safe; a change freeze around a release window.
 - Least privilege for CI and for each team's deploy identity.
 - OpenID Connect federated credentials for GitHub Actions to Azure login.
-- SPF, DKIM and DMARC for transactional mail.
+- DKIM, the provider's domain code and DMARC for transactional mail (Brevo needs no SPF record: it sends from its own return path).
 
 **Links** (web verified on 2026-10-25):
 - Azure for Students: https://azure.microsoft.com/en-us/free/students
