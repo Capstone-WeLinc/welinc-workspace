@@ -6,6 +6,9 @@ param location string = resourceGroup().location
 @description('Principal ids of every deploy login (ours, VMMS, BMS; staging and production). Each gets AcrPush, which also covers reading tags.')
 param pushPrincipalIds array = []
 
+@description('Principal id of the weekly image cleanup login (.github/workflows/purge-images.yml in the workspace). It gets Reader on the registry (to list repositories and tags) and AcrDelete to remove old ones, nothing else.')
+param purgePrincipalId string = ''
+
 @description('ACR Tasks can be paused on free credit subscriptions; set false and run infra/scripts/purge-images.sh weekly instead.')
 param purgeTask bool = true
 
@@ -66,6 +69,19 @@ resource push 'Microsoft.Authorization/roleAssignments@2022-04-01' = [for id in 
   properties: {
     roleDefinitionId: acrPush
     principalId: id
+    principalType: 'ServicePrincipal'
+  }
+}]
+
+var reader = subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'acdd72a7-3385-48ef-bd42-f606fba81ae7')
+var acrDelete = subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'c2f4ef07-c644-48eb-af81-4b1b4947fb11')
+
+resource purgeRoles 'Microsoft.Authorization/roleAssignments@2022-04-01' = [for role in (empty(purgePrincipalId) ? [] : [reader, acrDelete]): {
+  scope: registry
+  name: guid(registry.id, purgePrincipalId, role)
+  properties: {
+    roleDefinitionId: role
+    principalId: purgePrincipalId
     principalType: 'ServicePrincipal'
   }
 }]

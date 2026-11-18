@@ -97,7 +97,8 @@ case "$target" in
     az group create -n "$SHARED_RG" -l "$LOCATION" -o none
     jq '[.staging, .prod | .[] | .principalId | select(. != "")]' "$INFRA/env/logins.json" >"$TMP/push.json"
     deploy group welinc-shared -g "$SHARED_RG" -f "$INFRA/shared.bicep" \
-      -p location="$LOCATION" -p pushPrincipalIds=@"$TMP/push.json" -p purgeTask="${PURGE_TASK:-true}"
+      -p location="$LOCATION" -p pushPrincipalIds=@"$TMP/push.json" -p purgeTask="${PURGE_TASK:-true}" \
+      -p purgePrincipalId="$(jq -r '.purge.principalId // ""' "$INFRA/env/logins.json")"
     ;;
 
   budget)

@@ -1,11 +1,11 @@
 {
   "_readme": "Filled in task 13 when the six app registrations exist (ids, not secrets). clientId goes to the repo variables; principalId (the service principal object id) to the role assignments.",
-  "tenantId": "",
-  "subscriptionId": "",
+  "tenantId": "78149761-3c73-4551-8080-519a3b2f7b89",
+  "subscriptionId": "f05c8155-01b4-4261-84b1-30acec35530f",
   "staging": {
     "ours": {
-      "clientId": "",
-      "principalId": ""
+      "clientId": "22be0aab-d625-4d22-952b-0f939e6fdf8f",
+      "principalId": "3462871c-dfc0-4fad-9baf-3a54acff964b"
     },
     "vmms": {
       "clientId": "",
@@ -18,8 +18,8 @@
   },
   "prod": {
     "ours": {
-      "clientId": "",
-      "principalId": ""
+      "clientId": "757ca9ed-f44c-4639-a658-b53d0b38df4d",
+      "principalId": "2eea0914-35ce-4b6a-9b8d-60b573cca735"
     },
     "vmms": {
       "clientId": "",
@@ -29,5 +29,9 @@
       "clientId": "",
       "principalId": ""
     }
+  },
+  "purge": {
+    "clientId": "e3d153d6-0dcc-440c-a6e8-f621aabf51cb",
+    "principalId": "f0222e02-c20c-45f4-a8f6-3247a9d0b86f"
   }
 }
