@@ -40,6 +40,10 @@ _These are recommendations to keep the build orderly, not requirements. Skip any
 | S15 | Authenticator app sign in for admins | Admin | planned |
 | S16 | Temporary lockout and a clear deactivated answer | Account | done |
 | S17 | Contract and code agree on errors | Contract | planned |
+| S18 | Design direction refresh | Design | planned |
+| S19 | Person page shows only the person's systems | Design | planned |
+| S20 | Permissions page redesign | Design | planned |
+| S21 | Custom roles per system | Configuration | planned |
 
 ## Contract
 
@@ -368,6 +372,32 @@ Settle every place where contract 0001 and welinc-auth disagree, found while bui
 - Note (2026-11-17, replan): before the integration defense (Dec 4), after hosting goes live. Most items are contract wording; the code changes are small. The picture 500 is a real bug and can go first through `/debug` without waiting for the spec. Do it with or before S11's cleanup (contract version 9), so the contract moves once.
 - Note (2026-11-17, evening replan): the picture bug is fixed and merged (welinc-auth #54, `8db742e`): a wrong or missing file now answers 400, not 500. The rest of the spec 0026 list still waits for the spec.
 - [ ] Design it (spec): `/architect contract and code agree on errors`
+
+## Design
+
+### S18. Design direction refresh · planned · needs a decision · Beta
+Rewrite the suite `design.md` so screens stop coming out as the default shadcn look: keep the guardrails (tokens, contrast, status pills, four states, touch targets, no cards in cards) and add what makes WeLinc recognizable (a stronger type scale with display headings, layered surfaces, gold as a real accent, a short Signature section, a small motion vocabulary). Drop the tinted icon square KPI rule. VRMS's own `docs/context/vrms/design.md` follows where it repeats the old rules.
+**Done when:** a suite spec records the chosen direction, `design.md` is rewritten from it in a PR, and the portal and web-vrms tokens and base components match it.
+- Note (2026-11-18): raised by you: screens look plain, stale and AI made. Before the mock defense (Nov 28) apply the new direction to S19, S20 and the VRMS screens you demo, not to every page. Compare 2 or 3 visual directions before the spec.
+- [ ] Design it (spec): `/architect design direction refresh`
+
+### S19. Person page shows only the person's systems · planned · needs a decision · Beta
+A suite admin opening a person who isn't in the selected system hits a dead end with no name or email. Show the person header in every case, system tabs only for the systems the person is in (none when they are in one), and open on a system they are actually in.
+**Done when:** opening any person from People never shows the "isn't in this system" dead end, a one system person shows no tabs, and welinc-auth tells a suite admin which systems a person is in without guessing one first (an additive contract change).
+- [ ] Design it (spec): `/architect person page systems`
+
+### S20. Permissions page redesign · planned · needs a decision · Beta
+Replace the long checkbox grid with a role first view: pick a role, see its permissions in grouped sections with switches and plain descriptions, locks in place. Keep the full grid as a grouped "Compare roles" view, and send changes through a pending changes bar into the existing review dialog.
+**Done when:** an admin can read and change one role's permissions without scanning 27 rows by 3 columns, the compare view still shows every role, and saving still goes through the review step and the matrix history.
+- [ ] Design it (spec): `/architect permissions page redesign`
+
+## Configuration
+
+### S21. Custom roles per system · planned · needs a decision · GA
+Let a suite admin create, rename, duplicate and delete roles per system instead of the fixed list in each `prisma/catalog/<system>.ts`. Built in roles stay (renamable, never deletable); custom roles start as a copy of one. Behaviour that today keys on a role name (the VRMS mechanic list and audit events) moves to a permission such as "can be assigned tickets".
+**Done when:** a suite admin makes a custom VRMS role in the portal, gives it to a person, and that person's token and permissions follow it; deleting a role that people still hold is refused until they are moved; VMMS and BMS keep working on their built in roles, and contract 0001 gets a version with a Changes line.
+- Note (2026-11-18): your call: as much configurable as makes sense. The R2 mockup (role list with built in and custom sections) is the starting point; the S20 permissions redesign should be built so a longer role list fits.
+- [ ] Design it (spec): `/architect custom roles per system`
 
 ## Why this order
 

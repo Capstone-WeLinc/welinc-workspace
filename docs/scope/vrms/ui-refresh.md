@@ -173,3 +173,9 @@ spec [0024](../../specs/vrms/0024-ticket-detail-redesign/index.md) · code in `w
   - Note (2026-11-17, replan): partial pass, 12 more steps ticked in `verify.md` (row states, Returned, open rows kept on reload and refresh, `#issue-N`, the AI card). Still open among the major flows: the default open rule on an In progress ticket (AC-4, AC-6), Activity's 5 newest and Show all (AC-15), keyboard folding (AC-1), and axe (AC-19, AC-20). The other open steps wait for the full verify run after the build out.
 - [ ] Test it: `/test ticket detail redesign`
 - [ ] Polish it (optional, ask first): `impeccable` · `web-design-guidelines` · `break-ui` (10 issues with 20 steps each, long issue text, no known fix, returned issues)
+
+### 70. Navigation redesign · planned · needs a decision
+Rework the VRMS sidebar (and the portal Admin sidebar to match): a system switcher dropdown at the top, folding sections, a primary New repair button, queue counts, and an account menu at the bottom, instead of today's flat list.
+**Done when:** the chosen sidebar ships in web-vrms and the portal Admin, keeps the permission gating of `navItems.ts`, folds to icons on desktop, and still becomes the tab bar or sheet on phones.
+- Note (2026-11-18): raised by you: the sidebar is too plain. Four options are mocked up (N1 to N4 on the design directions canvas). Build it on the S18 design direction; the portal Admin half rides with S19 and S20.
+- [ ] Design it (spec): `/architect navigation redesign`

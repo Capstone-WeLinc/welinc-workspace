@@ -18,11 +18,11 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | Epic | File | Status |
 |---|---|---|
 | Foundations | [foundations.md](foundations.md) | 8 existing, 7 done, 1 planned |
-| UI refresh | [ui-refresh.md](ui-refresh.md) | 3 done, 6 in-progress, 2 planned, 1 dropped |
+| UI refresh | [ui-refresh.md](ui-refresh.md) | 3 done, 6 in-progress, 3 planned, 1 dropped |
 | Repair workflow | [repair-workflow.md](repair-workflow.md) | 12 done, 1 in-progress, 9 planned, 1 dropped |
 | Platform | [platform.md](platform.md) | 2 done, 3 in-progress, 4 planned, 3 dropped |
 | Outsourcing | [outsourcing.md](outsourcing.md) | 4 planned |
-| Operations | [operations.md](operations.md) | 5 planned, 1 dropped |
+| Operations | [operations.md](operations.md) | 6 planned, 1 dropped |
 | Reports & AI | [reports-ai.md](reports-ai.md) | 4 planned |
 
 ## At a glance
@@ -61,6 +61,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 51 | Analytics page | UI refresh | planned |
 | 64 | Audit log page redesign | UI refresh | planned |
 | 65 | Ticket detail redesign | UI refresh | in-progress |
+| 70 | Navigation redesign | UI refresh | planned |
 | 16 | Ticket status lifecycle | Slice 1 | done |
 | 17 | Chief Mechanic role | Slice 1 | done |
 | 18 | New repair ticket & assignment | Slice 1 | done |
@@ -100,6 +101,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 43 | Stuck and stale ticket alerts | Slice 5 | planned |
 | 44 | Driver role | Slice 5 | planned |
 | 59 | Mechanic home garage | Slice 5 | planned |
+| 71 | Company profile settings | Slice 5 | planned |
 | 45 | Reports module with filters & export | Slice 6 | planned |
 | 46 | Ready made reports | Slice 6 | planned |
 | 47 | AI repair suggestions | Slice 6 | planned |
