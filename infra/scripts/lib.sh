@@ -19,6 +19,10 @@ need() { command -v "$1" >/dev/null 2>&1 || die "$1 is not installed"; }
 
 env_rg() { echo "rg-welinc-$1"; }
 
+# The region of one environment's resources (region.env): production has its own.
+env_location() { if [ "$1" = prod ]; then echo "$PROD_LOCATION"; else echo "$LOCATION"; fi; }
+env_postgres_location() { if [ "$1" = prod ]; then echo "$PROD_POSTGRES_LOCATION"; else echo "$POSTGRES_LOCATION"; fi; }
+
 check_env() {
   case "${1:-}" in staging|prod) ;; *) die "environment must be staging or prod" ;; esac
 }

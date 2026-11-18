@@ -112,7 +112,7 @@ case "$target" in
     secrets="$(private_file "$env")"
     register_providers
     acr="$(registry_name)"
-    az group create -n "$rg" -l "$LOCATION" -o none
+    az group create -n "$rg" -l "$(env_location "$env")" -o none
 
     current_images "$env" >"$TMP/images.json"
     note "images kept: $(jq -c . "$TMP/images.json")"
@@ -126,7 +126,7 @@ case "$target" in
 
     deploy group welinc-env -g "$rg" -f "$INFRA/env.bicep" \
       -p @"$INFRA/env/$env.parameters.json" \
-      -p location="$LOCATION" postgresLocation="$POSTGRES_LOCATION" registryName="$acr" \
+      -p location="$(env_location "$env")" postgresLocation="$(env_postgres_location "$env")" registryName="$acr" \
       -p bindDomains="$domains" gatewayCertExists="$certExists" \
       -p images=@"$TMP/images.json" -p logins=@"$TMP/logins.json" -p secrets=@"$secrets"
 

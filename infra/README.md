@@ -36,4 +36,5 @@ Run `apply.sh <env>` again any time: it keeps each app's current image and chang
 - **First image of an app.** A new app starts on Microsoft's placeholder image (port 80, no probes). After its first image is pushed, run `apply.sh <env>` once: it finds the newest pushed image and sets the real port and probes.
 - **VMMS and BMS** are off (`enabledGroups: []`) until their S11 moves can deploy. Turning a group on creates its apps and jobs from contract 0001 sections 2 and 3; `groupApps` overrides a health path or adds settings, and their secrets go under `groups` in the private file.
 - **A secret change** reaches a running app only after a restart. `rotate-secret.sh` does both; put the value in the private file too, or the next apply sets the old one back.
+- **One Container Apps environment per region** on the trial subscription, so production runs in its own region (`PROD_LOCATION` in `env/region.env`). The registry stays in staging's region; production pulls across.
 - **ACR Tasks** can be paused on free credit subscriptions. If `apply.sh shared` fails on the purge task, run it with `PURGE_TASK=false` and run `purge-images.sh` weekly.
