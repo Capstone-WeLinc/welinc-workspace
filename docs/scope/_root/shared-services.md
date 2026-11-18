@@ -40,7 +40,7 @@ _These are recommendations to keep the build orderly, not requirements. Skip any
 | S15 | Authenticator app sign in for admins | Admin | planned |
 | S16 | Temporary lockout and a clear deactivated answer | Account | done |
 | S17 | Contract and code agree on errors | Contract | planned |
-| S18 | Design direction refresh | Design | planned |
+| S18 | Design direction refresh | Design | in-progress |
 | S19 | Person page shows only the person's systems | Design | planned |
 | S20 | Permissions page redesign | Design | planned |
 | S21 | Custom roles per system | Configuration | planned |
@@ -375,11 +375,20 @@ Settle every place where contract 0001 and welinc-auth disagree, found while bui
 
 ## Design
 
-### S18. Design direction refresh · planned · needs a decision · Beta
+### S18. Design direction refresh · in-progress · Beta
 Rewrite the suite `design.md` so screens stop coming out as the default shadcn look: keep the guardrails (tokens, contrast, status pills, four states, touch targets, no cards in cards) and add what makes WeLinc recognizable (a stronger type scale with display headings, layered surfaces, gold as a real accent, a short Signature section, a small motion vocabulary). Drop the tinted icon square KPI rule. VRMS's own `docs/context/vrms/design.md` follows where it repeats the old rules.
 **Done when:** a suite spec records the chosen direction, `design.md` is rewritten from it in a PR, and the portal and web-vrms tokens and base components match it.
 - Note (2026-11-18): raised by you: screens look plain, stale and AI made. Before the mock defense (Nov 28) apply the new direction to S19, S20 and the VRMS screens you demo, not to every page. Compare 2 or 3 visual directions before the spec.
-- [ ] Design it (spec): `/architect design direction refresh`
+- Spec: [0016](../../specs/_root/0016-design-direction-refresh/index.md)
+- Note (2026-11-18): direction B "Control room" decided over rounds 1 to 11 on the design canvas (IBM Plex, K15 StatCard, 640px save bar, L3 labels, icon collapse kept). Every page of the portal and web-vrms moves to it, but the build waits for your go.
+- [x] Design it (spec): `/architect design direction refresh`
+- [ ] Build it: `/develop design direction refresh` (start only when you say go)
+  - [ ] Standard and tracer slice: `design.md` rewrite, token check, Plex fonts, tokens, `Button` and `Card` on one page per app (AC-1 to AC-6, AC-10)
+  - [ ] Base components: fields, switch, segmented control, tabs, dialogs, menus, tables, toasts, banners (AC-5, AC-7 to AC-12)
+  - [ ] New components and shell: `PageHeader`, `StatCard`, `RoleChip`, `InitialsTile`, `SaveBar` with drafts, sidebar collapse, lint additions (AC-13 to AC-17)
+  - [ ] Page sweep and checks: every page in both apps, contrast, axe, lint, typecheck, builds (AC-18 to AC-21)
+- [ ] Verify it: `/check verify design direction refresh`
+- [ ] Test it: `/test design direction refresh`
 
 ### S19. Person page shows only the person's systems · planned · needs a decision · Beta
 A suite admin opening a person who isn't in the selected system hits a dead end with no name or email. Show the person header in every case, system tabs only for the systems the person is in (none when they are in one), and open on a system they are actually in.

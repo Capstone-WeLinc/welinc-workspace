@@ -2,7 +2,8 @@
 
 **Date**: 2026-10-22
 **Status**: Accepted
-**Updated**: 2026-11-11 (staleness sweep). The status badge keys follow spec 0010's nine status names (`OPEN`, `ASSIGNED`, ... `CLOSED`; `PENDING`, `COMPLETED` and `PENDING_VERIFICATION` are gone); the High priority pill is the `highlight/25` tint with `highlight-foreground` text and every pill uses `BadgePill` (spec 0024 AC-19); `confirm()` and `confirmChoice()` gained a `warning` tone.
+**Updated**: 2026-11-18. The look values (colors, fonts, radius, shadows, motion curves, role badges) are superseded by suite spec [0016](../../_root/0016-design-direction-refresh/index.md); the token machinery, palette switch off and lint here stay.
+**Updated (earlier)**: 2026-11-11 (staleness sweep). The status badge keys follow spec 0010's nine status names (`OPEN`, `ASSIGNED`, ... `CLOSED`; `PENDING`, `COMPLETED` and `PENDING_VERIFICATION` are gone); the High priority pill is the `highlight/25` tint with `highlight-foreground` text and every pill uses `BadgePill` (spec 0024 AC-19); `confirm()` and `confirmChoice()` gained a `warning` tone.
 
 ## Summary
 
