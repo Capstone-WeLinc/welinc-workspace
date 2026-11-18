@@ -164,6 +164,8 @@ The purge login gets Reader, not AcrPull: listing a registry's repositories need
 
 **Azure CLI 2.93** renamed the firewall rule arguments (`--server-name` for the server, `--name` for the rule), so `db-init.sh` failed until `lib.sh` changed.
 
+**OIDC subject forms.** The first purge run failed with `AADSTS700213`: GitHub sent `repo:Capstone-WeLinc@286169427/welinc-workspace@1428870101:ref:refs/heads/main`, its newer default for repos created after the change, while the credentials used the plain form. The older repos still send the plain form. Options: switch every repo to the form with ids (needs an org admin token and changes the other groups' repos), or match each credential to what its repo sends (chosen: no GitHub setting changes, and the safer form wherever GitHub already uses it).
+
 **Two corrections found on the way.** `set-repo-variables.sh` gave `STAGING_PORTAL_URL` only to the web repos and named the VRMS address `STAGING_WEB_URL`, while every deploy's smoke test reads `STAGING_PORTAL_URL` and `STAGING_VRMS_URL`; fixed in #58 (and #49). Task 13 said the first production run would move `main` up, but a manual run reads the workflow file on `main`, which has none until `main` is fast forwarded once.
 
 ## References
