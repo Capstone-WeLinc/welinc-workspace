@@ -7,7 +7,7 @@ The WeLinc suite's setup as code: the gateway image, the Azure resources for sta
 | Path | What it holds |
 |---|---|
 | `gateway/` | The nginx gateway image (suite spec 0008), the same locally and hosted |
-| `shared.bicep` | `rg-welinc-shared`: the one container registry, its weekly purge (keeps 15 tags per image), AcrPush for every deploy login |
+| `shared.bicep` | `rg-welinc-shared`: the one container registry, its weekly purge (keeps 15 tags per image; on the trial a workspace workflow does it), AcrPush for every deploy login, Reader and AcrDelete for the purge login |
 | `subscription.bicep` | The budget alerts at $50, $100, $150 and $180 |
 | `env.bicep` | One environment in `rg-welinc-<env>`: PostgreSQL with its seven databases, storage, logs, the Container Apps environment, every app and job of every group, the four Static Web Apps, custom domains, roles |
 | `modules/` | The pieces `env.bicep` repeats: one Container App, one job, the platform, PostgreSQL, a Static Web App, the gateway certificate, the access rules |
@@ -37,4 +37,4 @@ Run `apply.sh <env>` again any time: it keeps each app's current image and chang
 - **VMMS and BMS** are off (`enabledGroups: []`) until their S11 moves can deploy. Turning a group on creates its apps and jobs from contract 0001 sections 2 and 3; `groupApps` overrides a health path or adds settings, and their secrets go under `groups` in the private file.
 - **A secret change** reaches a running app only after a restart. `rotate-secret.sh` does both; put the value in the private file too, or the next apply sets the old one back.
 - **One Container Apps environment per region** on the trial subscription, so production runs in its own region (`PROD_LOCATION` in `env/region.env`). The registry stays in staging's region; production pulls across.
-- **ACR Tasks** can be paused on free credit subscriptions. If `apply.sh shared` fails on the purge task, run it with `PURGE_TASK=false` and run `purge-images.sh` weekly.
+- **ACR Tasks** can be paused on free credit subscriptions. If `apply.sh shared` fails on the purge task, run it with `PURGE_TASK=false` (the default in `env/region.env` on the trial); `.github/workflows/purge-images.yml` then runs `purge-images.sh` every Sunday.
