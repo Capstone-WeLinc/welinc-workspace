@@ -51,3 +51,9 @@ Mechanics belong to no garage today (only tickets do). Give each in house mechan
 - Note (2026-10-29): later, CASL rules can use it, for example a Chief Mechanic verifying only tickets in their garage.
 - [ ] Design it (spec): `/architect mechanic home garage`
 - [ ] Polish it (optional, ask first): `web-design-guidelines` · `break-ui` (long garage names, mechanics with no garage)
+
+### 71. Company profile settings · planned · needs a decision
+A Company section in Admin Settings for what differs between companies: name and logo, garages (branches), working hours, the ticket ID prefix, and currency. Today these are fixed in code or seed data.
+**Done when:** an Admin changes each of these in Settings without a deploy, every change is audit logged like other settings, and screens and exports read them from the settings service.
+- Note (2026-11-18): your call: make as much configurable as makes sense. Roles become configurable in suite S21; lists stay with feature 40. The ticket status workflow and locked security rules stay fixed on purpose (a configurable workflow is a product of its own and would weaken verification and the audit trail).
+- [ ] Design it (spec): `/architect company profile settings`
