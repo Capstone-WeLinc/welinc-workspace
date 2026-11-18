@@ -138,11 +138,9 @@ services:
 
   bms-analytics:
     <<: *node
+    # Its own .env only: it holds the bms-analytics key, not the shared bms one
     env_file:
       - path: ./welinc-backend-bms-analytics-ai/.env
-        required: false
-      # The one BMS identity is authoritative over standalone analytics defaults.
-      - path: ./welinc-backend-bms/.env
         required: false
     build: { context: ./welinc-backend-bms-analytics-ai, dockerfile: Dockerfile.dev }
     container_name: welinc_bms_analytics
@@ -153,6 +151,7 @@ services:
       DISPATCH_API_URL: http://bms-dispatch:3022
       COMPLETION_API_URL: http://bms-completion:3023
       <<: *auth
+      AUTH_CLIENT_ID: bms-analytics
       PORT: 3025
       DATABASE_URL: postgresql://bms_user:bms_pass@bms-analytics-db:5432/bms_analytics_db
     depends_on: { bms-analytics-db: { condition: service_healthy } }
