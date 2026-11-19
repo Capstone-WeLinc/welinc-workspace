@@ -169,7 +169,7 @@ The web apps need no `.env`: they use the `.env.development` file that's already
 
 Optional extras (mail, AI) don't stop the app. If one is off, the app starts anyway and writes one warning line in its log, which you can read with `docker logs welinc_vrms_backend` or `docker logs welinc_auth_service`.
 
-Online (in production) the check is stricter: every address must use `https` and must not be `localhost`, cookies must be secure, and mail and file storage must be set. A bad setting there stops the deploy instead of breaking the live site.
+Online (staging runs in production mode) the check is stricter: every address must use `https` and must not be `localhost`, cookies must be secure, and mail and file storage must be set. A bad setting there stops the deploy instead of breaking the live site.
 
 Optional extras you can add to your `.env`:
 

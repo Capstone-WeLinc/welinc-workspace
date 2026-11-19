@@ -1,8 +1,8 @@
 # Links: where to look at what
 
-Every place to open, check or manage the suite, per system: local addresses, databases, API docs, hosted apps, and the outside accounts. It holds no passwords or keys: local database logins are in each compose file, hosted secrets in the password manager.
+Every address to open or check, per system. No passwords here: local ones are in each compose file, hosted ones with the lead.
 
-Only staging is hosted (VRMS spec 0008 AC-24): the Azure trial refused production's database server, so production exists as code only and has no address to open. Staging uses `welinc.app` with `staging-` in front (see [hosting.md](hosting.md)). Every app and job in Azure ends in `-staging`.
+Staging is the only hosted environment. Its addresses start with `staging-` on `welinc.app`, and every Azure app and job ends in `-staging`.
 
 ## Quick health check
 
@@ -15,9 +15,9 @@ Only staging is hosted (VRMS spec 0008 AC-24): the Azure trial refused productio
 | VMMS analytics | http://localhost:3000/vmms/analytics/health | https://staging-api.welinc.app/vmms/analytics/health |
 | BMS | http://localhost:3000/bms/health | https://staging-api.welinc.app/bms/health |
 
-A healthy answer is 200 with `{"status":"ok", ...}`. Before a group is turned on hosted, its routes answer 502 `UPSTREAM_UNAVAILABLE`.
+Healthy is 200 with `{"status":"ok", ...}`. A group not yet turned on in staging answers 502 `UPSTREAM_UNAVAILABLE`.
 
-The full contract check: `node scripts/check-system.mjs <vrms|vmms|bms>` from the workspace root (local stack).
+Full check of a system on your local stack: `node scripts/check-system.mjs <vrms|vmms|bms>` from the workspace root.
 
 ## Shared services
 
@@ -27,7 +27,7 @@ The full contract check: `node scripts/check-system.mjs <vrms|vmms|bms>` from th
 | [welinc-web-portal](https://github.com/Capstone-WeLinc/welinc-web-portal) | http://localhost:8000 | 8000 | https://staging-portal.welinc.app (Static Web App `swa-welinc-staging-portal`) |
 | Gateway (`infra/gateway/`) | http://localhost:3000 | 3000 | https://staging-api.welinc.app (Container App `api-gateway-staging`) |
 
-- **API docs (Scalar):** http://localhost:3000/auth/docs, and on staging https://staging-api.welinc.app/auth/docs. Never in production, if it is ever hosted (spec 0026). The committed copy is [`docs/openapi.json`](https://github.com/Capstone-WeLinc/welinc-auth/blob/development/docs/openapi.json).
+- **API docs (Scalar):** http://localhost:3000/auth/docs, and on staging https://staging-api.welinc.app/auth/docs. The committed copy is [`docs/openapi.json`](https://github.com/Capstone-WeLinc/welinc-auth/blob/development/docs/openapi.json).
 - **Database:** `localhost:5432`, database `welinc_auth_db`, user `welinc_auth_user` (container `welinc_auth_db`).
 - **Logs:** `docker logs -f welinc_auth_service`, `docker logs -f welinc_api_gateway`, `docker logs -f welinc_portal`.
 
@@ -38,7 +38,7 @@ The full contract check: `node scripts/check-system.mjs <vrms|vmms|bms>` from th
 | [welinc-backend-vrms](https://github.com/Capstone-WeLinc/welinc-backend-vrms) | http://localhost:3000/vrms/ | 3002 | Container App `vrms-backend-staging` |
 | [welinc-web-vrms](https://github.com/Capstone-WeLinc/welinc-web-vrms) | http://localhost:8001 | 8001 | https://staging-vrms.welinc.app (Static Web App `swa-welinc-staging-vrms`) |
 
-- **API docs (Scalar):** http://localhost:3000/vrms/docs, and on staging https://staging-api.welinc.app/vrms/docs. Never in production.
+- **API docs (Scalar):** http://localhost:3000/vrms/docs, and on staging https://staging-api.welinc.app/vrms/docs.
 - **Database:** `localhost:5433`, database `welinc_vrms_db`, user `welinc_vrms_user` (container `welinc_vrms_db`, pgvector).
 - **File storage:** Azurite on `localhost:10000` (container `welinc_vrms_azurite`). Open it in Azure Storage Explorer: *Attach to a local emulator*.
 - **Logs:** `docker logs -f welinc_vrms_backend`.
@@ -91,10 +91,10 @@ Open everything from the [Azure portal](https://portal.azure.com), *Resource gro
 
 | Resource group | What's in it |
 |---|---|
-| `rg-welinc-shared` | the container registry (`acrwelinc...`), shared by both environments |
-| `rg-welinc-staging` | everything for staging, the only hosted environment |
+| `rg-welinc-shared` | the container registry (`acrwelinc...`) |
+| `rg-welinc-staging` | everything else |
 
-There is no `rg-welinc-prod`: production is not hosted (spec 0008 AC-24). Inside staging:
+Inside `rg-welinc-staging`:
 
 - **Container Apps** (backends, the gateway, migrate and seed jobs): environment `cae-welinc-staging`; every app and job name ends in `-staging`. Each app's *Log stream* shows live logs, and *Revisions* lets you roll back.
 - **Logs and queries:** Log Analytics workspace `log-welinc-staging`.
@@ -108,16 +108,16 @@ Setup, order and gotchas: [infra/README.md](../../infra/README.md).
 ## GitHub
 
 - **Org:** https://github.com/Capstone-WeLinc
-- **CI and deploys:** each repo's *Actions* tab, for example https://github.com/Capstone-WeLinc/welinc-backend-vrms/actions. Staging deploys on every push to `development`. The "Run workflow" button on `main` is production's, and it stops at once with "production is not hosted" (spec 0008 AC-24).
+- **CI and deploys:** each repo's *Actions* tab, for example https://github.com/Capstone-WeLinc/welinc-backend-vrms/actions. Every push to `development` deploys staging. Don't press "Run workflow".
 - **Dependabot:** each repo's *Pull requests*, filtered by author `app/dependabot`.
 
 ## Outside accounts
 
 | Service | What for | Where |
 |---|---|---|
-| Sentry | errors from `vrms-backend`, `vrms-web`, `welinc-auth`, `welinc-portal` (spec 0025) | https://welinc.sentry.io (org `welinc`, US region; how it was set up: [infra/RUNBOOK.md](../../infra/RUNBOOK.md)) |
-| Brevo | the email welinc-auth sends (sign in codes, resets) | https://app.brevo.com (*Transactional*, then *Logs*) |
+| Sentry | errors from `vrms-backend`, `vrms-web`, `welinc-auth`, `welinc-portal` | https://welinc.sentry.io |
+| Brevo | the email welinc-auth sends (codes, resets, alerts) | https://app.brevo.com (*Transactional*, then *Logs*). Free plan: 300 emails a day |
 | Name.com | the `welinc.app` domain and its DNS records | https://www.name.com/account/domain |
 | Jira | the backlog, the source of truth | the team's Atlassian site |
 
-Logins for all of these live in the password manager.
+Ask the lead for access to any of these.
