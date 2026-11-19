@@ -114,7 +114,24 @@ Removing typed passwords (on create and on edit) finishes the rule that an admin
 
 The own change and admin change differ on purpose. Your own change has a working old inbox and a signed in session, so the safe pending model costs nothing. An admin change exists for the case where that inbox is gone, so it must switch at once, and the sign in step confirms it.
 
+### Amendment AC-34 (2026-11-20): no links in emails
+
+Found on staging: every link in our emails pointed at `bciaiagd.r.bh.d.sendibt3.com`, Brevo's click tracking redirect. From the lead's home network the page hung; the Mac couldn't open a TCP connection to its address (`172.246.243.65`, ports 80 and 443), while check-host.net reached it in under 0.25 s from 8 countries. So a Philippine network can block or misroute it, and a defense venue might be one.
+
+- **Remove the links, name the portal host in plain text (chosen).** Pros: works on any network, keeps Brevo, small change in three builder files. Cons: one more step for a new person.
+- **Turn click tracking off in Brevo.** Not offered on our plan: Brevo staff say disabling is "upon request and for our Enterprise customers".
+- **Move to Azure Communication Services Email.** Pros: no link rewriting, same subscription. Cons: DNS records after the domain transfer, a Bicep change and new sending setup days before the mock defense; overkill while Brevo itself delivers fine.
+- **Keep the links.** Cons: a spinning tab on some networks, in front of the panel.
+
+Cross checked on another model (2026-11-20), 6 fixes applied: where `portalHost` comes from, the dead code to delete, the plain text part, one sentence for setup and reset (an admin sent reset has no page open), an explicit builder table in the test, and AC-34 limited to what the builder adds.
+
+The List-Unsubscribe header can't be removed on our plan either (Brevo: Enterprise, by support). Unblocking is self serve (dashboard or one API call), so it's a runbook step, not code.
+
 ## References
+
+- Brevo community, tracking in transactional email: https://community.brevo.com/t/no-way-to-disable-by-option-tracking-in-transactional-e-mail/201/28
+- Brevo help, list-unsubscribe and list-help headers: https://help.brevo.com/hc/en-us/articles/19100260472850
+- Brevo API, unblock a transactional contact: https://developers.brevo.com/reference/unblock-or-resubscribe-a-transactional-contact
 
 **Project sources**:
 - `welinc-auth/src/auth/auth.service.ts` (`createUser`, `updateUser`, `forgotPassword`, `verifyOtp`, `otpResetPassword`, `updateOwnProfile`, `changeOwnPassword`), `welinc-auth/prisma/schema.prisma`

@@ -75,3 +75,17 @@ The cron monitor (`vrms-directory-poll`) and the uptime monitor (`/vrms/health`)
 
 - **backend-vrms** (staging, or locally with `SENTRY_TEST_ROUTES=true`): `POST /vrms/debug/sentry-test` as a user with `settings.manage` answers 500 and creates one issue. Sentry drops an error identical to the last one from the same process, so a second identical call sends nothing until the app restarts.
 - **web-vrms** (a build with `VITE_SENTRY_TEST_ROUTES=true`): open `/debug/sentry` as a user with `settings.manage` and press Crash this page. The crash screen's reference code matches the start of the event id.
+
+## A person stops getting emails (suite spec 0009, AC-34)
+
+Brevo adds an unsubscribe header to every email, and we can't remove it on our plan. When someone clicks **Unsubscribe** in Gmail, Brevo blocks that exact address, and from then on its sign in, setup and reset codes never arrive. Each plus tagged seed address in the team inbox (`welinc.demo+vrms.admin@gmail.com`, and so on) is its own entry, so one click blocks one seed account.
+
+- **Check:** in Brevo, open Transactional, then the blocked contacts list. It shows each blocked address and why (unsubscribed, hard bounce, spam complaint, admin block).
+- **Unblock:** remove the address from that list. Or call the API with a Brevo API key (a key with only this use is enough; keep it in 1Password, never in a repo):
+  ```bash
+  curl -X DELETE -H "api-key: $BREVO_API_KEY" \
+    "https://api.brevo.com/v3/smtp/blockedContacts/welinc.demo%2Bvrms.admin%40gmail.com"
+  ```
+  Encode `+` as `%2B` and `@` as `%40`. It answers 204 when unblocked, 404 when the address wasn't blocked.
+- **Before each defense** (Nov 28, Dec 4, Dec 5): check that the blocked list holds none of the team inbox addresses or your own.
+- A spam complaint can block an address again; if the same address keeps coming back, mark the email "Not spam" in that inbox.
