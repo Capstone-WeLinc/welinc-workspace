@@ -24,8 +24,12 @@ param gatewayCertExists bool = false
 param registryName string
 param registryResourceGroup string = 'rg-welinc-shared'
 
-@description('{app or job name: image} as each runs now (apply.sh reads them back, so an apply never rolls an app back).')
+@description('{app or job name, ending included: image} as each runs now (apply.sh reads them back, so an apply never rolls an app back).')
 param images object = {}
+
+@description('The one Container Apps environment both WeLinc environments run in (the trial allows one): staging makes it, production joins it (AC-23).')
+param environmentName string = 'cae-welinc-staging'
+param environmentResourceGroup string = 'rg-welinc-staging'
 
 @description('Groups whose apps exist here: [] until their S11 move is ready, then vmms and bms.')
 param enabledGroups array = []
@@ -45,6 +49,9 @@ param secrets object
 
 var prod = envName == 'prod'
 var prefix = prod ? '' : 'staging-'
+// AC-23: every app, job, environment storage and certificate ends in its environment, because
+// both share one Container Apps environment and its internal domain. Never write a bare base name.
+var nameSuffix = '-${envName}'
 var placeholderImage = 'mcr.microsoft.com/k8se/quickstart:latest'
 var registryServer = '${registryName}.azurecr.io'
 
@@ -82,6 +89,23 @@ module platform 'modules/platform.bicep' = {
     envName: envName
     location: location
     vrmsWebOrigin: url.vrms
+    createEnvironment: !prod
+    environmentName: environmentName
+    environmentResourceGroup: environmentResourceGroup
+  }
+}
+
+// The auth file share on the shared environment, named per environment (AC-14, AC-23)
+module envStorage 'modules/env-storage.bicep' = {
+  name: 'env-storage${nameSuffix}'
+  scope: resourceGroup(environmentResourceGroup)
+  params: {
+    environmentName: platform.outputs.environmentName
+    storageName: 'auth-uploads${nameSuffix}'
+    filesAccountName: platform.outputs.filesAccountName
+    filesResourceGroup: resourceGroup().name
+    shareName: platform.outputs.authShareName
+    lock: prod
   }
 }
 
@@ -107,7 +131,15 @@ module postgres 'modules/postgres.bicep' = {
 
 var dbHost = 'psql-welinc-${envName}.postgres.database.azure.com'
 var internal = 'internal.${platform.outputs.defaultDomain}'
-var authInternal = 'https://auth-service.${internal}'
+
+// Base names (contract 0001 section 2); the deployed names add nameSuffix
+var coreApps = ['api-gateway', 'auth-service', 'vrms-backend']
+var coreJobs = ['auth-migrate', 'auth-seed', 'vrms-migrate', 'vrms-seed']
+
+// https://<app name with its ending>.internal.<environment domain> (spec 0008, Internal addresses)
+func internalUrl(base string, nameSuffix string, internal string) string => 'https://${base}${nameSuffix}.${internal}'
+
+var authInternal = internalUrl('auth-service', nameSuffix, internal)
 
 // ---------------------------------------------------------------- shared services and VRMS
 
@@ -159,10 +191,10 @@ var vrmsSecrets = {
 
 var gatewaySettings = {
   AUTH_UPSTREAM: authInternal
-  VRMS_UPSTREAM: 'https://vrms-backend.${internal}'
-  VMMS_UPSTREAM: 'https://vmms-backend.${internal}'
-  VMMS_ANALYTICS_UPSTREAM: 'https://vmms-analytics.${internal}'
-  BMS_UPSTREAM: 'https://bms-gateway.${internal}'
+  VRMS_UPSTREAM: internalUrl('vrms-backend', nameSuffix, internal)
+  VMMS_UPSTREAM: internalUrl('vmms-backend', nameSuffix, internal)
+  VMMS_ANALYTICS_UPSTREAM: internalUrl('vmms-analytics', nameSuffix, internal)
+  BMS_UPSTREAM: internalUrl('bms-gateway', nameSuffix, internal)
   ALLOWED_ORIGINS: webOrigins
   TRUST_EDGE_PROXY: '1'
   GATEWAY_HSTS: 'max-age=86400'
@@ -174,10 +206,10 @@ module auth 'modules/container-app.bicep' = {
   name: 'app-auth-service'
   dependsOn: [pullRole]
   params: {
-    name: 'auth-service'
+    name: 'auth-service${nameSuffix}'
     location: location
     environmentId: platform.outputs.environmentId
-    image: images[?'auth-service'] ?? placeholderImage
+    image: images[?'auth-service${nameSuffix}'] ?? placeholderImage
     placeholderImage: placeholderImage
     port: 3001
     healthPath: '/auth/health'
@@ -195,7 +227,7 @@ module auth 'modules/container-app.bicep' = {
     registryServer: registryServer
     pullIdentityId: platform.outputs.pullIdentityId
     fileMount: {
-      storageName: platform.outputs.authFilesStorageName
+      storageName: envStorage.outputs.name
       mountPath: '/app/uploads'
     }
   }
@@ -205,10 +237,10 @@ module vrms 'modules/container-app.bicep' = {
   name: 'app-vrms-backend'
   dependsOn: [pullRole]
   params: {
-    name: 'vrms-backend'
+    name: 'vrms-backend${nameSuffix}'
     location: location
     environmentId: platform.outputs.environmentId
-    image: images[?'vrms-backend'] ?? placeholderImage
+    image: images[?'vrms-backend${nameSuffix}'] ?? placeholderImage
     placeholderImage: placeholderImage
     port: 3002
     healthPath: '/vrms/health'
@@ -230,16 +262,17 @@ module vrms 'modules/container-app.bicep' = {
 // The two step binding: a host name first goes on with bindingType Disabled, the managed
 // certificate is issued, then it switches to SniEnabled. A re-apply with the certificate in
 // place skips straight to SniEnabled, so the gateway never loses its certificate.
-var certId = '${platform.outputs.environmentId}/managedCertificates/cert-api'
+var certName = 'cert-api${nameSuffix}'
+var certId = '${platform.outputs.environmentId}/managedCertificates/${certName}'
 
 module gatewayBind 'modules/container-app.bicep' = if (bindDomains && !gatewayCertExists) {
   name: 'app-api-gateway-bind'
   dependsOn: [pullRole]
   params: {
-    name: 'api-gateway'
+    name: 'api-gateway${nameSuffix}'
     location: location
     environmentId: platform.outputs.environmentId
-    image: images[?'api-gateway'] ?? placeholderImage
+    image: images[?'api-gateway${nameSuffix}'] ?? placeholderImage
     placeholderImage: placeholderImage
     port: 3000
     healthPath: '/health'
@@ -253,13 +286,16 @@ module gatewayBind 'modules/container-app.bicep' = if (bindDomains && !gatewayCe
   }
 }
 
+// On the shared environment, so in its resource group; the deployment name carries the environment
 module gatewayCert 'modules/managed-cert.bicep' = if (bindDomains && !gatewayCertExists) {
-  name: 'cert-api'
+  name: certName
+  scope: resourceGroup(environmentResourceGroup)
   dependsOn: [gatewayBind]
   params: {
     environmentName: platform.outputs.environmentName
     location: location
     hostName: hosts.api
+    name: certName
   }
 }
 
@@ -267,10 +303,10 @@ module gateway 'modules/container-app.bicep' = {
   name: 'app-api-gateway'
   dependsOn: [pullRole, gatewayCert]
   params: {
-    name: 'api-gateway'
+    name: 'api-gateway${nameSuffix}'
     location: location
     environmentId: platform.outputs.environmentId
-    image: images[?'api-gateway'] ?? placeholderImage
+    image: images[?'api-gateway${nameSuffix}'] ?? placeholderImage
     placeholderImage: placeholderImage
     port: 3000
     healthPath: '/health'
@@ -295,8 +331,8 @@ module authMigrate 'modules/job.bicep' = {
     environmentId: platform.outputs.environmentId
     registryServer: registryServer
     pullIdentityId: platform.outputs.pullIdentityId
-    name: 'auth-migrate'
-    image: images[?'auth-migrate'] ?? placeholderImage
+    name: 'auth-migrate${nameSuffix}'
+    image: images[?'auth-migrate${nameSuffix}'] ?? placeholderImage
     settings: authSettings
     secretSettings: union(authSecrets, {
       DATABASE_URL: dbUrl(dbHost, 'auth', 'owner', secrets.roles.auth.owner)
@@ -312,8 +348,8 @@ module authSeed 'modules/job.bicep' = {
     environmentId: platform.outputs.environmentId
     registryServer: registryServer
     pullIdentityId: platform.outputs.pullIdentityId
-    name: 'auth-seed'
-    image: images[?'auth-seed'] ?? placeholderImage
+    name: 'auth-seed${nameSuffix}'
+    image: images[?'auth-seed${nameSuffix}'] ?? placeholderImage
     settings: union(authSettings, seedAllow, {
       API_PUBLIC_URL: url.api
       CLIENT_VRMS_WEB_ADDRESS: url.vrms
@@ -339,8 +375,8 @@ module vrmsMigrate 'modules/job.bicep' = {
     environmentId: platform.outputs.environmentId
     registryServer: registryServer
     pullIdentityId: platform.outputs.pullIdentityId
-    name: 'vrms-migrate'
-    image: images[?'vrms-migrate'] ?? placeholderImage
+    name: 'vrms-migrate${nameSuffix}'
+    image: images[?'vrms-migrate${nameSuffix}'] ?? placeholderImage
     settings: vrmsSettings
     secretSettings: union(vrmsSecrets, {
       DATABASE_URL: dbUrl(dbHost, 'vrms', 'owner', secrets.roles.vrms.owner)
@@ -358,8 +394,8 @@ module vrmsSeed 'modules/job.bicep' = {
     environmentId: platform.outputs.environmentId
     registryServer: registryServer
     pullIdentityId: platform.outputs.pullIdentityId
-    name: 'vrms-seed'
-    image: images[?'vrms-seed'] ?? placeholderImage
+    name: 'vrms-seed${nameSuffix}'
+    image: images[?'vrms-seed${nameSuffix}'] ?? placeholderImage
     settings: union(vrmsSettings, seedAllow)
     secretSettings: union(vrmsSecrets, {
       DATABASE_URL: dbUrl(dbHost, 'vrms', 'owner', secrets.roles.vrms.owner)
@@ -426,10 +462,10 @@ module groupApp 'modules/container-app.bicep' = [for a in groupAppList: {
   name: 'app-${a.name}'
   dependsOn: [pullRole]
   params: {
-    name: a.name
+    name: '${a.name}${nameSuffix}'
     location: location
     environmentId: platform.outputs.environmentId
-    image: images[?a.name] ?? placeholderImage
+    image: images[?'${a.name}${nameSuffix}'] ?? placeholderImage
     placeholderImage: placeholderImage
     port: a.port
     healthPath: groupApps[?a.name].?healthPath ?? a.healthPath
@@ -454,8 +490,8 @@ module groupJob 'modules/job.bicep' = [for j in groupJobList: {
     environmentId: platform.outputs.environmentId
     registryServer: registryServer
     pullIdentityId: platform.outputs.pullIdentityId
-    name: j.name
-    image: images[?j.name] ?? placeholderImage
+    name: '${j.name}${nameSuffix}'
+    image: images[?'${j.name}${nameSuffix}'] ?? placeholderImage
     // The same settings as the app it migrates, plus the staging seed switch: the lead starts this
     // job once with the group's seed command to seed staging (spec 0008, Seed and bootstrap jobs)
     settings: union(
@@ -496,7 +532,8 @@ var blobContributor = subscriptionResourceId('Microsoft.Authorization/roleDefini
 // backend-vrms's own identity writes blobs and signs user delegation links (spec 0017)
 resource vrmsBlob 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   scope: blobAccount
-  name: guid(blobAccount.id, 'vrms-backend', blobContributor)
+  // Keyed on the suffixed app: a recreated app has a new identity, and an assignment's principal can't change
+  name: guid(blobAccount.id, 'vrms-backend${nameSuffix}', blobContributor)
   properties: {
     roleDefinitionId: blobContributor
     principalId: vrms.outputs.principalId
@@ -525,13 +562,27 @@ module groupAccess 'modules/group-access.bicep' = [for g in groupsWithLogin: {
     group: g
     envName: envName
     principalId: logins[g]
-    appNames: map(groupDefs[g].apps, a => a.name)
-    jobNames: map(groupDefs[g].jobs, j => j.name)
+    appNames: map(groupDefs[g].apps, a => '${a.name}${nameSuffix}')
+    jobNames: map(groupDefs[g].jobs, j => '${j.name}${nameSuffix}')
     webNames: ['swa-welinc-${envName}-${groupDefs[g].web}']
     environmentName: platform.outputs.environmentName
     pullIdentityName: platform.outputs.pullIdentityName
+    joinEnvironment: !prod
   }
 }]
+
+// Production on the shared environment: the joiner role for every production login, and the
+// delete locks (AC-11, AC-23). The certificate lock waits until the certificate exists (pass 2).
+module envGuard 'modules/env-guard.bicep' = if (prod) {
+  name: 'env-guard${nameSuffix}'
+  scope: resourceGroup(environmentResourceGroup)
+  dependsOn: [gateway, envStorage]
+  params: {
+    environmentName: platform.outputs.environmentName
+    principalIds: filter(map(['ours', 'vmms', 'bms'], w => logins[?w] ?? ''), p => !empty(p))
+    certName: bindDomains ? certName : ''
+  }
+}
 
 // ---------------------------------------------------------------- outputs (read by the scripts)
 
@@ -545,6 +596,7 @@ output webDefaultHostnames array = [for (w, i) in webs: {
   defaultHostname: web[i].outputs.defaultHostname
 }]
 output webNames object = toObject(webs, w => w, w => 'swa-welinc-${envName}-${w}')
-output appNames array = concat(['api-gateway', 'auth-service', 'vrms-backend'], map(groupAppList, a => a.name))
-output jobNames array = concat(['auth-migrate', 'auth-seed', 'vrms-migrate', 'vrms-seed'], map(groupJobList, j => j.name))
+output nameSuffix string = nameSuffix
+output appNames array = map(concat(coreApps, map(groupAppList, a => a.name)), n => '${n}${nameSuffix}')
+output jobNames array = map(concat(coreJobs, map(groupJobList, j => j.name)), n => '${n}${nameSuffix}')
 output resourceGroup string = resourceGroup().name

@@ -22,15 +22,16 @@ Until your group is turned on, your routes on the gateway (`/vmms/`, `/bms/`) an
 
 - **Addresses.** Production: `api.`, `portal.`, `vrms.`, `vmms.` and `bms.welinc.app`. Staging: the same names with `staging-` in front (`staging-api.welinc.app`). Your web app calls `https://<api>/vmms/` or `https://<api>/bms/`, as locally it calls `http://localhost:3000`.
 - **Services.** Each backend process is a Container App. Only the suite gateway is public; your services are internal, reached through the gateway's route or by each other.
-- **Internal addresses.** One service calls another at `https://<app name>.internal.<environment domain>`, on port 443, with no port in the address (for example `https://bms-booking.internal.<domain>`, not `:3021`). The lead fills these into your settings, so you only need to read them from the environment, which your code already does.
+- **One Container Apps environment for both.** The Azure trial allows only one, so staging's and production's apps run side by side in it. Every app and job in Azure has its environment at the end of its name: `bms-booking-staging` and `bms-booking-prod`, `vmms-migrate-staging` and `vmms-migrate-prod`. Your code, your compose file and contract 0001 keep the plain names; the ending exists only in Azure. Staging and production still have their own databases, keys, settings and logins, so the two never mix.
+- **Internal addresses.** One service calls another at `https://<app name with its ending>.internal.<environment domain>`, on port 443, with no port in the address (for example `https://bms-booking-staging.internal.<domain>` on staging and `https://bms-booking-prod.internal.<domain>` on production, not `:3021`). Both environments share the domain, so the ending is the only thing that tells them apart: an address without it reaches nothing. The lead fills these into your settings, per environment, so you only need to read them from the environment, which your code already does.
 - **Databases.** Each environment has one PostgreSQL 16 server, holding your databases next to ours: `vmms`; `bms_booking`, `bms_dispatch`, `bms_completion`, `bms_analytics`. They are created when staging is first set up (Nov 18 to 19) and start empty. Each has two logins: `<db>_owner` runs your migrations and owns every table, and `<db>_app` is what your service connects as (read and write rows, nothing else). A database's logins can't open any other database.
 - **Web apps.** Each web app is a Static Web App, built once per environment.
 - **Mobile.** The VMMS app calls `https://api.welinc.app` (staging: `https://staging-api.welinc.app`).
-- **Images.** One shared registry. Your deploy workflow will push `<app name>:<commit sha>` for the service and `<app name>-seed:<commit sha>` for its jobs.
+- **Images.** One shared registry. Your deploy workflow will push `<app name>:<commit sha>` for the service and `<app name>-seed:<commit sha>` for its jobs, with the plain name (no ending), so production runs exactly the image staging built.
 
 ## Your apps
 
-These are in the setup as code, named exactly like this, the same as the Docker service names in your compose file (contract 0001 section 2, and *Ports and names* in [move-bms.md](move-bms.md#ports-and-names)). Each gets 0.25 CPU and 0.5 GB of memory; tell the lead if one needs more.
+These are in the setup as code, named like this plus `-staging` or `-prod` in Azure, the same as the Docker service names in your compose file (contract 0001 section 2, and *Ports and names* in [move-bms.md](move-bms.md#ports-and-names)). Each gets 0.25 CPU and 0.5 GB of memory; tell the lead if one needs more.
 
 | App | Port | Health route the platform checks | Database | Stays on in staging | At most |
 |---|---|---|---|---|---|
@@ -142,7 +143,7 @@ You send only keys from outside providers, which only your accounts can issue: G
 - **Production:** Actions, the deploy workflow, "Run workflow", branch `main`, leave `sha` empty. It takes the newest `development` commit that staging deployed successfully, moves `main` up to it, runs CI and deploys. If someone committed to `main` by hand, the move fails and nothing deploys.
 - **Rollback:** run the production workflow again with its `sha` input set to an older `main` commit (the full 40 character SHA). It skips migrations, so your migrations must only add, never drop or rename. Never force push `main`.
 - **Your Azure login** is your group's own, separate for staging and production. It can update and start only your group's apps and jobs; it can't touch VRMS, the shared services or the other group.
-- **Workflow files.** Two files to copy into your repos (one for backends, one for the web app) and the repo variables to set will be added here once ours deploy staging by themselves (Nov 19). Until then there is nothing to copy.
+- **Workflow files.** Two files to copy into your repos (one for backends, one for the web app) and the repo variables to set will be added here once ours deploy staging by themselves (Nov 19). Until then there is nothing to copy. Their names follow ours: `IMAGE_REPO` is the plain app name (the image), `CONTAINER_APP_STAGING` and `CONTAINER_APP_PROD` the app with its ending, `MIGRATE_JOB_STAGING` and `MIGRATE_JOB_PROD` the job with its ending, and each workflow picks the pair for the environment it deploys.
 
 ## When something is wrong
 

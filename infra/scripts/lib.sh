@@ -19,7 +19,36 @@ need() { command -v "$1" >/dev/null 2>&1 || die "$1 is not installed"; }
 
 env_rg() { echo "rg-welinc-$1"; }
 
-# The region of one environment's resources (region.env): production has its own.
+# The one Container Apps environment both WeLinc environments run in (the trial allows one):
+# staging's apply makes it, production joins it (spec 0008 AC-23)
+CAE_NAME=cae-welinc-staging
+CAE_RG=rg-welinc-staging
+
+# Every app, job, environment storage and certificate ends in its environment: name_suffix staging -> -staging
+name_suffix() { echo "-$1"; }
+
+# A name without its environment ending: base_name auth-service-prod -> auth-service
+base_name() {
+  local n="$1"
+  n="${n%-staging}"
+  echo "${n%-prod}"
+}
+
+# The repository an app or job's image comes from. Image repositories keep the base names, so
+# both environments (and the old bare names) share them: runners are <app>, jobs run <app>-seed.
+image_repo() {
+  local b
+  b="$(base_name "$1")"
+  case "$b" in
+    auth-migrate | auth-seed) echo auth-service-seed ;;
+    vrms-migrate | vrms-seed) echo vrms-backend-seed ;;
+    vmms-migrate) echo vmms-backend-seed ;;
+    *-migrate) echo "${b%-migrate}-seed" ;;
+    *) echo "$b" ;;
+  esac
+}
+
+# The region of one environment's resources (region.env). Both are in the environment's region now.
 env_location() { if [ "$1" = prod ]; then echo "$PROD_LOCATION"; else echo "$LOCATION"; fi; }
 env_postgres_location() { if [ "$1" = prod ]; then echo "$PROD_POSTGRES_LOCATION"; else echo "$POSTGRES_LOCATION"; fi; }
 

@@ -2,6 +2,14 @@
 
 How to set up, run and recover the hosted WeLinc suite. Hosting spec 0008 (task 21) fills in the rest of this file: bootstrap, DNS and Brevo records, rollback, stopping staging, rotating keys and secrets, moving subscriptions, the freeze rule and the shutdown copy. Each section names the spec it comes from.
 
+## Staging and production share one Container Apps environment (VRMS spec 0008, AC-23)
+
+The trial subscription allows one Container Apps environment, so production's apps run in staging's `cae-welinc-staging`. Every app and job name ends in `-staging` or `-prod`; the details are in [infra/README.md](README.md#shared-environment-spec-0008-ac-23).
+
+- **Never delete** `rg-welinc-staging` or `cae-welinc-staging` while production runs. Delete locks on the environment, `cert-api-prod` and `auth-uploads-prod` back this up.
+- **Stopping staging** means scaling staging's apps to zero and stopping `psql-welinc-staging`, nothing else (the full command comes with task 21).
+- **Deleting one of staging's certificates or storages** needs the environment's lock lifted first, then `apply.sh prod` to put it back (the README shows the command).
+
 ## Error monitoring: the Sentry org (VRMS spec 0025)
 
 Set up by hand once, on 2026-11-17. Everything below lives in Sentry, not in this repo, so this is the record of how it was set.

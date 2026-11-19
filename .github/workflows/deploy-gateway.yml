@@ -86,7 +86,11 @@ jobs:
     env:
       ENVIRONMENT: ${{ needs.target.outputs.environment }}
       SHA: ${{ needs.target.outputs.sha }}
-      APP: ${{ vars.CONTAINER_APP }}
+      # Both environments share one Container Apps environment, so the app name carries its ending
+      # (api-gateway-staging, api-gateway-prod); the image keeps the base name, so production
+      # deploys the image staging built (spec 0008 AC-23)
+      APP: ${{ needs.target.outputs.environment == 'staging' && vars.CONTAINER_APP_STAGING || vars.CONTAINER_APP_PROD }}
+      IMAGE_REPO: ${{ vars.IMAGE_REPO }}
       ACR: ${{ vars.ACR_NAME }}
       RG: ${{ needs.target.outputs.environment == 'staging' && vars.RESOURCE_GROUP_STAGING || vars.RESOURCE_GROUP_PROD }}
       API_URL: ${{ needs.target.outputs.environment == 'staging' && vars.STAGING_API_URL || vars.PROD_API_URL }}
@@ -117,9 +121,11 @@ jobs:
       - name: Image name
         run: |
           set -euo pipefail
+          [ -n "$APP" ] && [ -n "$IMAGE_REPO" ] \
+            || { echo "::error::Set the repo variables CONTAINER_APP_STAGING, CONTAINER_APP_PROD and IMAGE_REPO (infra/scripts/set-repo-variables.sh)."; exit 1; }
           server="$(az acr show -n "$ACR" --query loginServer -o tsv)"
           {
-            echo "IMAGE=$server/$APP:$SHA"
+            echo "IMAGE=$server/$IMAGE_REPO:$SHA"
             echo "SUFFIX=r${SHA:0:7}-${{ github.run_attempt }}"
           } >> "$GITHUB_ENV"
 
@@ -134,8 +140,8 @@ jobs:
       - name: The image exists
         if: env.ENVIRONMENT == 'production'
         run: |
-          az acr repository show -n "$ACR" --image "$APP:$SHA" -o none \
-            || { echo "::error::$APP:$SHA is not in the registry. Only a commit that changed infra/gateway has one."; exit 1; }
+          az acr repository show -n "$ACR" --image "$IMAGE_REPO:$SHA" -o none \
+            || { echo "::error::$IMAGE_REPO:$SHA is not in the registry. Only a commit that changed infra/gateway has one."; exit 1; }
 
       - name: New revision
         run: az containerapp update -n "$APP" -g "$RG" --image "$IMAGE" --revision-suffix "$SUFFIX" -o none
