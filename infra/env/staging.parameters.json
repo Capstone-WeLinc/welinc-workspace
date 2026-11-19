@@ -19,6 +19,9 @@
     },
     "groupApps": {
       "value": {}
+    },
+    "warmAll": {
+      "value": true
     }
   }
 }
