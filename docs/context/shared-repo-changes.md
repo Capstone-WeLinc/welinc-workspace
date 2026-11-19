@@ -1,8 +1,8 @@
 # Changes in the shared repos (Capstone 2)
 
-A record of what changed in `welinc-auth`, `welinc-web-portal` and the gateway during Capstone 2, and what is proposed next. Background only: to move a system onto the shared services, follow its checklist in [docs/integration/](../integration/README.md) instead. Last checked 2026-11-13. This term's changes were made by the VRMS group, apart from Dependabot updates.
+A record of what changed in `welinc-auth`, `welinc-web-portal` and the gateway during Capstone 2, and what is proposed next. Background only: to move a system onto the shared services, follow its checklist in [docs/integration/](../integration/README.md) instead. Last checked 2026-11-19. This term's changes were made by the VRMS group, apart from Dependabot updates.
 
-`main` in both repos is still the Capstone 1 state. Everything below is on `development`, the branch every system builds against.
+Everything below is on `development`, the branch every system builds against and staging deploys from. `main` is production: it was still the Capstone 1 state on Nov 19 and is moved up to `development` once, when production first goes live (VRMS spec 0008).
 
 ## Suite rows (the shared services epic)
 
@@ -20,9 +20,9 @@ Each row has a suite spec in `docs/specs/_root/`; the plan is [docs/scope/_root/
 | S14, env checked at startup ([0010](../specs/_root/0010-startup-env-validation/index.md)) | Apps refuse to start with missing or malformed settings; `setup.sh` tops up an old `.env` | Every name in `.env.example` |
 | S7, account activity ([0011](../specs/_root/0011-account-activity-audit/index.md)) | One log of sign ins, sessions, codes and account changes, with a person route, an admin feed and a label catalog | Your activity screens read it ([account-screens.md](../integration/account-screens.md#activity)) |
 | S8, profile extras ([0012](../specs/_root/0012-profile-extras/index.md)) | Password recheck, deletion requests, a 30 day grace period and erasure; phone verification dropped | [account-screens.md, Account deletion](../integration/account-screens.md#account-deletion) |
-| S13, email verification ([0009](../specs/_root/0009-email-verification/index.md)) | An emailed code proves a person owns their email at sign in and on every email change | The portal shows the code step; your app does nothing |
+| S13, email verification ([0009](../specs/_root/0009-email-verification/index.md)) | An emailed code proves a person owns their email at sign in and on every email change | The portal shows the code step; your app does nothing. Seed addresses never get real mail: locally and on staging the code is in the auth log (AC-32) |
 | S10, suite admin ([0013](../specs/_root/0013-suite-admin-model/index.md)) | Suite admins, temporary access with a reason, an emailed code at each admin sign in, all account management in `<portal>/admin` | Delete your Users page ([account-screens.md, Admin pages](../integration/account-screens.md#admin-pages-move-to-the-portal)) |
-| S11, the move ([0014](../specs/_root/0014-move-vmms-bms-shared-services/index.md)) | In progress: the checklists, the fleet API and the checker script | [move-vmms.md](../integration/move-vmms.md), [move-bms.md](../integration/move-bms.md) |
+| S11, the move ([0014](../specs/_root/0014-move-vmms-bms-shared-services/index.md)) | In progress: the checklists, the fleet API and the checker script. Both groups merged their moves into `development` (BMS on Nov 19); next is hosting them on staging ([hosting.md](../integration/hosting.md)) | [move-vmms.md](../integration/move-vmms.md), [move-bms.md](../integration/move-bms.md) |
 | S15, authenticator app for admins | Planned, after S11 and hosting | Nothing |
 
 ## Earlier changes (before the suite rows)
@@ -48,6 +48,9 @@ Each row has a suite spec in `docs/specs/_root/`; the plan is [docs/scope/_root/
 | **Branch rule** | Branch from `development` as `feat/<feature>`, open a pull request back into `development`, never into `main`. |
 | **Env files** | Each repo has a `.env.example` with every variable name; real values go in a local `.env`. The portal also commits a `.env.development` with safe defaults. |
 | **SMS removed** | No system sends SMS; codes go by email and the phone is a plain contact field. |
+| **Deploys (VRMS spec 0008)** | A push to `development` deploys that repo to staging by itself; production deploys only from "Run workflow" on `main`, which first moves `main` up to what staging runs. Every deploy runs CI on that exact commit first. Staging went live on Nov 19 at `staging-api`, `staging-portal`, `staging-vrms`, `staging-vmms` and `staging-bms`.welinc.app; production (the same names without `staging-`) goes live Nov 20. |
+| **Secret scan** | `gitleaks` runs on every pull request and push. Branch protection isn't available on GitHub Free private repos, so the team rule is: never merge on a red `ci` or `gitleaks`. |
+| **Email through Brevo** | Auth sends mail through Brevo from `WeLinc <noreply@welinc.app>` when hosted. Locally it still uses whatever `SMTP_*` you set. |
 | **AGENTS.md** | Each repo has an `AGENTS.md` describing its files, rules and gotchas. Read it before changing the repo. |
 | **Portal on Tailwind v4 and shadcn** (suite spec 0007) | The portal uses Tailwind v4, shadcn and the shared design tokens in the workspace `design.md`. |
 
@@ -58,5 +61,3 @@ Not built. Each one changes the shared repos, so it gets a suite spec first (con
 | Proposal | Effect on the systems |
 |---|---|
 | **reCAPTCHA on login** (VRMS scope feature 35) | The portal's login page would check reCAPTCHA. |
-| **Email through Brevo** | Auth sends mail through a personal Gmail account today. Before staging it moves to Brevo with a sender address the team controls. Only the `SMTP_*` values change. |
-| **Hosting on Azure** (VRMS spec 0008) | The gateway, auth, portal and one PostgreSQL server on Azure, staging from `development` and production from a `release` branch. Every system's services fit the same setup. |
