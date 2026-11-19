@@ -54,3 +54,16 @@ _Steps derived from spec 0008 acceptance criteria. `/check verify` runs these; `
 - Slice 2 … AC-5, AC-6, AC-13, AC-14, AC-15, AC-21 partly covered by the Slice 2 commands (their hosted halves come with the Azure milestones)
 - Slice 3 … AC-5, AC-7, AC-8, AC-10, AC-11, AC-12, AC-16, AC-19 covered by the Slice 3 commands (most need the subscription; the init.sql and compile steps run now)
 - AC-3, AC-4, AC-9, AC-17, AC-18, AC-20 … not written yet, they belong to later milestones
+
+## Commands: shared environment, task 18a (added 2026-11-19)
+- [ ] `apply.sh prod --what-if` → no `Microsoft.App/managedEnvironments` and no Log Analytics workspace to create; every app and job to create ends in `-prod`; the storage `auth-uploads-prod` and certificate `cert-api-prod` go to `cae-welinc-staging` → AC-23
+- [ ] `apply.sh staging --what-if` (task 18a step 4, before applying) → only creates: the `-staging` apps, jobs and `auth-uploads-staging`; nothing deleted; the workspace cap changes → AC-23
+- [ ] After task 18a step 6 (staging rebuilt): `az containerapp list -g rg-welinc-staging --query [].name` and `az containerapp job list -g rg-welinc-staging --query [].name` → every name ends in `-staging`, no bare name left; a second `apply.sh staging` changes nothing → AC-23
+- [ ] After step 5: `https://staging-api.welinc.app/health` → 200, and a picture uploaded before the rebuild still loads (same file share) → AC-14, AC-23
+- [ ] After production's pass 1: `az containerapp show -g rg-welinc-prod -n api-gateway-prod --query "properties.template.containers[0].env[?ends_with(name,'_UPSTREAM')].value"` → every value names a `-prod` app → AC-23
+- [ ] Merge a change to backend-vrms `development` → staging's `vrms-backend-staging` gets a new revision, `vrms-backend-prod`'s `latestReadyRevisionName` is unchanged → AC-23
+- [ ] Signed in as the production deploy login: `az containerapp env update -g rg-welinc-staging -n cae-welinc-staging --tags x=y` → AuthorizationFailed → AC-11, AC-23
+- [ ] Sign in on `staging-portal.welinc.app`, copy the access token, call `https://api.welinc.app/vrms/me` (or any guarded route) with it → 401 → AC-5
+- [ ] Signed in as the production deploy login before the first production deploy: `az containerapp update -g rg-welinc-prod -n auth-service-prod --set-env-vars PROBE=1` then remove it → both succeed → AC-11, AC-23
+- [ ] `az lock list -g rg-welinc-staging` → `CanNotDelete` on `cae-welinc-staging`, `cert-api-prod`, `auth-uploads-prod` → AC-23
+- [ ] Workspace CI's name check on a branch that adds a 33 character name → red → AC-23

@@ -151,7 +151,7 @@ What the hosted setup already allows for: `bms-analytics-projection` is defined 
 
 Task 13 ran on the real subscription, a teammate's $200 trial, and three things differed from what the Bicep assumed.
 
-**One Container Apps environment per region.** `ManagedEnvironmentCount` is 1 in Southeast Asia, East Asia, Japan East, Korea Central, Australia East and Central India. Options:
+**One Container Apps environment per region.** (Superseded the same evening: the real limit is one per subscription, see *One environment for both* below.) `ManagedEnvironmentCount` is 1 in Southeast Asia, East Asia, Japan East, Korea Central, Australia East and Central India. Options:
 - **Production in a second region (chosen).** Pros: staging and production keep separate environments, the same app names and the AC-11 login boundary; one setting (`PROD_LOCATION`). Cons: a second region to remember; production pulls images across regions (cents).
 - **One environment for both.** Pros: one region, a few dollars less. Cons: no network wall between staging and production, every app renamed (contract 0001 fixes the names), group logins with join rights next to production, a spec change days before Nov 20.
 - **Ask for a quota increase.** Pros: nothing changes. Cons: trials are usually refused or slow, and production goes live Nov 20.
@@ -167,6 +167,26 @@ The purge login gets Reader, not AcrPull: listing a registry's repositories need
 **OIDC subject forms.** The first purge run failed with `AADSTS700213`: GitHub sent `repo:Capstone-WeLinc@286169427/welinc-workspace@1428870101:ref:refs/heads/main`, its newer default for repos created after the change, while the credentials used the plain form. The older repos still send the plain form. Options: switch every repo to the form with ids (needs an org admin token and changes the other groups' repos), or match each credential to what its repo sends (chosen: no GitHub setting changes, and the safer form wherever GitHub already uses it).
 
 **Two corrections found on the way.** `set-repo-variables.sh` gave `STAGING_PORTAL_URL` only to the web repos and named the VRMS address `STAGING_WEB_URL`, while every deploy's smoke test reads `STAGING_PORTAL_URL` and `STAGING_VRMS_URL`; fixed in #58 (and #49). Task 13 said the first production run would move `main` up, but a manual run reads the workflow file on `main`, which has none until `main` is fast forwarded once.
+
+## One environment for both (2026-11-19, evening)
+
+**What happened.** The first `apply.sh prod --what-if` failed at `welinc-env` with `MaxNumberOfGlobalEnvironmentsInSubExceeded`: "the subscription cannot have more than 1 Container App Environments". The per region usage report (`Microsoft.App/locations/<region>/usages`) still shows `ManagedEnvironmentCount` 1 of 1 in Southeast Asia and 0 of 1 in East Asia: it doesn't list the subscription wide limit, which is why the earlier finding read it as per region. The subscription's offer is `FreeTrial_2014-09-01` with the spending limit on. `rg-welinc-prod` was still empty, so nothing had to be undone.
+
+**What was checked** (the `azure-container-apps` skill's doc links, plus the subscription itself):
+- Microsoft's subscription limits page: free trial subscriptions aren't eligible for limit or quota increases; upgrading to pay as you go gets higher limits. A Microsoft moderator on Q&A adds that trial, sponsored and *upgraded from a trial* subscriptions are often hard capped at one environment whatever the quota page shows. So an upgrade might not help, and it would remove the spending limit on a teammate's card.
+- Express environments (200 per region, generally available since September 2026) don't support jobs, custom domains, managed certificates or calls by app name. The migration and seed jobs, `api.welinc.app` and the gateway's internal upstreams all need those.
+- Azure for Students subscriptions aren't eligible for quota increases either. A second subscription would give production its own environment, but in another tenant: new deploy logins and OIDC trust, image pulls from our registry across tenants, a second set of DNS checks. Too much for Nov 20.
+- An app can point at an environment in another resource group of the same subscription: `az deployment group validate` and `what-if` of a test app in `rg-welinc-prod` with `environmentId` set to `cae-welinc-staging` both passed (nothing was created).
+- In one environment, apps are addressed by name only (`<name>.internal.<environment domain>`), so two apps with one name would clash even in different resource groups, and internal ingress means "reachable from any app in this environment".
+- The environment's core quota is 100 consumption cores; staging used 1.25.
+
+**Options:**
+- **Production joins staging's environment, every name suffixed `-staging` or `-prod` (chosen).** Pros: works today on the trial (validated); production keeps its own resource group, server, storage, secrets and logins; everything in one region; no bare name exists, so a setting written without its suffix fails loudly instead of reaching the other environment. Cons: no network wall between the two (only keys keep them apart); one log workspace; an environment wide problem hits both; staging's apps and jobs are recreated under the new names (about an hour, its API down while the certificate is redone, one DNS change); three workflows, `set-repo-variables.sh`, the Bicep names and `hosting.md` change the day before production.
+- **Upgrade the trial to pay as you go.** Pros: the design stays as reviewed, production gets its own environment. Cons: the teammate's spending limit goes away; the cap may stay at 1 anyway (Q&A); then a quota request with an unknown wait, a day before production.
+- **Production in a second subscription.** Pros: full separation. Cons: a new tenant's logins, OIDC trust and registry access; the student offer has its own small limits; the most new work and the most unknowns.
+- **Drop staging, production only.** Pros: no sharing. Cons: every merge would go straight to the defense system; loses AC-3's whole point.
+
+**Rationale.** The deadline (production live Nov 20, mock defense Nov 28) and the trial's fixed limit decide it. Joining staging's environment is the only option already proven on this subscription, and it keeps every separation that guards data (servers, passwords, keys, storage, logins). What it gives up is network separation between staging and production apps, and the code already doesn't rely on that: every internal call carries a token or key that only its own environment holds. Suffixing only production was considered first (it leaves live staging alone), but then a production setting written without `-prod` would quietly reach a staging app; suffixing both turns that mistake into a failed deploy, and every log line and portal row names its environment. That safety is worth the one hour staging rebuild. The suffix comes from one `nameSuffix` value built from `envName`, so no name can be written without it.
 
 ## First staging deploy (2026-11-19)
 
@@ -208,5 +228,14 @@ What production should do differently on Nov 20: expect the placeholder port tra
 - Azure Container Registry tiers: https://learn.microsoft.com/en-us/azure/container-registry/container-registry-skus
 - GitHub Actions billing: https://docs.github.com/en/billing/concepts/product-billing/github-actions
 - GitHub environments: https://docs.github.com/en/actions/how-tos/deploy/configure-and-manage-deployments/manage-environments
+
+**Links** (web verified on 2026-11-19, for *One environment for both*):
+- Container Apps quotas: https://learn.microsoft.com/en-us/azure/container-apps/quotas
+- Container Apps quota requests: https://learn.microsoft.com/en-us/azure/container-apps/quota-requests
+- Azure subscription limits (trials can't get increases): https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/azure-subscription-service-limits
+- Container Apps Express overview: https://learn.microsoft.com/en-us/azure/container-apps/express-overview
+- Communicate between container apps (names, internal ingress): https://learn.microsoft.com/en-us/azure/container-apps/connect-apps
+- Container Apps environments (one or many): https://learn.microsoft.com/en-us/azure/container-apps/environment
+- Q&A, the hidden one environment cap: https://learn.microsoft.com/en-us/answers/questions/5950364/azure-container-apps-quota-inconsistency-quota-sho
 
 No new links were fetched on 2026-11-14. Every cost figure is an estimate until the pricing calculator check in build task 12; Brevo's free plan limits and the `.tech` offer are from memory and need a check.
