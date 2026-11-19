@@ -37,6 +37,9 @@ param enabledGroups array = []
 @description('Per group app, non secret extras: {"vmms-backend": {"settings": {...}, "healthPath": "..."}}.')
 param groupApps object = {}
 
+@description('Staging is the demo (AC-24): keep every group app at 1 replica from the defense window until the shutdown copy (AC-16, task 19a). Back to false after task 22.')
+param warmAll bool = false
+
 @description('Deploy login principal ids for this environment: {ours, vmms, bms}. Empty skips the role.')
 param logins object = {}
 
@@ -78,7 +81,7 @@ var databases = ['auth', 'vrms', 'vmms', 'bms_booking', 'bms_dispatch', 'bms_com
 func dbUrl(host string, db string, role string, password string) string =>
   'postgresql://${db}_${role}:${password}@${host}:5432/${db}?sslmode=require&uselibpqcompat=true'
 
-// AC-16: production keeps every app warm; staging only the gateway and timed apps
+// AC-16: production keeps every app warm; staging only the gateway and timed apps, or every app while warmAll is on
 func minReplicas(prod bool, warm bool) int => prod || warm ? 1 : 0
 
 // ---------------------------------------------------------------- foundation
@@ -470,7 +473,7 @@ module groupApp 'modules/container-app.bicep' = [for a in groupAppList: {
     port: a.port
     healthPath: groupApps[?a.name].?healthPath ?? a.healthPath
     ingress: a.ingress
-    minReplicas: minReplicas(prod, a.timed)
+    minReplicas: minReplicas(prod || warmAll, a.timed)
     maxReplicas: a.maxReplicas
     settings: union(groupCommon(a, url, issuer, authInternal), groupApps[?a.name].?settings ?? {})
     secretSettings: union(
