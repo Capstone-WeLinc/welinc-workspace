@@ -44,7 +44,8 @@ bash infra/scripts/apply.sh <shared|budget|staging|prod> [--what-if] [--domains]
 WHATIF_ARGS="--result-format ResourceIdOnly" bash infra/scripts/apply.sh <env> --what-if   # a what if that prints no secret values
 ```
 
-- **Azure names carry the environment** (spec 0008 AC-23): staging and production share `cae-welinc-staging`, so every app and job is `<name>-staging` or `<name>-prod` (`auth-service-prod`, `vrms-seed-staging`) in every `az containerapp` and `az rest` call; image repositories keep the plain name. Until task 18a step 6, staging still runs the old bare names.
+- **Only staging is hosted** (spec 0008 AC-24, since 2026-11-20): production exists as code only (`apply.sh prod`, the production path of each `deploy.yml`) and is never called live. Don't apply `prod` or press "Run workflow" on `main` without a `sha` (the promote job moves `main`) until task 19a's guard is merged. Staging's apps and jobs still run the old bare names (`auth-service`, `vrms-backend`, `auth-migrate`, `vrms-seed`) through the bridge variables; the `-staging` names (AC-23) arrive only if task 18a steps 4 to 6 run.
+- **Azure CLI on the Mac** is `~/.local/bin/az` (not on the agent shell's PATH): call it by full path, or prefix `PATH="$HOME/.local/bin:$PATH"` for `apply.sh`.
 
 ## Specs
 
