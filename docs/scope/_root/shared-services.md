@@ -34,7 +34,7 @@ _These are recommendations to keep the build orderly, not requirements. Skip any
 | S14 | Environment checked at startup | Config | done |
 | S7 | Account activity and audit | Account | done |
 | S8 | Profile extras | Account | done |
-| S13 | Email verification | Account | in-progress |
+| S13 | Email verification | Account | done |
 | S11 | Move VMMS and BMS onto the shared services | Cutover | in-progress |
 | S10 | Suite admin model | Admin | done |
 | S15 | Authenticator app sign in for admins | Admin | planned |
@@ -250,7 +250,7 @@ The profile routes the other apps already call: verify password before a sensiti
 - [x] Verify it: `/check verify profile extras` (2026-11-12, local stack, three runs; 33 of 35 `verify.md` steps ran and passed. Two were not run live and are covered by tests: the service token call, and a new account on an erased person's old email, which would send real mail)
 - [x] Test it: `/test profile extras` (2026-11-12; 6 new unit test files, welinc-auth 26 and web-vrms 105 passing; the database specs, components and AC-24 UI stay with verify)
 
-### S13. Email verification · in-progress
+### S13. Email verification · done
 spec [0009](../../specs/_root/0009-email-verification/index.md) · code in `welinc-auth/src/auth/codes/` (code service, sign in step), `welinc-auth/src/auth/sessions/` (the step routes), `welinc-web-portal/src/pages/auth/EmailCodeStep.tsx`, `welinc-web-vrms/src/features/auth/` (Change email) and `src/features/user-management/` (statuses)
 
 Prove a person owns their email before the suite relies on it, instead of only checking that the domain can receive mail. Today `emailVerified` turns true only when someone uses a setup or reset code; an account an admin creates with a typed password, and any email change by an admin or on the profile, is never checked.
@@ -274,7 +274,7 @@ Prove a person owns their email before the suite relies on it, instead of only c
 - [x] Verify the amendment: `/check verify email verification` (2026-11-20, the AC-33 lines in `verify.md` on staging) · AC-33
 - Note (2026-11-20, `/architect`, amendment AC-34): Brevo's click tracking sends every email link through `sendibt*.com`, which the lead's network can't reach. The emails drop their links and name the portal host in plain text; the unsubscribe unblock goes in the runbook. A full email redesign comes later.
 - [x] Build the amendment: `/develop email verification AC-34` (2026-11-20, welinc-auth `feat/email-no-links`; runbook section) · AC-34
-- [ ] Verify the amendment: `/check verify email verification` (the AC-34 lines in `verify.md`) · AC-34
+- [x] Verify the amendment: `/check verify email verification` (2026-11-20, the AC-34 lines in `verify.md` on staging) · AC-34
 
 ### S16. Temporary lockout and a clear deactivated answer · done · Beta · from spec 0015
 spec [0015](../../specs/_root/0015-temporary-lockout/index.md) · code in `welinc-auth/src/auth/lockout.ts`, the sign in and code step routes, `welinc-web-portal` (sign in messages)
