@@ -4,7 +4,6 @@ description: Full Sentry SDK setup for React. Use when asked to "add Sentry to R
 license: Apache-2.0
 category: sdk-setup
 parent: sentry-sdk-setup
-disable-model-invocation: true
 ---
 
 > [All Skills](../../SKILL_TREE.md) > [SDK Setup](../sentry-sdk-setup/SKILL.md) > React SDK
