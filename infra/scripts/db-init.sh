@@ -23,6 +23,8 @@ for db in auth vrms vmms bms_booking bms_dispatch bms_completion bms_analytics; 
   [ -n "$owner_pw" ] && [ -n "$app_pw" ] || die "roles.$db needs owner and app passwords in $secrets"
   ext=""
   [ "$db" = vrms ] && ext="vector,pg_trgm"
+  # VMMS analytics stores embeddings too. vector is untrusted on Azure, so only the admin can create it
+  [ "$db" = vmms ] && ext="vector"
   note "roles for $db"
   # The password goes in through the environment, never on the command line
   PGPASSWORD="$admin_pw" psql "host=$host port=5432 dbname=postgres user=welincadmin sslmode=require" \

@@ -70,6 +70,7 @@ Tick these in your move pull requests.
 
 - [ ] Work order and fuel anomaly attachments (`private-uploads/`) can't stay on disk. Tell the lead, and they move to a blob container the way VRMS's ticket files did (spec 0017 in our backend: the browser gets signed links).
 - [ ] VMMS analytics: its `CREATE EXTENSION vector` and its `notify_vmms_table_change()` triggers move into a migration that `npm run migrate` runs, not into the app at boot.
+- [ ] VMMS analytics: Azure refuses `CREATE EXTENSION IF NOT EXISTS vector` for your migration login even when the extension already exists (the lead creates it for you). Write it as `DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'vector') THEN CREATE EXTENSION vector; END IF; END $$;` instead. VRMS hit this on its first deploy.
 
 ### BMS only
 

@@ -168,6 +168,20 @@ The purge login gets Reader, not AcrPull: listing a registry's repositories need
 
 **Two corrections found on the way.** `set-repo-variables.sh` gave `STAGING_PORTAL_URL` only to the web repos and named the VRMS address `STAGING_WEB_URL`, while every deploy's smoke test reads `STAGING_PORTAL_URL` and `STAGING_VRMS_URL`; fixed in #58 (and #49). Task 13 said the first production run would move `main` up, but a manual run reads the workflow file on `main`, which has none until `main` is fast forwarded once.
 
+## First staging deploy (2026-11-19)
+
+The first real deploy to staging failed five ways before it went green. Each was fixed in code the same day:
+
+| What failed | Why | Fix |
+|---|---|---|
+| Every backend deploy at "Image names": registry "could not be found" | `AcrPush` can push and pull but has no `registries/read`, and `az acr show` needs it | Reader on the registry for every deploy login (`pushRead` in `shared.bicep`, workspace `123c8c1`) |
+| Migrate: "unrecognized arguments: -c …" | The Azure CLI reads any argument starting with a dash as its own option; no quoting works for both the CLI and `sh` | One npm script, `db:deploy:job`, started as `--command npm --args run db:deploy:job` (auth #57, backend-vrms #74) |
+| Migrate: `ContainerAppImageRequired` | A command given at `job start` replaces the whole container, so the job lost its image, settings and secrets | Set image and command with `job update`, then a plain `job start` (auth #58, backend-vrms #75); tested with `env:check`, 16 settings kept |
+| backend-vrms Migrate: "only members of azure_pg_admin are allowed to use CREATE EXTENSION vector" | Azure checks the right to create an untrusted extension before it checks existence, so `IF NOT EXISTS` doesn't help even though `init.sql` made it | A `DO` block that checks `pg_extension` first (backend-vrms #76); then Prisma's P3009 from the failed run, cleared with `migrate resolve --rolled-back` through `az rest` |
+| The gateway's revision never became ready; the gateway never deployed at all | Apps are created on the placeholder (port 80, no probes) and only switch port once Bicep sees a real image; the gateway deploys only on a push that changes `infra/gateway/` | A second `apply.sh staging` once the images existed, then rerun; a commit in `infra/gateway/` (the README "Deploys" section, `4a6d179`) |
+
+What production should do differently on Nov 20: expect the placeholder port trap on every app (run `apply.sh prod` again after the first images, then rerun); the gateway's production run is manual and needs an image, which the staging push already built; and the bootstrap job's `admin:recover -- --create` has dash arguments, so set it through `az rest`, not `job update`.
+
 ## References
 
 **Project sources** (verifiable, in this repo):
