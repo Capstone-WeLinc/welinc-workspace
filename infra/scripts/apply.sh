@@ -66,8 +66,11 @@ register_providers() {
 #   1. the image the app or job runs now;
 #   2. not there yet (the first apply under the new names): what the old bare named one runs, so
 #      a renamed app starts on the image staging runs today, never the placeholder;
-#   3. it runs the placeholder: the newest image pushed for it (its first deploy pushed one);
-#   4. neither exists (a brand new environment's pass 1): nothing, so Bicep uses the placeholder.
+#   3. staging only, it runs the placeholder: the newest image pushed for it (its first deploy
+#      pushed one). Never on production: its apps run only images its own deploys set, so an app
+#      there never starts on a staging build against a database with no migrations yet;
+#   4. otherwise nothing, so Bicep uses the placeholder (a brand new environment's pass 1, and
+#      production until its first deploys; then run apply.sh prod again for the real ports).
 current_images() {
   local env="$1" rg acr suffix last names n img repo tag out='{}'
   rg="$(env_rg "$env")"
@@ -82,11 +85,12 @@ current_images() {
   for n in $names; do
     img="$(running_image "$rg" "$n")"
     [ -n "$img" ] || img="$(running_image "$rg" "$(base_name "$n")")"
-    if [ "$img" = "$PLACEHOLDER_IMAGE" ]; then
+    if [ "$img" = "$PLACEHOLDER_IMAGE" ] && [ "$env" != prod ]; then
       repo="$(image_repo "$n")"
       tag="$(az acr repository show-tags -n "$acr" --repository "$repo" --orderby time_desc --top 1 -o tsv 2>/dev/null || true)"
       img="${tag:+$acr.azurecr.io/$repo:$tag}"
     fi
+    [ "$img" = "$PLACEHOLDER_IMAGE" ] && img=""
     [ -n "$img" ] && out="$(jq --arg n "$n" --arg i "$img" '. + {($n): $i}' <<<"$out")"
   done
   echo "$out"

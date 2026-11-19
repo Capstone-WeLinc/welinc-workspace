@@ -36,7 +36,7 @@ Run `apply.sh <env>` again any time: it keeps each app's current image and chang
 
 ## Things that bite
 
-- **First image of an app.** A new app starts on Microsoft's placeholder image (port 80, no probes). After its first image is pushed, run `apply.sh <env>` once: it finds the newest pushed image and sets the real port and probes.
+- **First image of an app.** A new app starts on Microsoft's placeholder image (port 80, no probes), so its first deploy fails at the revision wait. On staging, run `apply.sh staging` once after its first image is pushed: it finds the newest pushed image and sets the real port and probes. On production, `apply.sh prod` never takes a registry image (production runs only what its own deploys set): run the first production deploys, then `apply.sh prod` (it reads the image each deploy set and fixes the port), then rerun those deploys.
 - **VMMS and BMS** are off (`enabledGroups: []`) until their S11 moves can deploy. Turning a group on creates its apps and jobs from contract 0001 sections 2 and 3; `groupApps` overrides a health path or adds settings, and their secrets go under `groups` in the private file.
 - **A secret change** reaches a running app only after a restart. `rotate-secret.sh` does both; put the value in the private file too, or the next apply sets the old one back.
 - **One Container Apps environment in the whole subscription** on the trial (`MaxNumberOfGlobalEnvironmentsInSubExceeded`), so production's apps run in staging's `cae-welinc-staging`, in the same region (`PROD_LOCATION` in `env/region.env` must equal `LOCATION`; `apply.sh` checks). See *Shared environment* below.
