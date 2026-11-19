@@ -202,6 +202,28 @@ The first real deploy to staging failed five ways before it went green. Each was
 
 What production should do differently on Nov 20: expect the placeholder port trap on every app (run `apply.sh prod` again after the first images, then rerun); the gateway's production run is manual and needs an image, which the staging push already built; and the bootstrap job's `admin:recover -- --create` has dash arguments, so set it through `az rest`, not `job update`.
 
+## Production not hosted (2026-11-20)
+
+**What happened.** Production's pass 1 (`apply.sh prod`, Nov 19 and 20) created every app, job, storage account and Static Web App, then failed at `psql-welinc-prod` with `SkuNotAvailable` ("Specified SKU is not supported in this region"): B1ms three times (no zone, then zone 1, then after the failed server finished dropping) and B2s once. Each time Azure began the server, then dropped it. The quota had room (Southeast Asia, 1 of 8 B series cores in use outside the failed attempts), the capabilities API listed B1ms in all three zones, and staging's B1ms server there works. The subscription is a Free Trial (`FreeTrial_2014-09-01`, spending limit on).
+
+**What was checked.**
+- Microsoft's capacity errors page: for `SkuNotAvailable` the fix is a different size; a size can be unsupported in a region or temporarily unavailable.
+- Q&A moderators: the B series hardware behind Burstable B1ms and B2s is being retired, with growth restrictions and capacity limits, so new Burstable servers are blocked in some regions, for trial and pay as you go subscriptions alike. Listing a size (`list-skus`) doesn't mean the subscription can create it. A free quota request (*Service and subscription limits*) is the official path, usually 24 to 48 hours, sometimes stuck.
+- East Asia lists the newer Bsv2 sizes and an unused B series quota; Southeast Asia lists no Bsv2.
+- Measured from inside `cae-welinc-staging` (a throwaway job, TCP connect, median of 30): Southeast Asia storage 2.5 ms, East Asia storage 32.6 ms per round trip.
+- Counted on the local stack with statement logging: a portal sign in runs about 52 queries in a row (78 for an admin with the emailed code), a session refresh 14, the ticket list 6 to 9 (13 when the 30 s account check is due), a ticket detail 10, `permissions/me` 9. In East Asia that adds about 1 to 1.5 s to opening a ticket and about 2 s to signing in.
+- AWS RDS's free plan covers `db.t4g.micro` PostgreSQL for new accounts with US$100 to 200 of credit; DigitalOcean left the GitHub Student Pack in July 2026, so its credit no longer exists.
+
+**Options.**
+- **Production's databases on staging's server.** Pros: same speed, no cost, works today. Cons: one connection budget (about 40) and one set of CPU credits for both, so staging load can stall production; restarts, maintenance, settings, the admin password and backups are shared; staging can't be stopped. Rejected: one server per environment is the industry norm, and a shared server breaks the one promise staging exists for.
+- **B1ms in East Asia.** Pros: same plan as before, own server. Cons: production about 13 times slower per query than staging, measured; not certain East Asia accepts it either.
+- **Upgrade to pay as you go and retry.** Pros: no code change. Cons: no report of it fixing this error, one of it failing on a paid subscription; it puts a card behind the subscription. Rejected by you.
+- **A managed server in Singapore outside Azure (AWS RDS).** Pros: own server, same city, managed backups, free credit. Cons: a second provider (account, firewall open to the internet with TLS, backups, alerts), a Bicep parameter for the host. Kept as the way back (Follow-up).
+- **A teammate's free Azure account for production.** Pros: a live production for no spend, its own Container Apps environment. Cons: a separate subscription and tenant (new deploy logins and OIDC trust, image pulls across tenants from our registry, its own one environment limit and the same B series refusal risk), the most new work a week before the defenses. Rejected.
+- **Staging only (chosen).** Pros: no new provider or spend, nothing shared with a production that doesn't exist, the production code stays whole. Cons: the panel sees `staging-` addresses and staging's public test passwords; "production ready" is unproven until a first production run.
+
+**Rationale.** The deadline (mock defense Nov 28) and the trial's refusal decide it. Every option that keeps a real production either shares the server (rejected on principle), makes production clearly slower than the staging it was tested on, or adds a second cloud a week before the defenses. Staging only keeps the system honest and simple: one hosted environment, described as what it is, with production one apply away once a database server exists.
+
 ## References
 
 **Project sources** (verifiable, in this repo):
@@ -237,5 +259,12 @@ What production should do differently on Nov 20: expect the placeholder port tra
 - Communicate between container apps (names, internal ingress): https://learn.microsoft.com/en-us/azure/container-apps/connect-apps
 - Container Apps environments (one or many): https://learn.microsoft.com/en-us/azure/container-apps/environment
 - Q&A, the hidden one environment cap: https://learn.microsoft.com/en-us/answers/questions/5950364/azure-container-apps-quota-inconsistency-quota-sho
+
+**Links** (web verified on 2026-11-19 and 20, for *Production not hosted*):
+- Resolve PostgreSQL capacity errors: https://learn.microsoft.com/azure/postgresql/troubleshoot/how-to-resolve-capacity-errors
+- Q&A, B1ms `SkuNotAvailable` on a Free Trial (the B series retirement): https://learn.microsoft.com/en-us/answers/questions/6062972/azure-postgresql-flexible-server-standard-b1ms-dep
+- Q&A, `SkuNotAvailable` and the quota request path: https://learn.microsoft.com/en-us/answers/a/12999345
+- Free Trial upgrade and remaining credit: https://learn.microsoft.com/en-us/azure/cost-management-billing/manage/subscription-disabled
+- AWS RDS free plan: https://aws.amazon.com/rds/free
 
 No new links were fetched on 2026-11-14. Every cost figure is an estimate until the pricing calculator check in build task 12; Brevo's free plan limits and the `.tech` offer are from memory and need a check.

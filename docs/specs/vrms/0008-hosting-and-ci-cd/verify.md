@@ -55,7 +55,15 @@ _Steps derived from spec 0008 acceptance criteria. `/check verify` runs these; `
 - Slice 3 … AC-5, AC-7, AC-8, AC-10, AC-11, AC-12, AC-16, AC-19 covered by the Slice 3 commands (most need the subscription; the init.sql and compile steps run now)
 - AC-3, AC-4, AC-9, AC-17, AC-18, AC-20 … not written yet, they belong to later milestones
 
+## Commands: staging only, AC-24 (added 2026-11-20)
+- [ ] `az group exists -n rg-welinc-prod` → `false`; `az resource list -g rg-welinc-staging --query "[?contains(name,'prod')]"` → empty; `az lock list -g rg-welinc-staging` → only `keep-cae-welinc-staging`; `az role definition list --custom-role-only true` → no `WeLinc environment joiner` → AC-24
+- [ ] Run this check before the first line above, then that line again: `WHATIF_ARGS="--result-format ResourceIdOnly" bash infra/scripts/apply.sh prod --what-if` → runs and lists production's resources with `-prod` names and the `api.`, `portal.`, `vrms.welinc.app` hosts; it recreates the empty `rg-welinc-prod`, so `az group delete -n rg-welinc-prod --yes` right after → AC-5, AC-7, AC-23, AC-24
+- [ ] Only after task 19a step 1 is merged: a production "Run workflow" on `main` in backend-vrms with no `sha` → the `target` job fails with "production is not hosted: no AZURE_CLIENT_ID_PROD"; `promote` and `deploy` are skipped; `git ls-remote origin main` shows the same commit as before; no Azure change. Before that merge, never press it without `sha` (the promote job would move `main`) → AC-24
+- [ ] From Nov 27: every staging app shows min replicas 1 (`az containerapp list -g rg-welinc-staging --query "[].{n:name,min:properties.template.scale.minReplicas}"`) → AC-16
+- [ ] `docs/integration/links.md` and `hosting.md` show no production address as live → AC-24
+
 ## Commands: shared environment, task 18a (added 2026-11-19)
+On hold since 2026-11-20 (AC-24): every line below that names production (`-prod`, `rg-welinc-prod`, `api.welinc.app`, the production login, the production locks) runs only if production is hosted again. The staging lines (`apply.sh staging --what-if`, after steps 5 and 6) still apply if you run task 18a steps 4 to 6.
 - [ ] `apply.sh prod --what-if` → no `Microsoft.App/managedEnvironments` and no Log Analytics workspace to create; every app and job to create ends in `-prod`; the storage `auth-uploads-prod` and certificate `cert-api-prod` go to `cae-welinc-staging` → AC-23
 - [ ] `apply.sh staging --what-if` (task 18a step 4, before applying) → only creates: the `-staging` apps, jobs and `auth-uploads-staging`; nothing deleted; the workspace cap changes → AC-23
 - [ ] After task 18a step 6 (staging rebuilt): `az containerapp list -g rg-welinc-staging --query [].name` and `az containerapp job list -g rg-welinc-staging --query [].name` → every name ends in `-staging`, no bare name left; a second `apply.sh staging` changes nothing → AC-23
