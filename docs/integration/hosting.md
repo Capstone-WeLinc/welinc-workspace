@@ -2,6 +2,8 @@
 
 How your system goes online next to the shared services and VRMS. Everything runs in one Azure subscription that the shared services lead operates, on `welinc.app`. The decision behind it is [VRMS spec 0008](../specs/vrms/0008-hosting-and-ci-cd/index.md); you don't need to read it.
 
+**Only staging is hosted** (since Nov 20, spec 0008 AC-24). The Azure trial refused a second database server, so production exists as code only. Staging is the demo for every defense: you deploy to staging, and there is no production run to make. Wherever this page still names production, it describes the code, not a live environment.
+
 Read this after your move checklist ([move-vmms.md](move-vmms.md) or [move-bms.md](move-bms.md)). The move makes your system work on the shared services; this page makes it run on Azure. Most of it is a few files per service, and it's easiest to do while you're already in that code for the move.
 
 ## Dates
@@ -12,22 +14,23 @@ Read this after your move checklist ([move-vmms.md](move-vmms.md) or [move-bms.m
 | Tue Nov 17 | The lead checks your move (the checker) and sets up Azure and staging. You start the checklist below and add CI |
 | Wed Nov 18 | Your hosting ready pull requests are merged, and you've sent the lead what's listed in "What the lead needs from you" |
 | Thu Nov 19 | The workflow files arrive here. You copy them, the lead turns your group on, and your first push to `development` deploys staging |
-| Fri Nov 20 | Production goes live: you click "Run workflow" on `main` once in each repo |
-| Nov 21 to 27 | Keep building on `development` (staging); promote to production when it's stable |
-| Before the defenses (dates not set yet, likely December) | Freeze: production changes only for fixes, and only migrations that add (never drop or rename). The lead announces the dates |
+| Fri Nov 20 | Production is dropped: staging is the only hosted environment |
+| Nov 21 to 26 | Keep building on `development`; every merge deploys staging |
+| Nov 27 to the shutdown copy after Dec 5 | Every staging app stays awake (no cold starts in front of the panel) |
+| Defense days: Nov 28, Dec 4, Dec 5 | Freeze: no merge to `development` in any repo from 2 hours before each defense until it ends, since every merge redeploys the demo. A fix in that window only if the lead agrees, followed by a check of staging. Migrations only add (never drop or rename) |
 
 Until your group is turned on, your routes on the gateway (`/vmms/`, `/bms/`) answer 502 `UPSTREAM_UNAVAILABLE` and nothing else is affected. Between being turned on and your first deploy, they show Microsoft's placeholder page.
 
 ## How it fits together
 
-- **Addresses.** Production: `api.`, `portal.`, `vrms.`, `vmms.` and `bms.welinc.app`. Staging: the same names with `staging-` in front (`staging-api.welinc.app`). Your web app calls `https://<api>/vmms/` or `https://<api>/bms/`, as locally it calls `http://localhost:3000`.
+- **Addresses.** Staging: `staging-api.`, `staging-portal.`, `staging-vrms.`, `staging-vmms.` and `staging-bms.welinc.app`. Production's names (the same without `staging-`) are not live. Your web app calls `https://<api>/vmms/` or `https://<api>/bms/`, as locally it calls `http://localhost:3000`.
 - **Services.** Each backend process is a Container App. Only the suite gateway is public; your services are internal, reached through the gateway's route or by each other.
-- **One Container Apps environment for both.** The Azure trial allows only one, so staging's and production's apps run side by side in it. Every app and job in Azure has its environment at the end of its name: `bms-booking-staging` and `bms-booking-prod`, `vmms-migrate-staging` and `vmms-migrate-prod`. Your code, your compose file and contract 0001 keep the plain names; the ending exists only in Azure. Staging and production still have their own databases, keys, settings and logins, so the two never mix.
-- **Internal addresses.** One service calls another at `https://<app name with its ending>.internal.<environment domain>`, on port 443, with no port in the address (for example `https://bms-booking-staging.internal.<domain>` on staging and `https://bms-booking-prod.internal.<domain>` on production, not `:3021`). Both environments share the domain, so the ending is the only thing that tells them apart: an address without it reaches nothing. The lead fills these into your settings, per environment, so you only need to read them from the environment, which your code already does.
+- **Names end in `-staging`.** Every app and job in Azure has its environment at the end of its name: `bms-booking-staging`, `vmms-migrate-staging` (production's would end in `-prod`). Your code, your compose file and contract 0001 keep the plain names; the ending exists only in Azure.
+- **Internal addresses.** One service calls another at `https://<app name with its ending>.internal.<environment domain>`, on port 443, with no port in the address (for example `https://bms-booking-staging.internal.<domain>`, not `:3021`). An address without the ending reaches nothing. The lead fills these into your settings, so you only need to read them from the environment, which your code already does.
 - **Databases.** Each environment has one PostgreSQL 16 server, holding your databases next to ours: `vmms`; `bms_booking`, `bms_dispatch`, `bms_completion`, `bms_analytics`. They are created when staging is first set up (Nov 18 to 19) and start empty. Each has two logins: `<db>_owner` runs your migrations and owns every table, and `<db>_app` is what your service connects as (read and write rows, nothing else). A database's logins can't open any other database.
 - **Web apps.** Each web app is a Static Web App, built once per environment.
-- **Mobile.** The VMMS app calls `https://api.welinc.app` (staging: `https://staging-api.welinc.app`).
-- **Images.** One shared registry. Your deploy workflow will push `<app name>:<commit sha>` for the service and `<app name>-seed:<commit sha>` for its jobs, with the plain name (no ending), so production runs exactly the image staging built.
+- **Mobile.** The VMMS app calls `https://staging-api.welinc.app`.
+- **Images.** One shared registry. Your deploy workflow will push `<app name>:<commit sha>` for the service and `<app name>-seed:<commit sha>` for its jobs, with the plain name (no ending).
 
 ## Your apps
 
@@ -46,7 +49,7 @@ These are in the setup as code, named like this plus `-staging` or `-prod` in Az
 
 Jobs (started by your deploy workflow, never on a timer): `vmms-migrate`, and `bms-booking-migrate`, `bms-dispatch-migrate`, `bms-completion-migrate`, `bms-analytics-migrate`. Each runs your seed image as the database's owner login.
 
-"Stays on in staging: no" means the app sleeps when nobody calls it, and the first call after a while may answer 504 while it wakes (about 10 to 30 seconds). Production keeps every app awake. If one of your apps runs anything on a timer, it must stay on: tell the lead.
+"Stays on in staging: no" means the app sleeps when nobody calls it, and the first call after a while may answer 504 while it wakes (about 10 to 30 seconds). From Nov 27 until the shutdown copy after Dec 5, every staging app stays awake anyway, because staging is the demo. If one of your apps runs anything on a timer, it must stay on: tell the lead.
 
 A different health path or an app this table misses is a one line change on our side, so just tell the lead.
 
@@ -133,17 +136,17 @@ You send only keys from outside providers, which only your accounts can issue: G
 
 ## Deploying
 
-- **Branches.** Every repo has two long lived branches: `development` (your daily branch, deploys staging) and `main` (production). Feature branches come off `development` and go back into it by pull request. `staging` is an environment, not a branch: delete any old `staging` branch. Set `development` as each repo's default branch (Settings, General), so pull requests and Dependabot target it.
-- **Never touch `main`.** No pull requests into it, no commits, no pushes, apart from the one time fast forward below. The production workflow moves it for you after that.
-- **One time branch cleanup** (before Nov 20).
+- **Branches.** Every repo has two long lived branches: `development` (your daily branch, deploys staging) and `main` (production's branch, unused while production is not hosted). Feature branches come off `development` and go back into it by pull request. `staging` is an environment, not a branch: delete any old `staging` branch. Set `development` as each repo's default branch (Settings, General), so pull requests and Dependabot target it.
+- **Never touch `main`.** No pull requests into it, no commits, no pushes. While production is not hosted, nothing needs `main`, so the one time cleanup below is no longer needed; leave `main` as it is unless the lead says production is coming back.
+- **One time branch cleanup** (on hold since Nov 20, only if production is hosted again).
   - VMMS: in every repo but one, `main` is just behind `development`, so once your deploy workflow is on `development`, bring `main` up once before your first production run: `git push origin origin/development:main` (a fast forward, not a force push; the fast forward is what carries the workflow file to `main`). A manual run uses the workflow file on `main`, and `main` has none until then; after that the production workflow moves `main` for you. The exception is `welinc-web-vmms`: its `main` holds only GitHub's "Initial commit" README from May, which `development` doesn't have. Replace it once: `git push --force-with-lease origin origin/development:main`. Delete the old `staging` branches.
   - BMS: `welinc-backend-bms` and `welinc-backend-bms-analytics-ai` have no `development` yet, and `welinc-web-bms`'s is from May. Create or refresh them from your newest work (your move pull requests go into them). Your `main` is behind that work in all three, so once your deploy workflow is on `development`, bring `main` up once the same way (`git push origin origin/development:main`) before your first production run.
 - **Staging:** a push to `development` deploys that repo by itself, the same as VRMS: build both images, run the migration job, switch to the new version only once its health route answers, then a smoke test. If a migration or the health check fails, the old version keeps serving.
 - **CI first, always.** Every deploy runs your `ci.yml` on the commit first and deploys only if it passes. A push straight to `development` with a red check deploys nothing. Still, always go through a pull request.
-- **Production:** Actions, the deploy workflow, "Run workflow", branch `main`, leave `sha` empty. It takes the newest `development` commit that staging deployed successfully, moves `main` up to it, runs CI and deploys. If someone committed to `main` by hand, the move fails and nothing deploys.
-- **Rollback:** run the production workflow again with its `sha` input set to an older `main` commit (the full 40 character SHA). It skips migrations, so your migrations must only add, never drop or rename. Never force push `main`.
-- **Your Azure login** is your group's own, separate for staging and production. It can update and start only your group's apps and jobs; it can't touch VRMS, the shared services or the other group.
-- **Workflow files.** Two files to copy into your repos (one for backends, one for the web app) and the repo variables to set will be added here once ours deploy staging by themselves (Nov 19). Until then there is nothing to copy. Their names follow ours: `IMAGE_REPO` is the plain app name (the image), `CONTAINER_APP_STAGING` and `CONTAINER_APP_PROD` the app with its ending, `MIGRATE_JOB_STAGING` and `MIGRATE_JOB_PROD` the job with its ending, and each workflow picks the pair for the environment it deploys.
+- **Production:** not hosted. Don't press "Run workflow". In our repos the deploy workflow stops at once with "production is not hosted", and the workflow files you copy from ours carry the same check.
+- **Rollback on staging:** revert the bad change with a pull request into `development`, which deploys the fix. Migrations only add, never drop or rename, so older code still runs on the newer database.
+- **Your Azure login** is your group's own staging login. It can update and start only your group's apps and jobs; it can't touch VRMS, the shared services or the other group.
+- **Workflow files.** Two files to copy into your repos (one for backends, one for the web app) and the repo variables to set will be added here once ours deploy staging by themselves (Nov 19). Until then there is nothing to copy. Their names follow ours: `IMAGE_REPO` is the plain app name (the image), `CONTAINER_APP_STAGING` and `CONTAINER_APP_PROD` the app with its ending, `MIGRATE_JOB_STAGING` and `MIGRATE_JOB_PROD` the job with its ending, and each workflow picks the pair for the environment it deploys. The production half of each file stays unused while production is not hosted.
 
 ## When something is wrong
 
