@@ -1,0 +1,182 @@
+name: bms-environment
+
+x-auth: &auth
+  AUTH_ISSUER: http://localhost:3000/auth
+  AUTH_JWKS_URL: http://auth-service:3001/auth/.well-known/jwks.json
+  AUTH_INTERNAL_URL: http://auth-service:3001
+  NODE_ENV: development
+  DB_POOL_MAX: 2
+  AUTH_CLIENT_ID: bms
+
+x-db: &db
+  image: postgres:16
+  restart: unless-stopped
+  networks:
+    - welinc-network
+
+x-node: &node
+  restart: unless-stopped
+  env_file:
+    - path: ./welinc-backend-bms/.env
+      required: false
+  networks:
+    - welinc-network
+
+services:
+  bms-booking-db:
+    <<: *db
+    container_name: welinc_bms_booking_db
+    environment: { POSTGRES_USER: bms_user, POSTGRES_PASSWORD: bms_pass, POSTGRES_DB: bms_booking_db }
+    ports: ["5434:5432"]
+    volumes: [bms_booking_pgdata:/var/lib/postgresql/data]
+    healthcheck: { test: ["CMD-SHELL", "pg_isready -U bms_user -d bms_booking_db"], interval: 10s, timeout: 5s, retries: 5 }
+
+  bms-dispatch-db:
+    <<: *db
+    container_name: welinc_bms_dispatch_db
+    environment: { POSTGRES_USER: bms_user, POSTGRES_PASSWORD: bms_pass, POSTGRES_DB: bms_dispatch_db }
+    ports: ["5435:5432"]
+    volumes: [bms_dispatch_pgdata:/var/lib/postgresql/data]
+    healthcheck: { test: ["CMD-SHELL", "pg_isready -U bms_user -d bms_dispatch_db"], interval: 10s, timeout: 5s, retries: 5 }
+
+  bms-completion-db:
+    <<: *db
+    container_name: welinc_bms_completion_db
+    environment: { POSTGRES_USER: bms_user, POSTGRES_PASSWORD: bms_pass, POSTGRES_DB: bms_completion_db }
+    ports: ["5436:5432"]
+    volumes: [bms_completion_pgdata:/var/lib/postgresql/data]
+    healthcheck: { test: ["CMD-SHELL", "pg_isready -U bms_user -d bms_completion_db"], interval: 10s, timeout: 5s, retries: 5 }
+
+  bms-analytics-db:
+    <<: *db
+    container_name: welinc_bms_analytics_db
+    environment: { POSTGRES_USER: bms_user, POSTGRES_PASSWORD: bms_pass, POSTGRES_DB: bms_analytics_db }
+    ports: ["5437:5432"]
+    volumes: [bms_analytics_pgdata:/var/lib/postgresql/data]
+    healthcheck: { test: ["CMD-SHELL", "pg_isready -U bms_user -d bms_analytics_db"], interval: 10s, timeout: 5s, retries: 5 }
+
+  bms-gateway:
+    <<: *node
+    build: { context: ./welinc-backend-bms/bms-gateway, dockerfile: Dockerfile.dev }
+    container_name: welinc_bms_gateway
+    ports: ["3020:3020"]
+    volumes: [./welinc-backend-bms/bms-gateway:/app, /app/node_modules]
+    environment:
+      ANALYTICS_PROJECTION_URL: http://bms-analytics-projection:3024
+      <<: *auth
+      BMS_SESSION_HOST: "true"
+      PORT: 3020
+      AUTH_CLIENT_ID: bms
+      WEB_APP_URL: http://localhost:8003
+      PORTAL_URL: http://localhost:8000
+      AUTH_PUBLIC_URL: http://localhost:3000/auth
+      API_PUBLIC_URL: http://localhost:3000
+      SESSION_COOKIE_SECURE: "false"
+      TRUST_PROXY_HOPS: "1"
+      BOOKING_API_URL: http://bms-booking:3021
+      DISPATCH_API_URL: http://bms-dispatch:3022
+      COMPLETION_API_URL: http://bms-completion:3023
+      ANALYTICS_API_URL: http://bms-analytics:3025
+    depends_on: [bms-booking, bms-dispatch, bms-completion, bms-analytics]
+
+  bms-booking:
+    <<: *node
+    build: { context: ./welinc-backend-bms/bms-booking-service, dockerfile: Dockerfile.dev }
+    container_name: welinc_bms_booking
+    ports: ["3021:3021"]
+    volumes: [./welinc-backend-bms/bms-booking-service:/app, /app/node_modules]
+    environment:
+      DISPATCH_API_URL: http://bms-dispatch:3022
+      COMPLETION_API_URL: http://bms-completion:3023
+      <<: *auth
+      BMS_BOOKING_HOST: "true"
+      PORT: 3021
+      AUTH_CLIENT_ID: bms
+      DATABASE_URL: postgresql://bms_user:bms_pass@bms-booking-db:5432/bms_booking_db?schema=public
+    depends_on: { bms-booking-db: { condition: service_healthy } }
+
+  bms-dispatch:
+    <<: *node
+    build: { context: ./welinc-backend-bms/bms-dispatch-service, dockerfile: Dockerfile.dev }
+    container_name: welinc_bms_dispatch
+    ports: ["3022:3022"]
+    volumes: [./welinc-backend-bms/bms-dispatch-service:/app, /app/node_modules]
+    environment:
+      BOOKING_API_URL: http://bms-booking:3021
+      <<: *auth
+      PORT: 3022
+      AUTH_CLIENT_ID: bms
+      VMMS_INTERNAL_URL: http://vmms-backend:3010
+      DATABASE_URL: postgresql://bms_user:bms_pass@bms-dispatch-db:5432/bms_dispatch_db?schema=public
+    depends_on: { bms-dispatch-db: { condition: service_healthy } }
+
+  bms-completion:
+    <<: *node
+    build: { context: ./welinc-backend-bms/bms-completion-service, dockerfile: Dockerfile.dev }
+    container_name: welinc_bms_completion
+    ports: ["3023:3023"]
+    volumes: [./welinc-backend-bms/bms-completion-service:/app, /app/node_modules]
+    environment:
+      BOOKING_API_URL: http://bms-booking:3021
+      DISPATCH_API_URL: http://bms-dispatch:3022
+      <<: *auth
+      PORT: 3023
+      DATABASE_URL: postgresql://bms_user:bms_pass@bms-completion-db:5432/bms_completion_db?schema=public
+    depends_on: { bms-completion-db: { condition: service_healthy } }
+
+  bms-analytics-projection:
+    <<: *node
+    build: { context: ./welinc-backend-bms/bms-analytics-projection, dockerfile: Dockerfile.dev }
+    container_name: welinc_bms_analytics_projection
+    ports: ["3024:3024"]
+    volumes: [./welinc-backend-bms/bms-analytics-projection:/app, /app/node_modules]
+    environment:
+      BOOKING_API_URL: http://bms-booking:3021
+      DISPATCH_API_URL: http://bms-dispatch:3022
+      COMPLETION_API_URL: http://bms-completion:3023
+      DB_POOL_MAX: 2
+      ANALYTICS_READ_MODEL_DATABASE_URL: postgresql://bms_user:bms_pass@bms-analytics-db:5432/bms_analytics_db
+    depends_on: { bms-analytics-db: { condition: service_healthy } }
+
+  bms-analytics:
+    <<: *node
+    env_file:
+      # Analytics is a separate auth client; never inherit the bms private key.
+      - path: ./welinc-backend-bms-analytics-ai/.env
+        required: false
+    build: { context: ./welinc-backend-bms-analytics-ai, dockerfile: Dockerfile.dev }
+    container_name: welinc_bms_analytics
+    ports: ["3025:3025"]
+    volumes: [./welinc-backend-bms-analytics-ai:/app, /app/node_modules]
+    environment:
+      BOOKING_API_URL: http://bms-booking:3021
+      DISPATCH_API_URL: http://bms-dispatch:3022
+      COMPLETION_API_URL: http://bms-completion:3023
+      <<: *auth
+      AUTH_CLIENT_ID: bms-analytics
+      PORT: 3025
+      DATABASE_URL: postgresql://bms_user:bms_pass@bms-analytics-db:5432/bms_analytics_db
+    depends_on: { bms-analytics-db: { condition: service_healthy } }
+
+  web-bms:
+    build: { context: ./welinc-web-bms, dockerfile: Dockerfile.dev }
+    container_name: welinc_bms_frontend
+    restart: unless-stopped
+    ports: ["8003:8003"]
+    volumes: [./welinc-web-bms:/app, /app/node_modules]
+    environment:
+      VITE_API_BASE_URL: http://localhost:3000
+      VITE_PORTAL_URL: http://localhost:8000
+    networks:
+      - welinc-network
+
+volumes:
+  bms_booking_pgdata:
+  bms_dispatch_pgdata:
+  bms_completion_pgdata:
+  bms_analytics_pgdata:
+
+networks:
+  welinc-network:
+    name: welinc-network
+    external: true
