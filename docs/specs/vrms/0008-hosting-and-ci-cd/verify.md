@@ -47,7 +47,7 @@ _Steps derived from spec 0008 acceptance criteria. `/check verify` runs these; `
 - [x] Replica settings: production every app min 1; staging the gateway, `auth-service` and `vrms-backend` min 1, the rest 0; `auth-service` max 1 → AC-16 (2026-11-20, staging only: all three min 1, `auth-service` max 1; production is code only)
 - [x] Budget: Cost Management shows `welinc-credit` with alerts at 25, 50, 75 and 90 percent of $200 → AC-12 (2026-11-20)
 - [ ] With a VMMS login filled in `env/logins.json` and `vmms` enabled: as that login, `az containerapp update -n vrms-backend` → AuthorizationFailed; `az containerapp update -n vmms-backend` → succeeds → AC-11
-- [ ] `vrms-backend` reads and signs a blob link (open a ticket photo on staging) with no connection string set → the photo loads → AC-14
+- [x] `vrms-backend` reads and signs a blob link (open a ticket photo on staging) with no connection string set → the photo loads → AC-14 (2026-11-20: a 255 KB JPEG added to a ticket, opened full size before and after a restart; the app's only storage settings are `STORAGE_ACCOUNT_URL`, `STORAGE_CONTAINER`, `STORAGE_PUBLIC_URL`)
 
 ## Acceptance-criteria coverage
 - AC-1 … covered by steps 1, 4, 5, 6 and the first, second and third commands · AC-2 … covered by steps 2, 3 and the first two commands · AC-11 … covered by the last command (the OpenID login part comes with the Azure milestones)
