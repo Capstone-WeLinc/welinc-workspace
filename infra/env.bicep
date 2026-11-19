@@ -147,6 +147,12 @@ func internalUrl(base string, nameSuffix string, internal string) string => 'htt
 
 var authInternal = internalUrl('auth-service', nameSuffix, internal)
 
+// A group that isn't in enabledGroups gets a .invalid host (RFC 2606, never resolves). Every
+// *.internal name resolves to the environment's shared ingress, which answers a missing app with
+// its own 404 page; a failed lookup instead gives the gateway's 502 UPSTREAM_UNAVAILABLE (AC-19).
+func groupUpstream(group string, base string, enabled array, nameSuffix string, internal string) string =>
+  contains(enabled, group) ? internalUrl(base, nameSuffix, internal) : 'http://${base}.invalid'
+
 // ---------------------------------------------------------------- shared services and VRMS
 
 var authSettings = {
@@ -198,9 +204,9 @@ var vrmsSecrets = {
 var gatewaySettings = {
   AUTH_UPSTREAM: authInternal
   VRMS_UPSTREAM: internalUrl('vrms-backend', nameSuffix, internal)
-  VMMS_UPSTREAM: internalUrl('vmms-backend', nameSuffix, internal)
-  VMMS_ANALYTICS_UPSTREAM: internalUrl('vmms-analytics', nameSuffix, internal)
-  BMS_UPSTREAM: internalUrl('bms-gateway', nameSuffix, internal)
+  VMMS_UPSTREAM: groupUpstream('vmms', 'vmms-backend', enabledGroups, nameSuffix, internal)
+  VMMS_ANALYTICS_UPSTREAM: groupUpstream('vmms', 'vmms-analytics', enabledGroups, nameSuffix, internal)
+  BMS_UPSTREAM: groupUpstream('bms', 'bms-gateway', enabledGroups, nameSuffix, internal)
   ALLOWED_ORIGINS: webOrigins
   TRUST_EDGE_PROXY: '1'
   GATEWAY_HSTS: 'max-age=86400'
