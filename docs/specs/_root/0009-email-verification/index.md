@@ -1,7 +1,7 @@
 # 0009. Email verification and one shared code service
 
 **Date**: 2026-11-10
-**Status**: Accepted
+**Status**: In Progress
 **Amended**: 2026-11-19 (`/architect`, in place): AC-32, mail to seed addresses goes to the log on staging too, behind a staging only `SEED_MAIL_TO_LOG` setting, so seed admins can finish the sign in code step there and no code is mailed to `welinc.com`, a domain we don't own.
 **Amended**: 2026-11-20 (`/architect`, in place): AC-33, on staging mail to seed addresses goes to one team Gmail inbox by plus addressing (`SEED_MAIL_REDIRECT`), so the defense demo signs in by an emailed code the panel can watch arrive. The seed addresses themselves don't change anywhere, so no group's seed or manifest changes.
 **Scope row**: [S13. Email verification](../../../scope/_root/shared-services.md#s13-email-verification--in-progress)

@@ -26,7 +26,7 @@ They run from `docker-compose.shared.yml`, which also creates the `welinc-networ
 |---|---|---|
 | Your machine | `http://localhost:3000` (gateway), `:8000` (portal), each system's own port | The full seed |
 | Staging (live since 2026-11-19) | `https://staging-api.welinc.app` (gateway), `staging-portal`, `staging-vrms`, `staging-vmms`, `staging-bms`.welinc.app | The full seed |
-| Production (planned live 2026-11-20) | `https://api.welinc.app`, `portal`, `vrms`, `vmms`, `bms`.welinc.app | Real people only, invited from the portal |
+| Production (defined as code only, not hosted since 2026-11-20, VRMS spec 0008 AC-24) | none live (`api`, `portal`, `vrms`, `vmms`, `bms`.welinc.app if it is ever hosted) | Real people only, invited from the portal |
 
 Everything runs on Azure (VRMS spec 0008; group guide [hosting.md](../integration/hosting.md)). A push to `development` deploys staging; production deploys from "Run workflow" on `main`.
 

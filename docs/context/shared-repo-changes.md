@@ -2,7 +2,7 @@
 
 A record of what changed in `welinc-auth`, `welinc-web-portal` and the gateway during Capstone 2, and what is proposed next. Background only: to move a system onto the shared services, follow its checklist in [docs/integration/](../integration/README.md) instead. Last checked 2026-11-19. This term's changes were made by the VRMS group, apart from Dependabot updates.
 
-Everything below is on `development`, the branch every system builds against and staging deploys from. `main` is production: it was still the Capstone 1 state on Nov 19 and is moved up to `development` once, when production first goes live (VRMS spec 0008).
+Everything below is on `development`, the branch every system builds against and staging deploys from. `main` is production's branch, which is not hosted (VRMS spec 0008 AC-24); in the four service repos it was moved up to `development` by hand on Nov 19 and again on Nov 20 to carry the production guard.
 
 ## Suite rows (the shared services epic)
 
@@ -48,7 +48,7 @@ Each row has a suite spec in `docs/specs/_root/`; the plan is [docs/scope/_root/
 | **Branch rule** | Branch from `development` as `feat/<feature>`, open a pull request back into `development`, never into `main`. |
 | **Env files** | Each repo has a `.env.example` with every variable name; real values go in a local `.env`. The portal also commits a `.env.development` with safe defaults. |
 | **SMS removed** | No system sends SMS; codes go by email and the phone is a plain contact field. |
-| **Deploys (VRMS spec 0008)** | A push to `development` deploys that repo to staging by itself; production deploys only from "Run workflow" on `main`, which first moves `main` up to what staging runs. Every deploy runs CI on that exact commit first. Staging went live on Nov 19 at `staging-api`, `staging-portal`, `staging-vrms`, `staging-vmms` and `staging-bms`.welinc.app; production (the same names without `staging-`) goes live Nov 20. |
+| **Deploys (VRMS spec 0008)** | A push to `development` deploys that repo to staging by itself; "Run workflow" on `main` is production's and stops at once with "production is not hosted" (AC-24). Every deploy runs CI on that exact commit first. Staging went live on Nov 19 at `staging-api`, `staging-portal`, `staging-vrms`, `staging-vmms` and `staging-bms`.welinc.app and is the only hosted environment; every Azure app and job ends in `-staging`. On staging, seed account mail goes to the team inbox `welinc.demo@gmail.com` (suite spec 0009 AC-33). |
 | **Secret scan** | `gitleaks` runs on every pull request and push. Branch protection isn't available on GitHub Free private repos, so the team rule is: never merge on a red `ci` or `gitleaks`. |
 | **Email through Brevo** | Auth sends mail through Brevo from `WeLinc <noreply@welinc.app>` when hosted. Locally it still uses whatever `SMTP_*` you set. |
 | **AGENTS.md** | Each repo has an `AGENTS.md` describing its files, rules and gotchas. Read it before changing the repo. |

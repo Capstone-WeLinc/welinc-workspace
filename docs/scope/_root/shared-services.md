@@ -270,7 +270,7 @@ Prove a person owns their email before the suite relies on it, instead of only c
 - [x] Document it: `/document email verification` (2026-11-11, PRs opened)
 - [ ] Polish it (optional, ask first): `web-design-guidelines` (the portal code step)
 - Note (2026-11-20, `/architect`, amendment AC-33): staging is the defense demo (VRMS spec 0008 AC-24), so seed accounts' mail on staging goes to one team Gmail by plus addressing (`SEED_MAIL_REDIRECT`) instead of the auth log. The seed addresses don't change, so no group changes anything. Cross checked on another model, 7 fixes applied.
-- [ ] Build the amendment: `/develop email verification AC-33` (`SEED_MAIL_REDIRECT`, the tag helper, tests, the staging parameter; the team Gmail address goes in once it exists) · AC-33
+- [x] Build the amendment: `/develop email verification AC-33` (`SEED_MAIL_REDIRECT`, the tag helper, tests, the staging parameter; the team Gmail address goes in once it exists) · AC-33
 - [ ] Verify the amendment: `/check verify email verification` (the AC-33 lines in `verify.md`) · AC-33
 
 ### S16. Temporary lockout and a clear deactivated answer · done · Beta · from spec 0015
