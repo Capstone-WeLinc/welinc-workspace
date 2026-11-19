@@ -35,6 +35,17 @@ jobs:
       environment: ${{ steps.pick.outputs.environment }}
       sha: ${{ steps.pick.outputs.sha }}
     steps:
+      # Production is not hosted (spec 0008 AC-24): a manual run stops here, before any Azure
+      # login. Setting AZURE_CLIENT_ID_PROD again lifts it.
+      - name: Production is hosted
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          CLIENT_ID: ${{ vars.AZURE_CLIENT_ID_PROD }}
+        run: |
+          if [ -z "$CLIENT_ID" ]; then
+            echo "::error::production is not hosted: no AZURE_CLIENT_ID_PROD (spec 0008 AC-24)"
+            exit 1
+          fi
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
