@@ -186,7 +186,9 @@ module auth 'modules/container-app.bicep' = {
     maxReplicas: 1
     cpu: '0.5'
     memory: '1Gi'
-    settings: authSettings
+    // Suite spec 0009 AC-32: on staging, mail to seed addresses is logged, not sent. The app only,
+    // not authSettings (the jobs share those); welinc-auth refuses it with SENTRY_ENVIRONMENT=production.
+    settings: union(authSettings, prod ? {} : { SEED_MAIL_TO_LOG: 'true' })
     secretSettings: union(authSecrets, {
       DATABASE_URL: dbUrl(dbHost, 'auth', 'app', secrets.roles.auth.app)
     })
