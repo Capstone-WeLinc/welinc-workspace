@@ -1,7 +1,7 @@
 # 0009. Email verification and one shared code service
 
 **Date**: 2026-11-10
-**Status**: In Progress
+**Status**: Accepted
 **Amended**: 2026-11-19 (`/architect`, in place): AC-32, mail to seed addresses goes to the log on staging too, behind a staging only `SEED_MAIL_TO_LOG` setting, so seed admins can finish the sign in code step there and no code is mailed to `welinc.com`, a domain we don't own.
 **Amended**: 2026-11-20 (`/architect`, in place): AC-33, on staging mail to seed addresses goes to one team Gmail inbox by plus addressing (`SEED_MAIL_REDIRECT`), so the defense demo signs in by an emailed code the panel can watch arrive. The seed addresses themselves don't change anywhere, so no group's seed or manifest changes.
 **Amended**: 2026-11-20 (`/architect`, in place): AC-34, no email from welinc-auth carries a link, because Brevo rewrites every link through its click tracking domain (`sendibt*.com`), which some Philippine networks can't reach; the emails name the portal address and the place to go in plain words instead. Also the unblock step for Brevo's unsubscribe header. An interim fix: a full redesign of the emails comes later.
