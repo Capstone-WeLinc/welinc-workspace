@@ -41,7 +41,10 @@ node infra/gateway/test/check-routes.mjs
 
 # Azure setup as code (VRMS spec 0008; order and gotchas in infra/README.md; needs az, jq, psql, dig, gh)
 bash infra/scripts/apply.sh <shared|budget|staging|prod> [--what-if] [--domains]
+WHATIF_ARGS="--result-format ResourceIdOnly" bash infra/scripts/apply.sh <env> --what-if   # a what if that prints no secret values
 ```
+
+- **Azure names carry the environment** (spec 0008 AC-23): staging and production share `cae-welinc-staging`, so every app and job is `<name>-staging` or `<name>-prod` (`auth-service-prod`, `vrms-seed-staging`) in every `az containerapp` and `az rest` call; image repositories keep the plain name. Until task 18a step 6, staging still runs the old bare names.
 
 ## Specs
 
