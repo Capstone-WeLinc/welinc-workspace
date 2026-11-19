@@ -96,6 +96,12 @@ Staging runs with `NODE_ENV=production` and real SMTP (Brevo), and every admin c
 
 Why a new setting, `SEED_MAIL_TO_LOG`, and not `SEED_ALLOW=staging`: `SEED_ALLOW` lives only on the seed jobs and means "this run may write seed people". Putting it on the running app would mix two meanings, and the app would need it in its config schema for an unrelated reason. A setting named for what it does keeps the switch readable and easy to audit in `env.bicep`.
 
+**Amendment 2026-11-20: one team inbox for seed mail on staging.** Staging is now the only hosted environment and the defense demo (VRMS spec 0008 AC-24), so every demo sign in as a seed persona would mean reading a code from the auth log in front of the panel. The real inbox option is back, without its cost: the seed addresses stay `@welinc.com` everywhere, and only auth rewrites the recipient at send time, so no manifest, seed or group changes.
+
+- **Testmail** (`<namespace>.<tag>@inbox.testmail.app`): fits the rewrite, but its docs show reading mail through a JSON API only, the free plan keeps 100 mails a month for 1 day, and the student plan is by request. It stays the tool for `/test`, where an API is what you want.
+- **One team Gmail with plus addressing** (chosen): a normal inbox the panel can watch, on a laptop or phone, each persona findable by its tag, no signup beyond a Gmail account, and no limit that matters at demo volume.
+- **Pre signed in browser profiles**: no mail at all, but the panel never sees the code step that production has, and sessions can expire before the defense.
+
 ## Rationale
 
 The code wins because of where WeLinc's people sign in: a third of them on native mobile apps, and every one of them in a flow that is waiting on the same screen. A link's one advantage, a tap instead of six digits, matters for public sign ups where every lost click loses a customer. It doesn't matter for staff who do this about once. A link can still be added later without changing anything the code flow builds. (basis: OWASP Forgot Password Cheat Sheet on single use, short lived tokens)
