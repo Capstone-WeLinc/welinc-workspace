@@ -60,7 +60,7 @@ _Steps derived from spec 0008 acceptance criteria. `/check verify` runs these; `
 - [ ] Run this check before the first line above, then that line again: `WHATIF_ARGS="--result-format ResourceIdOnly" bash infra/scripts/apply.sh prod --what-if` → runs and lists production's resources with `-prod` names and the `api.`, `portal.`, `vrms.welinc.app` hosts; it recreates the empty `rg-welinc-prod`, so `az group delete -n rg-welinc-prod --yes` right after → AC-5, AC-7, AC-23, AC-24
 - [x] Only after task 19a step 1 is merged and backend-vrms's `main` is fast forwarded to carry it: a production "Run workflow" on `main` in backend-vrms with no `sha` → the `target` job fails with "production is not hosted: no AZURE_CLIENT_ID_PROD"; `promote` and `deploy` are skipped; `git ls-remote origin main` shows the same commit as before; no Azure change. Until `main` carries the guard, never press it without `sha` (the promote job would move `main`) → AC-24
 - [ ] From Nov 27: every staging app shows min replicas 1 (`az containerapp list -g rg-welinc-staging --query "[].{n:name,min:properties.template.scale.minReplicas}"`) → AC-16
-- [ ] `docs/integration/links.md` and `hosting.md` show no production address as live → AC-24
+- [x] `docs/integration/links.md` and `hosting.md` show no production address as live → AC-24
 
 ## Commands: shared environment, task 18a (added 2026-11-19)
 On hold since 2026-11-20 (AC-24): every line below that names production (`-prod`, `rg-welinc-prod`, `api.welinc.app`, the production login, the production locks) runs only if production is hosted again. The staging lines (`apply.sh staging --what-if`, after steps 5 and 6) still apply if you run task 18a steps 4 to 6.
