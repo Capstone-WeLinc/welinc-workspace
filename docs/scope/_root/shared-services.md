@@ -34,7 +34,7 @@ _These are recommendations to keep the build orderly, not requirements. Skip any
 | S14 | Environment checked at startup | Config | done |
 | S7 | Account activity and audit | Account | done |
 | S8 | Profile extras | Account | done |
-| S13 | Email verification | Account | done |
+| S13 | Email verification | Account | in-progress |
 | S11 | Move VMMS and BMS onto the shared services | Cutover | in-progress |
 | S10 | Suite admin model | Admin | done |
 | S15 | Authenticator app sign in for admins | Admin | planned |
@@ -250,7 +250,7 @@ The profile routes the other apps already call: verify password before a sensiti
 - [x] Verify it: `/check verify profile extras` (2026-11-12, local stack, three runs; 33 of 35 `verify.md` steps ran and passed. Two were not run live and are covered by tests: the service token call, and a new account on an erased person's old email, which would send real mail)
 - [x] Test it: `/test profile extras` (2026-11-12; 6 new unit test files, welinc-auth 26 and web-vrms 105 passing; the database specs, components and AC-24 UI stay with verify)
 
-### S13. Email verification · done
+### S13. Email verification · in-progress
 spec [0009](../../specs/_root/0009-email-verification/index.md) · code in `welinc-auth/src/auth/codes/` (code service, sign in step), `welinc-auth/src/auth/sessions/` (the step routes), `welinc-web-portal/src/pages/auth/EmailCodeStep.tsx`, `welinc-web-vrms/src/features/auth/` (Change email) and `src/features/user-management/` (statuses)
 
 Prove a person owns their email before the suite relies on it, instead of only checking that the domain can receive mail. Today `emailVerified` turns true only when someone uses a setup or reset code; an account an admin creates with a typed password, and any email change by an admin or on the profile, is never checked.
@@ -269,6 +269,9 @@ Prove a person owns their email before the suite relies on it, instead of only c
 - [x] Test it: `/test email verification` (2026-11-11)
 - [x] Document it: `/document email verification` (2026-11-11, PRs opened)
 - [ ] Polish it (optional, ask first): `web-design-guidelines` (the portal code step)
+- Note (2026-11-20, `/architect`, amendment AC-33): staging is the defense demo (VRMS spec 0008 AC-24), so seed accounts' mail on staging goes to one team Gmail by plus addressing (`SEED_MAIL_REDIRECT`) instead of the auth log. The seed addresses don't change, so no group changes anything. Cross checked on another model, 7 fixes applied.
+- [x] Build the amendment: `/develop email verification AC-33` (`SEED_MAIL_REDIRECT`, the tag helper, tests, the staging parameter; the team Gmail address goes in once it exists) · AC-33
+- [ ] Verify the amendment: `/check verify email verification` (the AC-33 lines in `verify.md`) · AC-33
 
 ### S16. Temporary lockout and a clear deactivated answer · done · Beta · from spec 0015
 spec [0015](../../specs/_root/0015-temporary-lockout/index.md) · code in `welinc-auth/src/auth/lockout.ts`, the sign in and code step routes, `welinc-web-portal` (sign in messages)

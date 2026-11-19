@@ -126,3 +126,12 @@ _Extra steps from the build, one or more per acceptance criterion plus the Value
 - [ ] Staging portal, `vrms.admin@welinc.com` / `admin1234` → the code step appears; the code is in `az containerapp logs show -n auth-service -g rg-welinc-staging`, and typing it signs you in → AC-32
 - [ ] `env.spec.ts`: `SEED_MAIL_TO_LOG=1` fails boot; `SEED_MAIL_TO_LOG=true` with `SENTRY_ENVIRONMENT=production` is refused → AC-32
 - [ ] Staging: `auth-migrate` and `auth-seed` jobs don't list `SEED_MAIL_TO_LOG` (`az containerapp job show -n auth-seed -g rg-welinc-staging`) → AC-32
+
+## Added by the amendment (2026-11-20, AC-33)
+
+- [ ] `mail.service.spec.ts`: the three AC-33 cases pass (seed address redirected to the tagged address and not logged; real address sent as is; `+` and uppercase in the local part normalized; a local part over 40 characters cut; no SMTP falls back to the log) → AC-33
+- [ ] `env.spec.ts`: a template without `{tag}`, with two, or with `{tag}` after the `@` fails boot; set with `SENTRY_ENVIRONMENT=production` is refused → AC-33
+- [ ] Staging: `az containerapp show -n auth-service-staging -g rg-welinc-staging` lists `SEED_MAIL_REDIRECT`; `auth-migrate-staging` and `auth-seed-staging` don't → AC-33
+- [ ] Staging portal, `vrms.admin@welinc.com` / `admin1234` → the code arrives in the team Gmail at `+vrms.admin`, from `WeLinc`, in the inbox (not spam); typing it signs you in; the auth log holds no code → AC-33
+- [ ] A real address on staging (your own Gmail, through a password reset) still gets its own mail, not the team inbox → AC-33
+
