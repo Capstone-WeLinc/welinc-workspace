@@ -1,8 +1,8 @@
 # Join the shared web login
 
-How a system's web app signs people in through the shared portal, the way VRMS does today. Written for the VMMS and BMS groups, who move onto it in S11. The rules behind it are in the shared services contract, [spec 0001](../specs/_root/0001-shared-services-contract/index.md), sections 5 and 7; the launcher is [spec 0007](../specs/_root/0007-app-initiated-login-launcher/index.md).
+How a web app signs people in through the shared portal, the way VRMS does.
 
-## How it works in one paragraph
+## How it works
 
 Your web app never sees a password, a login code or a refresh token. When someone opens your app without a session, your app sends them to your own backend, which starts a login at welinc-auth. welinc-auth sends them through the portal (the password form, or no form when they are already signed in) and back to your backend with a one time code. Your backend swaps the code for tokens, keeps the refresh token in an HttpOnly cookie, and hands your app a short lived access token that lives in memory only. The person lands on the exact address they first opened.
 
@@ -43,7 +43,7 @@ Copy the idea from `welinc-web-vrms/src/lib/session/` (`session.ts`, `bootGuard.
 
 ## Web app: Switch system and sign out
 
-- **Switch system:** show it when `user.systems` (from the refresh answer) has two or more entries, or when the person is Admin in your system (a suite admin's temporary Admin grant counts). A one system admin's launcher holds the Admin card, so they need the way back (spec 0007, AC-9 and AC-14). It opens `<portal>/?from=<SYS>` in the same tab, where the launcher lists the person's systems and tags yours "You're here". A missing `user.systems` counts as an empty list. VRMS's version is `welinc-web-vrms/src/lib/session/switchSystem.ts` and `src/components/layout/useShellActions.ts`.
+- **Switch system:** show it when `user.systems` (from the refresh answer) has two or more entries, or when the person is Admin in your system (a suite admin's temporary Admin grant counts). It opens `<portal>/?from=<SYS>` in the same tab, where the launcher lists the person's systems and tags yours "You're here". A missing `user.systems` counts as an empty list. VRMS's version is `welinc-web-vrms/src/lib/session/switchSystem.ts` and `src/components/layout/useShellActions.ts`.
 - **Sign out:** `POST /<sys>/session/logout`, then send the browser to `<portal>/login?reason=logout`. That ends the shared session, so every other app signs out within 30 seconds too.
 
 ## Remove the old handoff

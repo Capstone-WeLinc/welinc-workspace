@@ -1,137 +1,94 @@
 # Seed accounts
 
-The test people every WeLinc system shares, from [spec 0006](../specs/_root/0006-suite-seed-accounts/index.md). You sign in with these through the portal:
+The test people every WeLinc system shares. Sign in with them at the portal:
 
-| Where | Portal | Seed people |
+| Where | Portal | Who's there |
 |---|---|---|
-| Your machine | `http://localhost:8000` | all of them, broken state accounts included |
-| Staging | `https://staging-portal.welinc.app` | all but the broken state accounts, once staging is seeded (see *On staging*) |
-| Production | `https://portal.welinc.app` | none, ever: real people are invited from the portal |
+| Your machine | `http://localhost:8000` | everyone below |
+| Staging | `https://staging-portal.welinc.app` | everyone except the broken state accounts |
 
-## The manifest
+The passwords are public on purpose: these are test accounts only.
 
-- `welinc-auth/prisma/seeds/people.json` is the one list of seed people for the whole suite: 147 people (145, the suite admin from spec 0013 and `vmms.mech@` from spec 0014), each with a fixed id (see *Ids*), one email, their roles in each system, a password and a state.
-- `npm run seed` in welinc-auth creates those people. Every other system copies the file and links its own rows (mechanics, crew, actor ids) to the same ids. It never creates accounts of its own.
-- welinc-auth's file always wins. A copy that differs is out of date, never a second source. Need a new person or role? Ask the shared services owner to add them to the manifest.
-- An id is one person forever. A removed person's id is retired, never reused.
+## Getting the emailed code
 
-## Email rule
+Admins (and `state.unverified@`) type a 6 digit code from their email when they sign in. Seed addresses aren't real inboxes, so:
 
-| Who | Pattern | Example |
-|---|---|---|
-| Office accounts | `<system>.<role>@welinc.com`, numbered from the second person | `vmms.ops@`, `vmms.ops2@` |
-| Field people (drivers, helpers, named mechanics) | `<role>.<first name>@welinc.com`, lowercased, spaces removed | `helper.markanthony@` |
-| Bulk mechanics | `first.lastN@welinc.com` | `danilo.ramos1@` |
-| People in more than one system | `multi.<label>@welinc.com` | `multi.lead@` |
-| Broken accounts | `state.<state>@welinc.com` | `state.locked@` |
+- **Your machine:** the code is printed in the auth log: `docker logs welinc_auth_service`.
+- **Staging:** the code goes to the team inbox `welinc.demo@gmail.com`. Each account has its own tag: `vrms.admin@welinc.com` gets mail at `welinc.demo+vrms.admin@gmail.com`, so search `to:welinc.demo+vrms.admin`. Ask the lead for access.
+- **Real addresses** (an account you made with your own Gmail) get real mail, on your machine too. Don't send codes or resets to real people while testing.
 
-Every seed email ends in `@welinc.com`. The seed writes straight to the database, so the email domain check doesn't apply to it.
+## Suite admin
 
-## Ids
-
-Every person has a fixed id: `00000000-0000-4000-8000-` plus a 12 digit number. The number is built the same way for every system, so you can read who someone is from it. No system gets special numbers.
-
-| Number | Who |
-|---|---|
-| 1101 to 1199 | VRMS Admin |
-| 1201 to 1299 | VRMS Chief Mechanic |
-| 2101 to 2199 | VMMS Admin |
-| 2201 to 2299 | VMMS Operations |
-| 2301 to 2399 | VMMS Chief Mechanic |
-| 2401 to 2499 | VMMS Mechanic only (`vmms.mech@`, spec 0014) |
-| 3101 to 3199 | BMS Admin |
-| 3201 to 3299 | BMS Operations |
-| 3301 to 3399 | BMS Customer Support |
-| 3401 to 3499 | BMS Driver |
-| 3501 to 3599 | BMS Helper |
-| 4001 to 4099 | People in more than one system (`multi.*`) |
-| 4101 to 4199 | Named mechanics (VRMS and VMMS Mechanic) |
-| 4201 to 4299 | Bulk mechanics (VRMS and VMMS Mechanic) |
-| 5001 to 5099 | Broken state accounts |
-| 9001 | The suite admin (spec 0013) |
-
-Read it as: first digit is the system (1 VRMS, 2 VMMS, 3 BMS), second digit is the role in that system's catalog order, the last two digits count the people. A first digit of 4 means more than one system, and 5 means a broken account.
-
-An id is one person forever. A removed person's id is retired, never reused. A new person takes the next free number in their block.
-
-## Accounts
-
-### Suite admin
-
-| Id | Email | Name | Roles | Password | State |
-|---|---|---|---|---|---|
-| 9001 | `suite.admin@welinc.com` | Leonora Castillo | none (suite admin, spec 0013) | `admin1234` | active |
-
-Every admin, this one included, confirms each portal sign in with an emailed code (`ADMIN_SIGN_IN_CODE`, on by default). Seed addresses aren't real inboxes, so on your machine auth never sends mail to `@welinc.com` (or `localhost`, `test.com`, `example.com`): it prints the whole email, code included, to `docker logs welinc_auth_service`, even with `SMTP_*` set. Mail to a real address, such as an account you made with your own Gmail, goes out through SMTP as usual.
-
-On staging (suite spec 0009, AC-33), mail to a seed address goes to the team inbox `welinc.demo@gmail.com` instead, never to `welinc.com`. Each account has its own address there: `vrms.admin@welinc.com` gets its mail at `welinc.demo+vrms.admin@gmail.com`, so search the inbox for `to:welinc.demo+vrms.admin` to see one account's codes. Ask the lead for the inbox login. Real addresses still get their own mail. If the team inbox is ever switched off, the code is in the auth log instead (AC-32): `az containerapp logs show -n auth-service-staging -g rg-welinc-staging --tail 50`.
+| Id | Email | Name | Roles | Password |
+|---|---|---|---|---|
+| 9001 | `suite.admin@welinc.com` | Leonora Castillo | none (manages every account in the portal) | `admin1234` |
 
 ### VRMS office accounts
 
-| Id | Email | Name | Roles | Password | State |
-|---|---|---|---|---|---|
-| 1101 | `vrms.admin@welinc.com` | Victor Ramos | VRMS Admin | `admin1234` | active |
-| 1102 | `vrms.admin2@welinc.com` | Teresita Aquino | VRMS Admin | `admin1234` | active |
-| 1103 | `vrms.admin3@welinc.com` | Gilbert Navarro | VRMS Admin | `admin1234` | active |
-| 1104 | `vrms.admin4@welinc.com` | Marissa Domingo | VRMS Admin | `admin1234` | active |
-| 1105 | `vrms.admin5@welinc.com` | Rodrigo Salazar | VRMS Admin | `admin1234` | active |
-| 1201 | `vrms.chief@welinc.com` | Ramon Villanueva | VRMS Chief Mechanic | `chief1234` | active |
-| 1202 | `vrms.chief2@welinc.com` | Alfredo Bautista | VRMS Chief Mechanic | `chief1234` | active |
-| 1203 | `vrms.chief3@welinc.com` | Nestor Pineda | VRMS Chief Mechanic | `chief1234` | active |
-| 1204 | `vrms.chief4@welinc.com` | Lorna Galang | VRMS Chief Mechanic | `chief1234` | active |
-| 1205 | `vrms.chief5@welinc.com` | Efren Lacson | VRMS Chief Mechanic | `chief1234` | active |
+| Id | Email | Name | Roles | Password |
+|---|---|---|---|---|
+| 1101 | `vrms.admin@welinc.com` | Victor Ramos | VRMS Admin | `admin1234` |
+| 1102 | `vrms.admin2@welinc.com` | Teresita Aquino | VRMS Admin | `admin1234` |
+| 1103 | `vrms.admin3@welinc.com` | Gilbert Navarro | VRMS Admin | `admin1234` |
+| 1104 | `vrms.admin4@welinc.com` | Marissa Domingo | VRMS Admin | `admin1234` |
+| 1105 | `vrms.admin5@welinc.com` | Rodrigo Salazar | VRMS Admin | `admin1234` |
+| 1201 | `vrms.chief@welinc.com` | Ramon Villanueva | VRMS Chief Mechanic | `chief1234` |
+| 1202 | `vrms.chief2@welinc.com` | Alfredo Bautista | VRMS Chief Mechanic | `chief1234` |
+| 1203 | `vrms.chief3@welinc.com` | Nestor Pineda | VRMS Chief Mechanic | `chief1234` |
+| 1204 | `vrms.chief4@welinc.com` | Lorna Galang | VRMS Chief Mechanic | `chief1234` |
+| 1205 | `vrms.chief5@welinc.com` | Efren Lacson | VRMS Chief Mechanic | `chief1234` |
 
 ### VMMS office accounts
 
-| Id | Email | Name | Roles | Password | State |
-|---|---|---|---|---|---|
-| 2101 | `vmms.admin@welinc.com` | Valerio Mercado | VMMS Admin | `admin1234` | active |
-| 2102 | `vmms.admin2@welinc.com` | Cristina Velasco | VMMS Admin | `admin1234` | active |
-| 2103 | `vmms.admin3@welinc.com` | Dominic Sison | VMMS Admin | `admin1234` | active |
-| 2104 | `vmms.admin4@welinc.com` | Rowena Manalo | VMMS Admin | `admin1234` | active |
-| 2105 | `vmms.admin5@welinc.com` | Leonardo Abad | VMMS Admin | `admin1234` | active |
-| 2301 | `vmms.chief@welinc.com` | Ramon Garcia | VMMS Chief Mechanic | `chief1234` | active |
-| 2302 | `vmms.chief2@welinc.com` | Diego Martinez | VMMS Chief Mechanic | `chief1234` | active |
-| 2303 | `vmms.chief3@welinc.com` | Ariel Macaraeg | VMMS Chief Mechanic | `chief1234` | active |
-| 2304 | `vmms.chief4@welinc.com` | Benigno Tuazon | VMMS Chief Mechanic | `chief1234` | active |
-| 2305 | `vmms.chief5@welinc.com` | Celso Ramirez | VMMS Chief Mechanic | `chief1234` | active |
-| 2201 | `vmms.ops@welinc.com` | Oscar Ramos | VMMS Operations | `ops1234` | active |
-| 2202 | `vmms.ops2@welinc.com` | Imelda Fajardo | VMMS Operations | `ops1234` | active |
-| 2203 | `vmms.ops3@welinc.com` | Rafael Ilagan | VMMS Operations | `ops1234` | active |
-| 2204 | `vmms.ops4@welinc.com` | Josefina Dela Paz | VMMS Operations | `ops1234` | active |
-| 2205 | `vmms.ops5@welinc.com` | Noel Samonte | VMMS Operations | `ops1234` | active |
-| 2401 | `vmms.mech@welinc.com` | Ramil Aquino | VMMS Mechanic | `mechanic1234` | active |
+| Id | Email | Name | Roles | Password |
+|---|---|---|---|---|
+| 2101 | `vmms.admin@welinc.com` | Valerio Mercado | VMMS Admin | `admin1234` |
+| 2102 | `vmms.admin2@welinc.com` | Cristina Velasco | VMMS Admin | `admin1234` |
+| 2103 | `vmms.admin3@welinc.com` | Dominic Sison | VMMS Admin | `admin1234` |
+| 2104 | `vmms.admin4@welinc.com` | Rowena Manalo | VMMS Admin | `admin1234` |
+| 2105 | `vmms.admin5@welinc.com` | Leonardo Abad | VMMS Admin | `admin1234` |
+| 2301 | `vmms.chief@welinc.com` | Ramon Garcia | VMMS Chief Mechanic | `chief1234` |
+| 2302 | `vmms.chief2@welinc.com` | Diego Martinez | VMMS Chief Mechanic | `chief1234` |
+| 2303 | `vmms.chief3@welinc.com` | Ariel Macaraeg | VMMS Chief Mechanic | `chief1234` |
+| 2304 | `vmms.chief4@welinc.com` | Benigno Tuazon | VMMS Chief Mechanic | `chief1234` |
+| 2305 | `vmms.chief5@welinc.com` | Celso Ramirez | VMMS Chief Mechanic | `chief1234` |
+| 2201 | `vmms.ops@welinc.com` | Oscar Ramos | VMMS Operations | `ops1234` |
+| 2202 | `vmms.ops2@welinc.com` | Imelda Fajardo | VMMS Operations | `ops1234` |
+| 2203 | `vmms.ops3@welinc.com` | Rafael Ilagan | VMMS Operations | `ops1234` |
+| 2204 | `vmms.ops4@welinc.com` | Josefina Dela Paz | VMMS Operations | `ops1234` |
+| 2205 | `vmms.ops5@welinc.com` | Noel Samonte | VMMS Operations | `ops1234` |
+| 2401 | `vmms.mech@welinc.com` | Ramil Aquino | VMMS Mechanic | `mechanic1234` |
 
 `vmms.mech@` is the one person who holds VMMS Mechanic and nothing else (suite spec 0014, AC-8). The VMMS web app admits only Admin and Operations, so the portal shows them the phone only state, and the checker uses them for the `APP_NOT_ALLOWED` checks.
 
 ### BMS office accounts
 
-| Id | Email | Name | Roles | Password | State |
-|---|---|---|---|---|---|
-| 3101 | `bms.admin@welinc.com` | Bernardo Mendoza | BMS Admin | `admin1234` | active |
-| 3102 | `bms.admin2@welinc.com` | Evangeline Cortez | BMS Admin | `admin1234` | active |
-| 3103 | `bms.admin3@welinc.com` | Patrick Yap | BMS Admin | `admin1234` | active |
-| 3104 | `bms.admin4@welinc.com` | Gemma Lualhati | BMS Admin | `admin1234` | active |
-| 3105 | `bms.admin5@welinc.com` | Raul Tan | BMS Admin | `admin1234` | active |
-| 3301 | `bms.cs@welinc.com` | Clara Reyes | BMS Customer Support | `cs1234` | active |
-| 3302 | `bms.cs2@welinc.com` | Angelica Ong | BMS Customer Support | `cs1234` | active |
-| 3303 | `bms.cs3@welinc.com` | Mylene Serrano | BMS Customer Support | `cs1234` | active |
-| 3304 | `bms.cs4@welinc.com` | Jonathan Lim | BMS Customer Support | `cs1234` | active |
-| 3305 | `bms.cs5@welinc.com` | Kristine Valencia | BMS Customer Support | `cs1234` | active |
-| 3201 | `bms.ops@welinc.com` | Oscar Santos | BMS Operations | `ops1234` | active |
-| 3202 | `bms.ops2@welinc.com` | Melchor Agustin | BMS Operations | `ops1234` | active |
-| 3203 | `bms.ops3@welinc.com` | Liza Montemayor | BMS Operations | `ops1234` | active |
-| 3204 | `bms.ops4@welinc.com` | Hernani Cabral | BMS Operations | `ops1234` | active |
-| 3205 | `bms.ops5@welinc.com` | Susana Ventura | BMS Operations | `ops1234` | active |
+| Id | Email | Name | Roles | Password |
+|---|---|---|---|---|
+| 3101 | `bms.admin@welinc.com` | Bernardo Mendoza | BMS Admin | `admin1234` |
+| 3102 | `bms.admin2@welinc.com` | Evangeline Cortez | BMS Admin | `admin1234` |
+| 3103 | `bms.admin3@welinc.com` | Patrick Yap | BMS Admin | `admin1234` |
+| 3104 | `bms.admin4@welinc.com` | Gemma Lualhati | BMS Admin | `admin1234` |
+| 3105 | `bms.admin5@welinc.com` | Raul Tan | BMS Admin | `admin1234` |
+| 3301 | `bms.cs@welinc.com` | Clara Reyes | BMS Customer Support | `cs1234` |
+| 3302 | `bms.cs2@welinc.com` | Angelica Ong | BMS Customer Support | `cs1234` |
+| 3303 | `bms.cs3@welinc.com` | Mylene Serrano | BMS Customer Support | `cs1234` |
+| 3304 | `bms.cs4@welinc.com` | Jonathan Lim | BMS Customer Support | `cs1234` |
+| 3305 | `bms.cs5@welinc.com` | Kristine Valencia | BMS Customer Support | `cs1234` |
+| 3201 | `bms.ops@welinc.com` | Oscar Santos | BMS Operations | `ops1234` |
+| 3202 | `bms.ops2@welinc.com` | Melchor Agustin | BMS Operations | `ops1234` |
+| 3203 | `bms.ops3@welinc.com` | Liza Montemayor | BMS Operations | `ops1234` |
+| 3204 | `bms.ops4@welinc.com` | Hernani Cabral | BMS Operations | `ops1234` |
+| 3205 | `bms.ops5@welinc.com` | Susana Ventura | BMS Operations | `ops1234` |
 
 ### Multi system accounts
 
-| Id | Email | Name | Roles | Password | State |
-|---|---|---|---|---|---|
-| 4001 | `multi.chief@welinc.com` | Teodoro Manalastas | VRMS Chief Mechanic, VMMS Chief Mechanic | `chief1234` | active |
-| 4002 | `multi.admin@welinc.com` | Felicidad Roxas | VRMS Admin, VMMS Admin | `admin1234` | active |
-| 4003 | `multi.mixed@welinc.com` | Arturo Pangilinan | VRMS Chief Mechanic, VMMS Operations | `chief1234` | active |
-| 4004 | `multi.lead@welinc.com` | Corazon Villareal | VRMS Chief Mechanic, VMMS Operations, BMS Operations | `chief1234` | active |
+| Id | Email | Name | Roles | Password |
+|---|---|---|---|---|
+| 4001 | `multi.chief@welinc.com` | Teodoro Manalastas | VRMS Chief Mechanic, VMMS Chief Mechanic | `chief1234` |
+| 4002 | `multi.admin@welinc.com` | Felicidad Roxas | VRMS Admin, VMMS Admin | `admin1234` |
+| 4003 | `multi.mixed@welinc.com` | Arturo Pangilinan | VRMS Chief Mechanic, VMMS Operations | `chief1234` |
+| 4004 | `multi.lead@welinc.com` | Corazon Villareal | VRMS Chief Mechanic, VMMS Operations, BMS Operations | `chief1234` |
 
 ### Broken state accounts
 
@@ -151,11 +108,13 @@ On staging (suite spec 0009, AC-33), mail to a seed address goes to the team inb
 | BMS drivers | 12 | 3401 to 3412 (`driver.ramon@` to `driver.antonio@`) | BMS Driver | `driver1234` |
 | BMS helpers | 20 | 3501 to 3520 (`helper.markanthony@` to `helper.bryan@`) | BMS Helper | `helper1234` |
 
-Driver n matches BMS `emp_id` `DRV-00n`, and helper n matches `HLP-00n`. Drivers and helpers carry their `+63` phone in `contact`, copied from the BMS crew seed.
+Driver n is BMS `DRV-00n` and helper n is `HLP-00n`; both carry a `+63` phone.
 
-Together these give the launcher (S4) accounts with one system (most office people), two (the mechanics, `multi.chief@`, `multi.admin@`, `multi.mixed@`) and three (`multi.lead@`). A portal login with two or more systems lands on the launcher, and one with a single system goes straight in.
+`vmms.mech@` holds only VMMS Mechanic, so the VMMS web app turns them away (phone app only). The `multi.*` people hold two or three systems: they land on the launcher after sign in, while a one system person goes straight in.
 
-## What the broken accounts show at login today
+## What the broken accounts show
+
+These exist only on your machine, never on staging.
 
 | Account | Login answers |
 |---|---|
@@ -164,68 +123,36 @@ Together these give the launcher (S4) accounts with one system (most office peop
 | `state.deleted@` | 401 "Invalid credentials" (soft deleted; its roles stay) |
 | `state.unverified@` | The right password answers the email step (200 `EMAIL_VERIFICATION_REQUIRED`, spec 0009), not a session: the portal and the mobile login ask for the 6 digit code emailed to it. Once the code is used it signs in like anyone else, until the next `npm run seed` makes it unverified again. Locally, run welinc-auth with SMTP blank so the code prints in its log instead of going out as real mail |
 
-They exist only on local databases, never on staging. A reseed puts them back in their state, so if you unlock `state.locked@` (or 15 minutes pass), it is locked again after the next `npm run seed`. A reseed also clears a lock on any active seed account you locked while testing.
+A reseed puts each one back in its state.
 
 ## Commands
 
-You run these in `welinc-auth`, after `npm run db:deploy`.
+Run these in `welinc-auth`.
 
 | Command | What it does |
 |---|---|
-| `npm run seed` | Puts every seed person back to their listed state (name, email, password, state, exactly their roles), then applies the client registry. Accounts you made by hand and their sessions are left alone. Safe to run again: an unchanged run writes nothing to the directory feed |
-| `npm run seed -- --reset` | Removes every user first (with their sessions, change history and reset codes), then seeds. Local databases only: it refuses unless `NODE_ENV` is unset, `development` or `test`, and the database host is `localhost`, `127.0.0.1` or a compose service name |
-| `npm run seed:check -- <path>` | Compares a copy of `people.json` with welinc-auth's, byte for byte. Prints "Matches people.json", or tells you to copy the file again |
+| `npm run seed` | Puts every seed person back to their listed state. Accounts you made by hand stay. Safe to run again |
+| `npm run seed -- --reset` | Deletes every user first, then seeds. Local only |
+| `npm run seed:check -- <path>` | Checks that your copy of `people.json` matches welinc-auth's |
 
-The seed stops and writes nothing when:
-- the manifest has a problem (a duplicate email, a role not in the catalog, too many roles in one system, an admin in all three systems, and so on). It lists every problem at once.
-- a manifest email already belongs to someone else, for example an account you made by hand with `bms.cs2@welinc.com`. Free that email, or run `--reset` locally.
-- `NODE_ENV=production`, unless `SEED_ALLOW=staging` is set. Set that only in the staging environment's welinc-auth settings, never on production. With it, the seed skips the broken state accounts.
+The seed stops without writing anything if an email it needs is already taken by an account you made by hand. Free that email, or use `--reset` locally.
 
-The passwords here are public on purpose. That is only safe because the seed never runs on production.
+Staging is seeded by the lead, never from your machine.
 
-### On staging
+## Ids
 
-Staging is seeded once, after the first deploy, by the lead (VRMS spec 0008, *Seed and bootstrap jobs*). Nobody runs a seed against staging from their own machine.
+Every person has a fixed id: `00000000-0000-4000-8000-` plus a 12 digit number. First digit: 1 VRMS, 2 VMMS, 3 BMS, 4 more than one system, 5 broken account, 9 suite admin. Second digit: the role. Last two: the person.
 
-1. The `auth-seed-staging` job runs `npm run seed:clients`, then `npm run seed` (it carries `SEED_ALLOW=staging`, so the broken state accounts are skipped).
-2. The `vrms-seed` job runs VRMS's `npm run seed`.
-3. Each group's migrate job is started once with its own seed command, which links its rows to the same people.
+An id is one person forever, never reused.
 
-Reseeding staging works the same way and puts every seed person back to their listed state, as on your machine.
+## Using the seed people in your own seed
 
-## Moving from the old seed
+`welinc-auth/prisma/seeds/people.json` is the only list of seed people. Your seed never creates users. It links its own rows (mechanics, crew, bookings) to these people:
 
-- Every id changed when the numbers became one scheme per system (2026-11-09). A database seeded earlier holds the same people under their old ids, so the next `npm run seed` stops on an email conflict. On a local database run `npm run seed -- --reset`, then reseed VRMS.
-- `ops.user@welinc.com` is now `bms.ops@welinc.com`, and `cs.user@welinc.com` is now `bms.cs@welinc.com`.
-- The VRMS chief `vrms.chief@welinc.com` now uses `chief1234`, not `mechanic1234`.
+1. Keep a byte for byte copy of `people.json` in your seed folder, with `<path>/people.json text eol=lf` in `.gitattributes`.
+2. After each pull of welinc-auth, check it from the workspace root: `npm --prefix welinc-auth run seed:check -- <your repo>/<path>/people.json`.
+3. Find people by email or role, never by a typed id, and put their id in your column (`userId`, `authUserId`, `actorUserId`).
 
-## Adding your own seeded data
+VRMS's version: `welinc-backend-vrms/prisma/seeds/shared-ids.ts`.
 
-Your system's seed makes its own rows (tickets, work orders, bookings). When a row needs a person, such as the mechanic on a ticket or the user who made a booking, link it to the manifest person. Do it like this:
-
-1. Copy the manifest into your seed folder (see the steps below) and read it in your seed code.
-2. Find people by email or by role, never by a number you typed in. For example, the VRMS admin is the person whose email is `vrms.admin@welinc.com`, and the mechanics are everyone holding a VRMS Mechanic role. The id then comes from the file, so it stays right even if numbering changes.
-3. Put that id in your foreign column (`authUserId`, `userId`, `actorUserId`). The person's name and email can be copied into your row too, if your table keeps them.
-4. Read your rows back from the manifest on every seed run. Do not keep a second list of people in your own seed.
-
-VRMS shows the pattern in `welinc-backend-vrms/prisma/seeds/shared-ids.ts`: it loads its copy, offers `seedActor(email)` and `vrmsRole(person)`, and `mechanics.seed.ts` makes a `Mechanic` row for each VRMS mechanic or chief.
-
-Need a person that does not exist yet, for example a third VMMS operator? Add them to welinc-auth's `people.json` at the next free number in their block, run `npm run seed` there, copy the file into each system, and run `seed:check` on each copy.
-
-## For VMMS and BMS
-
-Both systems moved onto the shared login (S11). On 2026-11-19 their copies matched welinc-auth's byte for byte: `welinc-backend-vmms/prisma/seeds/people.json`, and `prisma/seeds/people.json` in each of BMS's booking, dispatch and completion services. The steps below are how that was done; step 1's check is the one to repeat after every change to the manifest.
-
-1. Copy `welinc-auth/prisma/seeds/people.json` into your seed folder, and add `<your path>/people.json text eol=lf` to your `.gitattributes` so a Windows checkout keeps the same bytes. After each pull of welinc-auth, check your copy from the workspace root:
-   ```bash
-   npm --prefix welinc-auth run seed:check -- <your repo>/<your path>/people.json
-   ```
-2. Stop creating users and roles in your seed. Link your rows to the manifest people instead (see *Adding your own seeded data* above):
-   - VMMS: `Mechanic.userId`, work order and audit actor ids.
-   - BMS: `drivers` and `helpers` gain a user id column set from the manifest (driver n is `DRV-00n`, helper n is `HLP-00n`), plus booking actor ids.
-3. Use the manifest emails:
-   - VMMS: `ops.user@` becomes `vmms.ops@` (Oscar Ramos), and `vmms.chiefmech@` and `vmms.chiefmech2@` become `vmms.chief@` and `vmms.chief2@`.
-   - BMS: `cs.user@` becomes `bms.cs@`, `ops.user@` becomes `bms.ops@`, and crew emails move from `@welinc.ph` to the manifest's `@welinc.com`.
-4. Need a new person or role? Ask the shared services owner to add them to the manifest. Never add people only in your own seed.
-
-VRMS already works this way: see `welinc-backend-vrms/prisma/seeds/shared-ids.ts`, which reads its copy and makes a `Mechanic` row for every VRMS mechanic and chief mechanic.
+Need a new person or role? Ask the lead to add them to `people.json`, then copy the file again.

@@ -1,6 +1,6 @@
 # Fleet API (VMMS serves, BMS reads)
 
-VMMS owns the trucks and garages. BMS reads them from VMMS through three read only routes instead of the old Capstone 1 database (`welinc_db`). This is the first real API between two systems, and it follows [suite spec 0014](../specs/_root/0014-move-vmms-bms-shared-services/index.md) (AC-23 and AC-28). Contract 0001 section 4 holds only the scope; the routes live here.
+VMMS owns the trucks and garages. BMS reads them from VMMS through three read only routes instead of the old Capstone 1 database (`welinc_db`).
 
 ## Who calls it
 
@@ -58,9 +58,9 @@ Each field is the VMMS `vehicles` column of the same name. `engineType` is not s
 | VMMS doesn't answer in 3 s, or answers 5xx: the list and the assignment answer 503 `FLEET_UNAVAILABLE` | No stale list is served and nothing is assigned |
 | A 401 `TOKEN_EXPIRED`: one new token, one retry | Clock drift between containers |
 | A vehicle VMMS answers 404 for shows as "Unavailable vehicle" and takes no new assignment | Old assignments keep their history |
-| Two assignments racing for one truck keep dispatch's existing guard | Unchanged by the move; name it in your PR |
+| Two assignments racing for one truck keep dispatch's existing guard | Unchanged |
 
-Dispatch only fields (required helpers, truck type, status remarks, the usual driver) live in BMS's own `vehicle_dispatch_profiles`, keyed by the VMMS `vehicle_id` with no foreign key. A vehicle with no profile row has `required_helpers` 0 and the rest null. See the data model in spec 0014.
+Dispatch only fields (required helpers, truck type, status remarks, the usual driver) live in BMS's own `vehicle_dispatch_profiles`, keyed by the VMMS `vehicle_id` with no foreign key. A vehicle with no profile row has `required_helpers` 0 and the rest null.
 
 ## Proving it
 

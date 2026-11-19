@@ -2,7 +2,7 @@
 
 A record of what changed in `welinc-auth`, `welinc-web-portal` and the gateway during Capstone 2, and what is proposed next. Background only: to move a system onto the shared services, follow its checklist in [docs/integration/](../integration/README.md) instead. Last checked 2026-11-19. This term's changes were made by the VRMS group, apart from Dependabot updates.
 
-Everything below is on `development`, the branch every system builds against and staging deploys from. `main` is production's branch, which is not hosted (VRMS spec 0008 AC-24); in the four service repos it was moved up to `development` by hand on Nov 19 and again on Nov 20 to carry the production guard.
+Everything below is on `development`, the branch every system builds against and staging deploys from. Only staging is hosted; nobody works on `main`.
 
 ## Suite rows (the shared services epic)
 
@@ -21,7 +21,7 @@ Each row has a suite spec in `docs/specs/_root/`; the plan is [docs/scope/_root/
 | S7, account activity ([0011](../specs/_root/0011-account-activity-audit/index.md)) | One log of sign ins, sessions, codes and account changes, with a person route, an admin feed and a label catalog | Your activity screens read it ([account-screens.md](../integration/account-screens.md#activity)) |
 | S8, profile extras ([0012](../specs/_root/0012-profile-extras/index.md)) | Password recheck, deletion requests, a 30 day grace period and erasure; phone verification dropped | [account-screens.md, Account deletion](../integration/account-screens.md#account-deletion) |
 | S13, email verification ([0009](../specs/_root/0009-email-verification/index.md)) | An emailed code proves a person owns their email at sign in and on every email change | The portal shows the code step; your app does nothing. Seed addresses never get real mail: locally and on staging the code is in the auth log (AC-32) |
-| S10, suite admin ([0013](../specs/_root/0013-suite-admin-model/index.md)) | Suite admins, temporary access with a reason, an emailed code at each admin sign in, all account management in `<portal>/admin` | Delete your Users page ([account-screens.md, Admin pages](../integration/account-screens.md#admin-pages-move-to-the-portal)) |
+| S10, suite admin ([0013](../specs/_root/0013-suite-admin-model/index.md)) | Suite admins, temporary access with a reason, an emailed code at each admin sign in, all account management in `<portal>/admin` | Delete your Users page ([account-screens.md, Admin pages](../integration/account-screens.md#admin-pages-live-in-the-portal)) |
 | S11, the move ([0014](../specs/_root/0014-move-vmms-bms-shared-services/index.md)) | In progress: the checklists, the fleet API and the checker script. Both groups merged their moves into `development` (BMS on Nov 19); next is hosting them on staging ([hosting.md](../integration/hosting.md)) | [move-vmms.md](../integration/move-vmms.md), [move-bms.md](../integration/move-bms.md) |
 | S15, authenticator app for admins | Planned, after S11 and hosting | Nothing |
 
