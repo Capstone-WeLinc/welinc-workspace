@@ -135,3 +135,13 @@ _Extra steps from the build, one or more per acceptance criterion plus the Value
 - [x] Staging portal, `vrms.admin@welinc.com` / `admin1234` → the code arrives in the team Gmail at `+vrms.admin`, from `WeLinc`, in the inbox (not spam); typing it signs you in; the auth log holds no code → AC-33 (2026-11-20: inbox, from WeLinc, signed by welinc.app, signed in; code not in the last 300 log lines)
 - [x] A real address on staging (your own Gmail, through a password reset) still gets its own mail, not the team inbox → AC-33 (2026-11-20: a password reset to a personal Gmail landed in that inbox, not the team one)
 
+
+
+## Added by the amendment (2026-11-20, AC-34)
+
+- [ ] Unit: the AC-34 test's builder table covers every builder in `code-emails.ts`, `admin-alert-emails.ts` and `deletion-emails.ts` (its guard fails on a new one); none adds `<a` or `http` → AC-34
+- [ ] Unit: `portalHostOf('http://localhost:8000')` is `localhost:8000`; `portalHostOf('https://staging-portal.welinc.app/')` is `staging-portal.welinc.app` → AC-34
+- [ ] Unit: the setup and reset emails name `{portalHost}` and Forgot password in both parts; the alert names `{portalHost}` and Admin; the deletion email names the Users page → AC-34
+- [ ] Staging: a setup code to a real Gmail (invite from People) and a reset code to a seed account: no button, the portal host shows as plain text, and if Gmail made it a link, hovering shows `staging-portal.welinc.app`, not `sendibt` → AC-34
+- [ ] Staging: an admin alert (make and undo a test admin change) shows the host as plain text, no `sendibt` link → AC-34
+- [ ] Brevo's transactional blocked contacts list holds none of the team inbox addresses → AC-34 (runbook)
