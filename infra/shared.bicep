@@ -3,7 +3,7 @@
 
 param location string = resourceGroup().location
 
-@description('Principal ids of every deploy login (ours, VMMS, BMS; staging and production). Each gets AcrPush, which also covers reading tags.')
+@description('Principal ids of every deploy login (ours, VMMS, BMS; staging and production). Each gets AcrPush (push and read tags) and Reader on the registry (so `az acr show` finds it).')
 param pushPrincipalIds array = []
 
 @description('Principal id of the weekly image cleanup login (.github/workflows/purge-images.yml in the workspace). It gets Reader on the registry (to list repositories and tags) and AcrDelete to remove old ones, nothing else.')
@@ -74,6 +74,19 @@ resource push 'Microsoft.Authorization/roleAssignments@2022-04-01' = [for id in 
 }]
 
 var reader = subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'acdd72a7-3385-48ef-bd42-f606fba81ae7')
+
+// AcrPush has no registries/read, so `az acr show` (the deploy's first step, for the login server) answers
+// "could not be found". Reader on the registry alone fixes that without any right on the rest of rg-welinc-shared.
+resource pushRead 'Microsoft.Authorization/roleAssignments@2022-04-01' = [for id in pushPrincipalIds: {
+  scope: registry
+  name: guid(registry.id, id, reader)
+  properties: {
+    roleDefinitionId: reader
+    principalId: id
+    principalType: 'ServicePrincipal'
+  }
+}]
+
 var acrDelete = subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'c2f4ef07-c644-48eb-af81-4b1b4947fb11')
 
 resource purgeRoles 'Microsoft.Authorization/roleAssignments@2022-04-01' = [for role in (empty(purgePrincipalId) ? [] : [reader, acrDelete]): {
