@@ -40,12 +40,12 @@ _Steps derived from spec 0008 acceptance criteria. `/check verify` runs these; `
 - [ ] welinc-auth: `npm run db:deploy` as `auth_owner` and `npm run seed` as `auth_app` on a database set up by `init.sql` → both succeed → AC-6, AC-13
 - [ ] After signup: `infra/scripts/apply.sh shared`, `apply.sh budget`, then `apply.sh staging --what-if` → the preview lists the server, seven databases, two storage accounts, the environment, three apps, four jobs and four Static Web Apps, and no VMMS or BMS app → AC-10, AC-19
 - [ ] `apply.sh staging` → finishes, `db-init.sh` reports "database roles ready", and the temporary firewall rule is gone afterwards (`az postgres flexible-server firewall-rule list`) → AC-5, AC-10
-- [ ] `az postgres flexible-server parameter show --name azure.extensions` and `idle_in_transaction_session_timeout` on each server → `VECTOR,PG_TRGM` and `60000`; backup retention 14 days → AC-8, AC-21
+- [x] `az postgres flexible-server parameter show --name azure.extensions` and `idle_in_transaction_session_timeout` on each server → `VECTOR,PG_TRGM` and `60000`; backup retention 14 days → AC-8, AC-21 (2026-11-20, staging, the only server)
 - [ ] `dns-records.sh staging`, add the records, `dns-records.sh staging --check` → every line `ok`; then `apply.sh staging --domains` → `https://staging-api.welinc.app/health` answers 200 with a valid certificate, and the four web names open their Static Web Apps → AC-7
 - [ ] `apply.sh staging --domains` again → the gateway keeps its certificate the whole time (curl the health route in a loop during the run), and `--what-if` before it shows no changes to images or secrets → AC-7, AC-10
 - [ ] Any app on staging other than the gateway: `az containerapp show --query properties.configuration.ingress.external` → `false`; the gateway's `GET /vmms/health` → 502 `UPSTREAM_UNAVAILABLE` while VMMS is off → AC-19
 - [ ] Replica settings: production every app min 1; staging the gateway, `auth-service` and `vrms-backend` min 1, the rest 0; `auth-service` max 1 → AC-16
-- [ ] Budget: Cost Management shows `welinc-credit` with alerts at 25, 50, 75 and 90 percent of $200 → AC-12
+- [x] Budget: Cost Management shows `welinc-credit` with alerts at 25, 50, 75 and 90 percent of $200 → AC-12 (2026-11-20)
 - [ ] With a VMMS login filled in `env/logins.json` and `vmms` enabled: as that login, `az containerapp update -n vrms-backend` → AuthorizationFailed; `az containerapp update -n vmms-backend` → succeeds → AC-11
 - [ ] `vrms-backend` reads and signs a blob link (open a ticket photo on staging) with no connection string set → the photo loads → AC-14
 
@@ -75,3 +75,6 @@ On hold since 2026-11-20 (AC-24): every line below that names production (`-prod
 - [ ] Signed in as the production deploy login before the first production deploy: `az containerapp update -g rg-welinc-prod -n auth-service-prod --set-env-vars PROBE=1` then remove it → both succeed → AC-11, AC-23
 - [ ] `az lock list -g rg-welinc-staging` → `CanNotDelete` on `cae-welinc-staging`, `cert-api-prod`, `auth-uploads-prod` → AC-23
 - [ ] Workspace CI's name check on a branch that adds a 33 character name → red → AC-23
+
+- [x] Restore drill → AC-8 (2026-11-20: point in time restore refused, `SkuNotAvailable`; the `pg_dump` fallback matched every table, `auth` 737 rows, `vrms` 19,263; `infra/RUNBOOK.md`)
+- [x] Runbook covers bootstrap, records, firewall, rollback, stopping staging in one command, the lock, secrets, moving, production later, the freeze and the shutdown copy; credit end date recorded (Dec 18) → AC-10, AC-12, AC-20
