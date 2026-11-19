@@ -108,3 +108,7 @@ From the workspace root, with Docker running (about a minute; it starts its own 
 ```bash
 node infra/gateway/test/check-routes.mjs           # add --keep to leave the harness running
 ```
+
+## Deploys
+
+Staging deploys on every push to `main` that changes this folder (`.github/workflows/deploy-gateway.yml`); production is a manual "Run workflow". Only those commits have a gateway image, so the very first staging deploy (2026-11-19) came from the commit that added this section.
