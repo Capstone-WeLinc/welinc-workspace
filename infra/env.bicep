@@ -40,6 +40,9 @@ param groupApps object = {}
 @description('Staging is the demo (AC-24): keep every group app at 1 replica from the defense window until the shutdown copy (AC-16, task 19a). Back to false after task 22.')
 param warmAll bool = false
 
+@description('Staging only (suite spec 0009 AC-33): the team inbox for seed account mail, with {tag}, like team+{tag}@gmail.com. Blank leaves seed mail in the auth log.')
+param seedMailRedirect string = ''
+
 @description('Deploy login principal ids for this environment: {ours, vmms, bms}. Empty skips the role.')
 param logins object = {}
 
@@ -221,9 +224,14 @@ module auth 'modules/container-app.bicep' = {
     maxReplicas: 1
     cpu: '0.5'
     memory: '1Gi'
-    // Suite spec 0009 AC-32: on staging, mail to seed addresses is logged, not sent. The app only,
+    // Suite spec 0009 AC-32 and AC-33: on staging, mail to seed addresses goes to the team inbox, or
+    // the log while the inbox is blank; never sent to welinc.com. The app only,
     // not authSettings (the jobs share those); welinc-auth refuses it with SENTRY_ENVIRONMENT=production.
-    settings: union(authSettings, prod ? {} : { SEED_MAIL_TO_LOG: 'true' })
+    settings: union(
+      authSettings,
+      prod ? {} : { SEED_MAIL_TO_LOG: 'true' },
+      prod || empty(seedMailRedirect) ? {} : { SEED_MAIL_REDIRECT: seedMailRedirect }
+    )
     secretSettings: union(authSecrets, {
       DATABASE_URL: dbUrl(dbHost, 'auth', 'app', secrets.roles.auth.app)
     })

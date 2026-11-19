@@ -64,7 +64,7 @@ An id is one person forever. A removed person's id is retired, never reused. A n
 
 Every admin, this one included, confirms each portal sign in with an emailed code (`ADMIN_SIGN_IN_CODE`, on by default). Seed addresses aren't real inboxes, so on your machine auth never sends mail to `@welinc.com` (or `localhost`, `test.com`, `example.com`): it prints the whole email, code included, to `docker logs welinc_auth_service`, even with `SMTP_*` set. Mail to a real address, such as an account you made with your own Gmail, goes out through SMTP as usual.
 
-Staging works the same way (suite spec 0009, AC-32): mail to a seed address is never sent, and the code is in the auth log instead. Read it with `az containerapp logs show -n auth-service -g rg-welinc-staging --tail 50` (the Azure CLI, signed in to the WeLinc subscription).
+On staging (suite spec 0009, AC-33), mail to a seed address goes to the team inbox `welinc.demo@gmail.com` instead, never to `welinc.com`. Each account has its own address there: `vrms.admin@welinc.com` gets its mail at `welinc.demo+vrms.admin@gmail.com`, so search the inbox for `to:welinc.demo+vrms.admin` to see one account's codes. Ask the lead for the inbox login. Real addresses still get their own mail. If the team inbox is ever switched off, the code is in the auth log instead (AC-32): `az containerapp logs show -n auth-service-staging -g rg-welinc-staging --tail 50`.
 
 ### VRMS office accounts
 
@@ -187,7 +187,7 @@ The passwords here are public on purpose. That is only safe because the seed nev
 
 Staging is seeded once, after the first deploy, by the lead (VRMS spec 0008, *Seed and bootstrap jobs*). Nobody runs a seed against staging from their own machine.
 
-1. The `auth-seed` job runs `npm run seed:clients`, then `npm run seed` (it carries `SEED_ALLOW=staging`, so the broken state accounts are skipped).
+1. The `auth-seed-staging` job runs `npm run seed:clients`, then `npm run seed` (it carries `SEED_ALLOW=staging`, so the broken state accounts are skipped).
 2. The `vrms-seed` job runs VRMS's `npm run seed`.
 3. Each group's migrate job is started once with its own seed command, which links its rows to the same people.
 

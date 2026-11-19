@@ -22,6 +22,9 @@
     },
     "warmAll": {
       "value": true
+    },
+    "seedMailRedirect": {
+      "value": "welinc.demo+{tag}@gmail.com"
     }
   }
 }
