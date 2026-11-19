@@ -118,3 +118,11 @@ _Extra steps from the build, one or more per acceptance criterion plus the Value
 
 ### Acceptance-criteria coverage
 - AC-1 command steps (hashes, sweep, logs) · AC-2 admin change step · AC-3 lifetime text · AC-4 wrong code UI and command steps · AC-5 limits steps · AC-6 address limit step · AC-7 login steps · AC-8 second login step · AC-9 portal right code · AC-10 resend step · AC-11 mobile step · AC-12 reset step · AC-13 forgot steps · AC-14 verify-otp step · AC-15 admin password steps · AC-16 seed and test:db steps · AC-17 to AC-20 profile steps · AC-21 admin email steps · AC-22 `/auth/users` step · AC-23 directory step · AC-24 notice steps · AC-25, AC-26 portal UI steps · AC-27, AC-28 My profile steps · AC-29 Users page steps · AC-30 `password` sent nowhere (no field in the web-vrms payload types) · AC-31 docs step
+
+## Added by the amendment (2026-11-19, AC-32)
+
+- [ ] `mail.service.spec.ts`: the four cases of AC-32 pass (production with `SEED_MAIL_TO_LOG` on: seed address logged, real address sent; production without it: seed address sent; development: seed address logged) → AC-32
+- [ ] Staging: `az containerapp show -n auth-service -g rg-welinc-staging` lists `SEED_MAIL_TO_LOG=true`; production's `auth-service` doesn't have it → AC-32
+- [ ] Staging portal, `vrms.admin@welinc.com` / `admin1234` → the code step appears; the code is in `az containerapp logs show -n auth-service -g rg-welinc-staging`, and typing it signs you in → AC-32
+- [ ] `env.spec.ts`: `SEED_MAIL_TO_LOG=1` fails boot; `SEED_MAIL_TO_LOG=true` with `SENTRY_ENVIRONMENT=production` is refused → AC-32
+- [ ] Staging: `auth-migrate` and `auth-seed` jobs don't list `SEED_MAIL_TO_LOG` (`az containerapp job show -n auth-seed -g rg-welinc-staging`) → AC-32

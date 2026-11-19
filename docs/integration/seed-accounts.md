@@ -1,6 +1,12 @@
 # Seed accounts
 
-The test people every WeLinc system shares, from [spec 0006](../specs/_root/0006-suite-seed-accounts/index.md). You sign in with these through the portal at `http://localhost:8000`.
+The test people every WeLinc system shares, from [spec 0006](../specs/_root/0006-suite-seed-accounts/index.md). You sign in with these through the portal:
+
+| Where | Portal | Seed people |
+|---|---|---|
+| Your machine | `http://localhost:8000` | all of them, broken state accounts included |
+| Staging | `https://staging-portal.welinc.app` | all but the broken state accounts, once staging is seeded (see *On staging*) |
+| Production | `https://portal.welinc.app` | none, ever: real people are invited from the portal |
 
 ## The manifest
 
@@ -57,6 +63,8 @@ An id is one person forever. A removed person's id is retired, never reused. A n
 | 9001 | `suite.admin@welinc.com` | Leonora Castillo | none (suite admin, spec 0013) | `admin1234` | active |
 
 Every admin, this one included, confirms each portal sign in with an emailed code (`ADMIN_SIGN_IN_CODE`, on by default). Seed addresses aren't real inboxes, so on your machine auth never sends mail to `@welinc.com` (or `localhost`, `test.com`, `example.com`): it prints the whole email, code included, to `docker logs welinc_auth_service`, even with `SMTP_*` set. Mail to a real address, such as an account you made with your own Gmail, goes out through SMTP as usual.
+
+Staging works the same way (suite spec 0009, AC-32): mail to a seed address is never sent, and the code is in the auth log instead. Read it with `az containerapp logs show -n auth-service -g rg-welinc-staging --tail 50` (the Azure CLI, signed in to the WeLinc subscription).
 
 ### VRMS office accounts
 
@@ -175,6 +183,16 @@ The seed stops and writes nothing when:
 
 The passwords here are public on purpose. That is only safe because the seed never runs on production.
 
+### On staging
+
+Staging is seeded once, after the first deploy, by the lead (VRMS spec 0008, *Seed and bootstrap jobs*). Nobody runs a seed against staging from their own machine.
+
+1. The `auth-seed` job runs `npm run seed:clients`, then `npm run seed` (it carries `SEED_ALLOW=staging`, so the broken state accounts are skipped).
+2. The `vrms-seed` job runs VRMS's `npm run seed`.
+3. Each group's migrate job is started once with its own seed command, which links its rows to the same people.
+
+Reseeding staging works the same way and puts every seed person back to their listed state, as on your machine.
+
 ## Moving from the old seed
 
 - Every id changed when the numbers became one scheme per system (2026-11-09). A database seeded earlier holds the same people under their old ids, so the next `npm run seed` stops on an email conflict. On a local database run `npm run seed -- --reset`, then reseed VRMS.
@@ -194,9 +212,9 @@ VRMS shows the pattern in `welinc-backend-vrms/prisma/seeds/shared-ids.ts`: it l
 
 Need a person that does not exist yet, for example a third VMMS operator? Add them to welinc-auth's `people.json` at the next free number in their block, run `npm run seed` there, copy the file into each system, and run `seed:check` on each copy.
 
-## For VMMS and BMS (in S11, not before)
+## For VMMS and BMS
 
-You switch your seed when your system moves onto the shared login (S11). Until then your own seed keeps working.
+Both systems moved onto the shared login (S11). On 2026-11-19 their copies matched welinc-auth's byte for byte: `welinc-backend-vmms/prisma/seeds/people.json`, and `prisma/seeds/people.json` in each of BMS's booking, dispatch and completion services. The steps below are how that was done; step 1's check is the one to repeat after every change to the manifest.
 
 1. Copy `welinc-auth/prisma/seeds/people.json` into your seed folder, and add `<your path>/people.json text eol=lf` to your `.gitattributes` so a Windows checkout keeps the same bytes. After each pull of welinc-auth, check your copy from the workspace root:
    ```bash

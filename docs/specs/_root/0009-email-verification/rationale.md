@@ -86,6 +86,16 @@ The scope row asks for: a code or link on every new account and email change, `e
 - Pros: smaller change.
 - Cons: two tables with the same rules to keep in step, and the guessable reset route stays open.
 
+### Seed addresses on staging (amendment, 2026-11-19)
+
+Staging runs with `NODE_ENV=production` and real SMTP (Brevo), and every admin confirms a portal sign in with an emailed code. The rule that prints seed mail instead of sending it only applied outside production, so on staging a seed admin's code went to `welinc.com`, a domain nobody in the suite owns. No seed admin could finish signing in there, and codes left for a stranger's mail server.
+
+- **Turn the admin code off on staging**: simplest, but staging would stop testing a step production has.
+- **Log seed mail on staging too** (chosen): the step stays the same as production; you read the code from the auth container log, the way you read it from Docker locally. Real addresses still get real mail.
+- **Give the seed admins real inboxes** (Testmail): most realistic, but it changes the shared manifest and every group's copy of it.
+
+Why a new setting, `SEED_MAIL_TO_LOG`, and not `SEED_ALLOW=staging`: `SEED_ALLOW` lives only on the seed jobs and means "this run may write seed people". Putting it on the running app would mix two meanings, and the app would need it in its config schema for an unrelated reason. A setting named for what it does keeps the switch readable and easy to audit in `env.bicep`.
+
 ## Rationale
 
 The code wins because of where WeLinc's people sign in: a third of them on native mobile apps, and every one of them in a flow that is waiting on the same screen. A link's one advantage, a tap instead of six digits, matters for public sign ups where every lost click loses a customer. It doesn't matter for staff who do this about once. A link can still be added later without changing anything the code flow builds. (basis: OWASP Forgot Password Cheat Sheet on single use, short lived tokens)
