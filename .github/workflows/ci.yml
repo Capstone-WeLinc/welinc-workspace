@@ -49,6 +49,12 @@ jobs:
           done
       - name: Shellcheck
         run: shellcheck -x -S warning infra/scripts/*.sh scripts/*.sh
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      # Every app and job name with its -staging or -prod ending fits Azure's 32 characters (AC-23)
+      - name: App and job names
+        run: node scripts/check-names.mjs
 
   gateway:
     runs-on: ubuntu-latest

@@ -38,14 +38,20 @@ common() {
   set_var "$1" "${ENV}_VRMS_URL" "https://$(host vrms)"
 }
 
+# Both environments share one Container Apps environment, so every app and job name carries its
+# ending (spec 0008 AC-23). IMAGE_REPO is the base name, the same for both: production reuses the
+# image staging built. The old CONTAINER_APP and MIGRATE_JOB are never written again; delete them
+# once every workflow reads these (task 18a step 6).
+suffix="$(name_suffix "$env")"
+
 note "writing $env variables"
-for repo in welinc-auth welinc-backend-vrms; do
+for pair in welinc-auth:auth-service:auth-migrate welinc-backend-vrms:vrms-backend:vrms-migrate; do
+  IFS=: read -r repo app job <<<"$pair"
   common "$repo"
+  set_var "$repo" IMAGE_REPO "$app"
+  set_var "$repo" "CONTAINER_APP_$ENV" "$app$suffix"
+  set_var "$repo" "MIGRATE_JOB_$ENV" "$job$suffix"
 done
-set_var welinc-auth CONTAINER_APP auth-service
-set_var welinc-auth MIGRATE_JOB auth-migrate
-set_var welinc-backend-vrms CONTAINER_APP vrms-backend
-set_var welinc-backend-vrms MIGRATE_JOB vrms-migrate
 
 for pair in welinc-web-portal:portal welinc-web-vrms:vrms; do
   repo="${pair%%:*}"
@@ -55,7 +61,8 @@ for pair in welinc-web-portal:portal welinc-web-vrms:vrms; do
 done
 
 common welinc-workspace
-set_var welinc-workspace CONTAINER_APP api-gateway
+set_var welinc-workspace IMAGE_REPO api-gateway
+set_var welinc-workspace "CONTAINER_APP_$ENV" "api-gateway$suffix"
 # The weekly image cleanup (.github/workflows/purge-images.yml); one login for both environments
 purge="$(jq -r '.purge.clientId // ""' "$INFRA/env/logins.json")"
 [ -z "$purge" ] || set_var welinc-workspace AZURE_CLIENT_ID_PURGE "$purge"

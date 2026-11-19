@@ -5,7 +5,8 @@
 #   apply.sh budget                         the subscription budget alerts (AC-12)
 #   apply.sh <staging|prod>                 pass 1: everything on the default Azure host names
 #   apply.sh <staging|prod> --domains       pass 2: bind the custom domains (after dns-records.sh)
-#   ... --what-if                           preview only, changes nothing
+#   ... --what-if                           preview only, changes nothing (WHATIF_ARGS="--result-format
+#                                           ResourceIdOnly" lists only what changes, no values)
 #   ... --skip-db                           skip infra/db/init.sql (it needs psql)
 #
 # An environment apply always passes the image each app and job runs now, so it never rolls an
@@ -38,7 +39,8 @@ deploy() {
   local scope="$1" name="$2"
   shift 2
   if $whatif; then
-    az deployment "$scope" what-if -n "$name" "$@"
+    # shellcheck disable=SC2086  # WHATIF_ARGS is a list of az options
+    az deployment "$scope" what-if -n "$name" ${WHATIF_ARGS:-} "$@"
   else
     az deployment "$scope" create -n "$name" "$@" -o none
     note "applied $name"
@@ -57,31 +59,30 @@ register_providers() {
   done
 }
 
-# The repository an app or job's image comes from: runners are <app>, jobs run <app>-seed
-image_repo() {
-  case "$1" in
-    auth-migrate | auth-seed) echo auth-service-seed ;;
-    vrms-migrate | vrms-seed) echo vrms-backend-seed ;;
-    vmms-migrate) echo vmms-backend-seed ;;
-    *-migrate) echo "${1%-migrate}-seed" ;;
-    *) echo "$1" ;;
-  esac
-}
-
-# {name: image}: what each app and job runs now; for one still on the placeholder, the newest
-# image pushed for it (its first deploy pushed one); else nothing, and Bicep uses the placeholder.
+# {name: image}: what each app and job runs now, keyed by its name with the environment ending.
+# The list is the base names (the core ones, plus any group app the last apply had, its ending
+# removed) with this environment's ending, never the last outputs as they are: before task 18a
+# they hold the old bare names. Per name:
+#   1. the image the app or job runs now;
+#   2. not there yet (the first apply under the new names): what the old bare named one runs, so
+#      a renamed app starts on the image staging runs today, never the placeholder;
+#   3. it runs the placeholder: the newest image pushed for it (its first deploy pushed one);
+#   4. neither exists (a brand new environment's pass 1): nothing, so Bicep uses the placeholder.
 current_images() {
-  local env="$1" rg acr names out='{}'
+  local env="$1" rg acr suffix last names n img repo tag out='{}'
   rg="$(env_rg "$env")"
   acr="$(registry_name)"
-  names="$(az deployment group show -g "$rg" -n welinc-env \
-    --query 'properties.outputs.[appNames.value, jobNames.value]' -o json 2>/dev/null |
-    jq -r 'flatten | .[]' || true)"
-  [ -n "$names" ] || names="api-gateway auth-service vrms-backend auth-migrate auth-seed vrms-migrate vrms-seed"
+  suffix="$(name_suffix "$env")"
+  last="$(az deployment group show -g "$rg" -n welinc-env \
+    --query 'properties.outputs.[appNames.value, jobNames.value]' -o json 2>/dev/null || true)"
+  names="$( {
+    printf '%s\n' api-gateway auth-service vrms-backend auth-migrate auth-seed vrms-migrate vrms-seed
+    jq -r 'flatten | .[]' <<<"${last:-[]}"
+  } | while read -r n; do echo "$(base_name "$n")$suffix"; done | sort -u)"
   for n in $names; do
-    img="$(az containerapp show -g "$rg" -n "$n" --query 'properties.template.containers[0].image' -o tsv 2>/dev/null ||
-      az containerapp job show -g "$rg" -n "$n" --query 'properties.template.containers[0].image' -o tsv 2>/dev/null || true)"
-    if [ -z "$img" ] || [ "$img" = "$PLACEHOLDER_IMAGE" ]; then
+    img="$(running_image "$rg" "$n")"
+    [ -n "$img" ] || img="$(running_image "$rg" "$(base_name "$n")")"
+    if [ "$img" = "$PLACEHOLDER_IMAGE" ]; then
       repo="$(image_repo "$n")"
       tag="$(az acr repository show-tags -n "$acr" --repository "$repo" --orderby time_desc --top 1 -o tsv 2>/dev/null || true)"
       img="${tag:+$acr.azurecr.io/$repo:$tag}"
@@ -89,6 +90,12 @@ current_images() {
     [ -n "$img" ] && out="$(jq --arg n "$n" --arg i "$img" '. + {($n): $i}' <<<"$out")"
   done
   echo "$out"
+}
+
+# The image an app or job runs now, or nothing if it doesn't exist
+running_image() {
+  az containerapp show -g "$1" -n "$2" --query 'properties.template.containers[0].image' -o tsv 2>/dev/null ||
+    az containerapp job show -g "$1" -n "$2" --query 'properties.template.containers[0].image' -o tsv 2>/dev/null || true
 }
 
 case "$target" in
@@ -113,21 +120,32 @@ case "$target" in
     secrets="$(private_file "$env")"
     register_providers
     acr="$(registry_name)"
-    az group create -n "$rg" -l "$(env_location "$env")" -o none
+    suffix="$(name_suffix "$env")"
+    # Production runs in staging's Container Apps environment (AC-23), so it must exist first
+    if [ "$env" = prod ] && ! az containerapp env show -g "$CAE_RG" -n "$CAE_NAME" -o none 2>/dev/null; then
+      die "$CAE_NAME in $CAE_RG doesn't exist. Production runs in staging's Container Apps environment: run apply.sh staging first."
+    fi
+    location="$(env_location "$env")"
+    if [ "$env" = prod ] && [ "$location" != "$LOCATION" ]; then
+      die "PROD_LOCATION ($location) must be staging's region ($LOCATION): production's apps join $CAE_NAME there"
+    fi
+    az group create -n "$rg" -l "$location" -o none
 
     current_images "$env" >"$TMP/images.json"
     note "images kept: $(jq -c . "$TMP/images.json")"
     jq --arg e "$env" '.[$e] | map_values(.principalId)' "$INFRA/env/logins.json" >"$TMP/logins.json"
 
     certExists=false
-    if $domains && [ -n "$(az containerapp env certificate list -g "$rg" -n "cae-welinc-$env" \
-      --managed-certificates-only --query "[?name=='cert-api'].name" -o tsv 2>/dev/null || true)" ]; then
+    # Each environment's gateway certificate sits on the shared environment as cert-api<ending>
+    if $domains && [ -n "$(az containerapp env certificate list -g "$CAE_RG" -n "$CAE_NAME" \
+      --managed-certificates-only --query "[?name=='cert-api$suffix'].name" -o tsv 2>/dev/null || true)" ]; then
       certExists=true
     fi
 
     deploy group welinc-env -g "$rg" -f "$INFRA/env.bicep" \
       -p @"$INFRA/env/$env.parameters.json" \
-      -p location="$(env_location "$env")" postgresLocation="$(env_postgres_location "$env")" registryName="$acr" \
+      -p location="$location" postgresLocation="$(env_postgres_location "$env")" registryName="$acr" \
+      -p environmentName="$CAE_NAME" environmentResourceGroup="$CAE_RG" \
       -p bindDomains="$domains" gatewayCertExists="$certExists" \
       -p images=@"$TMP/images.json" -p logins=@"$TMP/logins.json" -p secrets=@"$secrets"
 

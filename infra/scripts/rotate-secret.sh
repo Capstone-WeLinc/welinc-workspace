@@ -4,6 +4,8 @@
 #
 #   rotate-secret.sh <staging|prod> <app or job> <SETTING_NAME>
 #
+# The name has its environment ending, as in Azure: auth-service-prod, vrms-migrate-staging.
+#
 # The value is read without echo, so it never lands in the shell history. Put the same value in
 # infra/private/<env>.json too, or the next apply.sh sets the old one back.
 

@@ -1,22 +1,34 @@
-// What every app in one environment stands on (spec 0008): logs, the two storage accounts, the
-// Container Apps environment with the auth file share, and the identity that pulls images.
+// What every app in one environment stands on (spec 0008): the two storage accounts, the identity
+// that pulls images, and the Container Apps environment with its logs. The trial allows one
+// Container Apps environment in the subscription, so staging makes it and production only reads it
+// (createEnvironment false). Its environment storage is env-storage.bicep, scoped to its group.
 
 param envName string
 param location string
+
+@description('True on staging: make the Container Apps environment and its logs. False on production: use the existing one.')
+param createEnvironment bool
+
+@description('The one Container Apps environment both WeLinc environments run in.')
+param environmentName string
+
+@description('The resource group that holds it (rg-welinc-staging).')
+param environmentResourceGroup string
 
 @description('The VRMS web origin, allowed to GET blobs through signed links.')
 param vrmsWebOrigin string
 
 var suffix = take(uniqueString(resourceGroup().id), 8)
 
-// Logs: 30 days, and a daily cap that keeps ingestion inside the free amount
-resource logs 'Microsoft.OperationalInsights/workspaces@2023-09-01' = {
+// Logs: 30 days, and a daily cap near the free amount. Both environments' logs land here (logs
+// are set per Container Apps environment), so the cap is twice one environment's 0.15 GB.
+resource logs 'Microsoft.OperationalInsights/workspaces@2023-09-01' = if (createEnvironment) {
   name: 'log-welinc-${envName}'
   location: location
   properties: {
     sku: { name: 'PerGB2018' }
     retentionInDays: 30
-    workspaceCapping: { dailyQuotaGb: json('0.15') }
+    workspaceCapping: { dailyQuotaGb: json('0.3') }
   }
 }
 
@@ -88,32 +100,24 @@ resource attachments 'Microsoft.Storage/storageAccounts/blobServices/containers@
   }
 }
 
-resource cae 'Microsoft.App/managedEnvironments@2024-03-01' = {
-  name: 'cae-welinc-${envName}'
+resource cae 'Microsoft.App/managedEnvironments@2024-03-01' = if (createEnvironment) {
+  name: environmentName
   location: location
   properties: {
     appLogsConfiguration: {
       destination: 'log-analytics'
       logAnalyticsConfiguration: {
-        customerId: logs.properties.customerId
-        sharedKey: logs.listKeys().primarySharedKey
+        customerId: logs!.properties.customerId
+        sharedKey: logs!.listKeys().primarySharedKey
       }
     }
   }
 }
 
-// The key is read here and never stored anywhere else (Value sourcing: auth file share)
-resource authFiles 'Microsoft.App/managedEnvironments/storages@2024-03-01' = {
-  parent: cae
-  name: 'auth-uploads'
-  properties: {
-    azureFile: {
-      accountName: files.name
-      accountKey: files.listKeys().keys[0].value
-      shareName: authShare.name
-      accessMode: 'ReadWrite'
-    }
-  }
+// Production's view of the same environment (it must not change it, AC-23)
+resource sharedCae 'Microsoft.App/managedEnvironments@2024-03-01' existing = if (!createEnvironment) {
+  name: environmentName
+  scope: resourceGroup(environmentResourceGroup)
 }
 
 // Every app and job pulls images with this one identity (AcrPull on the shared registry)
@@ -122,12 +126,15 @@ resource pull 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
   location: location
 }
 
-output environmentId string = cae.id
-output environmentName string = cae.name
-output defaultDomain string = cae.properties.defaultDomain
-output staticIp string = cae.properties.staticIp
-output customDomainVerificationId string = cae.properties.customDomainConfiguration.customDomainVerificationId
-output authFilesStorageName string = authFiles.name
+output environmentId string = createEnvironment ? cae.id : sharedCae.id
+output environmentName string = environmentName
+output defaultDomain string = createEnvironment ? cae!.properties.defaultDomain : sharedCae!.properties.defaultDomain
+output staticIp string = createEnvironment ? cae!.properties.staticIp : sharedCae!.properties.staticIp
+output customDomainVerificationId string = createEnvironment
+  ? cae!.properties.customDomainConfiguration.customDomainVerificationId
+  : sharedCae!.properties.customDomainConfiguration.customDomainVerificationId
+output filesAccountName string = files.name
+output authShareName string = authShare.name
 output blobAccountName string = blobs.name
 output blobEndpoint string = 'https://${blobs.name}.blob.${environment().suffixes.storage}'
 output pullIdentityId string = pull.id
