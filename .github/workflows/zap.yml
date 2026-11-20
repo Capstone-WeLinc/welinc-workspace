@@ -1,0 +1,50 @@
+name: ZAP baseline
+
+# VRMS scope feature 69: OWASP ZAP's baseline scan against staging, weekly and on demand.
+# Baseline means passive only: ZAP crawls each site and reads what comes back (headers, cookies,
+# leaked versions, mixed content). It sends no attacks, so it is safe on the demo environment.
+# Only our own surfaces: the portal, the VRMS web app and the gateway. VMMS and BMS scan theirs.
+# The report is kept as a run artifact (HTML, JSON and Markdown). The scan never fails the run:
+# read the report, fix what matters, and record accepted findings in the runbook.
+on:
+  schedule:
+    # Mondays 02:00 Philippine time
+    - cron: '0 18 * * 0'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: zap
+  cancel-in-progress: false
+
+jobs:
+  baseline:
+    name: baseline (${{ matrix.name }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # The two web apps are single page apps, so -j adds the Ajax spider (a headless browser)
+          - name: portal
+            target: https://staging-portal.welinc.app
+            options: '-j -m 2'
+          - name: vrms
+            target: https://staging-vrms.welinc.app
+            options: '-j -m 2'
+          # The gateway serves JSON only; this checks the headers every API answer carries
+          - name: api
+            target: https://staging-api.welinc.app/health
+            options: '-m 1'
+    steps:
+      # v0.15.0, pinned by commit. The scanner image stays on zaproxy:stable so the rules stay current.
+      - uses: zaproxy/action-baseline@de8ad967d3548d44ef623df22cf95c3b0baf8b25
+        with:
+          target: ${{ matrix.target }}
+          cmd_options: ${{ matrix.options }}
+          allow_issue_writing: false
+          fail_action: false
+          artifact_name: zap-${{ matrix.name }}
