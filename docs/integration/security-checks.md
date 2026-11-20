@@ -58,6 +58,7 @@ These stay in every report, VRMS's included. Write them in your paper as accepte
 - **`CSP: style-src unsafe-inline` (Medium):** React libraries and toast popups add inline styles. Removing it needs a fresh nonce for each request, which a static host can't produce. This is the usual tradeoff for single page apps on static hosting.
 - **`Cross-Origin-Embedder-Policy` missing (Low):** see above.
 - **`Timestamp Disclosure` (Low) and the Informational items:** numbers and comments inside your built JavaScript. Not a real leak.
+- **`Cross-Origin-Resource-Policy` missing on the API (Low):** the API answers JSON that your web app reads through CORS. CORP only governs loads made without CORS (images, scripts), and the gateway's CORS list already decides which sites may read the answers.
 
 ## Your API
 
@@ -74,7 +75,9 @@ Once your backend is on staging, the gateway already sets HSTS and `X-Content-Ty
 Two free graders give you a letter grade to quote:
 
 - **Mozilla Observatory** (https://developer.mozilla.org/en-US/observatory): enter your staging address. It grades your headers.
-- **SSL Labs** (https://www.ssllabs.com/ssltest/): enter your staging address. It grades your HTTPS setup (Azure manages the certificate).
+- **SSL Labs** (https://www.ssllabs.com/ssltest/): enter your staging address. It grades your HTTPS setup (Azure manages the certificate). Tick "Do not show the results on the boards".
+
+For comparison, the portal and VRMS web both get A+ on both graders with the headers above. Observatory can't grade the API (`staging-api.welinc.app`), because its root answers JSON, not a page.
 
 ## What to send the lead
 

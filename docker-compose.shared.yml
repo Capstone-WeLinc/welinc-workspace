@@ -80,7 +80,7 @@ services:
       TRUST_EDGE_PROXY: "0"
       GATEWAY_RATE_PER_SECOND: "20"
       GATEWAY_RATE_BURST: "40"
-      # Empty locally (plain http); hosted sets max-age=86400
+      # Empty locally (plain http); hosted sets max-age=31536000 (a year)
       GATEWAY_HSTS: ""
     networks:
       - welinc-network

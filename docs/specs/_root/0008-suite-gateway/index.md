@@ -195,7 +195,7 @@ limit_req_zone $client_addr zone=flood:10m rate=${GATEWAY_RATE_PER_SECOND}r/s;
 - `ALLOWED_ORIGINS`: comma separated exact origins. Required. Local: `http://localhost:8000,http://localhost:8001,http://localhost:8002,http://localhost:8003`.
 - `TRUST_EDGE_PROXY`: `0` or `1`. Required. 0 locally, 1 hosted.
 - `GATEWAY_RATE_PER_SECOND`, `GATEWAY_RATE_BURST`: required; 20 and 40 everywhere to begin with (`limit_req ... burst=${GATEWAY_RATE_BURST} nodelay`).
-- `GATEWAY_HSTS`: must be set, may be empty. Empty locally, `max-age=86400` hosted to begin with.
+- `GATEWAY_HSTS`: must be set, may be empty. Empty locally, `max-age=86400` hosted to begin with; raised to `max-age=31536000` (a year) on 2026-11-20 once the domain was stable.
 
 No change to `TRUST_PROXY_HOPS` in the services: 1 locally, 2 hosted, as spec 0002 set it. The single value `X-Forwarded-For` keeps those numbers right.
 

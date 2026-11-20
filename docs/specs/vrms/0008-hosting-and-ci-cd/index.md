@@ -122,7 +122,7 @@ Every web app (portal, VRMS, VMMS, BMS) runs on a Static Web App per environment
 
 **Internal addresses**: `https://<app name>.internal.<environment default domain>`, where the domain is the Container Apps environment's `properties.defaultDomain`, a Bicep output. Both WeLinc environments share that domain, so the app name is the only thing that tells `auth-service-staging` from `auth-service-prod`: Bicep builds every name from one `nameSuffix` (`-staging` or `-prod`, from `envName`) and never writes a bare base name. Contract 0001's service names (section 2) stay the base names; the suffix is a hosting detail. Every `*_UPSTREAM`, `AUTH_INTERNAL_URL` and `AUTH_JWKS_URL` uses this form (nginx ignores search domains, and `AUTH_JWKS_URL` must be HTTPS because the startup check refuses anything else in production).
 
-**Gateway on Azure**: the same image as local, with hosted settings: each `*_UPSTREAM` is the internal address above, `ALLOWED_ORIGINS` the four web origins of that environment, `TRUST_EDGE_PROXY=1`, `GATEWAY_HSTS=max-age=86400`, rate 20 and burst 40. An upstream that isn't deployed yet answers 502 on its own routes only.
+**Gateway on Azure**: the same image as local, with hosted settings: each `*_UPSTREAM` is the internal address above, `ALLOWED_ORIGINS` the four web origins of that environment, `TRUST_EDGE_PROXY=1`, `GATEWAY_HSTS=max-age=31536000` (a year; one day until 2026-11-20), rate 20 and burst 40. An upstream that isn't deployed yet answers 502 on its own routes only.
 
 **Cookies and the domain**: every web app and the gateway share `welinc.app`, so the refresh and SSO cookies are first party (contract 0001 section 7). Hosted, the cookies carry `Secure` and the `__Secure-` prefix (`SSO_COOKIE_SECURE=true` on auth, `SESSION_COOKIE_SECURE=true` on backend-vrms).
 
@@ -203,7 +203,7 @@ If a repo's setting changes, its logins fail with `AADSTS700213`, which prints t
 | Frontend build | `VITE_PORTAL_URL` | `https://<portal>`, repo variable `PROD_PORTAL_URL` or `STAGING_PORTAL_URL` |
 | Gateway start | `AUTH_UPSTREAM`, `VRMS_UPSTREAM`, `VMMS_UPSTREAM`, `VMMS_ANALYTICS_UPSTREAM`, `BMS_UPSTREAM` | the internal addresses, set by Bicep |
 | Gateway start | `ALLOWED_ORIGINS` | `https://<portal>,https://<vrms>,https://<vmms>,https://<bms>`, set by Bicep from the domain parameter |
-| Gateway start | `TRUST_EDGE_PROXY`, `GATEWAY_HSTS`, `GATEWAY_RATE_PER_SECOND`, `GATEWAY_RATE_BURST` | `1`, `max-age=86400`, `20`, `40`, set by Bicep |
+| Gateway start | `TRUST_EDGE_PROXY`, `GATEWAY_HSTS`, `GATEWAY_RATE_PER_SECOND`, `GATEWAY_RATE_BURST` | `1`, `max-age=31536000`, `20`, `40`, set by Bicep |
 | Auth start | `AUTH_ISSUER` | `https://<api>/auth`, set by Bicep |
 | Auth start | `PORTAL_URL` | `https://<portal>`, set by Bicep |
 | Auth start | `CORS_ORIGINS` | the four web origins, set by Bicep |

@@ -224,3 +224,26 @@ Brevo adds an unsubscribe header to every email, and we can't remove it on our p
   Encode `+` as `%2B` and `@` as `%40`. It answers 204 when unblocked, 404 when the address wasn't blocked.
 - **Before each defense** (Nov 28, Dec 4, Dec 5): check that the blocked list holds none of the team inbox addresses or your own.
 - A spam complaint can block an address again; if the same address keeps coming back, mark the email "Not spam" in that inbox.
+
+## Security grades (feature 69)
+
+Staging only: production isn't hosted (VRMS spec 0008 AC-24). Taken 2026-11-20, after the first ZAP scan's fixes were deployed (web-vrms #80, portal #43, workspace #82).
+
+| Site | Mozilla Observatory | SSL Labs |
+|---|---|---|
+| `staging-portal.welinc.app` | A+ (135, 12 of 12 tests) | A+ (TLS 1.2 and 1.3) |
+| `staging-vrms.welinc.app` | A+ (135, 12 of 12 tests) | A+ (TLS 1.2 and 1.3) |
+| `staging-api.welinc.app` (gateway) | Not graded: the root is a JSON 404, and Observatory grades only pages a browser loads | A (TLS 1.2 and 1.3) |
+
+The gateway got A, not A+, because its HSTS was `max-age=86400` (one day, suite spec 0008's starting value), and SSL Labs gives A+ only from 180 days. It was raised to a year (`infra/env.bicep`) on 2026-11-20 to match the web apps; take its SSL Labs grade again after that apply.
+
+To take them again: https://developer.mozilla.org/en-US/observatory and https://www.ssllabs.com/ssltest/ (tick "Do not show the results on the boards"), one site at a time.
+
+### Findings we accept
+
+The weekly ZAP scan (`.github/workflows/zap.yml`) keeps reporting these. They're accepted risks, not open work:
+
+- **`CSP: style-src 'unsafe-inline'` (Medium), web apps:** React libraries and the toast library set inline styles. A nonce would need a fresh value per request, which a static host can't produce.
+- **No `Cross-Origin-Embedder-Policy` (Low), web apps:** it would block repair photos from blob storage, which doesn't send the headers COEP requires.
+- **No `Cross-Origin-Resource-Policy` on the API (Low):** the API answers JSON that the web apps read through CORS. CORP only governs loads made without CORS (images, scripts), and the gateway's CORS list already decides which origins may read the answers.
+- **`Timestamp Disclosure` (Low) and the Informational items:** numbers and comments inside the built JavaScript, not a leak.
