@@ -57,7 +57,7 @@ spec [0025](../../specs/vrms/0025-error-monitoring/index.md) · code in `welinc-
   - [x] The shared side: welinc-auth (with `CodeErrorFilter`), the portal, the gateway tunnel and CORS headers, contract 0001 (AC-1 to AC-9, AC-14 to AC-16). Tunnel envelope DSN check (task 7a) proven live 2026-11-17: the right DSN arrived, both cross project envelopes got 403 `TUNNEL_REJECTED`
   - [x] Jobs and releases: job failure reports, the directory poll monitor, release tags, source map upload and removal in `deploy.yml` (AC-1, AC-3, AC-10, AC-17) (2026-11-20, merged in all four repos and live on staging: release tags, maps uploaded and the `.map` 404 check passing)
   - [x] Alerts and hand off: Bicep settings and Azure alert rules, the uptime and cron alerts, the VMMS and BMS how to page (AC-10 to AC-14, AC-18) (2026-11-20: Azure alerts applied, uptime monitor on `/vrms/health` and the cron monitor on staging, both emailed by the new issue rule; `docs/integration/error-monitoring.md` written)
-- [ ] Verify it: `/check verify error monitoring`
+- [x] Verify it: `/check verify error monitoring` (2026-11-20: passed, 5 steps blocked by design because staging's test routes are off; see spec 0025 `verify.md`)
 - [ ] Test it: `/test error monitoring` (Testmail is not needed here; it is for the email code flows)
 
 ### 68. API docs · done
