@@ -3,11 +3,23 @@ name: CI
 # The workspace's own checks: the setup as code compiles, the shell scripts pass shellcheck,
 # the gateway answers every route the way suite spec 0008 says, and welinc-auth's generated
 # API docs still hold every route of contract 0001 section 16 (VRMS spec 0026).
+# Docs only changes skip CI (Actions minutes on private repos), except contract 0001, which
+# the contract-routes job reads. Later lines win, so the last one adds the contract back.
 on:
   pull_request:
     branches: [main]
+    paths:
+      - '**'
+      - '!docs/**'
+      - '!**/*.md'
+      - 'docs/specs/_root/0001-shared-services-contract/**'
   push:
     branches: [main]
+    paths:
+      - '**'
+      - '!docs/**'
+      - '!**/*.md'
+      - 'docs/specs/_root/0001-shared-services-contract/**'
   schedule:
     # daily at 06:00 Manila, so an auth change that drops a contract route shows within a day
     - cron: '0 22 * * *'
