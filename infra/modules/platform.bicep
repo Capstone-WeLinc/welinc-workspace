@@ -18,6 +18,9 @@ param environmentResourceGroup string
 @description('The VRMS web origin, allowed to GET blobs through signed links.')
 param vrmsWebOrigin string
 
+@description('The VMMS web origin, allowed to GET its own blobs through signed links.')
+param vmmsWebOrigin string
+
 var suffix = take(uniqueString(resourceGroup().id), 8)
 
 // Logs: 30 days, and a daily cap near the free amount. Both environments' logs land here (logs
@@ -81,7 +84,7 @@ resource blobService 'Microsoft.Storage/storageAccounts/blobServices@2023-05-01'
     cors: {
       corsRules: [
         {
-          allowedOrigins: [vrmsWebOrigin]
+          allowedOrigins: [vrmsWebOrigin, vmmsWebOrigin]
           allowedMethods: ['GET']
           allowedHeaders: ['*']
           exposedHeaders: ['Content-Length', 'Content-Type']
@@ -92,13 +95,15 @@ resource blobService 'Microsoft.Storage/storageAccounts/blobServices@2023-05-01'
   }
 }
 
-resource attachments 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-05-01' = {
+// One private container per system. Each backend's identity is allowed into its own container
+// only (env.bicep, access), so no system reads another system's files.
+resource attachments 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-05-01' = [for c in ['vrms-attachments', 'vmms-attachments']: {
   parent: blobService
-  name: 'vrms-attachments'
+  name: c
   properties: {
     publicAccess: 'None'
   }
-}
+}]
 
 resource cae 'Microsoft.App/managedEnvironments@2024-03-01' = if (createEnvironment) {
   name: environmentName
