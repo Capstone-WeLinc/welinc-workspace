@@ -46,7 +46,7 @@ IP=$(curl -s https://api.ipify.org)
 ## Rotating secrets and keys
 
 - **One setting on one app or job:** `bash infra/scripts/rotate-secret.sh staging <app or job>-staging <SETTING>`. It reads the value without echo and restarts the revision (a running revision keeps the old value until then). Put the same value in `infra/private/staging.json`, or the next apply sets the old one back.
-- **welinc-auth's signing keys:** `npm run keys:rotate` in welinc-auth, following its `docs/keys.md` (add, wait, promote, wait, remove).
+- **welinc-auth's signing keys:** one step at a time with `PATH="$HOME/.local/bin:$PATH" bash infra/scripts/rotate-signing-keys.sh staging <add|promote|remove> [--now] [<kid>]`. It runs `keys:rotate` on the key set in `infra/private/staging.json`, writes it back, and sets it on `auth-service-staging` (restarted) and both auth jobs. The order, the waits and the leak steps are in welinc-auth `docs/keys.md`. Stay signed in to VRMS throughout: being sent to the login page means a step went too early. Last rotation: 2026-11-20 (current key `auth-20261120-5d7341`). Update the 1Password copy of `staging.json` after each step.
 - **A client key** (`vrms`, `vmms`, `bms`, `bms-analytics`): `npm run keys:client` in welinc-auth, then the private half on that app and the public half on auth, both through `rotate-secret.sh`.
 
 ## Stopping staging (saves the credit)

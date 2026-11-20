@@ -16,7 +16,7 @@ The WeLinc suite's setup as code: the gateway image, the Azure resources for sta
 | `env/region.env` | The Azure region, picked after the quota check |
 | `private.example.json` | The shape of `private/<env>.json`, the git ignored secrets file per environment |
 | `db/init.sql` | The owner and app role per database, run once per database before its first migration |
-| `scripts/` | `apply.sh`, `db-init.sh`, `dns-records.sh`, `set-repo-variables.sh`, `rotate-secret.sh`, `purge-images.sh`; `scripts/check-names.mjs` at the workspace root checks every name fits 32 characters (workspace CI) |
+| `scripts/` | `apply.sh`, `db-init.sh`, `dns-records.sh`, `set-repo-variables.sh`, `rotate-secret.sh`, `rotate-signing-keys.sh`, `purge-images.sh`; `scripts/check-names.mjs` at the workspace root checks every name fits 32 characters (workspace CI) |
 
 ## Order for a new environment
 
