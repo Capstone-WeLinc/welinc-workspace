@@ -76,7 +76,7 @@ All required except the two `SENTRY_DSN_*` ones. None of them is a secret.
 | `ALLOWED_ORIGINS` | the four `http://localhost:800x` apps | the deployed web addresses | Exact origins that get CORS answers, comma separated. Never `*` |
 | `TRUST_EDGE_PROXY` | `0` | `1` | `1` takes the client address from the last `X-Forwarded-For` entry. Only safe behind a proxy that appends it (Azure's ingress) |
 | `GATEWAY_RATE_PER_SECOND`, `GATEWAY_RATE_BURST` | `20`, `40` | `20`, `40` | Flood limit per client address. Preflights and `/health` never count |
-| `GATEWAY_HSTS` | empty | `max-age=86400` | The `Strict-Transport-Security` value; empty leaves the header out |
+| `GATEWAY_HSTS` | empty | `max-age=31536000` (a year) | The `Strict-Transport-Security` value; empty leaves the header out |
 | `SENTRY_DSN_VRMS_WEB`, `SENTRY_DSN_PORTAL` | empty (tunnel off) | the `vrms-web` and `welinc-portal` DSNs (the same values the web builds get as `VITE_SENTRY_DSN`) | The Sentry tunnel (VRMS spec 0025). Optional, but both or neither. Each must be `https://<32 lowercase hex>@o123.ingest.us.sentry.io/456`: no port, password, path or trailing slash |
 
 A bad setting stops the container at start with a line naming it: read it with `docker logs welinc_api_gateway`.

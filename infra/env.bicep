@@ -219,7 +219,7 @@ var gatewaySettings = {
   BMS_UPSTREAM: groupUpstream('bms', 'bms-gateway', enabledGroups, nameSuffix, internal)
   ALLOWED_ORIGINS: webOrigins
   TRUST_EDGE_PROXY: '1'
-  GATEWAY_HSTS: 'max-age=86400'
+  GATEWAY_HSTS: 'max-age=31536000'
   GATEWAY_RATE_PER_SECOND: '20'
   GATEWAY_RATE_BURST: '40'
   // The two browser tunnels (spec 0025, AC-4, AC-5): both or neither, the gateway refuses half
