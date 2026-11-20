@@ -35,9 +35,9 @@ How VMMS and BMS run online next to the shared services and VRMS. Everything run
 | `bms-analytics-projection` | 3024 | none (a worker) | `bms_analytics` | 1 |
 | `bms-analytics` | 3025 | `/health/ready` | `bms_analytics` | 1 |
 
-Migration jobs: `vmms-migrate`, `bms-booking-migrate`, `bms-dispatch-migrate`, `bms-completion-migrate`, `bms-analytics-migrate`. Your deploy starts them.
+Migration jobs: `vmms-migrate`, `vmms-analytics-migrate`, `bms-booking-migrate`, `bms-dispatch-migrate`, `bms-completion-migrate`, `bms-analytics-migrate`. Your deploy starts them.
 
-Until Nov 27 an app with no traffic sleeps, and the first call may take 10 to 30 seconds (or answer 504) while it wakes. Apps that run timers or loops (`vmms-backend`, `vmms-analytics`, `bms-analytics-projection`) never sleep. If another app runs something on a timer, tell the lead.
+Until Nov 27 an app with no traffic sleeps, and the first call may take 10 to 30 seconds (or answer 504) while it wakes. Apps that run timers or loops (`vmms-backend`, `vmms-analytics`, `bms-booking`, `bms-dispatch`, `bms-analytics-projection`) never sleep. If another app runs something on a timer, tell the lead.
 
 ## Make your service hosting ready
 
@@ -56,7 +56,7 @@ Until Nov 27 an app with no traffic sleeps, and the first call may take 10 to 30
 ### VMMS only
 
 - [ ] Work order and fuel attachments move from `private-uploads/` to blob storage, like VRMS's ticket files. Your container is `vmms-attachments`, and only `vmms-backend` can read or write it, using its own identity (no key). On staging the app gets `STORAGE_ACCOUNT_URL`, `STORAGE_PUBLIC_URL` and `STORAGE_CONTAINER`; locally, point the same code at Azurite. Copy `welinc-backend-vrms/src/modules/attachments/blob-file-store.ts` for the client and the signed links.
-- [ ] Fuel receipt scanning: staging has an Azure AI Document Intelligence resource (free tier, prebuilt receipt model). The app gets `DOCUMENT_INTELLIGENCE_ENDPOINT` and calls it with its own identity, no key. For local testing, ask the lead for a key and keep it in your `.env` only. Keep scanning optional: if it's off or fails, staff type the receipt by hand.
+- [ ] Fuel receipt scanning: staging has an Azure AI Document Intelligence resource (free tier, prebuilt receipt model). The app gets `AZURE_DOCUMENT_INTELLIGENCE_ENDPOINT` and no key, so it calls the service with its own identity: when no key is set, get a token from `DefaultAzureCredential` for `https://cognitiveservices.azure.com/.default` and send `Authorization: Bearer <token>` instead of `Ocp-Apim-Subscription-Key` (your blob storage code already uses the same credential). Accept the endpoint without a key in `env.ts`. For local testing, ask the lead for a key and keep it in your `.env` only. Keep scanning optional: if it's off or fails, staff type the receipt by hand.
 - [ ] Analytics: `CREATE EXTENSION vector` and the `notify_vmms_table_change()` triggers live in a migration. Write the extension as `DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'vector') THEN CREATE EXTENSION vector; END IF; END $$;` (Azure refuses the plain `IF NOT EXISTS` form).
 
 ### BMS only

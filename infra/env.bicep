@@ -449,14 +449,17 @@ var groupDefs = {
     ]
     jobs: [
       { group: 'vmms', name: 'vmms-migrate', app: 'vmms-backend', database: 'vmms' }
+      // Analytics' own migration (the vector extension and the notify triggers): npm run migrate -- --skip-embeddings
+      { group: 'vmms', name: 'vmms-analytics-migrate', app: 'vmms-analytics', database: 'vmms' }
     ]
   }
   bms: {
     web: 'bms'
     apps: [
       { group: 'bms', name: 'bms-gateway', port: 3020, healthPath: '/bms/health', database: '', timed: false, maxReplicas: 1, edge: true, ingress: true }
-      { group: 'bms', name: 'bms-booking', port: 3021, healthPath: '/health/ready', database: 'bms_booking', timed: false, maxReplicas: 1, edge: false, ingress: true }
-      { group: 'bms', name: 'bms-dispatch', port: 3022, healthPath: '/health/ready', database: 'bms_dispatch', timed: false, maxReplicas: 1, edge: false, ingress: true }
+      // timed: booking flushes its approvals outbox every 5 s; dispatch syncs erased trucks from VMMS daily
+      { group: 'bms', name: 'bms-booking', port: 3021, healthPath: '/health/ready', database: 'bms_booking', timed: true, maxReplicas: 1, edge: false, ingress: true }
+      { group: 'bms', name: 'bms-dispatch', port: 3022, healthPath: '/health/ready', database: 'bms_dispatch', timed: true, maxReplicas: 1, edge: false, ingress: true }
       { group: 'bms', name: 'bms-completion', port: 3023, healthPath: '/health/ready', database: 'bms_completion', timed: false, maxReplicas: 1, edge: false, ingress: true }
       { group: 'bms', name: 'bms-analytics-projection', port: 3024, healthPath: '', database: 'bms_analytics', timed: true, maxReplicas: 1, edge: false, ingress: false }
       { group: 'bms', name: 'bms-analytics', port: 3025, healthPath: '/health/ready', database: 'bms_analytics', timed: false, maxReplicas: 1, edge: false, ingress: true }
@@ -513,7 +516,8 @@ module groupApp 'modules/container-app.bicep' = [for a in groupAppList: {
         STORAGE_PUBLIC_URL: platform.outputs.blobEndpoint
         STORAGE_CONTAINER: '${a.group}-attachments'
       } : {},
-      (a.?docIntel ?? false) ? { DOCUMENT_INTELLIGENCE_ENDPOINT: docIntel.outputs.endpoint } : {},
+      // VMMS's own setting name; no key: the app signs in with its identity (Cognitive Services User)
+      (a.?docIntel ?? false) ? { AZURE_DOCUMENT_INTELLIGENCE_ENDPOINT: docIntel.outputs.endpoint } : {},
       groupApps[?a.name].?settings ?? {}
     )
     secretSettings: union(
