@@ -233,9 +233,9 @@ Staging only: production isn't hosted (VRMS spec 0008 AC-24). Taken 2026-11-20, 
 |---|---|---|
 | `staging-portal.welinc.app` | A+ (135, 12 of 12 tests) | A+ (TLS 1.2 and 1.3) |
 | `staging-vrms.welinc.app` | A+ (135, 12 of 12 tests) | A+ (TLS 1.2 and 1.3) |
-| `staging-api.welinc.app` (gateway) | Not graded: the root is a JSON 404, and Observatory grades only pages a browser loads | A (TLS 1.2 and 1.3) |
+| `staging-api.welinc.app` (gateway) | Not graded: the root is a JSON 404, and Observatory grades only pages a browser loads | A+ (TLS 1.2 and 1.3) |
 
-The gateway got A, not A+, because its HSTS was `max-age=86400` (one day, suite spec 0008's starting value), and SSL Labs gives A+ only from 180 days. It was raised to a year (`infra/env.bicep`) on 2026-11-20 to match the web apps; take its SSL Labs grade again after that apply.
+The gateway first got A, because its HSTS was `max-age=86400` (one day, suite spec 0008's starting value) and SSL Labs gives A+ only from 180 days. It was raised to a year (`infra/env.bicep`) and applied on 2026-11-20, matching the web apps, and then graded A+.
 
 To take them again: https://developer.mozilla.org/en-US/observatory and https://www.ssllabs.com/ssltest/ (tick "Do not show the results on the boards"), one site at a time.
 
