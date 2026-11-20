@@ -101,6 +101,7 @@ server {
         default_type application/json;
         add_header X-Request-Id $gateway_request_id always;
         add_header Strict-Transport-Security "${GATEWAY_HSTS}" always;
+        add_header X-Content-Type-Options nosniff always;
         return 200 '{"status":"ok"}';
     }
 

@@ -3,7 +3,8 @@ name: ZAP baseline
 # VRMS scope feature 69: OWASP ZAP's baseline scan against staging, weekly and on demand.
 # Baseline means passive only: ZAP crawls each site and reads what comes back (headers, cookies,
 # leaked versions, mixed content). It sends no attacks, so it is safe on the demo environment.
-# Only our own surfaces: the portal, the VRMS web app and the gateway. VMMS and BMS scan theirs.
+# The shared surfaces (the portal and the gateway) and every system's web app on staging. The VMMS
+# and BMS reports are theirs to read and fix (docs/integration/security-checks.md).
 # The report is kept as a run artifact (HTML, JSON and Markdown). The scan never fails the run:
 # read the report, fix what matters, and record accepted findings in the runbook.
 on:
@@ -34,6 +35,12 @@ jobs:
             options: '-j -m 2'
           - name: vrms
             target: https://staging-vrms.welinc.app
+            options: '-j -m 2'
+          - name: vmms
+            target: https://staging-vmms.welinc.app
+            options: '-j -m 2'
+          - name: bms
+            target: https://staging-bms.welinc.app
             options: '-j -m 2'
           # The gateway serves JSON only; this checks the headers every API answer carries
           - name: api
