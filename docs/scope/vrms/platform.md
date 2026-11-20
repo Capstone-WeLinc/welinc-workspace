@@ -45,7 +45,7 @@ spec [0008](../../specs/vrms/0008-hosting-and-ci-cd/index.md) · code in `infra/
 - Note (2026-11-08, replan): from suite specs 0001 and 0002, spec 0008 is now out of date. Before the Azure milestones, update it through `/architect`: register the custom domain (working name `welinc.tech`, note the renewal date) and put it on every Static Web App and the gateway Container App; gateway config from `infra/gateway/`; the new routes and ports; replace the `JWT_SECRET` row and the "rotating the JWT secret" step with `AUTH_SIGNING_KEYS`, `CLIENT_VRMS_JWKS`, `AUTH_CLIENT_PRIVATE_KEY` and a link to `docs/keys.md`. The staging key rotation check (spec 0002 AC-24 and AC-26) runs once staging exists.
 - Note (2026-11-03, replan): the gateway change from spec 0017 (26 MB uploads and a 120 second read timeout on the VRMS routes, commit `1803092`) was pushed straight to welinc-auth `development` on 2026-11-03. Add it to the feature 55 list of changes you made to the shared repos.
 
-### 27. Error monitoring · in-progress
+### 27. Error monitoring · done
 Catch errors in production before users report them.
 **Done when:** frontend and backend errors from staging and production reach one place with the release and user role attached, and no secrets or personal data are sent.
 spec [0025](../../specs/vrms/0025-error-monitoring/index.md) · code in `welinc-backend-vrms`, `welinc-web-vrms`, `welinc-auth`, `welinc-web-portal`, `infra/gateway/`, `infra/`
@@ -58,7 +58,7 @@ spec [0025](../../specs/vrms/0025-error-monitoring/index.md) · code in `welinc-
   - [x] Jobs and releases: job failure reports, the directory poll monitor, release tags, source map upload and removal in `deploy.yml` (AC-1, AC-3, AC-10, AC-17) (2026-11-20, merged in all four repos and live on staging: release tags, maps uploaded and the `.map` 404 check passing)
   - [x] Alerts and hand off: Bicep settings and Azure alert rules, the uptime and cron alerts, the VMMS and BMS how to page (AC-10 to AC-14, AC-18) (2026-11-20: Azure alerts applied, uptime monitor on `/vrms/health` and the cron monitor on staging, both emailed by the new issue rule; `docs/integration/error-monitoring.md` written)
 - [x] Verify it: `/check verify error monitoring` (2026-11-20: passed, 5 steps blocked by design because staging's test routes are off; see spec 0025 `verify.md`)
-- [ ] Test it: `/test error monitoring` (Testmail is not needed here; it is for the email code flows)
+- [x] Test it: `/test error monitoring` (2026-11-20: gaps filled in backend-vrms, web-vrms and the portal; the crash screen and boundary, redact, the Sentry setup, user context and the test route now have tests; Testmail is not needed here)
 
 ### 68. API docs · done
 Interactive API docs generated from the NestJS controllers (`@nestjs/swagger`), so VMMS and BMS can read the auth API without the code, and the panel can see the API. Added 2026-11-16, after hosting and before the integration defense (Dec 4).
