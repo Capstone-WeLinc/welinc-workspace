@@ -14,6 +14,7 @@ proxy_hide_header Access-Control-Max-Age;
 proxy_hide_header Vary;
 proxy_hide_header X-Request-Id;
 proxy_hide_header Strict-Transport-Security;
+proxy_hide_header X-Content-Type-Options;
 
 add_header Access-Control-Allow-Origin $cors_origin always;
 add_header Access-Control-Allow-Credentials $cors_credentials always;
@@ -21,6 +22,7 @@ add_header Access-Control-Expose-Headers $cors_expose_headers always;
 add_header Vary Origin always;
 add_header X-Request-Id $gateway_request_id always;
 add_header Strict-Transport-Security "${GATEWAY_HSTS}" always;
+add_header X-Content-Type-Options nosniff always;
 
 # Preflight: answered here, before the flood limit and without the upstream. An if block drops the
 # headers above, so it repeats them on purpose.
@@ -33,6 +35,7 @@ if ($request_method = OPTIONS) {
     add_header Vary Origin always;
     add_header X-Request-Id $gateway_request_id always;
     add_header Strict-Transport-Security "${GATEWAY_HSTS}" always;
+    add_header X-Content-Type-Options nosniff always;
     return 204;
 }
 

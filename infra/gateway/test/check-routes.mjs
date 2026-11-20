@@ -412,6 +412,10 @@ try {
     check('AC-21', 'with GATEWAY_HSTS set, proxied, preflight, error and /health answers carry it',
       on.every((r) => headerValues(r, 'strict-transport-security').join() === 'max-age=60'),
       on.map((r) => headerValues(r, 'strict-transport-security').join('|')).join(' / '));
+    // VRMS feature 69 (first ZAP scan): one nosniff on every answer, whatever the upstream sends
+    check('AC-21', 'proxied, preflight, error and /health answers carry exactly one nosniff',
+      off.every((r) => headerValues(r, 'x-content-type-options').join() === 'nosniff'),
+      off.map((r) => headerValues(r, 'x-content-type-options').join('|')).join(' / '));
   }
 
   // ---------- AC-16: behind an edge proxy ----------

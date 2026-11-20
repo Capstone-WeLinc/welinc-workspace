@@ -37,9 +37,11 @@ proxy_hide_header Access-Control-Max-Age;
 proxy_hide_header Vary;
 proxy_hide_header Set-Cookie;
 proxy_hide_header Strict-Transport-Security;
+proxy_hide_header X-Content-Type-Options;
 
 # The internal redirect left the public location, so its headers are added again here
 add_header Access-Control-Allow-Origin $cors_origin always;
 add_header Vary Origin always;
 add_header X-Request-Id $gateway_request_id always;
 add_header Strict-Transport-Security "${GATEWAY_HSTS}" always;
+add_header X-Content-Type-Options nosniff always;
