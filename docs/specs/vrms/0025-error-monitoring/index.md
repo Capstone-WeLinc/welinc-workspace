@@ -1,7 +1,7 @@
 # 0025. Error monitoring with Sentry and Azure alerts
 
 **Date**: 2026-11-16
-**Status**: In Progress
+**Status**: Accepted
 **Updated**: 2026-11-20 (`/architect`, in place, with spec 0008's amendment): only staging is hosted (spec 0008 AC-24), so the cron monitor, the uptime monitor and their alerts (AC-10, AC-11, AC-12, task 11) watch staging instead of production. Earlier, 2026-11-16, cross checked on another model; 17 gaps closed (health and filter reporting, the gateway tunnel mechanics, every config source, the role tag, double reporting, trace linking, map files) and 3 wording fixes. 2026-11-17, from the first live test: Sentry stores a location worked out from the sender's address, so `city` and `region` join the sensitive fields and AC-6 covers the location; the gateway's two trace headers moved into milestone 1. 2026-11-17, from milestone 2's live check: Sentry files an envelope under the DSN inside it and ignores the project id in the address (test event `VRMS-WEB-2` sent to the portal project landed in vrms-web), so a tunnel that only fixes the address relays for any Sentry project. The gateway now reads each envelope's header with njs and forwards only its own route's DSN (AC-5, the gateway tunnel design, the security model, settings and task 7). 2026-11-17, from the task 7a build: the internal location keeps its access log (nginx logs where the request ends, so `access_log off` there would drop the only line), an empty body answers 403 `TUNNEL_REJECTED` (413 only for a body that went to a file), and the tunnel uses two snippets (public and internal).
 
 ## Summary
