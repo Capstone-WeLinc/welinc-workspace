@@ -197,7 +197,14 @@ One alert covers all four projects: **New or regressed issue (spec 0025)** (http
 
 Sentry also makes a "Send a notification for high priority issues" rule for each new project. Those are disabled so one problem sends one email. A project added later gets one too: disable it, and add the project to the alert above (Alerts → the alert → Edit → Connected projects).
 
-The cron monitor (`vrms-directory-poll`) and the uptime monitor (`/vrms/health`) watch staging. They come with spec 0025's milestones 3 and 4.
+### Monitors (the free plan's one cron and one uptime slot)
+
+Both watch staging and live in the `vrms-backend` project. Neither has an alert of its own: a failure opens an outage issue, and the alert above emails it.
+
+- **Cron, `vrms-directory-poll`** (https://welinc.sentry.io/crons/vrms-backend/vrms-directory-poll/): made by the backend's first check in (spec 0025 task 8), not by hand. Every 5 minutes, margin 5, max runtime 2. A miss or an `error` check in opens "Cron failure: vrms-directory-poll".
+- **Uptime, VRMS health (staging)** (https://welinc.sentry.io/monitors/11012202/): created 2026-11-20 through the Sentry MCP server. `GET https://staging-api.welinc.app/vrms/health` every 60 s, timeout 10 s, down after 3 failed checks in a row, up after 1 good one, owner team `welinc`, environment `staging`, captures the response on failure. One call proves the gateway, the VRMS backend and its database.
+
+A local backend must use `SENTRY_ENVIRONMENT=development` (or no DSN). With `staging` its check ins land on the staging monitor, and when it stops (a branch switch, the laptop sleeping) the monitor reports misses that aren't real (seen 2026-11-20, issue VRMS-BACKEND-7).
 
 ### Sending a test error
 
