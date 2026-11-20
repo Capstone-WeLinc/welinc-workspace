@@ -57,7 +57,8 @@ Product backlog lives in Jira (read it through the Atlassian MCP); Jira wins whe
 
 - Ask before any git write: commit, push, merge, branch switch, or opening a PR.
 - Before calling a task done, run `npm run lint` and the build in every repo you touched (`build:local` in the two frontends, plus `npm run typecheck` in web-vrms).
-- VMMS and BMS repos (both `*-analytics-ai` repos and `welinc-mobile-vrms_vmms` included) belong to other groups: read them for integration context, never edit them.
+- VMMS and BMS repos (both `*-analytics-ai` repos included) belong to other groups: read them for integration context, never edit them.
+- `welinc-mobile-vrms_vmms` (Expo) is shared with VMMS: VRMS may edit it for its repair screens. Branch from `development` and open a PR into it, like every service repo.
 - Playwright is expensive (snapshots and screenshots eat context). Do not run it after every change. Use it only for a new page or flow, a visual or layout change that code cannot prove, or at `/check verify` before a PR. Prefer `browser_snapshot` over screenshots, keep it to one pass, and never for backend-only or logic-only edits.
 - Say "Using skill: <name>" in the reply each time a skill is invoked, so the user can see it was applied.
 - UI follows the suite `design.md` at the workspace root plus our own rules in `docs/context/vrms/design.md` (ours win on VRMS screens). Read both before UI work.

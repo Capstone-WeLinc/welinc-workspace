@@ -2,7 +2,7 @@
 
 **Date**: 2026-11-01
 **Status**: Accepted
-**Updated**: 2026-11-11 (staleness sweep). Spec 0018 replaced the photo kinds: Before and After photos with their own labels and per group limit message (AC-2, AC-3), and proof is images only, no PDF. Spec 0024 AC-13 moved the photos into their own Photos card after Issues with one add tile (no separate "Take photo" and "Choose photos" buttons; the full state reads "{Group} photos full (n of max)"), and put the Documents card on the detail page itself, not in `TicketSidePanel`.
+**Updated**: 2026-11-21 (`/architect`, in place, from workspace #84): the hosted blob account now holds one container per system, so backend-vrms's data role moved from the account to its own container, with Storage Blob Delegator on the account for signing (*Security*, Credentials). Earlier, 2026-11-11 (staleness sweep). Spec 0018 replaced the photo kinds: Before and After photos with their own labels and per group limit message (AC-2, AC-3), and proof is images only, no PDF. Spec 0024 AC-13 moved the photos into their own Photos card after Issues with one add tile (no separate "Take photo" and "Choose photos" buttons; the full state reads "{Group} photos full (n of max)"), and put the Documents card on the detail page itself, not in `TicketSidePanel`.
 
 ## Summary
 
@@ -237,7 +237,7 @@ The list has no pagination on purpose. It's bounded by the settings caps (at mos
 - File attacks: types come from magic bytes, images are re-encoded (this strips hidden payloads, polyglots and GPS), PDFs are disarmed and rebuilt, `limitInputPixels` stops decompression bombs, and the upload size has a hard cap at multer and the gateway.
 - Serving: files come from the storage domain, a different origin from the app, so nothing in a file can read the app's token. The forced `Content-Type` and `inline` disposition, plus `nosniff` (sent by Blob Storage), stop type confusion.
 - Links: one blob, read only, 10 minutes, HTTPS in Azure. A leaked link works until it expires. That's the accepted tradeoff.
-- Credentials: managed identity with the "Storage Blob Data Contributor" role on its own account only. No account key in Azure. Locally the Azurite connection string is the public development key.
+- Credentials: managed identity with "Storage Blob Data Contributor" on the `vrms-attachments` container only, plus "Storage Blob Delegator" on the account (needed to sign user delegation links, it grants no data access). The account also holds other systems' containers (`vmms-attachments`), which backend-vrms cannot read or write. No account key in Azure. Locally the Azurite connection string is the public development key.
 - Abuse: 30 uploads per user per minute, plus the caps. QA's security tests (Jira VRMS-291, VRMS-294) target AC-4 to AC-7 and AC-12.
 
 **Configuration required** (backend-vrms `.env.example`, values never committed):
