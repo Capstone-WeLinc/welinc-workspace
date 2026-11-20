@@ -95,6 +95,7 @@ module platform 'modules/platform.bicep' = {
     envName: envName
     location: location
     vrmsWebOrigin: url.vrms
+    vmmsWebOrigin: url.vmms
     createEnvironment: !prod
     environmentName: environmentName
     environmentResourceGroup: environmentResourceGroup
@@ -442,7 +443,8 @@ var groupDefs = {
   vmms: {
     web: 'vmms'
     apps: [
-      { group: 'vmms', name: 'vmms-backend', port: 3010, healthPath: '/vmms/health', database: 'vmms', timed: true, maxReplicas: 2, edge: true, ingress: true }
+      // blob: its own container (vmms-attachments) with signed links; docIntel: fuel receipt scanning
+      { group: 'vmms', name: 'vmms-backend', port: 3010, healthPath: '/vmms/health', database: 'vmms', timed: true, maxReplicas: 2, edge: true, ingress: true, blob: true, docIntel: true }
       { group: 'vmms', name: 'vmms-analytics', port: 3011, healthPath: '/vmms/analytics/health', database: 'vmms', timed: true, maxReplicas: 1, edge: true, ingress: true }
     ]
     jobs: [
@@ -502,7 +504,18 @@ module groupApp 'modules/container-app.bicep' = [for a in groupAppList: {
     ingress: a.ingress
     minReplicas: minReplicas(prod || warmAll, a.timed)
     maxReplicas: a.maxReplicas
-    settings: union(groupCommon(a, url, issuer, authInternal), groupApps[?a.name].?settings ?? {})
+    // Its own identity, for Blob Storage and Document Intelligence (no keys in settings)
+    systemIdentity: (a.?blob ?? false) || (a.?docIntel ?? false)
+    settings: union(
+      groupCommon(a, url, issuer, authInternal),
+      (a.?blob ?? false) ? {
+        STORAGE_ACCOUNT_URL: platform.outputs.blobEndpoint
+        STORAGE_PUBLIC_URL: platform.outputs.blobEndpoint
+        STORAGE_CONTAINER: '${a.group}-attachments'
+      } : {},
+      (a.?docIntel ?? false) ? { DOCUMENT_INTELLIGENCE_ENDPOINT: docIntel.outputs.endpoint } : {},
+      groupApps[?a.name].?settings ?? {}
+    )
     secretSettings: union(
       empty(a.database) ? {} : { DATABASE_URL: dbUrl(dbHost, a.database, 'app', secrets.roles[a.database].app) },
       secrets.?groups[?a.name] ?? {}
@@ -558,18 +571,87 @@ resource blobAccount 'Microsoft.Storage/storageAccounts@2023-05-01' existing = {
 }
 
 var blobContributor = subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'ba92f5b4-2d11-453d-a403-e96b0029c9fe')
+// Only lets an identity ask for a user delegation key (to sign links); Azure accepts it at the
+// account level only, so it carries no access to any blob by itself
+var blobDelegator = subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'db58b8e5-c6ad-4a2a-8342-4190687cbf4a')
+var cognitiveUser = subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'a97b65f3-24c7-4388-baec-2e87135dc908')
 
-// backend-vrms's own identity writes blobs and signs user delegation links (spec 0017)
+// Each system's backend reads and writes its own container only, and signs links for it
+// (spec 0017). Narrowed from the whole account on 2026-11-21, when VMMS got a container too.
+resource vrmsContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-05-01' existing = {
+  name: '${blobAccount.name}/default/vrms-attachments'
+}
+
 resource vrmsBlob 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  scope: blobAccount
+  scope: vrmsContainer
   // Keyed on the suffixed app: a recreated app has a new identity, and an assignment's principal can't change
-  name: guid(blobAccount.id, 'vrms-backend${nameSuffix}', blobContributor)
+  name: guid(vrmsContainer.id, 'vrms-backend${nameSuffix}', blobContributor)
   properties: {
     roleDefinitionId: blobContributor
     principalId: vrms.outputs.principalId
     principalType: 'ServicePrincipal'
   }
 }
+
+resource vrmsDelegator 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  scope: blobAccount
+  name: guid(blobAccount.id, 'vrms-backend${nameSuffix}', blobDelegator)
+  properties: {
+    roleDefinitionId: blobDelegator
+    principalId: vrms.outputs.principalId
+    principalType: 'ServicePrincipal'
+  }
+}
+
+// Document Intelligence (VMMS fuel receipt scanning). Made even before VMMS is enabled, so its
+// developers can test against it locally; its role assignment waits for the VMMS app below.
+module docIntel 'modules/document-intelligence.bicep' = {
+  name: 'document-intelligence${nameSuffix}'
+  params: {
+    name: 'di-welinc-${envName}-${suffix}'
+    location: location
+    sku: prod ? 'S0' : 'F0'
+  }
+}
+
+resource docIntelAccount 'Microsoft.CognitiveServices/accounts@2024-10-01' existing = {
+  name: 'di-welinc-${envName}-${suffix}'
+}
+
+// The same access for an enabled group's app that asks for it (groupDefs: blob, docIntel)
+resource groupContainers 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-05-01' existing = [for a in groupAppList: {
+  name: '${blobAccount.name}/default/${a.group}-attachments'
+}]
+
+resource groupBlob 'Microsoft.Authorization/roleAssignments@2022-04-01' = [for (a, i) in groupAppList: if (a.?blob ?? false) {
+  scope: groupContainers[i]
+  name: guid(groupContainers[i].id, '${a.name}${nameSuffix}', blobContributor)
+  properties: {
+    roleDefinitionId: blobContributor
+    principalId: groupApp[i].outputs.principalId
+    principalType: 'ServicePrincipal'
+  }
+}]
+
+resource groupDelegator 'Microsoft.Authorization/roleAssignments@2022-04-01' = [for (a, i) in groupAppList: if (a.?blob ?? false) {
+  scope: blobAccount
+  name: guid(blobAccount.id, '${a.name}${nameSuffix}', blobDelegator)
+  properties: {
+    roleDefinitionId: blobDelegator
+    principalId: groupApp[i].outputs.principalId
+    principalType: 'ServicePrincipal'
+  }
+}]
+
+resource groupDocIntel 'Microsoft.Authorization/roleAssignments@2022-04-01' = [for (a, i) in groupAppList: if (a.?docIntel ?? false) {
+  scope: docIntelAccount
+  name: guid(docIntelAccount.id, '${a.name}${nameSuffix}', cognitiveUser)
+  properties: {
+    roleDefinitionId: cognitiveUser
+    principalId: groupApp[i].outputs.principalId
+    principalType: 'ServicePrincipal'
+  }
+}]
 
 var contributor = subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'b24988ac-6180-42a0-ab88-20f7382dd24c')
 
