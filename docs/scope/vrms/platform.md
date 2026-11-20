@@ -52,11 +52,11 @@ spec [0025](../../specs/vrms/0025-error-monitoring/index.md) · code in `welinc-
 - Note (2026-11-16, `/architect`): Sentry in your four apps (student offer, free plan fallback, US region), browser reports through two gateway tunnel routes, one cron monitor (directory poll) and one uptime check (`/vrms/health`), Azure metric alerts in Bicep, a crash screen with a reference code, staging only test routes. Milestones 3 and 4 wait for feature 26's `deploy.yml`. Cross checked on another model, 17 gaps closed.
 - Note (2026-11-17, replan, from spec 0026 follow up): when milestone 1 adds the staging only test routes, hide them from the API docs in the same change (spec 0026 AC-7), then regenerate `docs/openapi.json`.
 - [x] Design it (spec): `/architect error monitoring`
-- [ ] Build it: `/develop error monitoring`
+- [x] Build it: `/develop error monitoring`
   - [x] Thin thread in VRMS: the Sentry org and projects, backend-vrms and web-vrms SDKs, scrubbing, crash screen, test route and page, proven from your laptop (AC-1 to AC-3, AC-6 to AC-9, AC-12, AC-14 to AC-16)
   - [x] The shared side: welinc-auth (with `CodeErrorFilter`), the portal, the gateway tunnel and CORS headers, contract 0001 (AC-1 to AC-9, AC-14 to AC-16). Tunnel envelope DSN check (task 7a) proven live 2026-11-17: the right DSN arrived, both cross project envelopes got 403 `TUNNEL_REJECTED`
   - [x] Jobs and releases: job failure reports, the directory poll monitor, release tags, source map upload and removal in `deploy.yml` (AC-1, AC-3, AC-10, AC-17) (2026-11-20, merged in all four repos and live on staging: release tags, maps uploaded and the `.map` 404 check passing)
-  - [ ] Alerts and hand off: Bicep settings and Azure alert rules, the uptime and cron alerts, the VMMS and BMS how to page (AC-10 to AC-14, AC-18) (tasks 10 and 11 done 2026-11-20: Azure alerts applied, uptime monitor on `/vrms/health` and the cron monitor on staging, both emailed by the new issue rule; task 12 left)
+  - [x] Alerts and hand off: Bicep settings and Azure alert rules, the uptime and cron alerts, the VMMS and BMS how to page (AC-10 to AC-14, AC-18) (2026-11-20: Azure alerts applied, uptime monitor on `/vrms/health` and the cron monitor on staging, both emailed by the new issue rule; `docs/integration/error-monitoring.md` written)
 - [ ] Verify it: `/check verify error monitoring`
 - [ ] Test it: `/test error monitoring` (Testmail is not needed here; it is for the email code flows)
 
