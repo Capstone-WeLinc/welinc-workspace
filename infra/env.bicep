@@ -155,6 +155,12 @@ func groupUpstream(group string, base string, enabled array, nameSuffix string, 
 
 // ---------------------------------------------------------------- shared services and VRMS
 
+// VRMS spec 0025: DSNs are public values (they can only send events), so they are plain settings.
+// Blank in the private file means Sentry off for that app (AC-14). SENTRY_TEST_ROUTES is never set
+// here: staging is the demo (spec 0008 AC-24), so its test routes stay off.
+var sentryDsn = secrets.?sentry.?dsn ?? {}
+var sentryEnvironment = prod ? 'production' : 'staging'
+
 var authSettings = {
   NODE_ENV: 'production'
   AUTH_ISSUER: issuer
@@ -170,6 +176,8 @@ var authSettings = {
   SMTP_PORT: '587'
   SMTP_USER: smtpUser
   SMTP_FROM: 'WeLinc <noreply@${domain}>'
+  SENTRY_DSN: sentryDsn.?auth ?? ''
+  SENTRY_ENVIRONMENT: sentryEnvironment
 }
 var authSecrets = {
   AUTH_SIGNING_KEYS: secrets.auth.signingKeys
@@ -195,6 +203,8 @@ var vrmsSettings = {
   STORAGE_CONTAINER: 'vrms-attachments'
   // API docs at /vrms/docs on staging only, as for auth above (VRMS spec 0026)
   API_DOCS_ENABLED: prod ? 'false' : 'true'
+  SENTRY_DSN: sentryDsn.?vrmsBackend ?? ''
+  SENTRY_ENVIRONMENT: sentryEnvironment
 }
 var vrmsSecrets = {
   AUTH_CLIENT_PRIVATE_KEY: secrets.vrms.clientPrivateKey
@@ -212,6 +222,9 @@ var gatewaySettings = {
   GATEWAY_HSTS: 'max-age=86400'
   GATEWAY_RATE_PER_SECOND: '20'
   GATEWAY_RATE_BURST: '40'
+  // The two browser tunnels (spec 0025, AC-4, AC-5): both or neither, the gateway refuses half
+  SENTRY_DSN_VRMS_WEB: sentryDsn.?vrmsWeb ?? ''
+  SENTRY_DSN_PORTAL: sentryDsn.?portal ?? ''
 }
 
 module auth 'modules/container-app.bicep' = {
@@ -598,6 +611,19 @@ module envGuard 'modules/env-guard.bicep' = if (prod) {
     environmentName: platform.outputs.environmentName
     principalIds: filter(map(['ours', 'vmms', 'bms'], w => logins[?w] ?? ''), p => !empty(p))
     certName: bindDomains ? certName : ''
+  }
+}
+
+// VRMS spec 0025, AC-13: database storage and CPU, and a restart loop on any app, emailed to the
+// private file's alertEmail. Skipped when the file has no alertEmail.
+module alerts 'modules/alerts.bicep' = if (!empty(secrets.?alertEmail ?? '')) {
+  name: 'alerts${nameSuffix}'
+  dependsOn: [auth, vrms, gateway, groupApp]
+  params: {
+    envName: envName
+    alertEmail: secrets.?alertEmail ?? ''
+    postgresServerName: postgres.outputs.name
+    appNames: map(concat(coreApps, map(groupAppList, a => a.name)), n => '${n}${nameSuffix}')
   }
 }
 

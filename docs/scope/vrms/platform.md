@@ -55,7 +55,7 @@ spec [0025](../../specs/vrms/0025-error-monitoring/index.md) · code in `welinc-
 - [ ] Build it: `/develop error monitoring`
   - [x] Thin thread in VRMS: the Sentry org and projects, backend-vrms and web-vrms SDKs, scrubbing, crash screen, test route and page, proven from your laptop (AC-1 to AC-3, AC-6 to AC-9, AC-12, AC-14 to AC-16)
   - [x] The shared side: welinc-auth (with `CodeErrorFilter`), the portal, the gateway tunnel and CORS headers, contract 0001 (AC-1 to AC-9, AC-14 to AC-16). Tunnel envelope DSN check (task 7a) proven live 2026-11-17: the right DSN arrived, both cross project envelopes got 403 `TUNNEL_REJECTED`
-  - [ ] Jobs and releases: job failure reports, the directory poll monitor, release tags, source map upload and removal in `deploy.yml` (AC-1, AC-3, AC-10, AC-17)
+  - [x] Jobs and releases: job failure reports, the directory poll monitor, release tags, source map upload and removal in `deploy.yml` (AC-1, AC-3, AC-10, AC-17) (2026-11-20, branch `feat/sentry-releases` in all four repos, committed, not pushed)
   - [ ] Alerts and hand off: Bicep settings and Azure alert rules, the uptime and cron alerts, the VMMS and BMS how to page (AC-10 to AC-14, AC-18)
 - [ ] Verify it: `/check verify error monitoring`
 - [ ] Test it: `/test error monitoring` (Testmail is not needed here; it is for the email code flows)
