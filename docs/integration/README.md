@@ -11,5 +11,6 @@ How VMMS and BMS work with the shared services (auth, portal, gateway). Setting 
 | [account-screens.md](account-screens.md) | Profile, activity, the portal admin section, account deletion |
 | [fleet-api.md](fleet-api.md) | The trucks API: VMMS serves it, BMS reads it |
 | [error-monitoring.md](error-monitoring.md) | Optional: reporting your crashes and errors to Sentry, with the gateway tunnel for web apps |
+| [security-checks.md](security-checks.md) | The weekly ZAP scan of your web app, the security headers to copy, secret scanning |
 
 Every welinc-auth route with its exact inputs and errors: `http://localhost:3000/auth/docs` (or `https://staging-api.welinc.app/auth/docs`).
