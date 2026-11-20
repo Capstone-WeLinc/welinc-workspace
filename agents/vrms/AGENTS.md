@@ -13,7 +13,7 @@ VRMS (Vehicle Repair Management System) rules, loaded on top of the root `AGENTS
 | `welinc-backend-vrms` | NestJS + Prisma + PostgreSQL API | 3002 |
 
 - **Gateway route**: `/vrms/`.
-- **File storage**: Azurite (the local Blob Storage emulator, port 10000) in `docker-compose.vrms.yml`, Azure Blob Storage when hosted. Only `welinc-backend-vrms` talks to it (spec 0017); the browser gets signed links.
+- **File storage**: Azurite (the local Blob Storage emulator, port 10000) in `docker-compose.vrms.yml`, Azure Blob Storage when hosted. Only `welinc-backend-vrms` talks to it (spec 0017); the browser gets signed links. The hosted account holds one container per system (`vrms-attachments`, `vmms-attachments`); each backend gets Storage Blob Data Contributor on its own container only, plus Storage Blob Delegator on the account to sign links. Bicep never removes a role assignment, so narrowing one means deleting the old one by hand after the apply.
 - **Runtime**: Node 24 and npm (`package-lock.json`) in every Node repo.
 
 ## Build approach
