@@ -12,7 +12,7 @@ _Steps derived from spec 0002 acceptance criteria and its Value sourcing table. 
 - [x] Portal: sign in with an account holding no system role → "no assigned subsystem access" message, nothing stored → AC-5, AC-7
 - [x] As a VRMS Admin, `POST /vrms/mechanics/sync` (the Users page has no sync button) → 200 `{ created, updated, deactivated }`, the VRMS mechanic count equals the welinc-auth VRMS mechanic and chief count, and the auth log shows one `issued service token client=vrms aud=AUTH scope="directory.read"` line → AC-14, AC-19, AC-21, AC-27
 - [x] Deactivate a mechanic in welinc-auth, sync, then `POST /vrms/mechanics/:authUserId/release-tickets` as the Admin → 200 (before spec 0002 it failed on welinc-auth's admin only route); the same call as the Chief → 403 `users.manage`, because that cell is locked off (VRMS spec 0011, AC-4); reactivate the mechanic and sync again after → AC-21
-- [ ] Staging (once spec 0008 exists): one planned rotation per `welinc-auth/docs/keys.md`, with someone signed in to VRMS throughout → nobody is sent to the login page → AC-24, AC-26
+- [x] Staging (once spec 0008 exists): one planned rotation per `welinc-auth/docs/keys.md`, with someone signed in to VRMS throughout → nobody is sent to the login page → AC-24, AC-26 (2026-11-20: add 07:05Z, promote `--now` 07:18Z, remove `--now` of the old kid 07:40Z, each applied to `auth-service-staging` and both auth jobs; the published key set followed each step and the health checks stayed 200; a VRMS session stayed signed in throughout and 5 minutes after the remove. The waits were cut from the runbook's margins (60 min, then token life plus 30) to twice the 5 minute key cache and token life plus 5)
 
 ## Commands
 
