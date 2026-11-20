@@ -220,7 +220,7 @@ It copies your group's setup into places git ignores: `.claude/skills/`, `.mcp.j
 
 ## Adding your system (VMMS and BMS)
 
-Your group's checklist is the one page to follow: [move-vmms.md](docs/integration/move-vmms.md) or [move-bms.md](docs/integration/move-bms.md). It covers the compose file, the token check, the session routes, health and your data. The gateway needs nothing from you: `/vmms/` and `/bms/` already route to your service names.
+VMMS and BMS already run on the shared login (both passed `node scripts/check-system.mjs <vmms|bms>` on `development` on 2026-11-20). To put your system online, follow [hosting.md](docs/integration/hosting.md). The gateway needs nothing from you: `/vmms/` and `/bms/` already route to your service names.
 
 ## Team rules
 
@@ -276,7 +276,7 @@ Your group's checklist is the one page to follow: [move-vmms.md](docs/integratio
 | You want to... | Read |
 |---|---|
 | Understand the whole suite | [docs/context/suite-overview.md](docs/context/suite-overview.md) |
-| Move VMMS or BMS onto the shared services | [move-vmms.md](docs/integration/move-vmms.md) or [move-bms.md](docs/integration/move-bms.md) |
+| Put VMMS or BMS on staging | [docs/integration/hosting.md](docs/integration/hosting.md) |
 | Find a test account | [docs/integration/seed-accounts.md](docs/integration/seed-accounts.md) |
 | Connect your web app to the login | [docs/integration/web-login.md](docs/integration/web-login.md) |
 | See what changed in the shared services this term | [docs/context/shared-repo-changes.md](docs/context/shared-repo-changes.md) |
