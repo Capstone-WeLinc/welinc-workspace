@@ -265,6 +265,7 @@ WL-304. The shared notification service every alert uses, across in app, email a
 - Note (2026-11-01, replan): from spec 0014. Notify the mechanic on Send back and on Verify (WL-212).
 - Note (2026-11-01, replan): from spec 0016. Notify the mechanic on create with mechanics and on assign (WL-201, VRMS-67).
 - Note (2026-11-03, replan): from spec 0019. Notify a mechanic when added to or removed from a ticket by an edit. Once a push channel exists, consider replacing the 3 second visible poll (`useVisiblePoll`) with SSE, or at least a light `GET /repairs/:id/version` check so phones on mobile data fetch only on change.
+- Note (2026-11-20, agreed with VMMS in feature 56): no shared notification service. VRMS keeps its own notifications ("The shared notification service" in the intent now means VRMS's own one service for all its alerts and channels). Integration events from VMMS and BMS (for example a maintenance job sent "For Repair") also become VRMS notifications, so design feature 28 after feature 56 lists which events cross.
 - [ ] Design it (spec): `/architect in-app notifications`
 - [ ] Polish it (optional, ask first): `emil-design-eng` (notification popover and toasts) · `web-design-guidelines`
 
