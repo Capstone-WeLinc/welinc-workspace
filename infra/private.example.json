@@ -26,6 +26,15 @@
     "clientPrivateKey": "private JWK from the same npm run keys:client vrms run",
     "geminiApiKey": ""
   },
+  "sentry": {
+    "_readme": "VRMS spec 0025: each project's DSN from Sentry (Project settings, Client Keys). Public values; blank turns Sentry off for that app. vrmsWeb and portal both or neither (the gateway tunnels). The same two browser DSNs go in the web repos' SENTRY_DSN_VRMS_WEB and SENTRY_DSN_PORTAL variables.",
+    "dsn": {
+      "vrmsBackend": "",
+      "auth": "",
+      "vrmsWeb": "",
+      "portal": ""
+    }
+  },
   "groups": {
     "vmms-backend": { "SOME_SECRET": "sent privately by the VMMS group" },
     "bms-booking": { "BMS_INTERNAL_SERVICE_KEY": "sent privately by the BMS group" }
