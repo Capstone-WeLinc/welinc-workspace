@@ -27,6 +27,7 @@ WL-206 and WL-207. Expected completion from priority and issue type, with a rule
 - Note (2026-10-30): spec 0012 follow up. Add the duration settings as entries in the settings catalog (Thresholds section), not code constants.
 - Note (2026-11-01, replan): from spec 0015. Default the Chief Mechanic to **on** for setting fix time estimates. Reuse `repair_tickets.status_changed_at` for time in status.
 - Note (2026-11-03, replan): from spec 0019. Admins can now change a ticket's priority after create. Decide whether that recomputes a `dueAt` that came from priority.
+- Note (2026-11-21, integration talks): the due date becomes the **expected return date** BMS plans around (feature 56, flow 3 "Repair impact on bookings"). VRMS sends BMS every set or change of `dueAt`, and BMS flags bookings before it. This makes the feature a dependency of the integration defense (Dec 4), so design it with feature 56. Recommended answer to the priority question above: recompute only when `dueAtSource` is `PRIORITY` or `ISSUE_TYPE`, never `MANUAL`, and send BMS the new date either way. Inside VRMS it stays "due date"; toward BMS it's "expected return date".
 - [ ] Design it (spec): `/architect deadlines & fix time estimates`
 - [ ] Polish it (optional, ask first): `web-design-guidelines` · `break-ui` (overdue by years, due today, missing estimates)
 
