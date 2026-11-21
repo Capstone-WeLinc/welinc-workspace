@@ -4,6 +4,8 @@
 **Status**: Backend and web implemented; migration applied to local Docker; interactive acceptance pending
 **Scope**: [Module 2: Vehicles, garages, and fleet records](../../../scope/vmms/index.md); [Module 3: Maintenance scheduling and alerts](../../../scope/vmms/index.md)
 
+Decision history (context, options, rationale): [rationale.md](rationale.md). Verification steps: [verify.md](verify.md).
+
 ## Summary
 
 Operations should record a truck's actual odometer once on the vehicle master,

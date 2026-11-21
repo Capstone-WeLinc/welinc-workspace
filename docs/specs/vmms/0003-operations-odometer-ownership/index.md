@@ -4,6 +4,8 @@
 **Status**: Single-vehicle ownership flow implemented; runtime acceptance pending
 **Scope**: [Module 2: Vehicles, garages, and fleet records](../../../scope/vmms/index.md)
 
+Decision history (context, options, rationale): [rationale.md](rationale.md). Verification steps: [verify.md](verify.md).
+
 ## Summary
 
 Operations owns all changes to a vehicle's master odometer reading. The update

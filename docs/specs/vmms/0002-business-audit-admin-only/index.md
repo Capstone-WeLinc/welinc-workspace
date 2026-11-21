@@ -4,6 +4,8 @@
 **Status**: User-selected policy; implementation in progress
 **Scope**: [Module 7: Reports and fleet dashboard](../../../scope/vmms/index.md)
 
+Decision history (context, options, rationale): [rationale.md](rationale.md). Verification steps: [verify.md](verify.md).
+
 ## Summary
 
 Restrict the VMMS business audit log to Admin. Operations, Chief Mechanic, and Mechanic must not access the page or its API, including through a direct URL or direct request. This is separate from authentication and account activity, which is owned by shared auth and the portal.

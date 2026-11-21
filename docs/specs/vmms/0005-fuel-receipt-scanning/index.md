@@ -3,6 +3,8 @@
 **Status**: Implemented; runtime OCR verification and production configuration pending
 **Scope**: [Module 5: Fuel expenses and anomaly handling](../../../scope/vmms/index.md)
 
+Decision history (context, options, rationale): [rationale.md](rationale.md). Verification steps: [verify.md](verify.md).
+
 ## Summary
 
 Add an Operations-only receipt-scanning option to the existing fuel-entry
@@ -111,7 +113,12 @@ entry or confirmation.
 - Both scanning and saving require the VMMS Operations role on the backend.
 - Enforce an image size limit (initial proposal: the existing 10 MB attachment
   ceiling), allow only JPG/JPEG/PNG, and validate actual file content as well
-  as the declared MIME type. Reject unsupported and malformed images.
+  as the declared MIME type. Fully decode the image before sending it to OCR
+  or storing it, while retaining the original bytes. Reject unsupported,
+  truncated, malformed, and over-dimension images.
+- Rate-limit final receipt uploads per actor as well as OCR scans. The initial
+  limit is five upload attempts per actor per minute, consistent with the
+  existing scan limit.
 - Keep uploaded receipts in private storage. Authorize every receipt download
   through the backend; do not expose public or long-lived storage URLs.
 - Do not log image contents, full OCR text, or extracted personal/payment
@@ -150,6 +157,9 @@ entry or confirmation.
    upload does not leave an orphaned object.
 8. OCR text and payment-card data are not persisted or emitted to application
    logs; receipt retention follows the approved policy.
+9. A supported image must successfully decode within configured dimension and
+    memory bounds before OCR or private persistence; stored bytes remain the
+    user's original image. Final upload attempts are rate-limited per actor.
 
 ## Affected repositories
 
@@ -210,3 +220,6 @@ accuracy/latency checks have not been performed because no Azure resource
 endpoint/key or receipt corpus was configured for this task. Production
 rollout remains gated on configuring an endpoint in an organization-approved
 region and completing the accuracy/latency pilot.
+
+Full image decoding and a final-upload rate limit are approved hardening
+extensions. They are not yet implemented or verified.

@@ -1,0 +1,101 @@
+﻿{
+    "version":  1,
+    "skills":  {
+                   "architect":  {
+                                     "source":  "jsmastery-pro/skills",
+                                     "sourceType":  "github",
+                                     "skillPath":  "skills/architect/SKILL.md",
+                                     "computedHash":  "66856595ec9fd2477534954ff9ee1f0b91c537eabbce0b4b9a19f69329c02f72"
+                                 },
+                   "ask-sonner":  {
+                                      "source":  "emilkowalski/skills",
+                                      "sourceType":  "github",
+                                      "skillPath":  "skills/ask-sonner/SKILL.md",
+                                      "computedHash":  "0168a6a129ba0a3561ccbda3a3d8d0dc0af1d556f373e315e9479e3364420dd3"
+                                  },
+                   "audit":  {
+                                 "source":  "jsmastery-pro/skills",
+                                 "sourceType":  "github",
+                                 "skillPath":  "skills/audit/SKILL.md",
+                                 "computedHash":  "f388e74b95dcfea40615dcce28223b9166e9213867ac35e9971b549b7cda1eae"
+                             },
+                   "break-ui":  {
+                                    "source":  "emilkowalski/skills",
+                                    "sourceType":  "github",
+                                    "skillPath":  "skills/break-ui/SKILL.md",
+                                    "computedHash":  "79e9e01e3f2fe2ced55448b55de1835c6e641826ee0a81991289e79d3f50cdc7"
+                                },
+                   "check":  {
+                                 "source":  "jsmastery-pro/skills",
+                                 "sourceType":  "github",
+                                 "skillPath":  "skills/check/SKILL.md",
+                                 "computedHash":  "59055fb74dd47dc1443cbdf970152d614e81372dd51aa636159eb3246a627dd8"
+                             },
+                   "debug":  {
+                                 "source":  "jsmastery-pro/skills",
+                                 "sourceType":  "github",
+                                 "skillPath":  "skills/debug/SKILL.md",
+                                 "computedHash":  "fa8f950ff8f78b45b5f665d889bc0df9f93b9784deca6dfc588ab08e23152f0e"
+                             },
+                   "impeccable":  {
+                                      "source":  "pbakaus/impeccable",
+                                      "sourceType":  "github",
+                                      "skillPath":  ".agents/skills/impeccable/SKILL.md",
+                                      "computedHash":  "58ed3306678b241316905ffaee23efdf098247a181f593ad125c4c299e63ad8c"
+                                  },
+                   "nestjs-best-practices":  {
+                                                 "source":  "kadajett/agent-nestjs-skills",
+                                                 "sourceType":  "github",
+                                                 "skillPath":  "skills/nestjs-best-practices/SKILL.md",
+                                                 "computedHash":  "29c326e77d1462ed9526996acae5da0cf4003146982abc8c67378f5dbad6b181"
+                                             },
+                   "prisma-cli":  {
+                                      "source":  "prisma/skills",
+                                      "sourceType":  "github",
+                                      "skillPath":  "prisma-cli/SKILL.md",
+                                      "computedHash":  "f1e28c22e9dd3457eebc05c53a7921f96f8b9fdcf50edb93a0b1de73b78fa2c5"
+                                  },
+                   "prisma-client-api":  {
+                                             "source":  "prisma/skills",
+                                             "sourceType":  "github",
+                                             "skillPath":  "prisma-client-api/SKILL.md",
+                                             "computedHash":  "5dcc0793337151efa73a444e5adbc7e1c24180778e83b4fe94c9109c391bd333"
+                                         },
+                   "react-hook-form":  {
+                                           "source":  "pproenca/dot-skills",
+                                           "sourceType":  "github",
+                                           "skillPath":  "skills/.curated/react-hook-form/SKILL.md",
+                                           "computedHash":  "c32b9536b64b2bbfb26ecadac5caf9ac85697f319edffe6f77c9ecd00db51d14"
+                                       },
+                   "shadcn":  {
+                                  "source":  "shadcn-ui/ui",
+                                  "sourceType":  "github",
+                                  "skillPath":  "skills/shadcn/SKILL.md",
+                                  "computedHash":  "7859e9a064940a1a0010c992b63e4633c4f5f39ed367a23c16f24029816b1703"
+                              },
+                   "sync":  {
+                                "source":  "jsmastery-pro/skills",
+                                "sourceType":  "github",
+                                "skillPath":  "skills/sync/SKILL.md",
+                                "computedHash":  "5986c38a23bbb14f82c018862ff0a601f3f20b4a8a1f429e9731b4da6742a765"
+                            },
+                   "tailwind-4-docs":  {
+                                           "source":  "lombiq/tailwind-agent-skills",
+                                           "sourceType":  "github",
+                                           "skillPath":  "skills/tailwind-4-docs/SKILL.md",
+                                           "computedHash":  "4900f575f24641b1af459cda37cbb8438ecf3f8f1a63148384197cb730895093"
+                                       },
+                   "vercel-composition-patterns":  {
+                                                       "source":  "vercel-labs/agent-skills",
+                                                       "sourceType":  "github",
+                                                       "skillPath":  "skills/composition-patterns/SKILL.md",
+                                                       "computedHash":  "10eb4ec94577b79ae98c63ce3e7f35f8a6a06436a4011bff083b397de6960eeb"
+                                                   },
+                   "vercel-react-best-practices":  {
+                                                       "source":  "vercel-labs/agent-skills",
+                                                       "sourceType":  "github",
+                                                       "skillPath":  "skills/react-best-practices/SKILL.md",
+                                                       "computedHash":  "6b526d013e28073246a36f99b529bc43745d30832ecfa8217b359c34f260ca6b"
+                                                   }
+               }
+}
