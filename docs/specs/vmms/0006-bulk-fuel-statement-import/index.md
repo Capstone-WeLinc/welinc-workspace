@@ -3,6 +3,8 @@
 **Status**: Approved for implementation
 **Scope**: [Module 5: Fuel expenses and anomaly handling](../../../scope/vmms/index.md)
 
+Decision history (context, options, rationale): [rationale.md](rationale.md). Verification steps: [verify.md](verify.md).
+
 ## Summary
 
 Operations can import a multi-row fuel billing workbook, review and edit each

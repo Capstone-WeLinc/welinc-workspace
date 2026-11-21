@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__playwright",
+      "mcp__shadcn"
+    ],
+    "ask": [
+      "Edit(/welinc-web-vmms/**)",
+      "Edit(/welinc-backend-vmms/**)",
+      "Edit(/welinc-backend-vmms-analytics-ai/**)",
+      "Edit(/welinc-mobile-vrms_vmms/**)"
+    ]
+  },
+  "enabledMcpjsonServers": [
+    "playwright",
+    "shadcn",
+    "atlassian"
+  ],
+  "enabledPlugins": {
+    "frontend-design@claude-plugins-official": true
+  }
+}
