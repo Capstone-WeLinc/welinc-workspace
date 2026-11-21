@@ -1,0 +1,95 @@
+name: Deploy
+
+# Staging deploy for a VMMS or BMS web app (docs/integration/hosting.md, "Deploying").
+# Copy this file to .github/workflows/deploy.yml. It runs after your CI workflow (named "CI")
+# passes on a push to development, builds that exact commit with staging's addresses and uploads
+# dist/ to your Static Web App.
+#
+# Repo variables, all plain values:
+#   AZURE_CLIENT_ID_STAGING, AZURE_TENANT_ID, AZURE_SUBSCRIPTION_ID, RESOURCE_GROUP_STAGING,
+#   STATIC_WEB_APP_STAGING, STAGING_API_URL, STAGING_PORTAL_URL, STAGING_WEB_URL
+# BMS only, a repo secret: VITE_GOOGLE_MAPS_API_KEY (the browser key restricted to your address)
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [development]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-${{ github.repository }}-staging
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      RG: ${{ vars.RESOURCE_GROUP_STAGING }}
+      SWA: ${{ vars.STATIC_WEB_APP_STAGING }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+
+      # A production build (build:prod when the repo has one) with staging's addresses
+      - name: Build with staging's addresses
+        run: |
+          if npm run | grep -q '^  build:prod$'; then npm run build:prod; else npm run build; fi
+        env:
+          VITE_API_BASE_URL: ${{ vars.STAGING_API_URL }}
+          VITE_PORTAL_URL: ${{ vars.STAGING_PORTAL_URL }}
+          VITE_GOOGLE_MAPS_API_KEY: ${{ secrets.VITE_GOOGLE_MAPS_API_KEY }}
+
+      # Source maps would publish your source code
+      - name: Remove source maps
+        run: find dist -name '*.map' -delete
+
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID_STAGING }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Static Web App deployment token
+        id: swa
+        run: |
+          set -euo pipefail
+          token="$(az staticwebapp secrets list -n "$SWA" -g "$RG" --query properties.apiKey -o tsv)"
+          echo "::add-mask::$token"
+          echo "token=$token" >> "$GITHUB_OUTPUT"
+
+      - uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ steps.swa.outputs.token }}
+          action: upload
+          app_location: dist
+          skip_app_build: true
+          skip_api_build: true
+
+      - name: Smoke test
+        env:
+          URL: ${{ vars.STAGING_WEB_URL }}
+        run: |
+          set -euo pipefail
+          deadline=$((SECONDS + 180))
+          until code="$(curl -s -o /dev/null -w '%{http_code}' --max-time 15 "$URL/")" && [ "$code" = 200 ]; do
+            if [ "$SECONDS" -ge "$deadline" ]; then
+              echo "::error::$URL answered ${code:-nothing}, not 200."
+              exit 1
+            fi
+            sleep 10
+          done
+          echo "ok  $URL"

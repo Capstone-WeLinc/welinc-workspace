@@ -58,6 +58,7 @@ Product backlog lives in Jira (read it through the Atlassian MCP); Jira wins whe
 - Ask before any git write: commit, push, merge, branch switch, or opening a PR.
 - Before calling a task done, run `npm run lint` and the build in every repo you touched (`build:local` in the two frontends, plus `npm run typecheck` in web-vrms).
 - VMMS and BMS repos (both `*-analytics-ai` repos included) belong to other groups: read them for integration context, never edit them.
+- One exception when turning a group on for staging (spec 0008 task 18): the lead adds `.github/workflows/deploy.yml` from `docs/integration/deploy-templates/` and the deploy repo variables and secrets to that group's repos, by branch and PR into `development`. Nothing else in their repos.
 - `welinc-mobile-vrms_vmms` (Expo) is shared with VMMS: VRMS may edit it for its repair screens. Branch from `development` and open a PR into it, like every service repo.
 - Playwright is expensive (snapshots and screenshots eat context). Do not run it after every change. Use it only for a new page or flow, a visual or layout change that code cannot prove, or at `/check verify` before a PR. Prefer `browser_snapshot` over screenshots, keep it to one pass, and never for backend-only or logic-only edits.
 - Say "Using skill: <name>" in the reply each time a skill is invoked, so the user can see it was applied.
