@@ -1,0 +1,169 @@
+name: Deploy
+
+# Staging deploy for a VMMS or BMS backend repo (docs/integration/hosting.md, "Deploying").
+# Copy this file to .github/workflows/deploy.yml and edit only the `services` list below.
+#
+# It runs after your CI workflow (named "CI") passes on a push to development, on exactly that
+# commit. A red CI means no deploy. Per service: build both images, run the migration job (if the
+# service has one), start a new revision and wait until it holds all traffic. If any step fails,
+# the old revision keeps serving.
+#
+# Repo variables (Settings > Secrets and variables > Actions > Variables), all plain values:
+#   AZURE_CLIENT_ID_STAGING, AZURE_TENANT_ID, AZURE_SUBSCRIPTION_ID, ACR_NAME,
+#   RESOURCE_GROUP_STAGING, STAGING_API_URL
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [development]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-${{ github.repository }}-staging
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      id-token: write
+    strategy:
+      fail-fast: false
+      matrix:
+        # dir: the folder holding Dockerfile.prod ("." for the repo root)
+        # app: the Azure app's base name (docs/integration/hosting.md, "Your apps")
+        # job: its migration job, or "" for none
+        # migrate: the migration command; no word may start with a dash (the Azure CLI reads it as
+        #          its own option), so wrap such a command in an npm script
+        #
+        # welinc-backend-bms:
+        service:
+          - { dir: bms-gateway, app: bms-gateway, job: '', migrate: '' }
+          - { dir: bms-booking-service, app: bms-booking, job: bms-booking-migrate, migrate: npx prisma migrate deploy }
+          - { dir: bms-dispatch-service, app: bms-dispatch, job: bms-dispatch-migrate, migrate: npx prisma migrate deploy }
+          - { dir: bms-completion-service, app: bms-completion, job: bms-completion-migrate, migrate: npx prisma migrate deploy }
+          - { dir: bms-analytics-projection, app: bms-analytics-projection, job: '', migrate: '' }
+        # welinc-backend-bms-analytics-ai:
+        #   - { dir: ., app: bms-analytics, job: bms-analytics-migrate, migrate: npx prisma migrate deploy }
+        # welinc-backend-vmms:
+        #   - { dir: ., app: vmms-backend, job: vmms-migrate, migrate: npx prisma migrate deploy }
+        # welinc-backend-vmms-analytics-ai (add "migrate:deploy": "npm run migrate -- --skip-embeddings" first):
+        #   - { dir: ., app: vmms-analytics, job: vmms-analytics-migrate, migrate: npm run migrate:deploy }
+    env:
+      SHA: ${{ github.event.workflow_run.head_sha }}
+      DIR: ${{ matrix.service.dir }}
+      APP: ${{ matrix.service.app }}-staging
+      JOB: ${{ matrix.service.job && format('{0}-staging', matrix.service.job) || '' }}
+      MIGRATE: ${{ matrix.service.migrate }}
+      IMAGE_REPO: ${{ matrix.service.app }}
+      ACR: ${{ vars.ACR_NAME }}
+      RG: ${{ vars.RESOURCE_GROUP_STAGING }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      # A short lived OpenID Connect pass, no stored password. Your login trusts only development.
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID_STAGING }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Image names
+        run: |
+          set -euo pipefail
+          server="$(az acr show -n "$ACR" --query loginServer -o tsv)"
+          {
+            echo "IMAGE=$server/$IMAGE_REPO:$SHA"
+            echo "SEED_IMAGE=$server/$IMAGE_REPO-seed:$SHA"
+            echo "SUFFIX=r${SHA:0:7}-${{ github.run_attempt }}"
+          } >> "$GITHUB_ENV"
+
+      - name: Build and push the images
+        run: |
+          set -euo pipefail
+          az acr login -n "$ACR"
+          docker build -f "$DIR/Dockerfile.prod" --target runner -t "$IMAGE" "$DIR"
+          docker push "$IMAGE"
+          if [ -n "$JOB" ]; then
+            docker build -f "$DIR/Dockerfile.prod" --target seed -t "$SEED_IMAGE" "$DIR"
+            docker push "$SEED_IMAGE"
+          fi
+
+      # The migration runs as the database owner before the new revision takes traffic. The
+      # command is set on the job, not given at start (a start override replaces the whole
+      # container, settings included).
+      - name: Migrate
+        if: env.JOB != ''
+        run: |
+          set -euo pipefail
+          read -r -a words <<<"$MIGRATE"
+          az containerapp job update -n "$JOB" -g "$RG" --image "$SEED_IMAGE" \
+            --command "${words[0]}" --args "${words[@]:1}" -o none
+          execution="$(az containerapp job start -n "$JOB" -g "$RG" --query name -o tsv)"
+          echo "Started $execution"
+          status=Running
+          for _ in $(seq 1 66); do
+            sleep 10
+            status="$(az containerapp job execution show -n "$JOB" -g "$RG" \
+              --job-execution-name "$execution" --query properties.status -o tsv)"
+            case "$status" in Succeeded|Failed|Stopped|Degraded) break ;; esac
+          done
+          echo "Migration job: $status"
+          if [ "$status" != Succeeded ]; then
+            az containerapp job logs show -n "$JOB" -g "$RG" --container "$JOB" \
+              --execution "$execution" --format text --tail 200 || true
+            echo "::error::The migration job ended $status. Nothing was deployed."
+            exit 1
+          fi
+
+      - name: New revision
+        run: az containerapp update -n "$APP" -g "$RG" --image "$IMAGE" --revision-suffix "$SUFFIX" -o none
+
+      - name: Wait for the revision
+        run: |
+          set -euo pipefail
+          revision="$APP--$SUFFIX"
+          for _ in $(seq 1 36); do
+            ready="$(az containerapp show -n "$APP" -g "$RG" --query properties.latestReadyRevisionName -o tsv)"
+            if [ "$ready" = "$revision" ]; then
+              echo "$revision is ready."
+              exit 0
+            fi
+            state="$(az containerapp revision show -n "$APP" -g "$RG" --revision "$revision" \
+              --query properties.runningState -o tsv 2>/dev/null || true)"
+            if [ "$state" = Failed ]; then
+              echo "::error::$revision failed to start. The previous revision keeps serving."
+              exit 1
+            fi
+            sleep 10
+          done
+          echo "::error::$revision was not ready after 6 minutes. The previous revision keeps serving."
+          exit 1
+
+  smoke:
+    needs: deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      # Your health route through the suite gateway (change bms to vmms for a VMMS repo)
+      - name: Health through the gateway
+        env:
+          URL: ${{ vars.STAGING_API_URL }}/bms/health
+        run: |
+          set -euo pipefail
+          deadline=$((SECONDS + 180))
+          until code="$(curl -s -o /dev/null -w '%{http_code}' --max-time 15 "$URL")" && [ "$code" = 200 ]; do
+            if [ "$SECONDS" -ge "$deadline" ]; then
+              echo "::error::$URL answered ${code:-nothing}, not 200."
+              exit 1
+            fi
+            sleep 10
+          done
+          echo "ok  $URL"

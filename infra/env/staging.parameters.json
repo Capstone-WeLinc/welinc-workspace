@@ -15,10 +15,65 @@
       "value": "c36f7f001@smtp-brevo.com"
     },
     "enabledGroups": {
-      "value": []
+      "value": [
+        "bms"
+      ]
     },
     "groupApps": {
-      "value": {}
+      "value": {
+        "bms-gateway": {
+          "settings": {
+            "AUTH_CLIENT_ID": "bms",
+            "BMS_SESSION_HOST": "true",
+            "CORS_ORIGINS": "https://staging-bms.welinc.app,https://staging-portal.welinc.app",
+            "BOOKING_API_URL": "https://bms-booking-staging.internal.mangocliff-6bf65d8d.southeastasia.azurecontainerapps.io",
+            "DISPATCH_API_URL": "https://bms-dispatch-staging.internal.mangocliff-6bf65d8d.southeastasia.azurecontainerapps.io",
+            "COMPLETION_API_URL": "https://bms-completion-staging.internal.mangocliff-6bf65d8d.southeastasia.azurecontainerapps.io",
+            "ANALYTICS_API_URL": "https://bms-analytics-staging.internal.mangocliff-6bf65d8d.southeastasia.azurecontainerapps.io"
+          }
+        },
+        "bms-booking": {
+          "settings": {
+            "AUTH_CLIENT_ID": "bms",
+            "BMS_BOOKING_HOST": "true",
+            "CORS_ORIGINS": "https://staging-bms.welinc.app,https://staging-portal.welinc.app",
+            "DISPATCH_API_URL": "https://bms-dispatch-staging.internal.mangocliff-6bf65d8d.southeastasia.azurecontainerapps.io",
+            "COMPLETION_API_URL": "https://bms-completion-staging.internal.mangocliff-6bf65d8d.southeastasia.azurecontainerapps.io"
+          }
+        },
+        "bms-dispatch": {
+          "settings": {
+            "AUTH_CLIENT_ID": "bms",
+            "CORS_ORIGINS": "https://staging-bms.welinc.app,https://staging-portal.welinc.app",
+            "BOOKING_API_URL": "https://bms-booking-staging.internal.mangocliff-6bf65d8d.southeastasia.azurecontainerapps.io",
+            "VMMS_INTERNAL_URL": "https://vmms-backend-staging.internal.mangocliff-6bf65d8d.southeastasia.azurecontainerapps.io"
+          }
+        },
+        "bms-completion": {
+          "settings": {
+            "AUTH_CLIENT_ID": "bms",
+            "CORS_ORIGINS": "https://staging-bms.welinc.app,https://staging-portal.welinc.app",
+            "BOOKING_API_URL": "https://bms-booking-staging.internal.mangocliff-6bf65d8d.southeastasia.azurecontainerapps.io",
+            "DISPATCH_API_URL": "https://bms-dispatch-staging.internal.mangocliff-6bf65d8d.southeastasia.azurecontainerapps.io"
+          }
+        },
+        "bms-analytics-projection": {
+          "settings": {
+            "BOOKING_API_URL": "https://bms-booking-staging.internal.mangocliff-6bf65d8d.southeastasia.azurecontainerapps.io",
+            "DISPATCH_API_URL": "https://bms-dispatch-staging.internal.mangocliff-6bf65d8d.southeastasia.azurecontainerapps.io",
+            "COMPLETION_API_URL": "https://bms-completion-staging.internal.mangocliff-6bf65d8d.southeastasia.azurecontainerapps.io"
+          }
+        },
+        "bms-analytics": {
+          "settings": {
+            "AUTH_CLIENT_ID": "bms-analytics",
+            "CORS_ORIGINS": "https://staging-bms.welinc.app,https://staging-portal.welinc.app",
+            "BOOKING_API_URL": "https://bms-booking-staging.internal.mangocliff-6bf65d8d.southeastasia.azurecontainerapps.io",
+            "DISPATCH_API_URL": "https://bms-dispatch-staging.internal.mangocliff-6bf65d8d.southeastasia.azurecontainerapps.io",
+            "COMPLETION_API_URL": "https://bms-completion-staging.internal.mangocliff-6bf65d8d.southeastasia.azurecontainerapps.io"
+          }
+        }
+      }
     },
     "warmAll": {
       "value": true
