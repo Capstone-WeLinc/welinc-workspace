@@ -322,11 +322,25 @@ function readState(input) {
 
 const OPEN = (q) => !['done', 'parked', 'skipped', 'failed'].includes(q.status);
 
-// Exit 0 when the run is still going and has an item left (used by start.sh --fresh between sessions).
+// Model and effort for an item: its own `model` and `effort` (from a [sonnet] or [opus high] tag in
+// queue.md) win; otherwise building uses Opus and everything else (verify, test, docs, diagrams) Sonnet.
+const MODELS = new Set(['opus', 'sonnet', 'haiku', 'fable']);
+const EFFORTS = new Set(['low', 'medium', 'high', 'xhigh', 'max']);
+export function pick(item = {}) {
+  const building = /^\/develop\b/.test(String(item.command || '').trim());
+  const model = MODELS.has(item.model) ? item.model : building ? 'opus' : 'sonnet';
+  const effort = EFFORTS.has(item.effort) ? item.effort : 'medium';
+  return { model, effort };
+}
+
+// Exit 0 when the run is still going and has an item left (used by start.sh between sessions).
+// Prints: <items left> <model> <effort>, the last two for the item the next session takes.
 function next(input) {
   const { state } = readState(input);
   const left = state && state.status === 'running' ? (state.queue || []).filter(OPEN) : [];
-  process.stdout.write(`${left.length}\n`);
+  const first = left.find((q) => q.status === 'running') || left[0];
+  const { model, effort } = pick(first);
+  process.stdout.write(`${left.length} ${model} ${effort}\n`);
   process.exit(left.length ? 0 : 1);
 }
 

@@ -3,7 +3,7 @@
 Write the report in this order. Leave out a section that has nothing in it, except **Needs you** and **Ready to push**, which always appear (say "Nothing" when empty). Keep it short enough to read on a phone over breakfast.
 
 ```markdown
-# Overnight run · <date> · <start> to <end>
+# Overnight run · <run id> · <start> to <end>
 
 <Artifact link, once published>
 
@@ -39,14 +39,31 @@ Branches with commits whose local CI went red: the step, its last relevant lines
 - **Proposed** (your call): <file and line> says <x>, but <evidence>. Suggested edit: <new wording>.
 - **Handoff**: item <N> looks done (<evidence>). Suggested edit: <strike it / new wording>.
 
-## What happened
-One short block per item, in run order:
+## What changed
+One block per item, in run order. This is the part to read before you push.
 
-### <item id> · <done | parked | failed | skipped> · <minutes> · from <queue.md | command line | carried | scope>
+### <item id> · <done | parked | failed | skipped> · <minutes> · <model effort> · from <queue.md | command line | carried | scope>
 - Box: `<the scope box>` → <ticked | still open>
-- Did: <one or two lines>
-- Evidence: <commands and counts; for verify, each acceptance criterion with pass or fail>
-- <For failed: the last relevant lines of output and the stash name.>
+
+**What it did.** <explain.did: 3 to 6 plain sentences: what was built or checked, how it works now, what a user of the app notices.>
+
+**Why.** <explain.why: the spec, acceptance criterion or note behind each main choice.>
+
+**Commits** (from `runs/<id>/changes.md`, built from git):
+- `<sha>` <subject>: <files changed, with line counts; group pictures as "N PNGs">
+
+**Read these first:**
+- `<file>`: <what to look for>
+
+**Check it yourself** (a couple of minutes):
+1. <a page and what you should see, or a command and its expected output>
+
+Evidence: <commands and counts; for verify, each acceptance criterion with pass or fail>. <Screenshots: paths in `runs/<id>/shots/`.>
+<For failed: the last relevant lines of output and the stash name.>
+Whole diff: `git -C <repo> diff <base>...<branch>`
+
+## Usage
+The table from `node agents/vrms/overnight/runner.mjs usage`: each step's model, turns, minutes, and your 5 hour and weekly usage. Then one line: which step cost the most, and whether a cheaper model would have done.
 
 ## Decided for you
 Small choices taken on your behalf, each easy to undo:

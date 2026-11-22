@@ -1,7 +1,7 @@
 ---
 name: overnight
 allowed-tools: Bash, Read, Grep, Glob, Write, Edit, Agent, Skill, PushNotification, Artifact
-argument-hint: "[feature numbers...] [--until HH:MM] [--plan] [--prepare | --one | --close]"
+argument-hint: "[feature numbers...] [--until HH:MM] [--plan] [--prepare | --one | --close | --watch]"
 description: "Unattended overnight run for VRMS. Works through your bedtime queue and the scope's open build, verify and test boxes with /develop, /check verify, /test and /sync while you are away: local branches and commits only, never a push or PR. Finds stale docs, parks anything that needs your decision, runs each branch's CI locally, and ends with a morning report. Start it with agents/vrms/overnight/start.sh, never by hand in a normal session."
 disable-model-invocation: true
 ---
@@ -22,13 +22,16 @@ All the project rules still apply (root `AGENTS.md`, `agents/vrms/AGENTS.md`, ea
 
 Files, all under `docs/_private/vrms/overnight/` (git ignores it):
 - `queue.md`: the user's bedtime queue (shape in `queue-template.md`). Optional. It works like the handoff: one file, read first, rewritten at the end to only what is left, deleted when nothing is left.
-- `state.json`: the night's memory (queue, progress, findings). One file, replaced each night. The Stop hook reads it and keeps the session working while `status` is `running`. Everything you need to continue lives here, so a fresh context (or a restart after a crash or a usage limit) resumes from it.
-- `YYYY-MM-DD.md`: the morning report (shape in `report-template.md`). Keep the newest 7; delete older ones at close out.
+- `state.json`: the run's memory (queue, progress, findings). The Stop hook reads it and keeps the session working while `status` is `running`. Everything you need to continue lives here, so a fresh context (or a restart after a crash or a usage limit) resumes from it. `start.sh` files a finished one under `runs/<id>/` before the next run starts.
+- `<run id>.md`: the morning report (shape in `report-template.md`). The run id is in `$OVERNIGHT_RUN_ID` (for example `2026-11-24-2310`), so a second run the same night gets its own report and never writes over the first. `start.sh` prunes old runs; never delete a report yourself.
+- `runs/<run id>/`: this run's folder: `usage.jsonl` (the usage meter), `changes.md` (what changed, built from git), `runner.log`, and `shots/` for screenshots.
+
+The helper `node agents/vrms/overnight/runner.mjs` does the bookkeeping without model usage: `changes` writes `runs/<id>/changes.md`, `usage` prints the usage table.
 
 ## Modes
 
-- No mode flag (**session mode**, the default): one long session does preflight, every item, and close out.
-- `--prepare`, `--one`, `--close` (**fresh mode**, driven by `start.sh --fresh`): each is its own headless session with a clean context. `--prepare` runs Steps 0 and 1 and exits. `--one` takes the next `pending` item from `state.json`, runs Step 2 for it alone, saves, and exits. `--close` runs Step 3. In every mode, read `state.json` first and trust it over your memory.
+- `--prepare`, `--one`, `--close` (**fresh mode**, the default, driven by `start.sh`): each is its own headless session with a clean context, on the model `start.sh` picked for it (the item's `model` and `effort`, else Opus for `/develop` and Sonnet for everything else). `--prepare` runs Steps 0 and 1 and exits. `--one` takes the next `pending` item from `state.json`, runs Step 2 for it alone, saves, and exits. `--close` runs Step 3. In every mode, read `state.json` first and trust it over your memory.
+- No mode flag (**session mode**, `start.sh --watch`): one long session does preflight, every item, and close out, so the user can follow it from the Claude app.
 - `--plan`: Steps 0 and 1 only, then the report's Plan and Drift sections, `status` set to `finished`. A dry run.
 
 ## Step 0: Preflight (stop the run if a safety check fails)
@@ -49,6 +52,7 @@ Logins: use the seeded accounts in `docs/integration/seed-accounts.md` (never `.
 
 Sources, in order:
 1. **`queue.md`**, when present: the user's items, in their order. Their notes on an item are the user's answers: follow them, and don't park a question they already answered. A queued item that is not runnable (needs `/architect`, is dated, touches staging) is not skipped silently: record why in the plan and, for a design item, write the questions it would need into `needsYou` so the user can answer them in the next `queue.md`.
+   A tag in square brackets on a line sets that item's model and effort: `[sonnet]`, `[opus high]`, `[haiku low]`. Save them as the item's `model` and `effort`; leave both out when there is no tag (the defaults apply).
 2. **Command line feature numbers** (`start.sh 69 58 S19`): same as queue lines with no notes.
 3. **Carried over:** items parked or failed last night whose blocker is now resolved (the user answered in `queue.md`, or the fix landed). Otherwise they stay in the report's carried list, not the queue.
 4. **The scope fill**, only as the `queue.md` "After these" line allows (default: checks and tests). When there is no `queue.md` and no feature numbers, the fill is the whole queue.
@@ -66,17 +70,18 @@ Never queue: `/architect`, `/scope` planning, `/check review`, `/document`, `/au
 
 Order: `queue.md` and command line items first, then carried items, then the fill (features already `in-progress` before new ones, then scope order). After an item finishes, the feature's next box may join the end of the queue if it is eligible under the same rules.
 
-Write `state.json`:
+Write `state.json`, with `runId` set to `$OVERNIGHT_RUN_ID`:
 
 ```json
 {
+  "runId": "2026-11-24-2310",
   "date": "2026-11-24",
   "startedAt": "23:10",
   "until": "07:00",
   "after": "checks and tests",
   "status": "running",
   "queue": [
-    { "id": "69-verify", "feature": 69, "box": "Verify it", "command": "/check verify security checks", "source": "queue.md", "notes": "", "status": "pending", "repos": [], "branches": [], "commits": [], "ci": [], "risk": [], "result": "" }
+    { "id": "69-verify", "feature": 69, "box": "Verify it", "command": "/check verify security checks", "source": "queue.md", "notes": "", "model": "sonnet", "effort": "medium", "status": "pending", "repos": [], "branches": [], "commits": [], "ci": [], "risk": [], "result": "", "explain": null }
   ],
   "drift": [],
   "decidedForYou": [],
@@ -100,8 +105,14 @@ For each `pending` item, in order:
 2. Set the item `running` and save. Invoke its skill with the Skill tool (`develop`, `check` with `verify ...`, `test`) and follow it fully, with the overrides below and the user's notes from `queue.md`.
 3. Before calling it done: `npm run lint` and the build in every repo it touched (`build:local` in the two frontends, plus `npm run typecheck` in web-vrms). For backend changes, restart the container first; after a Prisma schema change, run `docker exec welinc_vrms_backend npx prisma generate` and restart.
 4. Green: commit (see Git), tick the box in the scope the way the skill says, set the item `done`, and record branches, commits and the checks that passed with counts ("lint ok, build ok, 42 tests passed").
-5. Red: run `/debug` once on the failure. Still red: don't commit. `git stash push -u -m "overnight <date> <item id>"`, record the stash, set the item `failed` with the last 20 relevant lines of output, and move on.
-6. **Risk flags** for each branch touched, recorded in the item's `risk`: changes in `welinc-auth` or `welinc-web-portal` (shared), `schema.prisma` or a migration, auth, sessions, roles, permissions, guards, uploads or storage code, `.github/workflows/`, Dockerfiles or compose files, `infra/`, new or upgraded dependencies, or a feature tagged `· GA`. Each flag names the files. These are the diffs the user should read closely.
+5. **Explain it** for the morning, in the item's `explain` (for every item that changed anything, done, parked or failed). The reader is the user over breakfast: a lead dev who did not watch, wants to know what changed and why, and will check it before pushing. Plain words, no jargon without a short gloss:
+   - `did`: 3 to 6 sentences: what you built or checked, how it works now, and what is different for someone using the app.
+   - `why`: the spec, acceptance criterion or note that drove each main choice.
+   - `readFirst`: the 2 to 4 files that matter most, each with one line on what to look for.
+   - `howToCheck`: 2 to 4 steps the user can follow in a couple of minutes (a page and what they should see, or a command and its expected output).
+   - `screenshots`: paths of any screenshots worth seeing (in `runs/<id>/shots/`).
+6. Red: run `/debug` once on the failure. Still red: don't commit. `git stash push -u -m "overnight <date> <item id>"`, record the stash, set the item `failed` with the last 20 relevant lines of output, and move on.
+7. **Risk flags** for each branch touched, recorded in the item's `risk`: changes in `welinc-auth` or `welinc-web-portal` (shared), `schema.prisma` or a migration, auth, sessions, roles, permissions, guards, uploads or storage code, `.github/workflows/`, Dockerfiles or compose files, `infra/`, new or upgraded dependencies, or a feature tagged `· GA`. Each flag names the files. These are the diffs the user should read closely.
 
 **Questions (overrides every skill's "ask the engineer"):** nobody can answer, and `AskUserQuestion` is blocked.
 - Answered in `queue.md`: use that answer.
@@ -114,7 +125,11 @@ For each `pending` item, in order:
 - Commit only what landed green, by explicit path (never `git add -A` in a repo that had other changes). One line Conventional Commit subject, no body, **no** `Co-Authored-By` trailer (project rule: attribution none).
 - Never: push, pull without `--ff-only`, merge, rebase, reset `--hard`, amend, delete branches, drop stashes. The guard blocks them anyway.
 
-**Running the app:** Playwright once per verify, `browser_snapshot` over screenshots. Sign in only with seeded `@welinc.com` accounts; never type a real email address anywhere (local auth sends real mail). Steps in a `verify.md` that need staging, another group, a real person or a real device: mark them "left for you" and verify the local steps.
+**Running the app:** use `browser_snapshot` to check structure and text; take a screenshot when the look matters (layout, colors, a phone width), saved to `runs/<id>/shots/<item id>-<page>-<width>.png`. Look at as many as you need to get it right; you are in a fresh session per item, so they don't pile up.
+
+**Diagrams and images:** export PNG only (no SVG, no DBML); the sources (`.puml`, `.drawio`) can export SVG later. Sign in only with seeded `@welinc.com` accounts; never type a real email address anywhere (local auth sends real mail). Steps in a `verify.md` that need staging, another group, a real person or a real device: mark them "left for you" and verify the local steps.
+
+**Usage:** `start.sh` checks your usage before every step and waits while the 5 hour window is at 95% or more, so never stop or slow down on your own because of usage.
 
 **Halt the whole run** (set `status` to `halted`, write `haltReason`, go to Step 3) when: auto mode stops allowing actions (several blocks in a row, or Claude Code starts asking for permission), three items in a row fail for the same cause (usually the environment, not the code), Docker or the databases go down and won't come back, or you are about to do something the overrides forbid.
 
@@ -123,8 +138,8 @@ For each `pending` item, in order:
 1. **Sync.** If any item is `done`: run `/sync` once for the night's changes and commit its edits on the workspace branch (or leave them uncommitted if the workspace is dirty). Record in `syncEdits` which file and line each edit touched and which branch it describes, so the user can drop the lines for a branch they reject.
 2. **Local CI.** For every branch with green commits, read that repo's `.github/workflows/ci.yml` and run each `run:` step of the jobs that would run on a PR into `development` (lint, typecheck, build, tests, `audit-ci`, and the like), in the order CI runs them. Skip `npm ci` (the packages are installed already; say so) and steps that need secrets, a GitHub only action (gitleaks, uploads) or a service you don't have locally: list those as "CI only". Record each step's result in the item's `ci`. A red step moves the branch from **Ready to push** to **Not ready yet**, with the output.
 3. **Queue file.** Rewrite `queue.md` to only what is left, like the handoff: keep the user's unfinished lines with their notes, add parked items with "carried from <date>: <what it needs>", drop finished ones. Nothing left: delete `queue.md`.
-4. **Report.** Write it from `report-template.md` into `docs/_private/vrms/overnight/<date>.md`. Facts only: every "passed" comes with the command and its count; say plainly what failed or was skipped. Delete reports older than the newest 7.
-5. **Publish** it as a private Artifact page for the phone: load the `artifact-design` skill first, build a simple HTML page from the report, publish it, and put the link at the top of the markdown report. If the publish is refused or fails, the markdown file is the report; say so in the notification.
+4. **Report.** Run `node agents/vrms/overnight/runner.mjs changes` and `node agents/vrms/overnight/runner.mjs usage` first. Then write the report from `report-template.md` into `docs/_private/vrms/overnight/$OVERNIGHT_RUN_ID.md`: each item's **What changed** block comes from its `explain` plus its commits and files in `runs/<id>/changes.md` (git is the truth: if they disagree, say so), and the **Usage** section is the table as printed. Facts only: every "passed" comes with the command and its count; say plainly what failed or was skipped.
+5. **Publish** it as a private Artifact page for the phone: load the `artifact-design` skill first, build a simple HTML page from the report (each item a card you can open for its What changed block and screenshots), publish it, and put the link at the top of the markdown report. If the publish is refused or fails, the markdown file is the report; say so in the notification.
 6. Set `status` to `finished` (or keep `halted`) in `state.json`.
 7. Send one `PushNotification`: "Overnight run finished: N done, N need you, N failed. Report: <link or path>". This is the only notification of the night, except a halt, which also sends one.
 8. Finish with a short message: the counts, the report path and link, and the first thing to look at in the morning. In session mode the session then stays open and idle; that is the end of the run.
