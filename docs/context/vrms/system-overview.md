@@ -34,8 +34,7 @@ browser ─► web-portal (:8000, login) ─► web-vrms (:8001)
                 │                           │
                 └────────► gateway :3000 ◄──┘
                      /auth ─► welinc-auth (:3001) ─► Postgres (auth)
-                     /vrms ─► backend-vrms (:3002) ─► Postgres (vrms)
-analytics-ai (:8020) ─► pgvector, DuckDB, Redis, MongoDB; reads the VRMS Postgres
+                     /vrms ─► backend-vrms (:3002, includes AI and analytics) ─► Postgres (vrms)
 ```
 
 Shared tables owned by VRMS (other subsystems reference them): vehicles, garages, in house mechanics.
@@ -45,7 +44,7 @@ Shared tables owned by VRMS (other subsystems reference them): vehicles, garages
 - **Architecture is microservices**, as in the code. The BRD and diagrams that show a modular monolith are outdated.
 - **Mechanic mobile app: one app shared with VMMS** (decided 2026-10-29). VMMS already has a mobile app; VRMS adds its repair screens to it. Its platform and repo are settled after the integration meeting (scope feature 56). Jira still lists this as an open platform decision (WL-801, ticket missing). Update Jira.
 - **Hosting: Azure** (Static Web Apps, Container Apps, one shared PostgreSQL server) with GitHub Actions, per spec 0008; this replaced the earlier Vercel and Render plan. Email goes through Brevo from `noreply@welinc.app` when hosted; SMS is dropped as not worth the cost. Staging went live on 2026-11-19; production is planned for 2026-11-20. Jira still says "Vercel vs Netlify" (WL-901, ticket missing). Update Jira. License photo storage may be dropped.
-- **AI and analytics is a Capstone 2 addition** not covered by BRD v1.1. It lives in its own repo only because an earlier requirement said it couldn't touch the main DB and backend. That requirement is gone, so merging it into the main VRMS repos is an open option (decide with `/architect`).
+- **AI and analytics is a Capstone 2 addition** not covered by BRD v1.1. It lives in `welinc-backend-vrms` (`src/modules/ai` and `src/modules/analytics`), not the old separate analytics repo, and stays optional.
 
 ## Still open
 
