@@ -1,0 +1,28 @@
+@startuml 4.4.2-sequence-2-work-the-repair
+!include _style.iuml
+title Sequence 2: a mechanic works the repair
+autonumber
+skinparam responseMessageBelowArrow true
+
+actor Mechanic
+participant "VRMS web app" as Web
+participant "VRMS backend" as BE
+database "VRMS database" as DB
+participant "File storage\n(Azure Blob)" as Blob
+
+Mechanic -> Web : take a Before photo
+Web -> BE : upload the photo
+BE -> BE : check the file type and\nthat it is not a duplicate
+BE -> Blob : store the photo
+BE -> DB : save the photo record,\nwrite the audit entry
+Mechanic -> Web : press Start work
+Web -> BE : move the ticket to In progress
+BE -> DB : check a Before photo exists,\nsave the new status and audit entry
+Mechanic -> Web : tick checklist steps,\nadd After photos
+Web -> BE : save the ticks and photos
+BE -> Blob : store the After photos
+Mechanic -> Web : record what fixed each issue,\npress Send for verification
+Web -> BE : move the ticket to For verification
+BE -> DB : save the fixes, the new status\nand the audit entry
+BE --> Web : updated ticket
+@enduml

@@ -1,0 +1,62 @@
+' Shared look for the VRMS paper diagrams: black on white, WeLinc gold (#E8B800) as the only accent.
+skinparam dpi 150
+skinparam shadowing false
+skinparam defaultFontName Helvetica
+skinparam defaultFontSize 12
+skinparam defaultFontColor #0F172A
+skinparam ArrowColor #0F172A
+skinparam ArrowFontSize 10
+skinparam BackgroundColor #FFFFFF
+skinparam roundCorner 6
+skinparam linetype ortho
+skinparam component {
+  BackgroundColor #FFFFFF
+  BorderColor #0F172A
+}
+skinparam package {
+  BackgroundColor #FFFFFF
+  BorderColor #0F172A
+}
+skinparam rectangle {
+  BackgroundColor #FFFFFF
+  BorderColor #0F172A
+}
+skinparam database {
+  BackgroundColor #FFFFFF
+  BorderColor #0F172A
+}
+skinparam cloud {
+  BackgroundColor #FFFFFF
+  BorderColor #0F172A
+}
+skinparam node {
+  BackgroundColor #FFFFFF
+  BorderColor #0F172A
+}
+skinparam actor {
+  BackgroundColor #FFFFFF
+  BorderColor #0F172A
+}
+skinparam usecase {
+  BackgroundColor #FFFFFF
+  BorderColor #0F172A
+}
+skinparam class {
+  BackgroundColor #FFFFFF
+  BorderColor #0F172A
+  HeaderBackgroundColor #FFFFFF
+  AttributeFontSize 11
+}
+skinparam sequence {
+  LifeLineBorderColor #64748B
+  ParticipantBackgroundColor #FFFFFF
+  ParticipantBorderColor #0F172A
+  ActorBackgroundColor #FFFFFF
+  ActorBorderColor #0F172A
+  BoxBorderColor #0F172A
+  GroupBorderColor #64748B
+}
+skinparam note {
+  BackgroundColor #FFFFFF
+  BorderColor #64748B
+}

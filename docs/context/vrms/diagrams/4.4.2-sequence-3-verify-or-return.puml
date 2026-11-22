@@ -1,0 +1,31 @@
+@startuml 4.4.2-sequence-3-verify-or-return
+!include _style.iuml
+title Sequence 3: the Chief Mechanic verifies or returns the work
+autonumber
+skinparam responseMessageBelowArrow true
+
+actor "Chief Mechanic" as Chief
+participant "VRMS web app" as Web
+participant "VRMS backend" as BE
+database "VRMS database" as DB
+participant "File storage\n(Azure Blob)" as Blob
+
+Chief -> Web : open the ticket
+Web -> BE : get the ticket and its photos
+BE -> Blob : sign short lived links\nfor each photo
+BE --> Web : ticket, allowed actions\nand photo links
+Web -> Blob : show the photos
+alt the work is done
+  Chief -> Web : press Verify and close
+  Web -> BE : close the ticket
+  BE -> BE : check the Chief is not\nassigned to this ticket
+  BE -> DB : mark it closed with who verified it,\nwrite the audit entry
+  BE -> DB : return the truck to its\nearlier status
+  BE --> Web : closed ticket
+else more work is needed
+  Chief -> Web : press Return to mechanic,\nwrite remarks
+  Web -> BE : return the ticket
+  BE -> DB : move it back to In progress,\nsave the remarks in the audit entry
+  BE --> Web : returned ticket
+end
+@enduml

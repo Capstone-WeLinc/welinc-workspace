@@ -1,0 +1,63 @@
+@startuml 4.4.1-component
+!include _style.iuml
+title VRMS component diagram
+skinparam linetype polyline
+skinparam nodesep 35
+skinparam ranksep 45
+
+rectangle "Users and browser" as tier1 {
+  actor "Admin, Chief Mechanic,\nMechanic" as user
+  component "VRMS web app" as web
+  component "WeLinc portal\n(sign in)" as portal
+}
+
+rectangle "Gateway" as tier2 {
+  component "API gateway" as gw
+}
+
+rectangle "welinc-backend-vrms" as tier3 #FFFFFF;line:E8B800;line.bold {
+  component "Access check: signed in and allowed (every request)" as guard
+  component "Sign in and sessions" as sess
+  rectangle "Feature modules" as mods {
+    component "Repair tickets\n(create, assign, work,\nverify, costs)" as tickets
+    component "Fix library" as kb
+    component "Analytics" as an
+    component "Settings and\nlookup lists" as set
+    component "AI diagnosis" as ai
+    component "Photos and\ndocuments" as files
+  }
+  component "Data access layer (shared by every module)" as data
+}
+
+rectangle "Data and outside services" as tier4 {
+  database "VRMS database\n(PostgreSQL)" as db
+  cloud "Google Gemini" as gemini
+  cloud "File storage\n(Azure Blob)" as blob
+  component "WeLinc sign in service\n(welinc-auth)" as auth
+}
+
+' Left to right order inside each tier, so lines drop straight down
+tickets -[hidden]right- kb
+kb -[hidden]right- an
+an -[hidden]right- set
+set -[hidden]right- ai
+ai -[hidden]right- files
+db -[hidden]right- gemini
+gemini -[hidden]right- blob
+blob -[hidden]right- auth
+guard -[hidden]right- sess
+web -[hidden]right- portal
+
+user --> web : uses
+user --> portal : signs in
+web --> gw : sends requests
+gw --> guard : app requests
+gw --> sess : sign in requests
+guard --> mods : passes allowed requests
+mods --> data : reads and saves
+data --> db : stores records
+ai --> gemini : asks for a diagnosis
+files --> blob : stores files
+sess --> auth : exchanges login code
+guard --> auth : checks session\nand permissions
+@enduml

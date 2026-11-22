@@ -1,0 +1,175 @@
+@startuml 4.4.2-class
+!include _style.iuml
+title VRMS class diagram (domain and services)
+skinparam linetype ortho
+hide empty members
+hide circle
+
+package "Domain" #FFFFFF;line:E8B800;line.bold {
+  class RepairTicket {
+    repairNumber : string
+    repairStatus : RepairStatus
+    priority : RepairPriority
+    odometer : int
+    dueAt : DateTime
+    totalCost : decimal
+    closedAt : DateTime
+  }
+  class RepairIssue {
+    description : string
+    resolutionNote : string
+    hoursSpent : decimal
+    followedKnownFix : bool
+    resolvedAt : DateTime
+  }
+  class RepairIssueStep {
+    position : int
+    text : string
+    checkedAt : DateTime
+    origin : StepOrigin
+  }
+  class RepairPart {
+    description : string
+    unitCost : decimal
+    quantity : int
+    subtotal : decimal
+  }
+  class TicketAssignment {
+    assignedAt : DateTime
+    assignedByUserId : string
+  }
+  class Mechanic {
+    authUserId : string
+    name : string
+    role : string
+    isActive : bool
+  }
+  class Vehicle {
+    plateNumber : string
+    model : string
+    status : VehicleStatus
+    odometer : int
+  }
+  class Driver {
+    name : string
+    licenseNumber : string
+    isVerified : bool
+  }
+  class Garage {
+    name : string
+  }
+  class Attachment {
+    kind : AttachmentKind
+    storageKey : string
+    mimeType : string
+    sizeBytes : int
+    sha256 : string
+    deletedAt : DateTime
+  }
+  class AuditLog {
+    actorUserId : string
+    actorRole : string
+    action : string
+    changes : Json
+    createdAt : DateTime
+  }
+  class KnowledgeEntry {
+    name : string
+    status : KnowledgeEntryStatus
+    symptoms : string
+    suggestedPriority : RepairPriority
+    estimatedHours : decimal
+  }
+  class IssueCategory {
+    name : string
+    isActive : bool
+  }
+  class AiDiagnosis {
+    model : string
+    confidence : string
+    result : Json
+    latencyMs : int
+  }
+  enum RepairStatus {
+    OPEN
+    ASSIGNED
+    IN_PROGRESS
+    ON_HOLD
+    FOR_VERIFICATION
+    OUTSOURCED
+    PENDING_APPROVAL
+    CLOSED
+    CANCELLED
+  }
+}
+
+package "Services" {
+  class RepairsService {
+    +create()
+    +findAll()
+    +findOne()
+    +updateStatus()
+    +updateCosts()
+    +unlockTicket()
+    +checkStep()
+    +linkKnowledge()
+  }
+  class TicketEditsService {
+    +editDetails()
+    +setMechanics()
+    +addIssue()
+    +removeIssue()
+  }
+  class AttachmentsService {
+    +upload()
+    +list()
+    +remove()
+    +move()
+  }
+  interface FileStore {
+    +put()
+    +delete()
+    +readUrl()
+  }
+  class BlobFileStore
+  class DiagnosisService {
+    +run()
+    +latest()
+    +saveFeedback()
+  }
+  interface AiProvider {
+    +embed()
+    +generateJson()
+  }
+  class GeminiProvider
+  class VehiclesService {
+    +setStatus()
+  }
+}
+
+Vehicle "1" -- "0..*" RepairTicket
+Driver "1" -- "0..*" RepairTicket
+Garage "1" -- "0..*" RepairTicket
+RepairTicket "1" *-- "1..*" RepairIssue
+RepairIssue "1" *-- "0..*" RepairIssueStep
+RepairTicket "1" *-- "0..*" RepairPart
+RepairTicket "1" *-- "0..*" TicketAssignment
+TicketAssignment "0..*" -- "1" Mechanic
+RepairTicket "1" o-- "0..*" Attachment
+RepairTicket "1" o-- "1..*" AuditLog
+RepairTicket "1" *-- "0..*" AiDiagnosis
+RepairIssue "0..*" -- "0..1" IssueCategory
+RepairIssue "0..*" -- "0..1" KnowledgeEntry
+IssueCategory "1" -- "0..*" KnowledgeEntry
+RepairTicket ..> RepairStatus
+
+RepairsService ..> RepairTicket : manages
+TicketEditsService ..> RepairTicket : edits
+AttachmentsService ..> Attachment
+AttachmentsService --> FileStore
+BlobFileStore ..|> FileStore
+DiagnosisService ..> AiDiagnosis
+DiagnosisService --> AiProvider
+GeminiProvider ..|> AiProvider
+RepairsService --> VehiclesService : vehicle status
+@enduml

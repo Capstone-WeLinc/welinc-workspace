@@ -1,0 +1,29 @@
+@startuml 4.4.2-sequence-1-create-and-assign
+!include _style.iuml
+title Sequence 1: create a repair ticket and assign mechanics
+autonumber
+skinparam responseMessageBelowArrow true
+
+actor Admin
+actor "Chief Mechanic" as Chief
+participant "VRMS web app" as Web
+participant "VRMS backend" as BE
+database "VRMS database" as DB
+participant "WeLinc sign in\nservice" as Auth
+
+Admin -> Web : open the new repair form
+Web -> BE : load garages, trucks, drivers,\nmechanics and known fixes
+BE --> Web : form choices
+Admin -> Web : enter truck, driver, odometer,\npriority and issues, pick mechanics
+Web -> BE : create the ticket
+BE -> Auth : check the session is still signed in
+BE -> BE : check the Admin may create tickets
+BE -> DB : lock the truck and make sure\nit has no other open ticket
+BE -> DB : save the ticket, issues, checklist steps\nand mechanics, mark the truck under repair,\nwrite the audit entry
+BE --> Web : new repair number
+Web --> Admin : show the ticket
+Chief -> Web : change the assigned mechanics
+Web -> BE : save the mechanic list
+BE -> DB : update assignments and status,\nwrite the audit entry
+BE --> Web : updated ticket
+@enduml

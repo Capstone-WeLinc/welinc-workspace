@@ -1,0 +1,234 @@
+@startuml 4.5.1-erd
+!include _style.iuml
+title VRMS entity relationship diagram
+hide circle
+hide empty members
+skinparam linetype ortho
+skinparam class {
+  AttributeFontSize 10
+}
+entity "vehicles" as vehicles {
+  * <<PK>> id : uuid
+  --
+  vehicle_type_id : uuid <<FK>>
+  * plate_number : varchar(20)
+  * model : varchar(100)
+  * capacity : integer
+  * status : VehicleStatus
+}
+entity "garages" as garages {
+  * <<PK>> id : uuid
+  --
+  * name : varchar(50)
+  * is_active : boolean
+}
+entity "mechanics" as mechanics {
+  * <<PK>> id : uuid
+  --
+  * auth_user_id : uuid
+  email : varchar(255)
+  * name : varchar(100)
+  * is_active : boolean
+}
+entity "drivers" as drivers {
+  * <<PK>> id : uuid
+  --
+  * name : varchar(100)
+  * license_number : varchar(50)
+  * is_verified : boolean
+  * is_active : boolean
+}
+entity "repair_tickets" as repair_tickets {
+  * <<PK>> id : uuid
+  --
+  * vehicle_id : uuid <<FK>>
+  * driver_id : uuid <<FK>>
+  * garage_id : uuid <<FK>>
+  * repair_number : varchar(50)
+  * repair_status : RepairStatus
+  * priority : RepairPriority
+  * odometer : integer
+}
+entity "ticket_assignments" as ticket_assignments {
+  * <<PK>> id : uuid
+  --
+  * repair_ticket_id : uuid <<FK>>
+  * mechanic_id : uuid <<FK>>
+  * assigned_at : timestamptz(6)
+}
+entity "repair_issues" as repair_issues {
+  * <<PK>> id : uuid
+  --
+  * repair_ticket_id : uuid <<FK>>
+  category_id : uuid <<FK>>
+  knowledge_entry_id : uuid <<FK>>
+  * description : text
+  resolution_note : text
+  hours_spent : decimal(5,2)
+  followed_known_fix : boolean
+}
+entity "repair_issue_steps" as repair_issue_steps {
+  * <<PK>> id : uuid
+  --
+  * repair_issue_id : uuid <<FK>>
+  * position : integer
+  * text : varchar(300)
+  checked_at : timestamptz(6)
+  * origin : StepOrigin
+}
+entity "repair_parts" as repair_parts {
+  * <<PK>> id : uuid
+  --
+  * repair_ticket_id : uuid <<FK>>
+  * description : varchar(255)
+  * unit_cost : decimal(10,2)
+  * quantity : integer
+  * subtotal : decimal(10,2)
+}
+entity "audit_logs" as audit_logs {
+  * <<PK>> id : uuid
+  --
+  * repair_ticket_id : uuid <<FK>>
+  * action : varchar(50)
+  * changes : jsonb
+  note : text
+}
+entity "attachments" as attachments {
+  * <<PK>> id : uuid
+  --
+  * repair_ticket_id : uuid <<FK>>
+  issue_id : uuid <<FK>>
+  * kind : AttachmentKind
+  * storage_key : varchar(300)
+  thumbnail_key : varchar(300)
+  * file_name : varchar(255)
+}
+entity "issue_categories" as issue_categories {
+  * <<PK>> id : uuid
+  --
+  * name : varchar(50)
+  * name_key : varchar(50)
+  description : varchar(200)
+  * is_active : boolean
+}
+entity "knowledge_entries" as knowledge_entries {
+  * <<PK>> id : uuid
+  --
+  * category_id : uuid <<FK>>
+  * name : varchar(100)
+  * name_key : varchar(100)
+  * status : KnowledgeEntryStatus
+  * symptoms : text
+}
+entity "knowledge_entry_steps" as knowledge_entry_steps {
+  * <<PK>> id : uuid
+  --
+  * entry_id : uuid <<FK>>
+  * position : integer
+  * text : varchar(300)
+}
+entity "knowledge_entry_parts" as knowledge_entry_parts {
+  * <<PK>> id : uuid
+  --
+  * entry_id : uuid <<FK>>
+  * position : integer
+  * name : varchar(100)
+}
+entity "knowledge_suggestions" as knowledge_suggestions {
+  * <<PK>> id : uuid
+  --
+  entry_id : uuid <<FK>>
+  repair_issue_id : uuid <<FK>>
+  * kind : SuggestionKind
+  * status : SuggestionStatus
+  * body : text
+  resolved_at : timestamptz(6)
+}
+entity "knowledge_entry_changes" as knowledge_entry_changes {
+  * <<PK>> id : uuid
+  --
+  entry_id : uuid <<FK>>
+  category_id : uuid <<FK>>
+  * action : varchar(50)
+  * changes : jsonb
+  note : text
+}
+entity "issue_embeddings" as issue_embeddings {
+  * <<PK>> issue_id : uuid <<FK>>
+  --
+  * embedding : vector(768)
+  * model : varchar(60)
+  * text_hash : char(64)
+}
+entity "ai_diagnoses" as ai_diagnoses {
+  * <<PK>> id : uuid
+  --
+  * repair_ticket_id : uuid <<FK>>
+  * input : jsonb
+  * similar : jsonb
+  * result : jsonb
+  * model : varchar(60)
+}
+entity "ai_diagnosis_feedback" as ai_diagnosis_feedback {
+  * <<PK>> id : uuid
+  --
+  * diagnosis_id : uuid <<FK>>
+  * user_id : uuid
+  * helpful : boolean
+  rating : smallint
+  comment : text
+}
+entity "lookup_values" as lookup_values {
+  * <<PK>> id : uuid
+  --
+  * list : varchar(40)
+  * name : varchar(100)
+  * name_key : varchar(100)
+  * is_active : boolean
+}
+entity "lookup_value_changes" as lookup_value_changes {
+  * <<PK>> id : uuid
+  --
+  * lookup_value_id : uuid <<FK>>
+  * action : varchar(12)
+  before : jsonb
+  after : jsonb
+}
+entity "vehicle_changes" as vehicle_changes {
+  * <<PK>> id : uuid
+  --
+  * vehicle_id : uuid <<FK>>
+  repair_ticket_id : uuid <<FK>>
+  * field : varchar(30)
+  before : jsonb
+  after : jsonb
+  note : text
+}
+lookup_values |o--o{ vehicles
+vehicles ||--o{ repair_tickets
+drivers ||--o{ repair_tickets
+garages ||--o{ repair_tickets
+repair_tickets ||--o{ ticket_assignments
+mechanics ||--o{ ticket_assignments
+repair_tickets ||--o{ repair_issues
+issue_categories |o--o{ repair_issues
+knowledge_entries |o--o{ repair_issues
+repair_issues ||--o{ repair_issue_steps
+repair_tickets ||--o{ repair_parts
+repair_tickets ||--o{ audit_logs
+repair_tickets ||--o{ attachments
+repair_issues |o--o{ attachments
+issue_categories ||--o{ knowledge_entries
+knowledge_entries ||--o{ knowledge_entry_steps
+knowledge_entries ||--o{ knowledge_entry_parts
+knowledge_entries |o--o{ knowledge_suggestions
+repair_issues |o--o{ knowledge_suggestions
+knowledge_entries |o--o{ knowledge_entry_changes
+issue_categories |o--o{ knowledge_entry_changes
+repair_issues ||--o| issue_embeddings
+repair_tickets ||--o{ ai_diagnoses
+ai_diagnoses ||--o{ ai_diagnosis_feedback
+lookup_values ||--o{ lookup_value_changes
+vehicles ||--o{ vehicle_changes
+repair_tickets |o--o{ vehicle_changes
+@enduml
