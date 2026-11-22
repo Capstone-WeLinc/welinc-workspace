@@ -33,7 +33,7 @@ if ! docker info >/dev/null 2>&1; then
   exit 1
 fi
 
-# 4. Keep the machine awake while this shell (and Claude Code after exec) runs.
+# 4. Keep the machine awake while this shell (and Claude Code, its child) runs.
 case "$(uname -s)" in
   Darwin)
     caffeinate -dimsu -w $$ &
@@ -56,13 +56,21 @@ for a in "$@"; do
   if [ "$a" = "--fresh" ]; then FRESH=1; else ARGS+=("$a"); fi
 done
 
+# 5. The shared .claude/settings.json "asks" before git commit and git switch -c, and an ask rule
+# beats every allow rule, so lift those routine rules for the run and put them back when it ends
+# (after the report, on Ctrl+C, or at the next start if the machine died mid run).
+node agents/vrms/overnight/lift-settings.mjs lift
+trap 'node agents/vrms/overnight/lift-settings.mjs restore' EXIT
+trap 'exit 130' INT TERM
+
 if [ "$FRESH" = 0 ]; then
   echo "Starting the overnight run. Open the Claude app on your phone to watch it (Remote Control)."
-  exec "$CLAUDE_BIN" \
+  "$CLAUDE_BIN" \
     --settings "$SETTINGS" \
     --permission-mode auto \
     --remote-control "overnight $(date +%Y-%m-%d)" \
-    "/overnight ${ARGS[*]:-}"
+    "/overnight ${ARGS[*]:-}" || true
+  exit 0
 fi
 
 LOG="$DIR/runner-$(date +%Y-%m-%d).log"
