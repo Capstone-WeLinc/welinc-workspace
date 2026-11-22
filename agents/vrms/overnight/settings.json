@@ -1,0 +1,66 @@
+{
+  "env": {
+    "OVERNIGHT_RUN": "1"
+  },
+  "permissions": {
+    "denyInsteadOfPrompting": true,
+    "deny": [
+      "Bash(git push)",
+      "Bash(git push *)",
+      "Bash(gh pr create *)",
+      "Bash(gh pr merge *)",
+      "Bash(gh pr comment *)",
+      "Bash(gh pr review *)",
+      "Bash(gh pr edit *)",
+      "Bash(gh pr close *)",
+      "Bash(gh pr ready *)",
+      "Bash(gh run rerun *)",
+      "Bash(gh workflow run *)",
+      "Bash(gh secret *)",
+      "Bash(gh variable *)",
+      "Bash(op *)",
+      "Bash(az *)",
+      "Bash(~/.local/bin/az *)",
+      "Bash(~/.local/bin/op *)"
+    ]
+  },
+  "autoMode": {
+    "environment": [
+      "$defaults",
+      "The working directory is the WeLinc workspace repo. Its welinc-* folders are separate git clones of the user's own project repos (VRMS and the shared auth and portal services); they are in project scope. Folders named welinc-*-vmms* and welinc-*-bms* belong to other teams and are read only.",
+      "Local Docker containers named welinc_* (and the auth-infrastructure compose project) and the databases inside them are the user's local development stack. Starting, restarting, rebuilding and migrating them, and calling them on localhost, is normal work.",
+      "This is an unattended overnight run the user started on purpose with agents/vrms/overnight/start.sh. The user is asleep and reviews everything in the morning. Local branches, commits and stashes are expected; nothing may leave this machine."
+    ],
+    "hard_deny": [
+      "$defaults",
+      "Never push to any git remote, and never open, merge, comment on, review or close a pull request or issue, rerun or dispatch a GitHub Actions workflow, or change repository settings, secrets or variables.",
+      "Never run the Azure CLI, the 1Password CLI or infra/scripts/apply.sh, and never send requests that change anything on staging-api.welinc.app or any *.welinc.app host.",
+      "Never send email, Jira, Sentry, chat or other messages to people or outside services, and never invite or register real email addresses (only the seeded @welinc.com accounts).",
+      "Never read, print or copy .env files or anything under infra/private/.",
+      "Never edit the VMMS or BMS repos (welinc-*-vmms*, welinc-*-bms*) or the overnight guard files in agents/vrms/overnight/."
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/agents/vrms/overnight/guard.mjs\" pre"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/agents/vrms/overnight/guard.mjs\" stop"
+          }
+        ]
+      }
+    ]
+  }
+}

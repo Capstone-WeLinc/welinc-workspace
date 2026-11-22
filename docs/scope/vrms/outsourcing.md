@@ -4,11 +4,12 @@ Jira WL-E4. In house first; outsourced shops never get accounts. Back to [index]
 
 ## Slice 4: Outsourcing
 
-### 36. Outsourced shop directory · planned
+### 36. Outsourced shop directory · planned · needs a decision
 WL-405. An Admin managed list of approved shops.
 **Done when:** Admin can add, edit and deactivate shops, and deactivated shops leave pickers but stay on old tickets.
 - Note (2026-11-01, replan): from spec 0016. Add the outsourced group after In house in the assignment picker (WL-401).
-- [ ] Build it: `/develop outsourced shop directory`
+- Note (2026-11-23, replan): your 2026-11-20 call in feature 56 says VMMS owns the shop list (`OutsourcedProvider`) and VRMS reads it, building no directory of its own. So this feature becomes reading that list, and the **Done when** above changes with it. Design it with feature 56 (or right after), not before.
+- [ ] Design it (spec): `/architect outsourced shop directory`
 - [ ] Polish it (optional, ask first): `web-design-guidelines` · `break-ui` (long shop names and addresses, empty directory)
 
 ### 37. Transfer to outsourced shop · planned · needs a decision
