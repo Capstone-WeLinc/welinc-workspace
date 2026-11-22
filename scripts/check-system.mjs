@@ -50,7 +50,7 @@ export const SYSTEMS = {
     // don't fail just because VMMS is down
     protectedPath: '/bms/dispatch/assignments',
     account: 'bms.ops',
-    repos: ['welinc-backend-bms', 'welinc-backend-bms-analytics-ai', 'welinc-web-bms'],
+    repos: ['welinc-backend-bms', 'welinc-backend-bms-analytics-ai', 'welinc-web-bms', 'welinc-mobile-bms'],
   },
 };
 

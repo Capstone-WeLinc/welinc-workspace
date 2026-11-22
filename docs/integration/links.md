@@ -67,6 +67,7 @@ Full check of a system on your local stack: `node scripts/check-system.mjs <vrms
 | | analytics projection (a worker) | | 3024 | `bms-analytics-projection-staging` |
 | [welinc-backend-bms-analytics-ai](https://github.com/Capstone-WeLinc/welinc-backend-bms-analytics-ai) | analytics | through `/bms/reports` | 3025 | `bms-analytics-staging` |
 | [welinc-web-bms](https://github.com/Capstone-WeLinc/welinc-web-bms) | web app | http://localhost:8003 | 8003 | https://staging-bms.welinc.app (Static Web App `swa-welinc-staging-bms`) |
+| [welinc-mobile-bms](https://github.com/Capstone-WeLinc/welinc-mobile-bms) | mobile app (drivers and helpers) | Expo, against your LAN address on port 3000 | none | the app calls https://staging-api.welinc.app |
 
 - **Databases**, all user `bms_user`:
 

@@ -71,7 +71,7 @@ Product backlog lives in Jira (read it through the Atlassian MCP); Jira wins whe
 - branch prefix: feat/
 - commit: per-milestone
 - attribution: none. Never add a `Co-Authored-By` trailer or a "Generated with Claude Code" line to commits or PR descriptions; commits are authored by the developer alone.
-- rulesets (since 2026-11-20, enforced only while the repos are public, until Dec 5): in all 12 public repos `development` and `main` refuse force pushes and deletion; `development` in every service repo takes changes only through a PR with green required checks (`ci` and `gitleaks` in ours, plus `db` in auth; `ci` in VMMS and BMS); the workspace `main` is PR only with `gitleaks` required. Repository admins can bypass. A service repo's `main` still moves by the hand fast forward in spec 0008. Workspace CI skips docs only changes (`ci.yml` paths filter); `gitleaks` still runs.
+- rulesets (since 2026-11-20, enforced only while the repos are public, until Dec 5): in all 13 public repos `development` and `main` refuse force pushes and deletion; `development` in every service repo takes changes only through a PR with green required checks (`ci` and `gitleaks` in ours, plus `db` in auth; `ci` in VMMS and BMS, none yet in `welinc-mobile-bms` until it has CI); the workspace `main` is PR only with `gitleaks` required. Repository admins can bypass. A service repo's `main` still moves by the hand fast forward in spec 0008. Workspace CI skips docs only changes (`ci.yml` paths filter); `gitleaks` still runs.
 
 ## Agent skills
 
