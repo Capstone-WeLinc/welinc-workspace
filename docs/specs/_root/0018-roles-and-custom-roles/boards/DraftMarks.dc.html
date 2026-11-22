@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Draft marks</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Inter+Tight:wght@500;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+button{font:inherit;cursor:pointer}
+button:focus-visible{outline:2px solid #1a1f6e;outline-offset:2px}
+.rrow:hover{background:#f3f5fa!important}
+</style>
+</helmet>
+<div style="width: 1440px; height: 1080px; box-sizing: border-box; padding: 32px 40px; font-family: Inter, system-ui, sans-serif; color: #0f172a; background: #e9ecf3; display: flex; flex-direction: column; gap: 20px">
+  <div style="display: flex; flex-direction: column; gap: 4px">
+    <h1 style="margin: 0; font-family: 'Inter Tight', sans-serif; font-weight: 700; font-size: 28px; letter-spacing: -0.02em">Draft marks: pick one</h1>
+    <span style="font-size: 14px; color: #475569">Same list in each: Chief mechanic is open with 2 unsaved changes, Parts clerk has 1 waiting from earlier. Click a row to move the selection.</span>
+  </div>
+  <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; flex: 1; min-height: 0">
+    <sc-for list="{{variants}}" as="v" hint-placeholder-count="8">
+      <div style="display: flex; flex-direction: column; gap: 8px; min-height: 0">
+        <span style="font-size: 14px; font-weight: 600">{{v.code}} · {{v.name}}</span>
+        <div style="background: #fff; border-radius: 14px; box-shadow: 0 0 0 1px rgba(15,20,69,.07), 0 1px 3px rgba(15,20,69,.06); padding: 4px 6px 8px">
+          <sc-for list="{{v.sections}}" as="sec" hint-placeholder-count="2">
+            <div>
+              <span style="display: block; padding: 10px 10px 4px; font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #64748b">{{sec.title}}</span>
+              <sc-for list="{{sec.rows}}" as="r" hint-placeholder-count="3">
+                <button class="rrow" onClick="{{r.pick}}" aria-current="{{r.cur}}" style="width: 100%; border: 0; background: {{r.bg}}; box-shadow: {{r.shadow}}; border-radius: 10px; text-align: left; padding: 7px 8px; margin: 1px 0; display: flex; align-items: center; gap: 10px; min-height: 52px; position: relative">
+                  <span aria-hidden="true" style="flex: none; position: relative; width: 32px; height: 32px; border-radius: 9px; background: {{r.tileBg}}; color: {{r.tileFg}}; box-shadow: {{r.tileRing}}; display: flex; align-items: center; justify-content: center; font-family: 'Inter Tight', sans-serif; font-size: 12px; font-weight: 700">{{r.ini}}<sc-if value="{{r.tileDot}}" hint-placeholder-val="{{false}}"><span style="position: absolute; top: -3px; right: -3px; width: 10px; height: 10px; border-radius: 999px; background: #e8b800; box-shadow: 0 0 0 2px #fff"></span></sc-if></span>
+                  <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+                    <span style="display: flex; align-items: baseline; gap: 6px; min-width: 0"><span style="font-size: 14px; font-weight: {{r.weight}}; font-style: {{r.nameStyle}}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.name}}</span><sc-if value="{{r.after}}" hint-placeholder-val="{{false}}"><span style="flex: none; font-size: 12px; font-weight: 600; color: #a16207">{{r.afterText}}</span></sc-if></span>
+                    <span style="display: flex; align-items: center; gap: 5px; font-size: 12px; color: {{r.subFg}}; font-weight: {{r.subWeight}}; white-space: nowrap; overflow: hidden"><sc-if value="{{r.subPencil}}" hint-placeholder-val="{{false}}"><svg aria-hidden="true" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 1 1 3 3L7 19l-4 1 1-4z"></path></svg></sc-if>{{r.sub}}</span>
+                  </span>
+                  <sc-if value="{{r.tag}}" hint-placeholder-val="{{false}}"><span style="flex: none; display: flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; color: {{r.tagFg}}; background: {{r.tagBg}}; box-shadow: {{r.tagRing}}; border-radius: {{r.tagRadius}}; padding: {{r.tagPad}}; min-width: {{r.tagMin}}; justify-content: center; box-sizing: border-box"><sc-if value="{{r.tagPencil}}" hint-placeholder-val="{{false}}"><svg aria-hidden="true" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 1 1 3 3L7 19l-4 1 1-4z"></path></svg></sc-if>{{r.tagText}}</span></sc-if>
+                  <sc-if value="{{r.pencil}}" hint-placeholder-val="{{false}}"><span title="Unsaved changes" style="flex: none; width: 26px; height: 26px; border-radius: 8px; color: #a16207; background: #fdf3cc; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 1 1 3 3L7 19l-4 1 1-4z"></path></svg></span></sc-if>
+                </button>
+              </sc-for>
+            </div>
+          </sc-for>
+        </div>
+        <p style="margin: 0; font-size: 13px; color: #475569; line-height: 1.45">{{v.note}}</p>
+      </div>
+    </sc-for>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1080}}'>
+const ROLES = [
+  ['Admin', true, '6 people', 0], ['Chief mechanic', true, '8 people', 2], ['Mechanic', true, '69 people', 0],
+  ['Garage supervisor', false, 'No one yet · from Chief mechanic', 0], ['Parts clerk', false, '3 people · from Mechanic', 1], ['Auditor', false, 'No one yet · from Admin', 0]
+];
+const V = [
+  ['A', 'Tag with pencil (now)', 'The current one: a soft amber tag on the right that says how many.'],
+  ['B', 'Count bubble', 'A small amber circle with the number, like an unread count. Quiet; hover says “2 unsaved changes”.'],
+  ['C', 'Edge line', 'An amber line down the left edge of the row, plus the count in the sub line. Reads as “this row is touched”.'],
+  ['D', 'Dot on the tile', 'A gold dot on the corner of the initials tile, like an app badge. Smallest mark; the sub line names it.'],
+  ['E', 'Sub line says it', 'Nothing added on the right: the sub line itself turns amber, “✎ 2 unsaved changes”. People count returns after saving.'],
+  ['F', '“Edited” after the name', 'Like a document title: an amber “Edited” right after the role name. No count in the list; the save bar has it.'],
+  ['G', 'Tinted row', 'The whole row gets a light amber wash with a “Draft” tag, the same tint as an unsaved permission row.'],
+  ['H', 'Pencil button', 'Just a small amber pencil square on the right. Most compact; needs the hover text to say what it means.']
+];
+class Component extends DCLogic {
+  renderVals() {
+    const s = this.state || {};
+    const active = s.active || {};
+    const variants = V.map(([code, name, note], vi) => {
+      const act = active[vi] || 'Chief mechanic';
+      const rows = ROLES.map(([rn, builtin, ppl, d]) => {
+        const on = rn === act;
+        const dr = d > 0;
+        const r = {
+          name: rn, builtin, cur: on ? 'page' : 'false', weight: on ? '600' : '500', nameStyle: 'normal',
+          ini: rn.split(' ').slice(0, 2).map((w) => w[0].toUpperCase()).join(''),
+          bg: on ? '#eef0f8' : 'transparent', shadow: on ? 'inset 0 0 0 1px rgba(26,31,110,.14)' : 'none',
+          tileBg: on ? '#1a1f6e' : '#eef0f8', tileFg: on ? '#fff' : '#1a1f6e', tileRing: 'none', tileDot: false,
+          sub: ppl, subFg: '#64748b', subWeight: '400', subPencil: false,
+          after: false, afterText: '', tag: false, tagText: '', tagFg: '', tagBg: '', tagRing: 'none', tagRadius: '6px', tagPad: '3px 7px', tagMin: '0', tagPencil: false, pencil: false,
+          pick: () => this.setState({ active: Object.assign({}, active, { [vi]: rn }) })
+        };
+        if (dr) {
+          const many = d + (d === 1 ? ' unsaved change' : ' unsaved changes');
+          if (code === 'A') Object.assign(r, { tag: true, tagPencil: true, tagText: d + ' unsaved', tagFg: '#7a5b00', tagBg: '#fdf3cc', tagRing: 'inset 0 0 0 1px #f2d675' });
+          if (code === 'B') Object.assign(r, { tag: true, tagText: String(d), tagFg: '#0f1445', tagBg: '#e8b800', tagRadius: '999px', tagPad: '2px 6px', tagMin: '20px' });
+          if (code === 'C') Object.assign(r, { shadow: (on ? 'inset 0 0 0 1px rgba(26,31,110,.14), ' : '') + 'inset 3px 0 0 #e8b800', sub: many, subFg: '#a16207', subWeight: '600' });
+          if (code === 'D') Object.assign(r, { tileDot: true, sub: many, subFg: '#a16207', subWeight: '500' });
+          if (code === 'E') Object.assign(r, { sub: many, subFg: '#a16207', subWeight: '600', subPencil: true });
+          if (code === 'F') Object.assign(r, { after: true, afterText: 'Edited' });
+          if (code === 'G') Object.assign(r, { bg: on ? '#fdf3cc' : '#fffbeb', shadow: on ? 'inset 0 0 0 1px #f2d675' : 'none', tag: true, tagText: 'Draft', tagFg: '#7a5b00', tagBg: '#fff', tagRing: 'inset 0 0 0 1px #f2d675' });
+          if (code === 'H') Object.assign(r, { pencil: true });
+        }
+        return r;
+      });
+      return { code, name, note, sections: [{ title: 'Built in', rows: rows.filter((r) => r.builtin) }, { title: 'Custom', rows: rows.filter((r) => !r.builtin) }] };
+    });
+    return { variants };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sidebars, round 8</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Inter+Tight:wght@500;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+button{font:inherit;cursor:pointer}
+a{text-decoration:none}
+button:focus-visible,a:focus-visible{outline:2px solid #e8b800;outline-offset:2px}
+@keyframes foldIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion: reduce){*{animation-duration:1ms!important;transition-duration:1ms!important}}
+</style>
+</helmet>
+<div style="width: 1440px; height: 1100px; box-sizing: border-box; padding: 32px 40px; font-family: Inter, system-ui, sans-serif; color: #0f172a; background: #e9ecf3; display: flex; flex-direction: column; gap: 20px">
+  <div style="display: flex; justify-content: space-between; align-items: center; gap: 16px">
+    <div style="display: flex; flex-direction: column; gap: 4px">
+      <h1 style="margin: 0; font-family: 'Inter Tight', sans-serif; font-weight: 700; font-size: 28px; letter-spacing: -0.02em">Sidebars: lines between sections, final</h1>
+      <span style="font-size: 13px; color: #475569">Every page has its own icon now. Lines between sections, and section names are plain labels (no folding). Only a page with pages under it opens. Click to try.</span>
+    </div>
+  </div>
+  <div style="display: grid; grid-template-columns: repeat(3, 280px) minmax(0, 1fr); gap: 24px; flex: 1; min-height: 0">
+    <sc-for list="{{variants}}" as="v" hint-placeholder-count="3">
+      <div style="display: flex; flex-direction: column; gap: 10px; min-height: 0">
+        <span style="font-size: 13px; font-weight: 600">{{v.title}} <span style="font-weight: 400; color: #475569">{{v.sub}}</span></span>
+        <nav aria-label="{{v.title}}" style="flex: 1; background: #0f1445; color: #fff; border-radius: 16px; padding: 12px; display: flex; flex-direction: column; overflow: auto">
+          <button style="border: 0; background: rgba(255,255,255,.06); color: #fff; border-radius: 10px; padding: 8px 10px; display: flex; align-items: center; gap: 10px; text-align: left; flex: none">
+            <span aria-hidden="true" style="width: 32px; height: 32px; border-radius: 8px; background: #e8b800; color: #0f1445; display: flex; align-items: center; justify-content: center; font-family: 'Inter Tight', sans-serif; font-weight: 700">W</span>
+            <span style="flex: 1; display: flex; flex-direction: column"><span style="font-family: 'Inter Tight', sans-serif; font-weight: 700; font-size: 15px">{{v.sys}}</span><span style="font-size: 11px; color: rgba(255,255,255,.65)">{{v.sysSub}}</span></span>
+            <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m7 15 5 5 5-5M7 9l5-5 5 5"></path></svg>
+          </button>
+          <div aria-hidden="true" style="flex: none; height: 1px; background: rgba(255,255,255,.12); margin: 14px 2px 12px"></div>
+          <sc-if value="{{v.hasNew}}" hint-placeholder-val="{{true}}">
+            <button style="flex: none; border: 0; margin: 0 0 8px; background: #e8b800; color: #0f1445; border-radius: 10px; height: 40px; font-size: 14px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"></path></svg>New repair</button>
+          </sc-if>
+          <sc-for list="{{v.sections}}" as="sec" hint-placeholder-count="4">
+            <div style="display: flex; flex-direction: column; gap: 2px; flex: none">
+              <sc-if value="{{sec.hasLabel}}" hint-placeholder-val="{{true}}">
+                <div style="display: flex; flex-direction: column">
+                  <sc-if value="{{sec.line}}" hint-placeholder-val="{{true}}"><div aria-hidden="true" style="height: 1px; background: rgba(255,255,255,.09); margin: 10px 10px 0"></div></sc-if>
+                  <div role="heading" aria-level="2" style="color: rgba(255,255,255,.5); padding: {{sec.pad}}; font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase">{{sec.name}}</div>
+                </div>
+              </sc-if>
+              <sc-if value="{{sec.open}}" hint-placeholder-val="{{true}}">
+                <div style="display: flex; flex-direction: column; gap: 2px; animation: foldIn .16s ease-out">
+                  <sc-for list="{{sec.items}}" as="it" hint-placeholder-count="3">
+                    <div style="display: flex; flex-direction: column; gap: 2px">
+                      <div style="display: flex; align-items: center; border-radius: 8px; background: {{it.bg}}; transition: background .15s">
+                        <a href="#" onClick="{{it.pick}}" aria-current="{{it.cur}}" style="flex: 1; min-width: 0; display: flex; align-items: center; gap: 12px; padding: 0 10px; height: 38px; font-size: 14px; font-weight: {{it.weight}}; color: {{it.fg}}">
+                          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" style="opacity: {{it.iconOp}}; flex: none"><path d="{{it.icon}}"></path></svg>
+                          <span style="flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{it.name}}</span>
+                          <sc-if value="{{it.hasCount}}" hint-placeholder-val="{{false}}"><span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #0f1445; background: #e8b800; border-radius: 999px; padding: 1px 7px">{{it.count}}</span></sc-if>
+                        </a>
+                        <sc-if value="{{it.hasKids}}" hint-placeholder-val="{{false}}">
+                          <button onClick="{{it.toggle}}" aria-expanded="{{it.open}}" aria-label="{{it.toggleLabel}}" style="flex: none; border: 0; background: transparent; color: rgba(255,255,255,.7); width: 32px; height: 38px; border-radius: 8px; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="transform: {{it.rot}}; transition: transform .16s"><path d="m9 6 6 6-6 6"></path></svg></button>
+                        </sc-if>
+                      </div>
+                      <sc-if value="{{it.open}}" hint-placeholder-val="{{false}}">
+                        <div style="display: flex; flex-direction: column; margin: 0 0 4px 19px; padding-left: 12px; border-left: 1px solid rgba(255,255,255,.14); animation: foldIn .16s ease-out">
+                          <sc-for list="{{it.kids}}" as="k" hint-placeholder-count="3">
+                            <a href="#" onClick="{{k.pick}}" aria-current="{{k.cur}}" style="display: flex; align-items: center; justify-content: space-between; padding: 0 10px; height: 34px; border-radius: 8px; font-size: 13px; font-weight: {{k.weight}}; color: {{k.fg}}; background: {{k.bg}}">{{k.name}}<sc-if value="{{k.hasCount}}" hint-placeholder-val="{{false}}"><span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: {{k.countFg}}; background: {{k.countBg}}; border-radius: 999px; padding: 1px 7px">{{k.count}}</span></sc-if></a>
+                          </sc-for>
+                        </div>
+                      </sc-if>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+            </div>
+          </sc-for>
+          <span style="flex: 1"></span>
+          <button style="flex: none; border: 0; border-top: 1px solid rgba(255,255,255,.12); background: transparent; color: #fff; padding: 12px 6px 4px; margin-top: 12px; display: flex; align-items: center; gap: 10px; text-align: left">
+            <span aria-hidden="true" style="width: 34px; height: 34px; border-radius: 999px; background: rgba(255,255,255,.14); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700">{{v.ini}}</span>
+            <span style="flex: 1; display: flex; flex-direction: column"><span style="font-size: 13px; font-weight: 600">{{v.person}}</span><span style="font-size: 11px; color: rgba(255,255,255,.65)">{{v.footer}}</span></span>
+            <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m18 15-6-6-6 6"></path></svg>
+          </button>
+        </nav>
+        <p style="margin: 0; font-size: 13px; color: #475569; line-height: 1.45">{{v.note}}</p>
+      </div>
+    </sc-for>
+    <section aria-label="Icon check" style="background: #fff; border-radius: 16px; box-shadow: 0 0 0 1px rgba(15,20,69,.07), 0 1px 3px rgba(15,20,69,.06); padding: 20px 22px; display: flex; flex-direction: column; gap: 14px; overflow: auto">
+      <div style="display: flex; flex-direction: column; gap: 4px">
+        <h2 style="margin: 0; font-family: 'Inter Tight', sans-serif; font-size: 18px; font-weight: 700">Icon check</h2>
+        <span style="font-size: 13px; color: #475569">Each icon at a glance. Gold marks a change from today.</span>
+      </div>
+      <sc-for list="{{iconSets}}" as="set" hint-placeholder-count="2">
+        <div style="display: flex; flex-direction: column; gap: 6px">
+          <span style="font-size: 12px; font-weight: 600; color: #64748b">{{set.name}}</span>
+          <sc-for list="{{set.rows}}" as="r" hint-placeholder-count="6">
+            <div style="display: grid; grid-template-columns: 36px 1fr auto; gap: 12px; align-items: center; padding: 6px 0; border-top: 1px solid #f1f3f8">
+              <span aria-hidden="true" style="width: 36px; height: 36px; border-radius: 10px; background: #0f1445; color: #fff; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="{{r.icon}}"></path></svg></span>
+              <span style="display: flex; flex-direction: column; gap: 1px"><span style="font-size: 14px; font-weight: 500">{{r.name}}</span><span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #64748b">{{r.lucide}}</span></span>
+              <sc-if value="{{r.changed}}" hint-placeholder-val="{{false}}"><span style="font-size: 11px; font-weight: 600; color: #7a5b00; background: #fdf3cc; border-radius: 999px; padding: 2px 8px">{{r.was}}</span></sc-if>
+            </div>
+          </sc-for>
+        </div>
+      </sc-for>
+    </section>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1100}}'>
+const I = {
+  dash: 'M3 3h7v9H3zM14 3h7v5h-7zM14 12h7v9h-7zM3 16h7v5H3z',
+  wrench: 'M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z',
+  history: 'M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5M12 7v5l3 2',
+  truck: 'M3 6h11v10H3zM14 10h4l3 3v3h-7M7 19a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM17 19a2 2 0 1 0 0-4 2 2 0 0 0 0 4z',
+  chart: 'M4 20V10M10 20V4M16 20v-7M22 20H2',
+  book: 'M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2zM22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z',
+  users: 'M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM2 21c0-4 3-6 7-6s7 2 7 6M17 11a3 3 0 1 0 0-6M22 21c0-3-2-5-5-5.5',
+  scroll: 'M8 21h12a2 2 0 0 0 2-2v-2H10v2a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v3h4M19 17V5a2 2 0 0 0-2-2H4M15 8h-5M15 12h-5',
+  cog: 'M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z',
+  userx: 'M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM2 21c0-4 3-6 7-6 1.5 0 2.8.3 4 .8M17 15l5 5M22 15l-5 5',
+  shieldCheck: 'M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6zM9 12l2 2 4-4',
+  idcard: 'M3 5h18v14H3zM8 11a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM5 16c.5-1.7 1.6-2.5 3-2.5s2.5.8 3 2.5M14 9h4M14 13h4',
+  timer: 'M10 2h4M12 14l3-3M12 22a8 8 0 1 0 0-16 8 8 0 0 0 0 16z',
+  activity: 'M22 12h-4l-3 9L9 3l-3 9H2'
+};
+const TICKET_KIDS = [['All open', '12'], ['Waiting for sign off', '3', 'hot'], ['On hold', '1'], ['Assigned to me', '']];
+const KB_KIDS = [['Guides', ''], ['Suggestions', '2', 'hot']];
+const V = [
+  { title: 'N16 · Admin', sub: '(VRMS)', sys: 'VRMS', sysSub: 'Vehicle repairs', hasNew: true, person: 'Victor Ramos', ini: 'VR', footer: 'Admin · Profile is in this menu', note: 'Work, Fleet, Insights, Admin. No Inbox: the gold counts on “Waiting for sign off” and “Suggestions” already say what waits on you. Settings opens one page with its own section list.', sections: [
+    { name: '', items: [['Dashboard', I.dash]] },
+    { name: 'Work', items: [['Repair tickets', I.wrench, '', TICKET_KIDS], ['Repair history', I.history]] },
+    { name: 'Fleet', items: [['Vehicles', I.truck]] },
+    { name: 'Insights', items: [['Analytics', I.chart], ['Knowledge base', I.book, '', KB_KIDS]] },
+    { name: 'Admin', items: [['Users', I.users], ['Audit logs', I.scroll], ['Settings', I.cog]] }
+  ] },
+  { title: 'N17 · Mechanic', sub: '(VRMS)', sys: 'VRMS', sysSub: 'Vehicle repairs', hasNew: false, person: 'Danilo Santos', ini: 'DS', footer: 'Mechanic · Profile is in this menu', note: 'No New repair button, so a line and space now sit between the switcher and My dashboard. Fewer pages, same sections where they apply.', sections: [
+    { name: '', items: [['My dashboard', I.dash]] },
+    { name: 'Work', items: [['My repairs', I.wrench, '', [['In progress', '2'], ['Sent back to me', '1', 'hot'], ['Done', '']]], ['Repair history', I.history]] },
+    { name: 'Insights', items: [['Knowledge base', I.book, '', [['Guides', ''], ['My suggestions', '']]]] }
+  ] },
+  { title: 'Suite admin', sub: '(portal)', sys: 'Suite admin', sysSub: 'WeLinc portal', hasNew: false, person: 'Leonora Castillo', ini: 'LC', footer: 'Suite admin', note: 'Same rules in the portal. “Permissions” becomes “Roles”, with an ID card icon instead of the sliders that read as settings.', sections: [
+    { name: '', items: [['Overview', I.dash]] },
+    { name: 'Accounts', items: [['People', I.users], ['Deletion requests', I.userx, '1'], ['Suite admins', I.shieldCheck]] },
+    { name: 'Access', items: [['Roles', I.idcard], ['Temporary access', I.timer]] },
+    { name: 'Audit', items: [['Activity', I.activity]] }
+  ] }
+];
+const ICONS = [
+  { name: 'VRMS', rows: [['Dashboard', I.dash, 'LayoutDashboard'], ['Repair tickets', I.wrench, 'Wrench'], ['Repair history', I.history, 'History'], ['Vehicles', I.truck, 'Truck', 'New page'], ['Analytics', I.chart, 'BarChart2'], ['Knowledge base', I.book, 'BookOpen'], ['Users', I.users, 'Users'], ['Audit logs', I.scroll, 'ScrollText', 'Was ClipboardList'], ['Settings', I.cog, 'Settings', 'Was sliders']] },
+  { name: 'Portal', rows: [['Roles', I.idcard, 'IdCard', 'Was SlidersHorizontal'], ['Temporary access', I.timer, 'Timer', 'Was KeyRound'], ['Activity', I.activity, 'Activity', 'Was History']] }
+];
+class Component extends DCLogic {
+  renderVals() {
+    const s = this.state || {};
+    const lines = true;
+    const variants = V.map((v, vi) => {
+      const active = (s.active || {})[vi] || (vi === 0 ? 'Waiting for sign off' : vi === 1 ? 'My repairs' : 'Roles');
+      const closed = (s.closed || {})[vi] || {};
+      const openKids = (s.kids || {})[vi] || (vi === 0 ? { 'Repair tickets': true } : vi === 1 ? { 'My repairs': true } : {});
+      const setActive = (n) => { const a = Object.assign({}, s.active || {}); a[vi] = n; this.setState({ active: a }); };
+      let labelled = 0;
+      return {
+        title: v.title, sub: v.sub, sys: v.sys, sysSub: v.sysSub, note: v.note, hasNew: v.hasNew, footer: v.footer, person: v.person, ini: v.ini,
+        sections: v.sections.map((sec, si) => {
+          const open = true;
+          const line = lines && !!sec.name;
+          if (sec.name) labelled++;
+          return {
+            name: sec.name, hasLabel: !!sec.name, open, line, rot: open ? 'none' : 'rotate(-90deg)', pad: line ? '12px 10px 6px' : '18px 10px 6px',
+            toggle: () => { const c = Object.assign({}, s.closed || {}); c[vi] = Object.assign({}, closed, { [si]: open }); this.setState({ closed: c }); },
+            items: sec.items.map((it) => {
+              const kids = it[3] || [];
+              const kidActive = kids.some((k) => k[0] === active);
+              const on = it[0] === active;
+              const ko = !!openKids[it[0]];
+              return {
+                name: it[0], icon: it[1], count: it[2] || '', hasCount: !!it[2], hasKids: kids.length > 0, open: ko,
+                toggleLabel: (ko ? 'Close ' : 'Open ') + it[0], rot: ko ? 'rotate(90deg)' : 'none',
+                cur: on ? 'page' : 'false', weight: on || kidActive ? '600' : '500',
+                fg: on || kidActive ? '#fff' : 'rgba(255,255,255,.78)', bg: on ? 'rgba(255,255,255,.13)' : 'transparent', iconOp: on || kidActive ? '1' : '.7',
+                pick: (e) => { if (e && e.preventDefault) e.preventDefault(); setActive(it[0]); },
+                toggle: () => { const k = Object.assign({}, s.kids || {}); k[vi] = Object.assign({}, openKids, { [it[0]]: !ko }); this.setState({ kids: k }); },
+                kids: kids.map((k) => {
+                  const kon = k[0] === active;
+                  return { name: k[0], count: k[1], hasCount: !!k[1], cur: kon ? 'page' : 'false', weight: kon ? '600' : '500', fg: kon ? '#fff' : 'rgba(255,255,255,.72)', bg: kon ? 'rgba(255,255,255,.13)' : 'transparent', countFg: k[2] ? '#0f1445' : 'rgba(255,255,255,.75)', countBg: k[2] ? '#e8b800' : 'transparent', pick: (e) => { if (e && e.preventDefault) e.preventDefault(); setActive(k[0]); } };
+                })
+              };
+            })
+          };
+        })
+      };
+    });
+    const lineModes = [['Lines', true], ['Space only', false]].map(([n, val]) => { const on = val === lines; return { name: n, on, bg: on ? '#fff' : 'transparent', fg: on ? '#0f172a' : '#475569', sh: on ? '0 1px 2px rgba(15,20,69,.15)' : 'none', pick: () => this.setState({ lines: val }) }; });
+    const iconSets = ICONS.map((set) => ({ name: set.name, rows: set.rows.map((r) => ({ name: r[0], icon: r[1], lucide: r[2], changed: !!r[3], was: r[3] || '' })) }));
+    return { variants, lineModes, iconSets };
+  }
+}
+</script>
+</body>
+</html>

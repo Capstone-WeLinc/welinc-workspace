@@ -42,8 +42,8 @@ _These are recommendations to keep the build orderly, not requirements. Skip any
 | S17 | Contract and code agree on errors | Contract | planned |
 | S18 | Design direction refresh | Design | in-progress |
 | S19 | Person page shows only the person's systems | Design | in-progress |
-| S20 | Permissions page redesign | Design | planned |
-| S21 | Custom roles per system | Configuration | planned |
+| S20 | Permissions page redesign | Design | in-progress |
+| S21 | Custom roles per system | Configuration | in-progress |
 
 ## Contract
 
@@ -412,22 +412,41 @@ spec [0017](../../specs/_root/0017-person-page-systems/index.md) · code in `wel
 - [ ] Verify it: `/check verify person page systems`
 - [ ] Test it: `/test person page systems`
 
-### S20. Permissions page redesign · planned · needs a decision · Beta
+### S20. Permissions page redesign · in-progress · Beta
 Replace the long checkbox grid with a role first view: pick a role, see its permissions in grouped sections with switches and plain descriptions, locks in place. Keep the full grid as a grouped "Compare roles" view, and send changes through a pending changes bar into the existing review dialog.
 **Done when:** an admin can read and change one role's permissions without scanning 27 rows by 3 columns, the compare view still shows every role, and saving still goes through the review step and the matrix history.
 - Note (2026-11-23): already designed in the S18 rounds; `/architect` starts from these boards (canvas "WeLinc design directions", page "Round 8", spec 0016 *Board index*), not new design rounds. `Roles9`: the app shell with a full height role list (title with count, system switch, search, sticky Built in and Custom headings, dashed New role pinned at the bottom, people in words on each row) beside the role, whose tabs are Permissions, People and History; "Add people" on the People tab. `DraftMarks` B: a gold count bubble on a role with unsaved changes. `SaveBar9` and `SaveWidths10`: the 640px navy save bar with the change list. `Picks8`: review, leaving with a draft, the two ways to save. The compare view is out of date: round 6 replaced the grid with "Who can do what" and made the full grid a spreadsheet download, then round 8 **dropped "Who can do what"** (no page, no button on Roles). So the intent's "Compare roles" view and the Done when's "the compare view still shows every role" need settling in `/architect` (the spreadsheet download is the only compare left from the rounds). Also settled: the review dialog is RC (folded groups, who it touches, the activity log note folded behind "Add a note for the activity log", shown on the role's History tab); deleting a role is DB (blocked until no one has it); the role header facts end with "Last changed [date] by …". The Nov 18 picks are in git: `docs/context/vrms/handoff-2026-11-18.md` (commit 33db0d0).
 - Note (2026-11-23, board check): `Roles9` is the final role list (it replaced `Roles8`). Open for this feature's `/architect`, because no board settles them: saving changes made in several roles at once (`Roles9`'s bar says "in 2 roles", but the RC review, the `SaveBar9` change list and the draft toast are drawn for one role); whether the full grid spreadsheet download stays; and permission descriptions and a search inside a role, which the intent above asks for but the final boards dropped without a note.
-- [ ] Design it (spec): `/architect permissions page redesign`
+- Note (2026-11-23, `/architect`): designed with S21 as one spec (umbrella 0018, child 0001). Decided: several roles save in one review; descriptions under each label; a "Find a permission" filter; the compare view is a spreadsheet download (the Done when's "compare view" means that download now); the note stays required when anything is taken away and opens itself then; Add people moves people already in the system. Board copies in the spec's `boards/`.
+spec [0018](../../specs/_root/0018-roles-and-custom-roles/index.md) (child [0001](../../specs/_root/0018-roles-and-custom-roles/0001-roles-page.md)) · code in `welinc-auth/src/auth/` and `welinc-web-portal/src/pages/admin/roles/`
+- [x] Design it (spec): `/architect permissions page redesign`
+- [ ] Build it: `/develop roles page` (the welinc-auth milestone can start now; the portal milestones wait for S18's milestone 3)
+  - [ ] welinc-auth: the 0018 migration, `default_roles` in the sync, the roles read and history routes, `createdAt`, `excludeRole` and `assignable`, the members route (AC-17, AC-18)
+  - [ ] Portal tracer and saving: route and redirects, list, header, Permissions tab, the multi role draft, save bar, review RC, conflicts, stored drafts, Reset to defaults, read only (AC-1 to AC-4, AC-6 to AC-12)
+  - [ ] People with Add people, History, filter, spreadsheet, VMMS and BMS views, phones, `PermissionsView` retired (AC-5, AC-13 to AC-16)
+  - [ ] Sweep and board comparison (AC-18, AC-19)
+- [ ] Verify it: `/check verify roles page`
+- [ ] Test it: `/test roles page`
 
 ## Configuration
 
-### S21. Custom roles per system · planned · needs a decision · GA
+### S21. Custom roles per system · in-progress · GA
 Let a suite admin create, rename, duplicate and delete roles per system instead of the fixed list in each `prisma/catalog/<system>.ts`. Built in roles stay (renamable, never deletable); custom roles start as a copy of one. Behaviour that today keys on a role name (the VRMS mechanic list and audit events) moves to a permission such as "can be assigned tickets".
 **Done when:** a suite admin makes a custom VRMS role in the portal, gives it to a person, and that person's token and permissions follow it; deleting a role that people still hold is refused until they are moved; VMMS and BMS keep working on their built in roles, and contract 0001 gets a version with a Changes line.
 - Note (2026-11-18): your call: as much configurable as makes sense. The R2 mockup (role list with built in and custom sections) is the starting point; the S20 permissions redesign should be built so a longer role list fits.
 - Note (2026-11-23): the role list R2 started became `Roles9` (11 roles so the list scrolls, Built in and Custom sections, dashed New role); the round 6 and 8 boards also settled deleting a role (`Confirm6`: DA to DC, and the rule that an action that would orphan data is blocked with the reason instead of confirmed, spec 0016 *Components*). Start `/architect` from those boards.
 - Note (2026-11-23, board check): open for `/architect`: New role, Duplicate, Rename, Edit description and Add people are drawn as buttons only, with no flow; "Rename" shows on built in roles (the intent says they are renamable) while "Reset to defaults" also shows on custom roles. Deleting is settled (DB).
-- [ ] Design it (spec): `/architect custom roles per system`
+- Note (2026-11-23, `/architect`): designed with S20 (umbrella 0018, child 0002). Decided: custom roles only for systems with permission keys (VRMS today; VMMS and BMS stay on built in roles, read only); copy from a role; suite admins only; built in roles can't be renamed or deleted (the intent's "renamable" is dropped), Chief mechanic stays built in; delete archives; 20 per system, unique names, `C_` codes; VRMS moves its role code checks to permissions with a new key "Can be assigned tickets"; the mobile client stays Mechanic and Chief mechanic only. The VRMS step ships before feature 70.
+spec [0018](../../specs/_root/0018-roles-and-custom-roles/index.md) (child [0002](../../specs/_root/0018-roles-and-custom-roles/0002-custom-roles.md)) · code in `welinc-auth/src/auth/roles/`, `welinc-web-portal/src/pages/admin/roles/`, `welinc-backend-vrms/src/auth/permissions/`, `welinc-backend-vrms/src/modules/vrms/`
+- [x] Design it (spec): `/architect custom roles per system`
+- [ ] Build it: `/develop custom roles` (after S20's welinc-auth milestone)
+  - [ ] welinc-auth groundwork: `ticket.assignable`, the sync limited to built in rows with the `C_` reservation, `/auth/systems` `builtIn` and revalidation (AC-29, AC-30, AC-33)
+  - [ ] VRMS on permissions: every live role, the roster by `ticket.assignable` with the cold start guard and parity test, lead by `ticket.verify`, role names from the catalog, no role code checks left (AC-32 to AC-35)
+  - [ ] Create, rename and delete in welinc-auth with locks, the VMMS and BMS unknown code check, contract 0001's new version (AC-22, AC-23, AC-25, AC-27, AC-29, AC-31, AC-37)
+  - [ ] Portal: New role, Duplicate, Rename, Edit description, Delete DB, custom roles in every role picker (AC-20, AC-21, AC-24 to AC-28)
+- [ ] Verify it: `/check verify custom roles`
+- [ ] Test it: `/test custom roles`
+- [ ] Document it: `/document custom roles`
 
 ## Why this order
 
