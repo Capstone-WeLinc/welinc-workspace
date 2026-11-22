@@ -39,6 +39,8 @@ resource deployer 'Microsoft.Authorization/roleDefinitions@2022-04-01' = {
           'Microsoft.App/jobs/stop/action'
           'Microsoft.App/jobs/listSecrets/action'
           'Microsoft.App/jobs/*/read'
+          // Log stream of a failed migration job (`az containerapp job logs show` in the deploy template)
+          'Microsoft.App/jobs/getAuthToken/action'
           'Microsoft.ManagedIdentity/userAssignedIdentities/read'
           'Microsoft.ManagedIdentity/userAssignedIdentities/assign/action'
           'Microsoft.Web/staticSites/read'

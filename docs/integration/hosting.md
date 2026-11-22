@@ -8,16 +8,13 @@ How VMMS and BMS run online next to the shared services and VRMS. Everything run
 |---|---|
 | Now | Every merge into `development` deploys staging |
 | Since Nov 20, until the final defense | Every staging app stays awake (no cold starts in front of the panel) |
+| Each defense day (dates moving; the final is by Dec 20 at the latest) | **Freeze:** no merge to `development` in any repo from 2 hours before each defense until it ends. A fix in that window only if the lead agrees |
 | Dec 18 | The Azure credit ends and staging stops. If the final defense is later, the lead decides what happens first |
 
 ## Status (2026-11-22)
 
 - **BMS:** on since Nov 21. All three repos deploy on every merge into `development`; booking mail and the Wix booking webhook work on staging. Left for BMS: point your Wix site at `POST https://staging-api.welinc.app/bms/integrations/wix/bookings` with the key in `x-api-key`, and confirm one booking arrives.
-- **VMMS:** turned on Nov 22. Your deploy login, apps, jobs, client keys, repo variables and the Gemini key are set, and each of your three repos has a pull request adding `deploy.yml` (backend #36, analytics #23, web #23). Left for VMMS, in order:
-  1. In `welinc-backend-vmms-analytics-ai`, add `"migrate:deploy": "npm run migrate -- --skip-embeddings"` to `package.json` (the deploy's migration job runs it, and a command word can't start with a dash).
-  2. Merge the three pull requests. Each first deploy is expected to fail at "Wait for the revision"; tell the lead, who reruns the setup, then rerun the deploy.
-  3. With the lead: run your migrations and seed on staging, then `node scripts/check-system.mjs vmms`.
-| Each defense day (dates moving; the final is by Dec 20 at the latest) | **Freeze:** no merge to `development` in any repo from 2 hours before each defense until it ends. A fix in that window only if the lead agrees |
+- **VMMS:** live since Nov 22. All three repos deploy on every merge into `development` (`deploy.yml` from backend #36, analytics #23, web #23; analytics #23 also added the `migrate:deploy` script, keep it). `https://staging-vmms.welinc.app`, `/vmms/health` and `/vmms/analytics/health` answer 200; migrations and the seed ran; `check-system.mjs vmms` passes on staging (login 19 of 19, fleet 5 of 5), and BMS now reads the same trucks from your fleet API. Pull `development` before you branch.
 
 ## How it fits together
 
@@ -67,7 +64,7 @@ Since Nov 20 every staging app keeps one copy awake for the defenses. Once that 
 - [x] Work order and fuel attachments move from `private-uploads/` to blob storage, like VRMS's ticket files. Your container is `vmms-attachments`, and only `vmms-backend` can read or write it, using its own identity (no key). On staging the app gets `STORAGE_ACCOUNT_URL`, `STORAGE_PUBLIC_URL` and `STORAGE_CONTAINER`; locally, point the same code at Azurite. Copy `welinc-backend-vrms/src/modules/attachments/blob-file-store.ts` for the client and the signed links.
 - [x] Fuel receipt scanning: staging has an Azure AI Document Intelligence resource (free tier, prebuilt receipt model). The app gets `AZURE_DOCUMENT_INTELLIGENCE_ENDPOINT` and no key, so it calls the service with its own identity: when no key is set, get a token from `DefaultAzureCredential` for `https://cognitiveservices.azure.com/.default` and send `Authorization: Bearer <token>` instead of `Ocp-Apim-Subscription-Key` (your blob storage code already uses the same credential). Accept the endpoint without a key in `env.ts`. *(Done: with no key set it signs in through `DefaultAzureCredential`.)* For local testing, ask the lead for a key and keep it in your `.env` only. Keep scanning optional: if it's off or fails, staff type the receipt by hand.
 - [x] Analytics: `CREATE EXTENSION vector` and the `notify_vmms_table_change()` triggers live in a migration. Write the extension as `DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'vector') THEN CREATE EXTENSION vector; END IF; END $$;` (Azure refuses the plain `IF NOT EXISTS` form). *(Done: `scripts/migrations/0001-hosting-infrastructure.sql` uses the `DO` block.)*
-- [ ] Analytics: add the `migrate:deploy` script (Status, step 1). On staging the app keeps its DuckDB data mart in `/tmp` (`DUCKDB_PATH`), since the image's app folder isn't writable; your sync rebuilds it from the database after a restart.
+- [x] Analytics: the `migrate:deploy` script (added in analytics #23). On staging the app keeps its DuckDB data mart in `/tmp` (`DUCKDB_PATH`), since the image's app folder isn't writable; your sync rebuilds it from the database after a restart.
 
 ### BMS only
 
@@ -107,6 +104,7 @@ A changed setting reaches a running app only after a restart; the lead does both
 - **Your Azure login** can update and start only your group's apps and jobs.
 - **Workflow files:** copy [`deploy-templates/deploy-backend.yml`](deploy-templates/deploy-backend.yml) into each backend repo and [`deploy-templates/deploy-web.yml`](deploy-templates/deploy-web.yml) into your web repo, as `.github/workflows/deploy.yml`. In the backend file, keep only your repo's `services` lines (the comments list them). Each runs after your `CI` passes on a push to `development`. When your group is turned on, the lead sets the repo variables and opens a pull request with each `deploy.yml` (done for BMS and VMMS); BMS adds `VITE_GOOGLE_MAPS_API_KEY` as a repo secret in `welinc-web-bms`.
 - **First deploy of each app:** it fails at "Wait for the revision", because a new app starts on a placeholder image. Tell the lead; one rerun of the setup fixes the port and probes, then rerun the deploy.
+- **Two services, one database (VMMS):** `vmms-analytics` adds triggers to `vmms-backend`'s tables, so on an empty database the backend must migrate first. If analytics deploys first, its migration fails and leaves its tracking table behind, and the backend's Prisma then refuses the database (`P3005`, not empty). The fix: the lead drops that table, then the backend deploy is rerun before the analytics one (this happened on the first deploy, 2026-11-22).
 
 ## When something is wrong
 

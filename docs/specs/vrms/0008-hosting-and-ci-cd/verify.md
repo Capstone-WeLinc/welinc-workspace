@@ -84,9 +84,9 @@ Until every row is built, a verify run covers these (your rule from 2026-11-17);
 
 - [x] Every staging app other than the gateway: `az containerapp show --query properties.configuration.ingress.external` → `false` → AC-19 (2026-11-20; run again for the two VMMS apps once they exist)
 - [x] BMS: `/bms/health` and `staging-bms.welinc.app` answer 200; a merge into a BMS repo's `development` deploys by itself; `check-system.mjs bms` on staging passes all but the fleet check (2026-11-21)
-- [ ] VMMS: `/vmms/health`, `/vmms/analytics/health` and `staging-vmms.welinc.app` answer 200; a merge into `welinc-backend-vmms` `development` deploys by itself → AC-3, AC-9, AC-19
+- [x] VMMS: `/vmms/health`, `/vmms/analytics/health` and `staging-vmms.welinc.app` answer 200; a merge into `welinc-backend-vmms` `development` deploys by itself → AC-3, AC-9, AC-19 (2026-11-22: all three 200; the merges of #36, #23 and #23 deployed, the backends after one rerun)
 - [ ] As the VMMS deploy login: `az containerapp update -n vrms-backend-staging` → AuthorizationFailed; `az containerapp update -n vmms-backend-staging` → succeeds → AC-11
-- [ ] `node scripts/check-system.mjs vmms` and `bms` against staging → exit 0 (the BMS fleet check green once VMMS is on) → AC-19, suite spec 0014 AC-32
+- [x] `node scripts/check-system.mjs vmms` and `bms` against staging → exit 0 (the BMS fleet check green once VMMS is on) → AC-19, suite spec 0014 AC-32 (2026-11-22: vmms login 19 and fleet 5 ok, bms login 16 and fleet 5 ok)
 - [ ] A VMMS fuel receipt scan on staging reads through Document Intelligence with no key set → AC-14 (Value sourcing)
 
 ## Shutdown (AC-20)
