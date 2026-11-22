@@ -38,7 +38,7 @@ The helper `node agents/vrms/overnight/runner.mjs` does the bookkeeping without 
 
 1. `echo $OVERNIGHT_RUN` prints `1`. If not, the session was not started through `start.sh`: tell the user to use `bash agents/vrms/overnight/start.sh` and stop. Never run unattended without the guard.
 2. Prove the guard is wired: run `git push --dry-run origin HEAD:refs/heads/overnight-guard-check` in the workspace. It must be **blocked**. If it runs, stop at once and report that the guard is not loaded.
-3. Read, in this order: `queue.md` if present, the previous night's report (newest `YYYY-MM-DD.md` before today) for parked and failed items, the newest `docs/context/vrms/handoff-*.md`, then the scopes: VRMS (`docs/scope/vrms/index.md` and its epic files) and the suite (`docs/scope/_root/`, rows S1 and up: the shared services the user owns: welinc-auth, welinc-web-portal, the gateway). Note any defense within 24 hours for a warning at the top of the report.
+3. Read, in this order: `queue.md` if present, the previous run's report (the newest `<run id>.md` in `docs/_private/vrms/overnight/`, or an older `YYYY-MM-DD.md`) for parked and failed items, the newest `docs/context/vrms/handoff-*.md`, then the scopes: VRMS (`docs/scope/vrms/index.md` and its epic files) and the suite (`docs/scope/_root/`, rows S1 and up: the shared services the user owns: welinc-auth, welinc-web-portal, the gateway). Note any defense within 24 hours for a warning at the top of the report.
 4. Docker: `docker ps` shows the shared and VRMS stacks (`welinc_*`). If not, start them (shared first, then VRMS) and wait for the backends' health routes on localhost. Still down after 10 minutes: stop the run (nothing can be verified).
 5. For each repo you may touch (the workspace, `welinc-backend-vrms`, `welinc-web-vrms`, `welinc-auth`, `welinc-web-portal`, `welinc-mobile-vrms_vmms`): `git fetch --quiet --prune` (stale refs make deleted branches look alive), note the branch and `git status --short`. A repo with uncommitted changes that are not from this run is **dirty**: never switch its branch, never commit in it, and skip items that need it. The user's own work always wins.
 6. **Drift check.** Compare the docs against reality before trusting them:
@@ -65,6 +65,8 @@ Scope fill (both scopes; suite rows are named by their id, `S19`, VRMS rows by t
 - When a `Build it` box or its note says only some milestones can start now (for example "the welinc-auth milestone can start now; the portal milestones wait for S18"), queue only those milestones; the rest stay for a later night.
 - A suite row's work in a shared repo follows the same git rules (a `feat/` branch from `origin/development`), and its spec's contract changes are part of the milestone, never a separate push.
 - It is not an `Extra skills` or `Polish it` box.
+
+Items named in `queue.md` or on the command line skip the eligibility list above (the words "waits for", "VMMS", "BMS" and the like are for the scope fill only): queue every milestone they name, and only the dependency check at each one's turn decides whether it runs.
 
 Never queue: `/architect`, `/scope` planning, `/check review`, `/document`, `/audit`, any ask first or Azure skill, anything on staging.
 
@@ -95,7 +97,7 @@ Write `state.json`, with `runId` set to `$OVERNIGHT_RUN_ID`:
 }
 ```
 
-Item `status`: `pending`, `running`, `done`, `parked` (needs the user), `failed` (red after one `/debug` pass), `skipped` (dirty repo, out of time, not eligible). Save `state.json` after every item and every notable event. If today's `state.json` exists with `status` `running`, resume it instead of building a new queue. An item found `running` at start was cut off (crash or usage limit): add a `pauses` entry and redo it from the top, reusing its branch.
+Item `status`, exactly one of: `pending`, `running`, `done`, `parked` (needs the user), `failed` (red after one `/debug` pass), `skipped` (dirty repo, out of time, not eligible). No other words: `start.sh` treats anything else as finished, and marks an item it finds still `pending` or `running` after its session as `failed`. Save `state.json` after every item and every notable event. If `state.json` exists with `status` `running`, it is this run cut off mid way (`start.sh` files older ones as halted): resume it instead of building a new queue. An item found `running` at start was cut off (crash or usage limit): add a `pauses` entry and redo it from the top, reusing its branch.
 
 Start `runs/<id>/notes.md` with what preflight found that the item sessions need: which stacks were up, which repos were dirty and skipped, the branches that already exist for tonight's features.
 
@@ -105,7 +107,7 @@ Then write the report's header, **Plan** and **Drift** sections right away, so a
 
 For each `pending` item, in order:
 
-1. Check the time against `until`. Past it: mark the rest `skipped` ("out of time") and go to Step 3.
+1. Check the time against `until`. Past it: mark the rest `skipped` ("out of time") and go to Step 3. In `--one` mode, mark them skipped, save `state.json` and exit; the close out runs in its own session.
 2. Read `runs/<id>/notes.md` first if it exists: earlier sessions tonight left what they learned there (slow commands, a container that needed a restart, which branch a later item builds on, a test that is flaky). Trust it over rediscovering.
 3. Set the item `running` and save. Invoke its skill with the Skill tool (`develop`, `check` with `verify ...`, `test`) and follow it fully, with the overrides below and the user's notes from `queue.md`.
 4. Before calling it done: `npm run lint` and the build in every repo it touched (`build:local` in the two frontends, plus `npm run typecheck` in web-vrms). For backend changes, restart the container first; after a Prisma schema change, run `docker exec welinc_vrms_backend npx prisma generate` and restart.
@@ -123,11 +125,11 @@ For each `pending` item, in order:
 **Questions (overrides every skill's "ask the engineer"):** nobody can answer, and `AskUserQuestion` is blocked.
 - Answered in `queue.md`: use that answer.
 - Small and easy to undo (a name, a test file layout, a default the skill itself marks recommended, which seed account to use): take the recommended option and add it to `decidedForYou` with how to undo it.
-- Load bearing (anything `/develop` would route to `/architect`, a spec or scope change beyond ticking boxes, a product or UX direction, a cross repo contract, a new dependency, a security trade off): **park** the item. Write the question into `needsYou` as a decision panel (2 to 4 options, one marked recommended with a one line why) plus the `queue.md` line that would resume it with that answer, set the item `parked`, and move on. Never decide these for the user.
+- Load bearing (anything `/develop` would route to `/architect`, a spec or scope change beyond ticking boxes, a product or UX direction, a cross repo contract, a new dependency, a security trade off): **park** the item. Write the question into `needsYou` as a decision panel (2 to 4 options, one marked recommended with a one line why) plus the `queue.md` line that would resume it with that answer. Leave no uncommitted work behind: commit what is green, stash the rest (`git stash push -u -m "overnight <date> <item id> parked"`, recorded in `stashes`). Then set the item `parked` and move on. Never decide these for the user.
 
 **Git (overrides "ask before any git write" for local operations only):**
 - Service repos: work on `feat/<feature-slug>` (or reuse the feature's existing local branch), created from the up to date remote: `git switch -c feat/<slug> origin/development`. When the queue line names another base (a local branch this work builds on, such as an unmerged feature it needs), branch from that instead and record the base in the item's `branches` and the report, because its PR has to wait for that branch's. Tests for code that is already merged go on `chore/test-<slug>` the same way. Never check out or commit on `development` or `main`.
-- Workspace repo (scope ticks, drift fixes, `verify.md` ticks, `/sync` edits): one branch for the night, `docs/overnight-<date>`, created with `git switch -c docs/overnight-<date> origin/main`. If the workspace is dirty, don't branch or commit there: leave the edits uncommitted and list them in the report.
+- Workspace repo (scope ticks, drift fixes, `verify.md` ticks, `/sync` edits): one branch for the night, `docs/overnight-<date>`, created with `git switch -c docs/overnight-<date> origin/main` the first time; later sessions switch to it (`git switch docs/overnight-<date>`). If the workspace is dirty, don't branch or commit there: leave the edits uncommitted and list them in the report.
 - Commit only what landed green, by explicit path (never `git add -A` in a repo that had other changes). One line Conventional Commit subject, no body, **no** `Co-Authored-By` trailer (project rule: attribution none).
 - Never: push, pull without `--ff-only`, merge, rebase, reset `--hard`, amend, delete branches, drop stashes. The guard blocks them anyway.
 

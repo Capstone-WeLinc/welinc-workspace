@@ -89,10 +89,19 @@ REPORT="$DIR/$OVERNIGHT_RUN_ID.md"
 LOG="$RUN_DIR/runner.log"
 mkdir -p "$RUN_DIR"
 node "$RUNNER" refs
-node "$RUNNER" probe start | tee -a "$LOG"
+START_USAGE="$(node "$RUNNER" probe start)"
+echo "$START_USAGE" | tee -a "$LOG"
+case "$START_USAGE" in
+  *'?%'*) echo "WARNING: could not read your usage, so the run will NOT wait at ${LIMIT}%. Check /usage yourself before you leave it." | tee -a "$LOG" ;;
+esac
 
 finish() {
-  echo "**Usage at the end:** $(node "$RUNNER" probe end | sed 's/^Usage: //')" >>"$REPORT" 2>/dev/null || true
+  # A run still marked running here ended early (the week filled up, close out failed): mark it halted so
+  # the next run starts fresh instead of resuming this one.
+  node "$RUNNER" halt "the run ended before close out finished" >>"$LOG" 2>&1 || true
+  if [ -f "$REPORT" ]; then
+    echo "**Usage at the end:** $(node "$RUNNER" probe end | sed 's/^Usage: //')" >>"$REPORT" || true
+  fi
   echo "Overnight run finished. Report: $REPORT"
 }
 
@@ -123,8 +132,9 @@ wait_for_room() {
   node "$RUNNER" probe after-wait >>"$LOG" 2>&1 || true
 }
 
-# Runs one headless step on its model, and records its turns and usage. A failed step tries again up to
-# 3 times: after the reset when usage was the cause, else after 5 minutes.
+# Runs one headless step on its model, and records its turns and usage. A step that failed because of the
+# usage limit waits for the reset and runs again (up to 3 times); any other failure returns 1 at once, so
+# one bad item costs one session, not three. Returns 2 when the week is full.
 step() {
   local mode="$1" prompt="$2" model="$3" effort="$4" label="$5" tries=0
   while true; do
@@ -132,7 +142,7 @@ step() {
     wait_for_room || return 2
     echo "[$(date +%H:%M)] $label on $model $effort: $prompt" >>"$LOG"
     if OVERNIGHT_MODE="$mode" "$CLAUDE_BIN" -p "$prompt" --settings "$SETTINGS" --permission-mode auto \
-      --max-turns 300 --model "$model" --effort "$effort" --output-format stream-json --verbose 2>>"$LOG" |
+      --max-turns 300 --model "$model" --effort "$effort" --output-format stream-json --verbose </dev/null 2>>"$LOG" |
       node "$RUNNER" log "$label" "$model" "$effort" >>"$LOG"; then
       return 0
     fi
@@ -142,9 +152,10 @@ step() {
       return 1
     fi
     if node "$RUNNER" room "$LIMIT" >/dev/null; then
-      echo "[$(date +%H:%M)] $label exited with an error; trying again in 5 minutes." >>"$LOG"
-      sleep 300
+      echo "[$(date +%H:%M)] $label exited with an error (not the usage limit); not trying again." >>"$LOG"
+      return 1
     fi
+    echo "[$(date +%H:%M)] $label hit the usage limit; it runs again after the reset." >>"$LOG"
   done
 }
 
@@ -154,13 +165,24 @@ if [ "$PLAN" = 1 ]; then
   exit 0
 fi
 
-step prepare "/overnight --prepare ${ARGS[*]:-}" sonnet medium prepare || exit 1
+if ! step prepare "/overnight --prepare ${ARGS[*]:-}" sonnet medium prepare || [ ! -f "$DIR/state.json" ]; then
+  echo "[$(date +%H:%M)] Preflight did not finish; no items run." >>"$LOG"
+  finish
+  exit 1
+fi
 rounds=0
 while [ "$rounds" -lt 50 ]; do
   NEXT="$(node agents/vrms/overnight/guard.mjs next </dev/null 2>/dev/null)" || break
-  read -r _left model effort <<<"$NEXT"
-  step one "/overnight --one" "$model" "$effort" "item $((rounds + 1))" || break
+  read -r _left model effort item <<<"$NEXT"
+  code=0
+  step one "/overnight --one" "$model" "$effort" "$item" || code=$?
+  [ "$code" = 2 ] && break # the week is full
+  # The session ended but the item is still open (it crashed, ran out of turns, or never saved): fail it,
+  # so the loop moves on instead of starting it again.
+  case "$(node "$RUNNER" status "$item")" in
+    pending | running) node "$RUNNER" fail "$item" "the session ended without finishing it (exit $code); see runs/$OVERNIGHT_RUN_ID/runner.log" >>"$LOG" ;;
+  esac
   rounds=$((rounds + 1))
 done
-step close "/overnight --close" sonnet medium close || true
+[ -f "$DIR/state.json" ] && step close "/overnight --close" sonnet medium close || true
 finish

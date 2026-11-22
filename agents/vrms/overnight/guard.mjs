@@ -320,7 +320,9 @@ function readState(input) {
   }
 }
 
-const OPEN = (q) => !['done', 'parked', 'skipped', 'failed'].includes(q.status);
+// Only these two count as open, so a status the skill never defined (`completed`, `blocked`) can't keep
+// an item alive and make start.sh start a session for it again and again.
+const OPEN = (q) => q.status === 'pending' || q.status === 'running';
 
 // Model and effort for an item: its own `model` and `effort` (from a [sonnet] or [opus high] tag in
 // queue.md) win; otherwise building uses Opus and everything else (verify, test, docs, diagrams) Sonnet.
@@ -334,13 +336,13 @@ export function pick(item = {}) {
 }
 
 // Exit 0 when the run is still going and has an item left (used by start.sh between sessions).
-// Prints: <items left> <model> <effort>, the last two for the item the next session takes.
+// Prints: <items left> <model> <effort> <item id>, for the item the next session takes.
 function next(input) {
   const { state } = readState(input);
   const left = state && state.status === 'running' ? (state.queue || []).filter(OPEN) : [];
   const first = left.find((q) => q.status === 'running') || left[0];
   const { model, effort } = pick(first);
-  process.stdout.write(`${left.length} ${model} ${effort}\n`);
+  process.stdout.write(`${left.length} ${model} ${effort} ${first?.id ?? '-'}\n`);
   process.exit(left.length ? 0 : 1);
 }
 
