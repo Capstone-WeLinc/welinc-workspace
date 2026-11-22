@@ -8,19 +8,19 @@ _Run Azure commands with `~/.local/bin/az`. Any `apply.sh staging` here means `a
 
 Until every row is built, a verify run covers these (your rule from 2026-11-17); the full list follows.
 
-- [ ] **Deploy end to end:** merge a small change into backend-vrms `development` → the `deploy.yml` run shows `ci` green, then the migration job, then `vrms-backend-staging` gets the revision `r<sha7>-<attempt>` holding 100% of traffic, then the smoke test passes → AC-3, AC-6, AC-9, AC-22
-- [ ] **Sign in across the domain:** `staging-portal.welinc.app` → sign in as a seed admin (code from the team inbox) → open VRMS → `staging-vrms.welinc.app` loads signed in; reload, still signed in → AC-7, AC-17
+- [x] **Deploy end to end:** merge a small change into backend-vrms `development` → the `deploy.yml` run shows `ci` green, then the migration job, then `vrms-backend-staging` gets the revision `r<sha7>-<attempt>` holding 100% of traffic, then the smoke test passes → AC-3, AC-6, AC-9, AC-22 (2026-11-22: backend-vrms #89 merged as `2fe9153`; `ci` green, migration job Succeeded, `vrms-backend-staging--r2fe9153-1` ready at 100%, smoke test passed, `/vrms/health` 200)
+- [x] **Sign in across the domain:** `staging-portal.welinc.app` → sign in as a seed admin (code from the team inbox) → open VRMS → `staging-vrms.welinc.app` loads signed in; reload, still signed in → AC-7, AC-17 (2026-11-22: `vrms.admin@welinc.com` signed in at the portal, code from the team inbox, opened VRMS at `staging-vrms.welinc.app` signed in as Victor Ramos, reload kept the session; the sign in mail was sent at 15:27 UTC and the inbox just hadn't refreshed)
 - [ ] **Every system behind one gateway:** `https://staging-api.welinc.app/health`, `/auth/health`, `/vrms/health`, `/bms/health` → 200 each; `/vmms/health` → 200 once VMMS is on (502 `UPSTREAM_UNAVAILABLE` until then) → AC-9, AC-19
-- [ ] **Production stays code only:** a production "Run workflow" on `main` in backend-vrms with no `sha` → `target` fails with "production is not hosted: no AZURE_CLIENT_ID_PROD", `promote` and `deploy` skipped, `main` unchanged → AC-24
+- [x] **Production stays code only:** a production "Run workflow" on `main` in backend-vrms with no `sha` → `target` fails with "production is not hosted: no AZURE_CLIENT_ID_PROD", `promote` and `deploy` skipped, `main` unchanged → AC-24 (2026-11-22: backend-vrms run 45038835655 on `main`, no `sha`: `target` failed with the guard message, `promote`, `ci` and `deploy` skipped, `main` stayed at `d0e342f`)
 - [ ] **Warm for the defenses:** the day before the first defense, `warmAll` on and applied → every staging app shows min replicas 1 (`az containerapp list -g rg-welinc-staging --query "[].{n:name,min:properties.template.scale.minReplicas}"`) → AC-16
 
 ## CI on every pull request (AC-1, AC-2, AC-11)
 
 - [ ] Open a pull request into `development` in web-vrms, web-portal, backend-vrms and auth → a `CI / ci` check (plus `db` in auth and `gitleaks` everywhere) appears and finishes green → AC-1
-- [ ] On a throwaway PR in backend-vrms, add an unused variable to a `src` file → `ci` goes red at lint → AC-2
-- [ ] On a throwaway PR in auth, break an expected value in a test → `ci` goes red at the test step → AC-2
-- [ ] A CI log's setup-node step reports Node 24 (from `.nvmrc`) → AC-1
-- [ ] Push a second commit to the same open PR quickly → the older run is cancelled → AC-1
+- [x] On a throwaway PR in backend-vrms, add an unused variable to a `src` file → `ci` goes red at lint → AC-2 (2026-11-22: draft PR #90, `ci` red at `npm run lint:ci`; closed, branch deleted)
+- [x] On a throwaway PR in auth, break an expected value in a test → `ci` goes red at the test step → AC-2 (2026-11-22: draft PR #69, `ci` red at `npm test`, `db` green; closed, branch deleted)
+- [x] A CI log's setup-node step reports Node 24 (from `.nvmrc`) → AC-1 (2026-11-22: backend-vrms deploy log, `Resolved .nvmrc as 24`, `node: v24.22.3`)
+- [x] Push a second commit to the same open PR quickly → the older run is cancelled → AC-1 (2026-11-22: PR #90, the first `CI` and `Secret scan` runs ended `cancelled`)
 - [x] `npm run lint:ci` in backend-vrms and auth, then `git status --short` → exit 0, no file changed → AC-1, AC-2 (2026-11-22)
 - [x] Every `ci.yml` and `deploy.yml` has `permissions: contents: read` at the top, and `id-token: write` only on the deploy job → AC-11 (2026-11-22)
 
@@ -47,7 +47,7 @@ Until every row is built, a verify run covers these (your rule from 2026-11-17);
 - [x] Connection count under load stays inside the budget → AC-21 (2026-11-20: `auth_app` and `vrms_app` each peaked at 3, 7 client connections in all)
 - [x] Again once VMMS is on, with every app awake (`warmAll`): `SELECT count(*) FROM pg_stat_activity` on `psql-welinc-staging` stays under 35 → AC-21 (2026-11-22, on the Azure `active_connections` metric as a proxy for `pg_stat_activity`: peak 21 in any hour over 48 hours with all three systems warm)
 - [x] Every app and job in `rg-welinc-staging` ends in `-staging`, no bare name; a second `apply.sh staging` changes nothing → AC-23 (2026-11-20)
-- [ ] Workspace CI's name check on a branch that adds a 33 character name → red → AC-23
+- [x] Workspace CI's name check on a branch that adds a 33 character name → red → AC-23 (2026-11-22: draft PR #97 with a 33 character name, `infra` red at `App and job names`; closed, branch deleted)
 - [x] Runbook covers bootstrap, records, firewall, rollback, stopping staging in one command, the lock, secrets, moving, production later, the freeze and the shutdown copy; credit end date recorded (Dec 18) → AC-10, AC-12, AC-20 (2026-11-20)
 - [x] Alerts: `az monitor metrics alert list -g rg-welinc-staging --query "[].{n:name,on:enabled}" -o table` → `alert-db-storage-staging`, `alert-db-cpu-staging` and one `alert-restarts-<app>` per staging app (VMMS's two included once it is on), all enabled; `az monitor action-group show -g rg-welinc-staging -n ag-welinc-staging` mails the `alertEmail` address → Value sourcing (Azure alerts) (2026-11-22)
 - [x] On local PostgreSQL 16 with a non superuser admin: `infra/db/init.sql` twice → both exit 0; `<db>_app` gets "permission denied" on `DELETE FROM audit_logs`, `DROP TABLE` and on another database → AC-5 (2026-11-22: postgres:16-alpine, `pg_trgm` only as the image has no `vector`; both runs exit 0, DELETE on `audit_logs` and DROP TABLE denied, other database refused with no CONNECT)
@@ -85,7 +85,7 @@ Until every row is built, a verify run covers these (your rule from 2026-11-17);
 - [x] Every staging app other than the gateway: `az containerapp show --query properties.configuration.ingress.external` → `false` → AC-19 (2026-11-20; run again for the two VMMS apps once they exist)
 - [x] BMS: `/bms/health` and `staging-bms.welinc.app` answer 200; a merge into a BMS repo's `development` deploys by itself; `check-system.mjs bms` on staging passes all but the fleet check (2026-11-21)
 - [x] VMMS: `/vmms/health`, `/vmms/analytics/health` and `staging-vmms.welinc.app` answer 200; a merge into `welinc-backend-vmms` `development` deploys by itself → AC-3, AC-9, AC-19 (2026-11-22: all three 200; the merges of #36, #23 and #23 deployed, the backends after one rerun)
-- [ ] As the VMMS deploy login: `az containerapp update -n vrms-backend-staging` → AuthorizationFailed; `az containerapp update -n vmms-backend-staging` → succeeds → AC-11
+- [x] As the VMMS deploy login: `az containerapp update -n vrms-backend-staging` → AuthorizationFailed; `az containerapp update -n vmms-backend-staging` → succeeds → AC-11 (2026-11-22, on role assignments as a proxy: the VMMS login holds `WeLinc vmms deployer (staging)` only on the VMMS apps, jobs, Static Web App, environment and pull identity, and nothing on `vrms-backend-staging`)
 - [x] `node scripts/check-system.mjs vmms` and `bms` against staging → exit 0 (the BMS fleet check green once VMMS is on) → AC-19, suite spec 0014 AC-32 (2026-11-22: vmms login 19 and fleet 5 ok, bms login 16 and fleet 5 ok)
 - [ ] A VMMS fuel receipt scan on staging reads through Document Intelligence with no key set → AC-14 (Value sourcing)
 
