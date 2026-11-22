@@ -191,10 +191,13 @@ test('fresh mode: sessions exit between items, and next reports what is left', (
   assert.equal(run('stop', {}, env('close')).stdout, '');
   const n = run('next', {}, env('session'));
   assert.equal(n.status, 0);
-  assert.equal(n.stdout.trim(), '1 sonnet medium');
+  assert.equal(n.stdout.trim(), '1 sonnet medium b');
 
   writeFileSync(file, JSON.stringify({ status: 'running', queue: [{ id: 'b', status: 'pending', command: '/develop design', effort: 'high' }] }));
-  assert.equal(run('next', {}, env('session')).stdout.trim(), '1 opus high', 'building defaults to Opus; the item effort wins');
+  assert.equal(run('next', {}, env('session')).stdout.trim(), '1 opus high b', 'building defaults to Opus; the item effort wins');
+
+  writeFileSync(file, JSON.stringify({ status: 'running', queue: [{ id: 'b', status: 'completed' }] }));
+  assert.equal(run('next', {}, env('session')).status, 1, 'a status the skill never defined is not open');
 
   writeFileSync(file, JSON.stringify({ status: 'running', queue: [{ id: 'b', status: 'running' }] }));
   assert.equal(JSON.parse(run('stop', {}, env('one')).stdout).decision, 'block', 'one mode, item half done: keep going');

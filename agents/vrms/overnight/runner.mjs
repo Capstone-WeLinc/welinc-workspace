@@ -10,10 +10,14 @@
 //                                       prints the seconds until it resets and exits 1 (3 when the week is full)
 //   node runner.mjs usage               the usage table (markdown) for the report
 //   node runner.mjs changes             writes runs/<id>/changes.md: every commit tonight, per repo and branch
+//   node runner.mjs status <item id>    prints that item's status in state.json
+//   node runner.mjs fail <item id> <why>   marks an item still pending or running as failed (start.sh, so it can't spin)
+//   node runner.mjs halt <why>          a run that is still `running` becomes `halted` (start.sh, after close out)
 // Pure node, no packages. Files live in docs/_private/vrms/overnight/ (git ignored).
 import { execFileSync, spawnSync } from 'node:child_process';
 import { appendFileSync, existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
+import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
@@ -50,6 +54,13 @@ const runDir = () => {
 // A finished (or halted) run moves to runs/<its id>/ so the next run never writes over it.
 function archive() {
   const s = state();
+  // A run still `running` whose state has not changed for 6 hours was cut off (a crash, a reboot): file
+  // it as halted instead of letting tonight's run resume an old night.
+  if (s?.status === 'running' && Date.now() - statSync(STATE).mtimeMs > 6 * 3600 * 1000) {
+    s.status = 'halted';
+    s.haltReason = s.haltReason || 'cut off: the state was not touched for 6 hours';
+    writeFileSync(STATE, JSON.stringify(s, null, 2));
+  }
   if (s && s.status !== 'running') {
     const id = s.runId || `${s.date || today()}-${String(s.startedAt || '0000').replace(':', '')}`;
     const d = join(RUNS, id);
@@ -59,7 +70,7 @@ function archive() {
   }
   if (!existsSync(RUNS)) return;
   const ids = readdirSync(RUNS).filter((n) => statSync(join(RUNS, n)).isDirectory()).sort();
-  for (const old of ids.slice(0, Math.max(0, ids.length - KEEP))) {
+  for (const old of ids.slice(0, Math.max(0, ids.length - (KEEP - 1)))) { // the new run makes it KEEP
     rmSync(join(RUNS, old), { recursive: true, force: true });
     rmSync(join(DIR, `${old}.md`), { force: true });
   }
@@ -97,6 +108,24 @@ function refs() {
   writeFileSync(file, JSON.stringify(Object.fromEntries(repos().map(([n, p]) => [n, tips(p)])), null, 2));
 }
 
+const isAncestor = (cwd, a, b) => spawnSync('git', ['-C', cwd, 'merge-base', '--is-ancestor', a, b]).status === 0;
+
+// A branch created tonight started from the closest commit among the start of night tips (a local
+// feature branch it builds on) and the remote base, so its list never repeats another branch's commits.
+function startingPoint(cwd, branch, startTips, name) {
+  const remote = name === 'workspace' ? 'origin/main' : 'origin/development';
+  let best = remote;
+  let fewest = Infinity;
+  for (const c of [remote, ...startTips]) {
+    const n = Number(git(cwd, 'rev-list', '--count', `${c}..${branch}`) || NaN);
+    if (Number.isFinite(n) && n < fewest && isAncestor(cwd, c, branch)) {
+      fewest = n;
+      best = c.length === 40 ? c.slice(0, 7) : c;
+    }
+  }
+  return best;
+}
+
 function changes() {
   const start = readJson(join(runDir(), 'refs-start.json'), {});
   let out = `# What changed · run ${runId()}\n\nBuilt from git, not from the model: every commit made tonight, per repo and branch. Nothing is pushed.\n`;
@@ -105,10 +134,13 @@ function changes() {
     const before = start[name] || {};
     for (const [branch, tip] of Object.entries(tips(p))) {
       if (before[branch] === tip) continue;
-      const base = before[branch] || (name === 'workspace' ? 'origin/main' : 'origin/development');
+      const base = before[branch] || startingPoint(p, branch, Object.values(before), name);
       const range = `${base}..${branch}`;
       const log = git(p, 'log', '--reverse', '--format=%h %s', range);
-      if (!log) continue;
+      if (!log) {
+        if (git(p, 'rev-parse', '--verify', '--quiet', base) === '') out += `\n## ${name} · \`${branch}\`\n\nMoved tonight, but its base \`${base}\` is missing here, so the commits could not be listed. Look with \`git -C ${name === 'workspace' ? '.' : name} log ${branch}\`.\n`;
+        continue;
+      }
       any = true;
       out += `\n## ${name} · \`${branch}\`\n\n`;
       for (const line of log.split('\n')) {
@@ -156,23 +188,35 @@ async function log(label, model, effort) {
   let buf = '';
   let lim = {};
   let result = null;
+  process.stdin.setEncoding('utf8');
+  const handle = (line) => {
+    let j;
+    try {
+      j = JSON.parse(line);
+    } catch {
+      if (line.trim()) console.log(line);
+      return;
+    }
+    if (j.type === 'rate_limit_event') lim = limits(j);
+    if (j.type === 'result') result = j;
+    // One line per tool call, so `tail -f runner.log` shows progress while a step runs.
+    if (j.type === 'assistant') {
+      for (const c of j.message?.content || []) {
+        if (c.type !== 'tool_use') continue;
+        const what = c.input?.command || c.input?.file_path || c.input?.skill || c.input?.description || '';
+        console.log(`  ${hhmm()} ${c.name} ${String(what).replace(/\s+/g, ' ').slice(0, 100)}`);
+      }
+    }
+  };
   for await (const chunk of process.stdin) {
     buf += chunk;
     let i;
     while ((i = buf.indexOf('\n')) >= 0) {
-      const line = buf.slice(0, i);
+      handle(buf.slice(0, i));
       buf = buf.slice(i + 1);
-      let j;
-      try {
-        j = JSON.parse(line);
-      } catch {
-        if (line.trim()) console.log(line);
-        continue;
-      }
-      if (j.type === 'rate_limit_event') lim = limits(j);
-      if (j.type === 'result') result = j;
     }
   }
+  if (buf) handle(buf);
   if (result?.result) console.log(result.result);
   const u = result?.usage || {};
   record({
@@ -192,7 +236,8 @@ function probe() {
   const bin = process.env.CLAUDE_BIN || 'claude';
   const r = spawnSync(bin, ['-p', 'Reply with ok.', '--model', 'haiku', '--output-format', 'stream-json', '--verbose', '--max-turns', '1', '--setting-sources', 'user'], {
     encoding: 'utf8',
-    cwd: DIR,
+    cwd: tmpdir(), // outside the workspace, so no CLAUDE.md or AGENTS.md loads into the check
+    timeout: 120000,
   });
   const event = (r.stdout || '')
     .split('\n')
@@ -243,6 +288,25 @@ function usage() {
   console.log(out);
 }
 
+function setItem(id, why) {
+  const s = state();
+  const q = s?.queue?.find((x) => x.id === id);
+  if (!q || !['pending', 'running'].includes(q.status)) return;
+  q.status = 'failed';
+  q.result = q.result ? `${q.result} · ${why}` : why;
+  writeFileSync(STATE, JSON.stringify(s, null, 2));
+  console.log(`Marked ${id} failed: ${why}`);
+}
+
+function halt(why) {
+  const s = state();
+  if (s?.status !== 'running') return;
+  s.status = 'halted';
+  s.haltReason = why;
+  writeFileSync(STATE, JSON.stringify(s, null, 2));
+  console.log(`Run halted: ${why}`);
+}
+
 const [cmd, ...args] = process.argv.slice(2);
 if (cmd === 'runid') console.log(runId());
 else if (cmd === 'archive') archive();
@@ -252,7 +316,10 @@ else if (cmd === 'probe') probe();
 else if (cmd === 'log') await log(args[0] || 'step', args[1] || '', args[2] || '');
 else if (cmd === 'room') room(Number(args[0]) || 95);
 else if (cmd === 'usage') usage();
+else if (cmd === 'status') console.log(state()?.queue?.find((x) => x.id === args[0])?.status ?? 'missing');
+else if (cmd === 'fail') setItem(args[0], args.slice(1).join(' ') || 'failed');
+else if (cmd === 'halt') halt(args.join(' ') || 'the run ended before close out finished');
 else {
-  console.error('Usage: node runner.mjs runid|archive|refs|probe|log|room|usage|changes');
+  console.error('Usage: node runner.mjs runid|archive|refs|probe|log|room|usage|changes|status|fail|halt');
   process.exit(2);
 }

@@ -8,7 +8,7 @@
 // The original is kept in the git ignored overnight folder, and git is told to ignore the edit while
 // it lasts, so the workspace still counts as clean. Push, merge, rebase, PRs and the deny list stay.
 import { execFileSync } from 'node:child_process';
-import { existsSync, readFileSync, rmSync, writeFileSync, copyFileSync } from 'node:fs';
+import { existsSync, readFileSync, rmSync, statSync, writeFileSync, copyFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -46,11 +46,11 @@ function lift() {
   const ask = settings.permissions?.ask ?? [];
   const kept = ask.filter((rule) => !LIFTED.includes(rule));
   if (kept.length === ask.length) return false;
+  if (process.argv[3]) writeFileSync(PID, process.argv[3]); // first, so a session starting now sees an owner
   copyFileSync(FILE, BACKUP);
   git('update-index', '--assume-unchanged', REL);
   settings.permissions.ask = kept;
   writeFileSync(FILE, `${JSON.stringify(settings, null, 2)}\n`);
-  if (process.argv[3]) writeFileSync(PID, process.argv[3]); // start.sh passes its own process id
   return true;
 }
 
@@ -66,7 +66,9 @@ function alive(pid) {
 // Restore only when no run owns the lift any more, so a normal session opened mid run leaves it alone.
 function restoreIfStale() {
   if (!existsSync(BACKUP)) return false;
-  if (existsSync(PID) && alive(readFileSync(PID, 'utf8').trim())) return false;
+  // A lift older than 20 hours belongs to no run (none lasts that long), even if its process id was reused.
+  const fresh = existsSync(PID) && Date.now() - statSync(PID).mtimeMs < 20 * 3600 * 1000;
+  if (fresh && alive(readFileSync(PID, 'utf8').trim())) return false;
   return restore();
 }
 

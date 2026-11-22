@@ -390,7 +390,8 @@ Rewrite the suite `design.md` so screens stop coming out as the default shadcn l
 - Note (2026-11-18): direction B "Control room" decided over rounds 1 to 11 on the design canvas (IBM Plex, K15 StatCard, 640px save bar, L3 labels, icon collapse kept). Every page of the portal and web-vrms moves to it, but the build waits for your go.
 - Note (2026-11-23): fix in the page sweep: the portal's sign out dialog (`welinc-web-portal/src/pages/launcher/SignOutDialog.tsx`) always says "signed out of VRMS, VMMS and BMS", even for someone in one system. Name only the person's own systems from the launcher's `systems` ("Sign out of WeLinc?", "…of VMMS on this browser"), and a plain "You'll need to sign in again" on the no access page.
 - [x] Design it (spec): `/architect design direction refresh`
-- [ ] Build it: `/develop design direction refresh` (start only when you say go)
+- Note (2026-11-23, overnight run): you gave the go. Milestone 1 is built except the Plex fonts (AC-3): `design.md` and the token check merged in workspace #107; tokens, type scale, `Button` and `Card` are on local `feat/design-direction-refresh` branches in welinc-web-portal and welinc-web-vrms, not pushed yet. The `Button` variants changed: `destructive` is quiet red text, `secondary` is gone, a gold `commit` variant is new.
+- [ ] Build it: `/develop design direction refresh`
   - [ ] Standard and tracer slice: `design.md` rewrite, token check, Plex fonts, tokens, `Button` and `Card` on one page per app (AC-1 to AC-6, AC-10)
   - [ ] Base components: fields, switch, segmented control, tabs, dialogs, menus, tables, toasts, banners (AC-5, AC-7 to AC-12)
   - [ ] New components and shell: `PageHeader`, `StatCard`, `RoleChip`, `InitialsTile`, `SaveBar` with drafts, sidebar collapse, lint additions (AC-13 to AC-17)
