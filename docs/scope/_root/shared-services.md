@@ -394,7 +394,7 @@ Rewrite the suite `design.md` so screens stop coming out as the default shadcn l
 - Note (2026-11-23, overnight): milestone 1 is built (the fonts are in; you chose to go back to Inter, so AC-3 changes), milestone 2 is built except AC-12's idle banner (waiting on your pick, option B recommended), milestone 3 is half built (web-vrms committed, the portal's new components uncommitted). All on local `feat/design-direction-refresh` branches, nothing pushed.
 - [ ] Build it: `/develop design direction refresh`
   - [x] Standard and tracer slice: `design.md` rewrite, token check, Plex fonts, tokens, `Button` and `Card` on one page per app (AC-1 to AC-6, AC-10)
-  - [ ] Base components: fields, switch, segmented control, tabs, dialogs, menus, tables, toasts, banners (AC-5, AC-7 to AC-12)
+  - [ ] Base components: fields, switch, segmented control, tabs, dialogs, menus, tables, toasts, banners (AC-5, AC-7 to AC-12) (2026-11-23: all built except signing out soon; you picked option B, and the portal gets it too: build step 4a, AC-12, AC-12a, AC-12b, in welinc-auth, web-vrms and the portal)
   - [x] New components and shell: `PageHeader`, `StatCard`, `RoleChip`, `InitialsTile`, `SaveBar` with drafts, sidebar collapse, lint additions (AC-13 to AC-17) (2026-11-23: web-vrms `2fcb5fe`, portal `224cb66`; the old text and shadow sizes only warn until the page sweep, then they become errors; the portal gets `PlateChip` when it first shows a truck)
   - [ ] Page sweep and checks: every page in both apps, contrast, axe, lint, typecheck, builds (AC-18 to AC-21)
 - [ ] Verify it: `/check verify design direction refresh`
