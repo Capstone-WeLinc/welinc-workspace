@@ -65,6 +65,7 @@ Docker Desktop's start and stop buttons do the same once setup has run: start `a
 | `welinc-backend-bms` | BMS | Booking APIs: `bms-gateway` (3020) in front of the booking, dispatch, completion and analytics services (3021 to 3024) | Node.js, NestJS, Prisma, PostgreSQL | 3020 | [link](https://github.com/Capstone-WeLinc/welinc-backend-bms) |
 | `welinc-backend-bms-analytics-ai` | BMS | Booking demand forecast | NestJS, Prisma, PostgreSQL | 3025 | [link](https://github.com/Capstone-WeLinc/welinc-backend-bms-analytics-ai) |
 | `welinc-web-bms` | BMS | Booking web app | React, Vite, Tailwind | 8003 | [link](https://github.com/Capstone-WeLinc/welinc-web-bms) |
+| `welinc-mobile-bms` | BMS | Mobile app for drivers and helpers | Expo, React Native | | [link](https://github.com/Capstone-WeLinc/welinc-mobile-bms) |
 
 Other local ports: auth database 5432, VRMS database 5433, VRMS file storage (Azurite) 10000.
 

@@ -11,7 +11,7 @@ ORG="https://github.com/Capstone-WeLinc"
 SHARED="welinc-auth welinc-web-portal"
 VRMS="welinc-web-vrms welinc-backend-vrms"
 VMMS="welinc-web-vmms welinc-backend-vmms welinc-backend-vmms-analytics-ai welinc-mobile-vrms_vmms"
-BMS="welinc-web-bms welinc-backend-bms welinc-backend-bms-analytics-ai"
+BMS="welinc-web-bms welinc-backend-bms welinc-backend-bms-analytics-ai welinc-mobile-bms"
 
 usage() {
   echo "Usage: sh scripts/clone-all.sh [vrms|vmms|bms]" >&2

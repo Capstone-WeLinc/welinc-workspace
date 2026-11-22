@@ -66,7 +66,7 @@ Once your backend is on staging, the gateway already sets HSTS and `X-Content-Ty
 
 ## Secrets
 
-- **Push protection** is on in all 12 public repos: GitHub refuses a push that contains a known key format and tells you why. If it stops you, remove the secret from the commit; don't click "allow" unless the value is a public test value.
+- **Push protection** is on in all 13 public repos: GitHub refuses a push that contains a known key format and tells you why. If it stops you, remove the secret from the commit; don't click "allow" unless the value is a public test value.
 - **gitleaks (optional):** VRMS runs `.github/workflows/secrets.yml` on every PR (copy it from `welinc-backend-vrms`). It catches more formats than GitHub does, and it keeps working after the repos go private again on Dec 5, when push protection stops.
 - If a real secret ever reaches a commit: rotate it first, then remove it.
 

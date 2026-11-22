@@ -43,7 +43,7 @@ sh scripts/clone-all.sh "$group"
 case "$group" in
   vrms) repos="welinc-auth welinc-web-portal welinc-web-vrms welinc-backend-vrms" ;;
   vmms) repos="welinc-auth welinc-web-portal welinc-web-vmms welinc-backend-vmms welinc-backend-vmms-analytics-ai welinc-mobile-vrms_vmms" ;;
-  bms) repos="welinc-auth welinc-web-portal welinc-web-bms welinc-backend-bms welinc-backend-bms-analytics-ai" ;;
+  bms) repos="welinc-auth welinc-web-portal welinc-web-bms welinc-backend-bms welinc-backend-bms-analytics-ai welinc-mobile-bms" ;;
 esac
 
 step "Environment files"
