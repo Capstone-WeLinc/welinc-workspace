@@ -41,7 +41,7 @@ _These are recommendations to keep the build orderly, not requirements. Skip any
 | S16 | Temporary lockout and a clear deactivated answer | Account | done |
 | S17 | Contract and code agree on errors | Contract | planned |
 | S18 | Design direction refresh | Design | in-progress |
-| S19 | Person page shows only the person's systems | Design | planned |
+| S19 | Person page shows only the person's systems | Design | in-progress |
 | S20 | Permissions page redesign | Design | planned |
 | S21 | Custom roles per system | Configuration | planned |
 
@@ -388,6 +388,7 @@ Rewrite the suite `design.md` so screens stop coming out as the default shadcn l
 - Note (2026-11-18): raised by you: screens look plain, stale and AI made. Before the mock defense (Nov 28) apply the new direction to S19, S20 and the VRMS screens you demo, not to every page. Compare 2 or 3 visual directions before the spec.
 - Spec: [0016](../../specs/_root/0016-design-direction-refresh/index.md)
 - Note (2026-11-18): direction B "Control room" decided over rounds 1 to 11 on the design canvas (IBM Plex, K15 StatCard, 640px save bar, L3 labels, icon collapse kept). Every page of the portal and web-vrms moves to it, but the build waits for your go.
+- Note (2026-11-23): fix in the page sweep: the portal's sign out dialog (`welinc-web-portal/src/pages/launcher/SignOutDialog.tsx`) always says "signed out of VRMS, VMMS and BMS", even for someone in one system. Name only the person's own systems from the launcher's `systems` ("Sign out of WeLinc?", "…of VMMS on this browser"), and a plain "You'll need to sign in again" on the no access page.
 - [x] Design it (spec): `/architect design direction refresh`
 - [ ] Build it: `/develop design direction refresh` (start only when you say go)
   - [ ] Standard and tracer slice: `design.md` rewrite, token check, Plex fonts, tokens, `Button` and `Card` on one page per app (AC-1 to AC-6, AC-10)
@@ -397,14 +398,25 @@ Rewrite the suite `design.md` so screens stop coming out as the default shadcn l
 - [ ] Verify it: `/check verify design direction refresh`
 - [ ] Test it: `/test design direction refresh`
 
-### S19. Person page shows only the person's systems · planned · needs a decision · Beta
-A suite admin opening a person who isn't in the selected system hits a dead end with no name or email. Show the person header in every case, system tabs only for the systems the person is in (none when they are in one), and open on a system they are actually in.
-**Done when:** opening any person from People never shows the "isn't in this system" dead end, a one system person shows no tabs, and welinc-auth tells a suite admin which systems a person is in without guessing one first (an additive contract change).
-- [ ] Design it (spec): `/architect person page systems`
+### S19. Person page shows only the person's systems · in-progress · Beta
+A suite admin, or an admin of two or more systems, opening a person who isn't in the selected system hits a dead end with no name or email. Build the person as the detail pane of the approved People page (spec 0016 board `People8`): the person is shown whole, never "inside one system". The header, facts strip and the Overview, Access, Signed in devices and Activity tabs always show; each system is a row in Access (role, temporary end date, Change role or Give access), so nothing on the page depends on picking a system.
+**Done when:** opening any person from People never shows the "isn't in this system" dead end; Access lists every system the person is in (rows for systems the viewer doesn't admin are read only) and offers Give access for the rest; a person with no role shows the header and "No access to VRMS, VMMS or BMS"; and welinc-auth answers an admin of two or more systems with the person across the systems they admin in one call (an additive contract change; suite admins already get it).
+- Note (2026-11-23, `/architect`): the first draft of this row asked for system tabs. The approved board `People8` (canvas "WeLinc design directions", page "Round 8") replaces them with section tabs and an Access card, and you chose to keep that. Decided so far: covers suite admins and admins of two or more systems (seed `multi.admin@welinc.com`); the additive auth change; a no role person gets the header plus Give access; systems the viewer doesn't admin show read only. Builds on S18's app shell (sidebar, list beside detail). Working notes: `docs/_private/vrms/s19-architect-notes.md`.
+spec [0017](../../specs/_root/0017-person-page-systems/index.md) · code in `welinc-auth/src/auth/` and `welinc-web-portal/src/pages/admin/people/`
+- [x] Design it (spec): `/architect person page systems`
+- [ ] Build it: `/develop person page systems` (the welinc-auth milestone can start now; the portal milestones wait for S18's milestone 3)
+  - [ ] welinc-auth: `last_signed_in_at` with backfill, the `systems` read scope on list, person and activity, the new person fields, `group` with counts, sorts, status lists, role search, contract 0001 amendment and OpenAPI (AC-19 to AC-23)
+  - [ ] Portal tracer: the `People8` page on the S18 shell with the list and the person pane's header, facts and Overview, routes and deep links (AC-1, AC-2, AC-7, AC-9, AC-10)
+  - [ ] Access, Change role and the Add person dialog AA, header actions, ⋮ menu, Sign in card, devices and Activity tabs, conflict handling (AC-8, AC-11 to AC-18)
+  - [ ] Full list pane (groups, sorts, search, filters, chips, states, phones), old pages retired, sweep and board comparison (AC-3 to AC-6, AC-23, AC-24)
+- [ ] Verify it: `/check verify person page systems`
+- [ ] Test it: `/test person page systems`
 
 ### S20. Permissions page redesign · planned · needs a decision · Beta
 Replace the long checkbox grid with a role first view: pick a role, see its permissions in grouped sections with switches and plain descriptions, locks in place. Keep the full grid as a grouped "Compare roles" view, and send changes through a pending changes bar into the existing review dialog.
 **Done when:** an admin can read and change one role's permissions without scanning 27 rows by 3 columns, the compare view still shows every role, and saving still goes through the review step and the matrix history.
+- Note (2026-11-23): already designed in the S18 rounds; `/architect` starts from these boards (canvas "WeLinc design directions", page "Round 8", spec 0016 *Board index*), not new design rounds. `Roles9`: the app shell with a full height role list (title with count, system switch, search, sticky Built in and Custom headings, dashed New role pinned at the bottom, people in words on each row) beside the role, whose tabs are Permissions, People and History; "Add people" on the People tab. `DraftMarks` B: a gold count bubble on a role with unsaved changes. `SaveBar9` and `SaveWidths10`: the 640px navy save bar with the change list. `Picks8`: review, leaving with a draft, the two ways to save. The compare view is out of date: round 6 replaced the grid with "Who can do what" and made the full grid a spreadsheet download, then round 8 **dropped "Who can do what"** (no page, no button on Roles). So the intent's "Compare roles" view and the Done when's "the compare view still shows every role" need settling in `/architect` (the spreadsheet download is the only compare left from the rounds). Also settled: the review dialog is RC (folded groups, who it touches, the activity log note folded behind "Add a note for the activity log", shown on the role's History tab); deleting a role is DB (blocked until no one has it); the role header facts end with "Last changed [date] by …". The Nov 18 picks are in git: `docs/context/vrms/handoff-2026-11-18.md` (commit 33db0d0).
+- Note (2026-11-23, board check): `Roles9` is the final role list (it replaced `Roles8`). Open for this feature's `/architect`, because no board settles them: saving changes made in several roles at once (`Roles9`'s bar says "in 2 roles", but the RC review, the `SaveBar9` change list and the draft toast are drawn for one role); whether the full grid spreadsheet download stays; and permission descriptions and a search inside a role, which the intent above asks for but the final boards dropped without a note.
 - [ ] Design it (spec): `/architect permissions page redesign`
 
 ## Configuration
@@ -413,6 +425,8 @@ Replace the long checkbox grid with a role first view: pick a role, see its perm
 Let a suite admin create, rename, duplicate and delete roles per system instead of the fixed list in each `prisma/catalog/<system>.ts`. Built in roles stay (renamable, never deletable); custom roles start as a copy of one. Behaviour that today keys on a role name (the VRMS mechanic list and audit events) moves to a permission such as "can be assigned tickets".
 **Done when:** a suite admin makes a custom VRMS role in the portal, gives it to a person, and that person's token and permissions follow it; deleting a role that people still hold is refused until they are moved; VMMS and BMS keep working on their built in roles, and contract 0001 gets a version with a Changes line.
 - Note (2026-11-18): your call: as much configurable as makes sense. The R2 mockup (role list with built in and custom sections) is the starting point; the S20 permissions redesign should be built so a longer role list fits.
+- Note (2026-11-23): the role list R2 started became `Roles9` (11 roles so the list scrolls, Built in and Custom sections, dashed New role); the round 6 and 8 boards also settled deleting a role (`Confirm6`: DA to DC, and the rule that an action that would orphan data is blocked with the reason instead of confirmed, spec 0016 *Components*). Start `/architect` from those boards.
+- Note (2026-11-23, board check): open for `/architect`: New role, Duplicate, Rename, Edit description and Add people are drawn as buttons only, with no flow; "Rename" shows on built in roles (the intent says they are renamable) while "Reset to defaults" also shows on custom roles. Deleting is settled (DB).
 - [ ] Design it (spec): `/architect custom roles per system`
 
 ## Why this order

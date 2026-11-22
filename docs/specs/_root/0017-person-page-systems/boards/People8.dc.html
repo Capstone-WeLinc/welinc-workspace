@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>People, round 8</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Inter+Tight:wght@500;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1a1f6e;text-decoration:none}
+button{font:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid #1a1f6e;outline-offset:2px}
+.prow:hover{background:#f6f7fb}
+@keyframes popIn{from{transform:translateY(-4px) scale(.98);opacity:0}to{transform:none;opacity:1}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion: reduce){*{animation-duration:1ms!important;transition-duration:1ms!important}}
+</style>
+</helmet>
+<div style="font-family: Inter, system-ui, sans-serif; color: #0f172a; background: #f3f5f9; min-height: 1100px; display: flex; flex-direction: column">
+  <div style="flex: 1; display: flex; flex-wrap: wrap">
+  <nav aria-label="Suite admin" style="flex: 0 0 248px; background: #0f1445; color: #fff; padding: 12px; box-sizing: border-box; display: flex; flex-direction: column; gap: 2px">
+    <div style="display: flex; align-items: center; gap: 10px; padding: 8px 10px 4px">
+      <span aria-hidden="true" style="width: 32px; height: 32px; border-radius: 8px; background: #e8b800; color: #0f1445; display: flex; align-items: center; justify-content: center; font-family: 'Inter Tight', sans-serif; font-weight: 700">W</span>
+      <span style="font-family: 'Inter Tight', sans-serif; font-weight: 700; font-size: 15px">Suite admin</span>
+    </div>
+    <div aria-hidden="true" style="height: 1px; background: rgba(255,255,255,.12); margin: 12px 2px 8px"></div>
+    <sc-for list="{{nav}}" as="sec" hint-placeholder-count="4">
+      <div style="display: flex; flex-direction: column; gap: 2px">
+        <sc-if value="{{sec.hasLabel}}" hint-placeholder-val="{{true}}"><div style="display: flex; flex-direction: column"><div aria-hidden="true" style="height: 1px; background: rgba(255,255,255,.09); margin: 10px 10px 0"></div><span style="color: rgba(255,255,255,.5); padding: 12px 10px 6px; font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase">{{sec.name}}</span></div></sc-if>
+        <sc-for list="{{sec.items}}" as="it" hint-placeholder-count="3">
+          <a href="#" aria-current="{{it.cur}}" style="display: flex; align-items: center; gap: 12px; padding: 0 10px; height: 38px; border-radius: 8px; font-size: 14px; font-weight: {{it.weight}}; color: {{it.fg}}; background: {{it.bg}}">
+            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" style="opacity: {{it.op}}"><path d="{{it.icon}}"></path></svg><span style="flex: 1">{{it.name}}</span><sc-if value="{{it.hasCount}}" hint-placeholder-val="{{false}}"><span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #0f1445; background: #e8b800; border-radius: 999px; padding: 1px 7px">{{it.count}}</span></sc-if>
+          </a>
+        </sc-for>
+      </div>
+    </sc-for>
+  </nav>
+
+  <section aria-label="People" style="flex: 0 0 360px; background: #fff; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column">
+    <div style="padding: 24px 20px 14px; display: flex; flex-direction: column; gap: 12px">
+      <div style="display: flex; justify-content: space-between; align-items: center">
+        <h1 style="margin: 0; font-family: 'Inter Tight', sans-serif; font-weight: 700; font-size: 24px; letter-spacing: -0.02em">People</h1>
+        <button style="border: 0; background: #1a1f6e; color: #fff; border-radius: 10px; height: 36px; padding: 0 12px; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"></path></svg>Add person</button>
+      </div>
+      <label style="display: flex; align-items: center; gap: 6px; background: #f3f5f9; border-radius: 8px; padding: 0 10px; height: 38px">
+        <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+        <input aria-label="Search people" placeholder="Name, email or role" value="{{q}}" onInput="{{setQ}}" style="border: 0; outline: none; background: transparent; font: inherit; font-size: 14px; min-width: 0; flex: 1">
+      </label>
+      <div role="group" aria-label="System" style="display: grid; grid-template-columns: repeat(4, 1fr); background: #f1f3f8; border-radius: 9px; padding: 3px; gap: 2px">
+        <sc-for list="{{filters}}" as="f" hint-placeholder-count="4">
+          <button aria-pressed="{{f.on}}" onClick="{{f.pick}}" style="border: 0; border-radius: 7px; height: 30px; font-size: 13px; font-weight: 600; background: {{f.bg}}; color: {{f.fg}}; box-shadow: {{f.sh}}; transition: background .15s">{{f.name}}</button>
+        </sc-for>
+      </div>
+    </div>
+    <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 12px 8px 20px; border-top: 1px solid #eef1f6; border-bottom: 1px solid #eef1f6; background: #fafbfd; position: relative">
+      <span style="font-size: 13px; color: #475569"><strong style="color: #0f172a; font-weight: 600">{{count}}</strong> people</span>
+      <button onClick="{{toggleSort}}" aria-expanded="{{sortOpen}}" style="border: 0; background: transparent; height: 32px; padding: 0 8px; font-size: 13px; color: #0f172a; display: flex; align-items: center; gap: 6px; border-radius: 8px"><span style="color: #64748b">Sort:</span><span style="font-weight: 600">{{sortName}}</span><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"></path></svg></button>
+      <sc-if value="{{sortOpen}}" hint-placeholder-val="{{false}}">
+        <div role="menu" style="position: absolute; top: 44px; right: 12px; width: 210px; background: #fff; border-radius: 12px; padding: 6px; box-shadow: 0 0 0 1px rgba(15,20,69,.08), 0 16px 40px rgba(15,20,69,.18); z-index: 6; animation: popIn .14s cubic-bezier(.2,.8,.2,1)">
+          <sc-for list="{{sorts}}" as="o" hint-placeholder-count="3"><button role="menuitemradio" aria-checked="{{o.on}}" onClick="{{o.pick}}" style="width: 100%; border: 0; background: {{o.bg}}; border-radius: 8px; padding: 9px 10px; text-align: left; font-size: 14px; font-weight: {{o.weight}}; display: flex; justify-content: space-between">{{o.name}}<sc-if value="{{o.on}}" hint-placeholder-val="{{false}}"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a1f6e" stroke-width="2.5"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></sc-if></button></sc-for>
+        </div>
+      </sc-if>
+    </div>
+    <div style="flex: 1; overflow: auto">
+      <sc-if value="{{hasAttn}}" hint-placeholder-val="{{true}}">
+        <div>
+          <span style="display: flex; justify-content: space-between; padding: 14px 20px 6px; font-size: 12px; font-weight: 600; color: #b54708">Needs attention <span style="font-family: 'JetBrains Mono', monospace">{{attnN}}</span></span>
+          <ul style="list-style: none; margin: 0; padding: 0">
+            <sc-for list="{{attn}}" as="p" hint-placeholder-count="2">
+              <li>
+                <button class="prow" onClick="{{p.pick}}" aria-current="{{p.active}}" style="width: 100%; border: 0; background: {{p.bg}}; box-shadow: {{p.bar}}; display: flex; align-items: center; gap: 12px; padding: 10px 20px; text-align: left; min-height: 60px">
+                  <span aria-hidden="true" style="width: 36px; height: 36px; border-radius: 999px; background: {{p.avBg}}; color: #1a1f6e; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; flex: none; box-shadow: {{p.avRing}}">{{p.initials}}</span>
+                  <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{p.name}}</span><span style="font-size: 12px; color: {{p.subFg}}">{{p.sub}}</span></span>
+                  <span style="display: flex; gap: 4px"><sc-for list="{{p.systems}}" as="sy" hint-placeholder-count="1"><span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #1a1f6e; background: #eef0f8; border-radius: 4px; padding: 2px 5px">{{sy}}</span></sc-for></span>
+                </button>
+              </li>
+            </sc-for>
+          </ul>
+        </div>
+      </sc-if>
+      <span style="display: flex; justify-content: space-between; padding: 14px 20px 6px; font-size: 12px; font-weight: 600; color: #475569">Active <span style="font-family: 'JetBrains Mono', monospace">{{activeN}}</span></span>
+      <ul style="list-style: none; margin: 0; padding: 0">
+        <sc-for list="{{people}}" as="p" hint-placeholder-count="6">
+          <li>
+            <button class="prow" onClick="{{p.pick}}" aria-current="{{p.active}}" style="width: 100%; border: 0; background: {{p.bg}}; box-shadow: {{p.bar}}; display: flex; align-items: center; gap: 12px; padding: 10px 20px; text-align: left; min-height: 60px">
+              <span aria-hidden="true" style="width: 36px; height: 36px; border-radius: 999px; background: #eef0f8; color: #1a1f6e; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; flex: none">{{p.initials}}</span>
+              <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{p.name}}</span><span style="font-size: 12px; color: #64748b">{{p.sub}}</span></span>
+              <span style="display: flex; gap: 4px"><sc-for list="{{p.systems}}" as="sy" hint-placeholder-count="1"><span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #1a1f6e; background: #eef0f8; border-radius: 4px; padding: 2px 5px">{{sy}}</span></sc-for></span>
+            </button>
+          </li>
+        </sc-for>
+      </ul>
+      <sc-if value="{{none}}" hint-placeholder-val="{{false}}"><p style="margin: 0; padding: 24px 20px; font-size: 14px; color: #64748b">No one matches “{{q}}”.</p></sc-if>
+    </div>
+  </section>
+
+  <section aria-label="Selected person" style="flex: 999 1 520px; min-width: 0; display: flex; flex-direction: column">
+    <div style="background: #fff; border-bottom: 1px solid #e2e8f0; padding: 28px 36px 0; display: flex; flex-direction: column; gap: 20px">
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 18px">
+        <span aria-hidden="true" style="width: 64px; height: 64px; border-radius: 18px; background: #0f1445; color: #fff; display: flex; align-items: center; justify-content: center; font-family: 'Inter Tight', sans-serif; font-weight: 700; font-size: 22px">{{sel.initials}}</span>
+        <div style="flex: 1 1 260px; display: flex; flex-direction: column; gap: 4px; min-width: 0">
+          <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap">
+            <h2 style="margin: 0; font-family: 'Inter Tight', sans-serif; font-weight: 700; font-size: 28px; letter-spacing: -0.025em">{{sel.name}}</h2>
+            <span style="font-size: 12px; font-weight: 600; color: {{sel.stFg}}; background: {{sel.stBg}}; border-radius: 999px; padding: 3px 10px">{{sel.status}}</span>
+          </div>
+          <span style="font-size: 15px; color: #475569">{{sel.roleLine}}</span>
+        </div>
+        <div style="display: flex; gap: 8px">
+          <sc-if value="{{sel.isPending}}" hint-placeholder-val="{{false}}"><button style="border: 0; background: #1a1f6e; color: #fff; border-radius: 10px; height: 40px; padding: 0 14px; font-size: 14px; font-weight: 600">Resend invite</button></sc-if>
+          <sc-if value="{{sel.isLocked}}" hint-placeholder-val="{{false}}"><button style="border: 0; background: #1a1f6e; color: #fff; border-radius: 10px; height: 40px; padding: 0 14px; font-size: 14px; font-weight: 600">Unlock account</button></sc-if>
+          <button style="border: 0; background: #fff; border-radius: 10px; height: 40px; padding: 0 14px; font-size: 14px; font-weight: 500; box-shadow: 0 0 0 1px rgba(15,20,69,.14)">Edit details</button>
+          <button aria-label="More account actions" style="border: 0; background: #fff; border-radius: 10px; width: 40px; height: 40px; box-shadow: 0 0 0 1px rgba(15,20,69,.14); display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="#334155"><circle cx="12" cy="5" r="1.8"></circle><circle cx="12" cy="12" r="1.8"></circle><circle cx="12" cy="19" r="1.8"></circle></svg></button>
+        </div>
+      </div>
+      <dl style="margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); background: #f8f9fc; border-radius: 12px; box-shadow: inset 0 0 0 1px #eef1f6">
+        <div style="padding: 12px 16px; display: flex; flex-direction: column; gap: 3px; border-right: 1px solid #eef1f6"><dt style="font-size: 12px; color: #64748b">Email</dt><dd style="margin: 0; font-size: 14px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">{{sel.email}}</dd></div>
+        <div style="padding: 12px 16px; display: flex; flex-direction: column; gap: 3px; border-right: 1px solid #eef1f6"><dt style="font-size: 12px; color: #64748b">Last signed in</dt><dd style="margin: 0; font-size: 14px; font-weight: 500">{{sel.seen}}</dd></div>
+        <div style="padding: 12px 16px; display: flex; flex-direction: column; gap: 3px; border-right: 1px solid #eef1f6"><dt style="font-size: 12px; color: #64748b">Account made</dt><dd style="margin: 0; font-size: 14px; font-weight: 500">[date]</dd></div>
+        <div style="padding: 12px 16px; display: flex; flex-direction: column; gap: 3px"><dt style="font-size: 12px; color: #64748b">Added by</dt><dd style="margin: 0; font-size: 14px; font-weight: 500">{{sel.addedBy}}</dd></div>
+      </dl>
+      <div role="tablist" aria-label="Person sections" style="display: flex; gap: 4px">
+        <sc-for list="{{tabs}}" as="t" hint-placeholder-count="4">
+          <button role="tab" aria-selected="{{t.active}}" onClick="{{t.pick}}" style="border: 0; background: transparent; padding: 12px 12px; font-size: 14px; font-weight: {{t.weight}}; color: {{t.fg}}; box-shadow: {{t.bar}}; min-height: 44px">{{t.name}}</button>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="padding: 24px 36px 40px; display: flex; flex-direction: column; gap: 16px">
+      <sc-if value="{{isOverview}}" hint-placeholder-val="{{true}}">
+        <div style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; align-items: start; animation: fadeIn .15s ease-out">
+          <div style="display: flex; flex-direction: column; gap: 16px">
+            <section style="background: #fff; border-radius: 14px; box-shadow: 0 0 0 1px rgba(15,20,69,.07), 0 1px 3px rgba(15,20,69,.06); overflow: hidden">
+              <header style="display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; border-bottom: 1px solid #eef1f6"><h3 style="margin: 0; font-family: 'Inter Tight', sans-serif; font-size: 16px; font-weight: 600">Access</h3><button onClick="{{goAccess}}" style="border: 0; background: transparent; color: #1a1f6e; font-size: 13px; font-weight: 600; height: 32px">Change</button></header>
+              <sc-for list="{{sel.access}}" as="a" hint-placeholder-count="2">
+                <div style="display: flex; align-items: center; gap: 14px; padding: 12px 20px; border-bottom: 1px solid #f3f5f9">
+                  <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #1a1f6e; background: #eef0f8; border-radius: 6px; padding: 3px 7px; width: 40px; text-align: center">{{a.code}}</span>
+                  <span style="flex: 1; font-size: 14px; font-weight: 600">{{a.role}}</span>
+                  <sc-if value="{{a.temp}}" hint-placeholder-val="{{false}}"><span title="Temporary access ends by itself" style="font-size: 12px; font-weight: 500; color: #93370d; background: #fffaeb; border-radius: 999px; padding: 2px 8px; display: flex; align-items: center; gap: 5px"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M10 2h4M12 14l3-3M12 22a8 8 0 1 0 0-16 8 8 0 0 0 0 16z"></path></svg>Until [date]</span></sc-if>
+                </div>
+              </sc-for>
+              <sc-if value="{{sel.hasNoAccess}}" hint-placeholder-val="{{true}}"><p style="margin: 0; padding: 10px 20px 12px; font-size: 13px; color: #64748b">No access to {{sel.noAccess}}.</p></sc-if>
+            </section>
+            <section style="background: #fff; border-radius: 14px; box-shadow: 0 0 0 1px rgba(15,20,69,.07), 0 1px 3px rgba(15,20,69,.06); overflow: hidden">
+              <header style="display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; border-bottom: 1px solid #eef1f6"><h3 style="margin: 0; font-family: 'Inter Tight', sans-serif; font-size: 16px; font-weight: 600">Sign in</h3><button onClick="{{goDevices}}" style="border: 0; background: transparent; color: #1a1f6e; font-size: 13px; font-weight: 600; height: 32px">{{sel.signAction}}</button></header>
+              <sc-for list="{{sel.signin}}" as="r" hint-placeholder-count="3">
+                <div style="display: flex; align-items: center; gap: 12px; padding: 11px 20px; border-bottom: 1px solid #f3f5f9">
+                  <span aria-hidden="true" style="flex: none; width: 24px; height: 24px; border-radius: 999px; background: {{r.bg}}; color: {{r.fg}}; display: flex; align-items: center; justify-content: center"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="{{r.glyph}}"></path></svg></span>
+                  <span style="flex: 1; font-size: 14px; color: #475569">{{r.label}}</span>
+                  <span style="font-size: 14px; font-weight: 600; color: {{r.valFg}}">{{r.value}}</span>
+                </div>
+              </sc-for>
+            </section>
+          </div>
+          <section style="background: #fff; border-radius: 14px; box-shadow: 0 0 0 1px rgba(15,20,69,.07), 0 1px 3px rgba(15,20,69,.06); padding: 14px 20px 6px">
+            <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px"><h3 style="margin: 0; font-family: 'Inter Tight', sans-serif; font-size: 16px; font-weight: 600">Recent activity</h3><button style="border: 0; background: transparent; color: #1a1f6e; font-size: 13px; font-weight: 600; height: 32px">See all</button></header>
+            <ol style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column">
+              <sc-for list="{{activity}}" as="e" hint-placeholder-count="3">
+                <li style="display: grid; grid-template-columns: 18px 1fr; gap: 10px; padding-bottom: 14px">
+                  <span aria-hidden="true" style="width: 8px; height: 8px; border-radius: 999px; background: #fff; box-shadow: 0 0 0 2px #1a1f6e; margin: 6px 5px 0"></span>
+                  <span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 14px">{{e.what}}</span><span style="font-size: 12px; color: #64748b">{{e.when}}</span></span>
+                </li>
+              </sc-for>
+            </ol>
+          </section>
+        </div>
+      </sc-if>
+      <sc-if value="{{isOther}}" hint-placeholder-val="{{false}}">
+        <section style="background: #fff; border-radius: 14px; box-shadow: 0 0 0 1px rgba(15,20,69,.07); padding: 40px 20px; text-align: center; font-size: 14px; color: #475569; animation: fadeIn .15s ease-out">{{otherTitle}}: today's cards, moved into this tab.</section>
+      </sc-if>
+    </div>
+  </section>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1100}}'>
+const I = {
+  dash: 'M3 3h7v9H3zM14 3h7v5h-7zM14 12h7v9h-7zM3 16h7v5H3z',
+  users: 'M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM2 21c0-4 3-6 7-6s7 2 7 6M17 11a3 3 0 1 0 0-6M22 21c0-3-2-5-5-5.5',
+  userx: 'M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM2 21c0-4 3-6 7-6 1.5 0 2.8.3 4 .8M17 15l5 5M22 15l-5 5',
+  shieldCheck: 'M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6zM9 12l2 2 4-4',
+  idcard: 'M3 5h18v14H3zM8 11a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM5 16c.5-1.7 1.6-2.5 3-2.5s2.5.8 3 2.5M14 9h4M14 13h4',
+  timer: 'M10 2h4M12 14l3-3M12 22a8 8 0 1 0 0-16 8 8 0 0 0 0 16z',
+  activity: 'M22 12h-4l-3 9L9 3l-3 9H2'
+};
+const NAV = [
+  { name: '', items: [['Overview', I.dash, '']] },
+  { name: 'Accounts', items: [['People', I.users, ''], ['Deletion requests', I.userx, '1'], ['Suite admins', I.shieldCheck, '']] },
+  { name: 'Access', items: [['Roles', I.idcard, ''], ['Temporary access', I.timer, '']] },
+  { name: 'Audit', items: [['Activity', I.activity, '']] }
+];
+const WORDS = [
+  { name: 'Pending', tag: 'Pending', sub: 'Invite sent, not set up yet', activity: 'Invited to VRMS as Mechanic by Victor Ramos' },
+  { name: 'Not set up', tag: 'Not set up', sub: 'Hasn’t set a password yet', activity: 'Added to VRMS as Mechanic by Victor Ramos' },
+  { name: 'Invited', tag: 'Invited', sub: 'Invite not accepted yet', activity: 'Invited to VRMS as Mechanic by Victor Ramos' }
+];
+const PEOPLE = [
+  { name: 'Joel Manalo', email: 'sample.invite@welinc.app', sys: ['VRMS'], role: 'Mechanic', status: 'Pending', seen: '', seenN: 999, added: 9 },
+  { name: 'Clara Reyes', email: 'bms.cs@welinc.com', sys: ['BMS'], role: 'Customer support', status: 'Locked', seen: '3 days ago', seenN: 72, added: 5 },
+  { name: 'Victor Ramos', email: 'vrms.admin@welinc.com', sys: ['VRMS', 'BMS'], role: 'Admin', role2: 'Admin', status: 'Active', seen: 'Just now', seenN: 0, added: 8, temp: 'BMS' },
+  { name: 'Ramon Villanueva', email: 'vrms.chief@welinc.com', sys: ['VRMS'], role: 'Chief mechanic', status: 'Active', seen: '2 hours ago', seenN: 2, added: 6 },
+  { name: 'Alfredo Bautista', email: 'vrms.chief2@welinc.com', sys: ['VRMS'], role: 'Chief mechanic', status: 'Active', seen: 'Yesterday', seenN: 24, added: 2 },
+  { name: 'Valerio Mercado', email: 'vmms.admin@welinc.com', sys: ['VMMS'], role: 'Admin', status: 'Active', seen: '5 hours ago', seenN: 5, added: 7 },
+  { name: 'Oscar Ramos', email: 'vmms.ops@welinc.com', sys: ['VMMS'], role: 'Operations', status: 'Active', seen: '2 days ago', seenN: 48, added: 3 },
+  { name: 'Bernardo Mendoza', email: 'bms.admin@welinc.com', sys: ['BMS'], role: 'Admin', status: 'Active', seen: 'Last week', seenN: 170, added: 4 }
+];
+const SORTS = ['Name, A to Z', 'Last signed in', 'Newest first'];
+const OK = 'M5 12.5l4.5 4.5L19 7.5', NO = 'M7 7l10 10M17 7 7 17', DOT = 'M12 8v5M12 16.5v.01';
+class Component extends DCLogic {
+  renderVals() {
+    const s = this.state || {};
+    const W = WORDS[0];
+    const filter = s.filter || 'All';
+    const selEmail = s.sel || 'vrms.admin@welinc.com';
+    const tab = s.tab || 'Overview';
+    const q = s.q || '';
+    const sort = s.sort || SORTS[0];
+    const ST = { Active: ['Active', '#067647', '#ecfdf3'], Pending: [W.tag, '#1a1f6e', '#eef0f8'], Locked: ['Locked', '#b42318', '#fef3f2'] };
+    const initials = (n) => n.split(' ').map((w) => w[0]).slice(0, 2).join('');
+    const nav = NAV.map((sec) => ({ name: sec.name, hasLabel: !!sec.name, items: sec.items.map((it) => { const on = it[0] === 'People'; return { name: it[0], icon: it[1], count: it[2], hasCount: !!it[2], cur: on ? 'page' : 'false', weight: on ? '600' : '500', fg: on ? '#fff' : 'rgba(255,255,255,.78)', bg: on ? 'rgba(255,255,255,.13)' : 'transparent', op: on ? '1' : '.7' }; }) }));
+    const filters = ['All', 'VRMS', 'VMMS', 'BMS'].map((n) => { const on = n === filter; return { name: n, on, bg: on ? '#fff' : 'transparent', fg: on ? '#0f172a' : '#475569', sh: on ? '0 1px 2px rgba(15,20,69,.15)' : 'none', pick: () => this.setState({ filter: n }) }; });
+    let match = PEOPLE.filter((p) => (filter === 'All' || p.sys.indexOf(filter) >= 0) && (!q || (p.name + ' ' + p.email + ' ' + p.role).toLowerCase().indexOf(q.toLowerCase()) >= 0));
+    if (sort === SORTS[0]) match = match.slice().sort((a, b) => a.name.localeCompare(b.name));
+    if (sort === SORTS[1]) match = match.slice().sort((a, b) => a.seenN - b.seenN);
+    if (sort === SORTS[2]) match = match.slice().sort((a, b) => b.added - a.added);
+    const row = (p) => {
+      const active = p.email === selEmail;
+      const odd = p.status !== 'Active';
+      const sub = p.status === 'Pending' ? W.sub : p.status === 'Locked' ? 'Locked after 5 wrong passwords' : (sort === SORTS[1] ? 'Signed in ' + p.seen.toLowerCase() : sort === SORTS[2] ? 'Added [date]' : p.role);
+      return { name: p.name, systems: p.sys, initials: initials(p.name), active: active ? 'true' : 'false', sub, subFg: odd ? ST[p.status][1] : '#64748b', avBg: p.status === 'Pending' ? '#fff' : '#eef0f8', avRing: p.status === 'Pending' ? 'inset 0 0 0 1.5px #94a3b8' : 'none', bg: active ? '#eef0f8' : '#fff', bar: active ? 'inset 3px 0 0 #1a1f6e' : 'none', pick: () => this.setState({ sel: p.email, tab: 'Overview' }) };
+    };
+    const attn = match.filter((p) => p.status !== 'Active').map(row);
+    const people = match.filter((p) => p.status === 'Active').map(row);
+    const P = PEOPLE.find((p) => p.email === selEmail) || PEOPLE[2];
+    const access = P.sys.map((code, i) => ({ code, role: i === 0 ? P.role : (P.role2 || 'Admin'), temp: P.temp === code }));
+    const missing = ['VRMS', 'VMMS', 'BMS'].filter((c) => P.sys.indexOf(c) < 0);
+    const pend = P.status === 'Pending', lock = P.status === 'Locked';
+    const signin = pend ? [
+      { label: 'Password', value: 'Not set yet', glyph: DOT, bg: '#fffaeb', fg: '#93370d', valFg: '#93370d' },
+      { label: 'Email', value: 'Not verified', glyph: DOT, bg: '#fffaeb', fg: '#93370d', valFg: '#93370d' },
+      { label: 'Invite link', value: 'Ends [date]', glyph: DOT, bg: '#f1f5f9', fg: '#475569', valFg: '#0f172a' }
+    ] : [
+      { label: 'Password', value: lock ? 'Locked' : 'Set', glyph: lock ? NO : OK, bg: lock ? '#fef3f2' : '#ecfdf3', fg: lock ? '#b42318' : '#067647', valFg: lock ? '#b42318' : '#0f172a' },
+      { label: 'Email', value: 'Verified', glyph: OK, bg: '#ecfdf3', fg: '#067647', valFg: '#0f172a' },
+      { label: 'Signed in devices', value: lock ? 'None' : '2', glyph: OK, bg: '#f1f5f9', fg: '#475569', valFg: '#0f172a' },
+      { label: 'Wrong passwords, last 30 days', value: lock ? '5' : '0', glyph: lock ? NO : OK, bg: lock ? '#fef3f2' : '#f1f5f9', fg: lock ? '#b42318' : '#475569', valFg: lock ? '#b42318' : '#0f172a' }
+    ];
+    const tabs = ['Overview', 'Access', 'Signed in devices', 'Activity'].map((n) => { const active = n === tab; return { name: n, active, weight: active ? '600' : '500', fg: active ? '#0f172a' : '#475569', bar: active ? 'inset 0 -2px 0 #1a1f6e' : 'none', pick: () => this.setState({ tab: n }) }; });
+    const st = ST[P.status];
+    return {
+      nav, filters, attn, people, hasAttn: attn.length > 0, attnN: String(attn.length), activeN: String(people.length), none: match.length === 0,
+      count: String(match.length), q, setQ: (e) => this.setState({ q: e.target.value }),
+      sortOpen: !!s.sortOpen, toggleSort: () => this.setState({ sortOpen: !s.sortOpen }), sortName: sort,
+      sorts: SORTS.map((n) => ({ name: n, on: n === sort, weight: n === sort ? '600' : '400', bg: n === sort ? '#eef0f8' : 'transparent', pick: () => this.setState({ sort: n, sortOpen: false }) })),
+      tabs, isOverview: tab === 'Overview', isOther: tab !== 'Overview', otherTitle: tab,
+      goAccess: () => this.setState({ tab: 'Access' }), goDevices: () => this.setState({ tab: pend ? 'Overview' : 'Signed in devices' }),
+      activity: pend ? [{ what: W.activity, when: '[date and time]' }] : [
+        { what: 'Signed in on a new phone', when: '[date and time]' },
+        { what: 'Verified ticket [ticket no.]', when: '[date and time]' },
+        { what: 'Role changed to ' + P.role + ' by Victor Ramos', when: '[date and time]' }
+      ],
+      sel: {
+        name: P.name, email: P.email, initials: initials(P.name), access, status: st[0], stFg: st[1], stBg: st[2],
+        hasNoAccess: missing.length > 0, noAccess: missing.join(' or '),
+        roleLine: P.role + ' in ' + P.sys[0] + (P.sys.length > 1 ? ', plus ' + (P.sys.length - 1) + ' more system' : ''),
+        isPending: pend, isLocked: lock, signin, signAction: pend ? 'Resend invite' : 'See devices',
+        seen: pend ? 'Never' : P.seen, addedBy: pend ? 'Victor Ramos' : 'Seed data'
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

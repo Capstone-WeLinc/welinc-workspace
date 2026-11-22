@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>People, list and tabs</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Inter+Tight:wght@500;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1a1f6e}a:hover{color:#151b4f}
+button{font:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid #1a1f6e;outline-offset:2px}
+</style>
+</helmet>
+<div style="font-family: Inter, system-ui, sans-serif; color: #0f172a; background: #f3f5f9; min-height: 1100px; display: flex; flex-wrap: wrap">
+  <nav aria-label="Admin" style="flex: 0 0 72px; background: #0f1445; padding: 16px 0; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; gap: 8px">
+    <span aria-hidden="true" style="width: 36px; height: 36px; border-radius: 10px; background: #e8b800; color: #0f1445; display: flex; align-items: center; justify-content: center; font-family: 'Inter Tight', sans-serif; font-weight: 700; margin-bottom: 16px">W</span>
+    <a href="#" aria-label="Overview" style="width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,.75)"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"></rect><rect x="14" y="3" width="7" height="5" rx="1.5"></rect><rect x="14" y="12" width="7" height="9" rx="1.5"></rect><rect x="3" y="16" width="7" height="5" rx="1.5"></rect></svg></a>
+    <a href="#" aria-label="People" aria-current="page" style="width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #fff; background: rgba(255,255,255,.12)"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="4"></circle><path d="M2 21c0-4 3-6 7-6s7 2 7 6"></path></svg></a>
+    <a href="#" aria-label="Roles and permissions" style="width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,.75)"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"></path></svg></a>
+  </nav>
+
+  <section aria-label="People" style="flex: 1 1 320px; max-width: 380px; background: #fff; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column">
+    <div style="padding: 20px 20px 12px; display: flex; flex-direction: column; gap: 12px; border-bottom: 1px solid #eef1f6">
+      <div style="display: flex; justify-content: space-between; align-items: center">
+        <h1 style="margin: 0; font-family: 'Inter Tight', sans-serif; font-weight: 700; font-size: 24px; letter-spacing: -0.02em">People</h1>
+        <button style="border: 0; background: #1a1f6e; color: #fff; border-radius: 10px; height: 36px; padding: 0 12px; font-size: 13px; font-weight: 500">Add person</button>
+      </div>
+      <label style="display: flex; align-items: center; gap: 6px; background: #f3f5f9; border-radius: 8px; padding: 0 10px; height: 38px">
+        <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+        <input aria-label="Search people" placeholder="Search by name or email" style="border: 0; outline: none; background: transparent; font: inherit; font-size: 14px; min-width: 0; flex: 1">
+      </label>
+      <div role="group" aria-label="System filter" style="display: flex; gap: 6px">
+        <sc-for list="{{filters}}" as="f" hint-placeholder-count="4">
+          <button aria-pressed="{{f.on}}" onClick="{{f.pick}}" style="border: 0; border-radius: 999px; height: 30px; padding: 0 12px; font-size: 12px; font-weight: 600; background: {{f.bg}}; color: {{f.fg}}">{{f.name}}</button>
+        </sc-for>
+      </div>
+    </div>
+    <ul style="list-style: none; margin: 0; padding: 0">
+      <sc-for list="{{people}}" as="p" hint-placeholder-count="7">
+        <li>
+          <button onClick="{{p.pick}}" aria-current="{{p.active}}" style="width: 100%; border: 0; border-bottom: 1px solid #f0f2f7; background: {{p.bg}}; box-shadow: {{p.bar}}; display: flex; align-items: center; gap: 12px; padding: 12px 20px; text-align: left; min-height: 60px">
+            <span aria-hidden="true" style="width: 36px; height: 36px; border-radius: 999px; background: #eef0f8; color: #1a1f6e; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; flex: none">{{p.initials}}</span>
+            <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+              <span style="font-size: 14px; font-weight: 600">{{p.name}}</span>
+              <span style="font-size: 12px; color: #64748b">{{p.role}}</span>
+            </span>
+            <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #1a1f6e; background: #eef0f8; border-radius: 5px; padding: 3px 6px">{{p.system}}</span>
+          </button>
+        </li>
+      </sc-for>
+    </ul>
+  </section>
+
+  <section aria-label="Selected person" style="flex: 999 1 520px; min-width: 0; display: flex; flex-direction: column">
+    <div style="background: #fff; border-bottom: 1px solid #e2e8f0; padding: 24px 32px 0; display: flex; flex-direction: column; gap: 18px">
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 18px">
+        <span aria-hidden="true" style="width: 60px; height: 60px; border-radius: 16px; background: #0f1445; color: #e8b800; display: flex; align-items: center; justify-content: center; font-family: 'Inter Tight', sans-serif; font-weight: 700; font-size: 21px">{{sel.initials}}</span>
+        <div style="flex: 1 1 240px; display: flex; flex-direction: column; gap: 4px; min-width: 0">
+          <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap">
+            <h2 style="margin: 0; font-family: 'Inter Tight', sans-serif; font-weight: 700; font-size: 24px; letter-spacing: -0.02em">{{sel.name}}</h2>
+            <span style="font-size: 12px; font-weight: 500; color: #065f46; background: #d1fae5; border-radius: 999px; padding: 3px 10px">Active</span>
+          </div>
+          <span style="font-size: 14px; color: #475569">{{sel.email}}</span>
+        </div>
+        <div style="display: flex; gap: 8px">
+          <button style="border: 0; background: #1a1f6e; color: #fff; border-radius: 10px; height: 40px; padding: 0 14px; font-size: 14px; font-weight: 500">Edit details</button>
+          <button aria-label="More account actions" style="border: 0; background: #fff; border-radius: 10px; width: 40px; height: 40px; box-shadow: 0 0 0 1px rgba(15,20,69,.14); display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="#334155"><circle cx="12" cy="5" r="1.8"></circle><circle cx="12" cy="12" r="1.8"></circle><circle cx="12" cy="19" r="1.8"></circle></svg></button>
+        </div>
+      </div>
+      <div role="tablist" aria-label="Person sections" style="display: flex; gap: 4px">
+        <sc-for list="{{tabs}}" as="t" hint-placeholder-count="4">
+          <button role="tab" aria-selected="{{t.active}}" onClick="{{t.pick}}" style="border: 0; background: transparent; padding: 12px 14px; font-size: 14px; font-weight: {{t.weight}}; color: {{t.fg}}; box-shadow: {{t.bar}}; min-height: 44px">{{t.name}}</button>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="padding: 24px 32px; display: flex; flex-direction: column; gap: 16px">
+      <sc-if value="{{isAccess}}" hint-placeholder-val="{{true}}">
+        <section style="background: #fff; border-radius: 14px; box-shadow: 0 0 0 1px rgba(15,20,69,.07), 0 1px 3px rgba(15,20,69,.06); overflow: hidden">
+          <sc-for list="{{sel.access}}" as="a" hint-placeholder-count="3">
+            <div style="display: flex; align-items: center; gap: 16px; padding: 16px 20px; border-bottom: 1px solid #f0f2f7">
+              <span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: {{a.codeFg}}; background: {{a.codeBg}}; border-radius: 6px; padding: 4px 8px; width: 44px; text-align: center">{{a.code}}</span>
+              <span style="flex: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 14px; font-weight: {{a.weight}}; color: {{a.fg}}">{{a.role}}</span><span style="font-size: 12px; color: #64748b">{{a.note}}</span></span>
+              <button style="border: {{a.btnBorder}}; background: #fff; color: #1a1f6e; border-radius: 8px; height: 36px; padding: 0 12px; font-size: 13px; font-weight: 600">{{a.action}}</button>
+            </div>
+          </sc-for>
+        </section>
+      </sc-if>
+      <sc-if value="{{isOverview}}" hint-placeholder-val="{{false}}">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px">
+          <section style="background: #fff; border-radius: 14px; box-shadow: 0 0 0 1px rgba(15,20,69,.07); padding: 18px 20px; display: flex; flex-direction: column; gap: 6px"><span style="font-size: 12px; color: #64748b">SIGN IN</span><span style="font-size: 15px; font-weight: 600">Password set, email verified</span></section>
+          <section style="background: #fff; border-radius: 14px; box-shadow: 0 0 0 1px rgba(15,20,69,.07); padding: 18px 20px; display: flex; flex-direction: column; gap: 6px"><span style="font-size: 12px; color: #64748b">LAST SIGN IN</span><span style="font-size: 15px; font-weight: 600">[date and time]</span></section>
+        </div>
+      </sc-if>
+      <sc-if value="{{isOther}}" hint-placeholder-val="{{false}}">
+        <section style="background: #fff; border-radius: 14px; box-shadow: 0 0 0 1px rgba(15,20,69,.07); padding: 40px 20px; text-align: center; font-size: 14px; color: #475569">{{otherTitle}}: today's cards, moved into this tab.</section>
+      </sc-if>
+      <p style="margin: 0; font-size: 13px; color: #64748b">The list stays on the left on laptops. On a phone the list is its own screen and a person opens full screen with a back link, same tabs.</p>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1100}}'>
+const PEOPLE = [
+  { name: 'Victor Ramos', email: 'vrms.admin@welinc.com', sys: 'VRMS', role: 'Admin' },
+  { name: 'Ramon Villanueva', email: 'vrms.chief@welinc.com', sys: 'VRMS', role: 'Chief mechanic' },
+  { name: 'Alfredo Bautista', email: 'vrms.chief2@welinc.com', sys: 'VRMS', role: 'Chief mechanic' },
+  { name: 'Valerio Mercado', email: 'vmms.admin@welinc.com', sys: 'VMMS', role: 'Admin' },
+  { name: 'Oscar Ramos', email: 'vmms.ops@welinc.com', sys: 'VMMS', role: 'Operations' },
+  { name: 'Bernardo Mendoza', email: 'bms.admin@welinc.com', sys: 'BMS', role: 'Admin' },
+  { name: 'Clara Reyes', email: 'bms.cs@welinc.com', sys: 'BMS', role: 'Customer support' }
+];
+const SYS = ['VRMS', 'VMMS', 'BMS'];
+class Component extends DCLogic {
+  renderVals() {
+    const s = this.state || {};
+    const filter = s.filter || 'All';
+    const selEmail = s.sel || 'vrms.chief@welinc.com';
+    const tab = s.tab || 'Access';
+    const initials = (n) => n.split(' ').map((w) => w[0]).slice(0, 2).join('');
+    const filters = ['All'].concat(SYS).map((n) => { const on = n === filter; return { name: n, on, bg: on ? '#0f1445' : '#f1f5f9', fg: on ? '#fff' : '#334155', pick: () => this.setState({ filter: n }) }; });
+    const people = PEOPLE.filter((p) => filter === 'All' || p.sys === filter).map((p) => {
+      const active = p.email === selEmail;
+      return { name: p.name, role: p.role, system: p.sys, initials: initials(p.name), active, bg: active ? '#eef0f8' : '#fff', bar: active ? 'inset 3px 0 0 #1a1f6e' : 'none', pick: () => this.setState({ sel: p.email }) };
+    });
+    const P = PEOPLE.find((p) => p.email === selEmail) || PEOPLE[1];
+    const access = SYS.map((code) => {
+      const has = code === P.sys;
+      return { code, role: has ? P.role : 'No access', note: has ? 'Permanent' : 'Not in ' + code, weight: has ? '600' : '400', fg: has ? '#0f172a' : '#64748b', codeFg: has ? '#1a1f6e' : '#64748b', codeBg: has ? '#eef0f8' : '#f1f5f9', action: has ? 'Change role' : 'Give access', btnBorder: has ? '1px solid #cbd5e1' : '1px dashed #94a3b8' };
+    });
+    const tabs = ['Overview', 'Access', 'Signed in devices', 'Activity'].map((n) => {
+      const active = n === tab;
+      return { name: n, active, weight: active ? '600' : '500', fg: active ? '#0f172a' : '#475569', bar: active ? 'inset 0 -2px 0 #1a1f6e' : 'none', pick: () => this.setState({ tab: n }) };
+    });
+    return {
+      filters, people, tabs,
+      isAccess: tab === 'Access', isOverview: tab === 'Overview', isOther: tab === 'Signed in devices' || tab === 'Activity', otherTitle: tab,
+      sel: { name: P.name, email: P.email, initials: initials(P.name), access }
+    };
+  }
+}
+</script>
+</body>
+</html>

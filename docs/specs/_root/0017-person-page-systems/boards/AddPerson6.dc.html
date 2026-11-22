@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Add a person options</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Inter+Tight:wght@500;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1a1f6e}
+button{font:inherit;cursor:pointer}
+input{font:inherit}
+input:focus{outline:none;border-color:#1a1f6e!important;box-shadow:inset 0 0 0 1px #1a1f6e}
+button:focus-visible{outline:2px solid #1a1f6e;outline-offset:2px}
+@keyframes stepIn{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:none}}
+@keyframes foldIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion: reduce){*{animation-duration:1ms!important;transition-duration:1ms!important}}
+</style>
+</helmet>
+<div style="width: 1440px; height: 1100px; box-sizing: border-box; padding: 32px 40px; font-family: Inter, system-ui, sans-serif; color: #0f172a; background: #4a5070; display: flex; flex-direction: column; gap: 18px">
+  <div style="display: flex; justify-content: space-between; align-items: baseline; color: #fff">
+    <h1 style="margin: 0; font-family: 'Inter Tight', sans-serif; font-weight: 700; font-size: 28px; letter-spacing: -0.02em">Add a person: three ways</h1>
+    <span style="font-size: 13px; color: rgba(255,255,255,.8)">Same fields: name, work email, which systems and roles, an end date if it's temporary.</span>
+  </div>
+  <div style="display: grid; grid-template-columns: 1fr 1.05fr 0.95fr; gap: 24px; flex: 1; min-height: 0; align-items: start">
+
+    <div style="display: flex; flex-direction: column; gap: 10px">
+      <span style="font-size: 13px; font-weight: 600; color: #fff">AA · A dialog in three steps</span>
+      <div role="dialog" aria-label="Add a person, option A" style="background: #fff; border-radius: 16px; box-shadow: 0 24px 64px rgba(11,16,56,.35); display: flex; flex-direction: column">
+        <div style="padding: 22px 22px 14px; display: flex; flex-direction: column; gap: 14px">
+          <h2 style="margin: 0; font-family: 'Inter Tight', sans-serif; font-size: 21px; font-weight: 700; letter-spacing: -0.02em">Add a person</h2>
+          <ol style="list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px">
+            <sc-for list="{{steps}}" as="st" hint-placeholder-count="3">
+              <li style="display: flex; flex-direction: column; gap: 6px"><span style="height: 4px; border-radius: 999px; background: {{st.bar}}; transition: background .2s"></span><span style="font-size: 12px; font-weight: {{st.weight}}; color: {{st.fg}}">{{st.name}}</span></li>
+            </sc-for>
+          </ol>
+        </div>
+        <div style="padding: 6px 22px 10px; min-height: 280px">
+          <sc-if value="{{s1}}" hint-placeholder-val="{{true}}">
+            <div style="display: flex; flex-direction: column; gap: 16px; animation: stepIn .18s cubic-bezier(.2,.8,.2,1)">
+              <label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600">Full name<input value="Joel Manalo" style="height: 44px; border-radius: 10px; border: 1px solid #94a3b8; padding: 0 12px; font-size: 14px; font-weight: 400"></label>
+              <label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600">Work email<input value="joel.manalo@welinc.app" style="height: 44px; border-radius: 10px; border: 1px solid #94a3b8; padding: 0 12px; font-size: 14px; font-weight: 400"><span style="font-size: 13px; font-weight: 400; color: #64748b">Their sign in name. We check it isn't taken.</span></label>
+            </div>
+          </sc-if>
+          <sc-if value="{{s2}}" hint-placeholder-val="{{false}}">
+            <div style="display: flex; flex-direction: column; gap: 10px; animation: stepIn .18s cubic-bezier(.2,.8,.2,1)">
+              <span style="font-size: 14px; font-weight: 600">Where can they sign in?</span>
+              <sc-for list="{{sysA}}" as="y" hint-placeholder-count="3">
+                <div style="border-radius: 12px; box-shadow: {{y.ring}}; background: {{y.bg}}; transition: background .15s">
+                  <button role="checkbox" aria-checked="{{y.on}}" onClick="{{y.toggle}}" style="width: 100%; border: 0; background: transparent; padding: 12px 14px; display: flex; align-items: center; gap: 12px; text-align: left">
+                    <span aria-hidden="true" style="width: 20px; height: 20px; border-radius: 6px; box-shadow: {{y.boxRing}}; background: {{y.boxBg}}; display: flex; align-items: center; justify-content: center; color: #fff"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" style="opacity: {{y.op}}"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span>
+                    <span style="flex: 1; display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 600">{{y.code}}</span><span style="font-size: 12px; color: #64748b">{{y.full}}</span></span>
+                  </button>
+                  <sc-if value="{{y.on}}" hint-placeholder-val="{{false}}">
+                    <div style="padding: 0 14px 12px 46px; display: flex; gap: 8px; animation: foldIn .14s ease-out">
+                      <span style="flex: 1; height: 38px; border-radius: 8px; border: 1px solid #94a3b8; background: #fff; padding: 0 10px; font-size: 13px; display: flex; align-items: center; justify-content: space-between">{{y.role}}<svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"></path></svg></span>
+                      <span style="height: 38px; border-radius: 8px; border: 1px solid #94a3b8; background: #fff; padding: 0 10px; font-size: 13px; display: flex; align-items: center; color: #475569">No end date</span>
+                    </div>
+                  </sc-if>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{s3}}" hint-placeholder-val="{{false}}">
+            <div style="display: flex; flex-direction: column; gap: 12px; animation: stepIn .18s cubic-bezier(.2,.8,.2,1)">
+              <div style="border-radius: 12px; background: #f8f9fc; box-shadow: inset 0 0 0 1px #eef1f6; padding: 14px; display: flex; flex-direction: column; gap: 8px; font-size: 14px">
+                <span style="font-family: 'Inter Tight', sans-serif; font-size: 16px; font-weight: 600">Joel Manalo</span>
+                <span style="color: #475569">joel.manalo@welinc.app</span>
+                <span>VRMS · Mechanic · no end date</span>
+              </div>
+              <span style="font-size: 14px; font-weight: 600">How do they get in?</span>
+              <span style="display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border-radius: 12px; box-shadow: inset 0 0 0 1.5px #1a1f6e; background: #eef0f8; font-size: 14px"><span aria-hidden="true" style="flex: none; margin-top: 2px; width: 16px; height: 16px; border-radius: 999px; box-shadow: inset 0 0 0 5px #1a1f6e"></span><span style="display: flex; flex-direction: column; gap: 2px"><strong style="font-weight: 600">Email them an invite</strong><span style="color: #475569; font-size: 13px">They set their own password. The link lasts 7 days.</span></span></span>
+              <span style="display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border-radius: 12px; box-shadow: inset 0 0 0 1px #dbe1ea; font-size: 14px"><span aria-hidden="true" style="flex: none; margin-top: 2px; width: 16px; height: 16px; border-radius: 999px; box-shadow: inset 0 0 0 1.5px #64748b"></span><span style="display: flex; flex-direction: column; gap: 2px"><strong style="font-weight: 600">Give them a one time password</strong><span style="color: #475569; font-size: 13px">For mechanics without email on their phone.</span></span></span>
+            </div>
+          </sc-if>
+        </div>
+        <div style="padding: 14px 22px 20px; display: flex; align-items: center; gap: 10px; border-top: 1px solid #eef1f6">
+          <button onClick="{{back}}" style="border: 0; background: transparent; color: #1a1f6e; font-size: 14px; font-weight: 600; height: 44px; padding: 0 4px; visibility: {{backVis}}">← Back</button>
+          <span style="flex: 1"></span>
+          <button style="border: 1px solid #cbd5e1; background: #fff; border-radius: 10px; height: 44px; padding: 0 14px; font-size: 14px; font-weight: 500">Cancel</button>
+          <button onClick="{{next}}" style="border: 0; background: #1a1f6e; color: #fff; border-radius: 10px; height: 44px; padding: 0 16px; font-size: 14px; font-weight: 600">{{nextText}}</button>
+        </div>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 10px; min-height: 0">
+      <span style="font-size: 13px; font-weight: 600; color: #fff">AB · A side sheet, done properly</span>
+      <div style="display: flex; border-radius: 16px; overflow: hidden; box-shadow: 0 24px 64px rgba(11,16,56,.35); height: 900px">
+        <div aria-hidden="true" style="flex: 0 0 60px; background: rgba(11,16,56,.45)"></div>
+        <div role="dialog" aria-label="Add a person, option B" style="flex: 1; background: #fff; display: flex; flex-direction: column; min-width: 0">
+          <div style="padding: 20px 24px 16px; display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; border-bottom: 1px solid #eef1f6">
+            <div style="display: flex; flex-direction: column; gap: 4px"><h2 style="margin: 0; font-family: 'Inter Tight', sans-serif; font-size: 21px; font-weight: 700; letter-spacing: -0.02em">Add a person</h2><span style="font-size: 13px; color: #475569">The list stays visible behind, so you can check who's there.</span></div>
+            <button aria-label="Close" style="border: 0; background: transparent; width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#334155" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+          </div>
+          <div style="flex: 1; overflow: auto; padding: 4px 24px 20px; display: flex; flex-direction: column">
+            <section style="padding: 18px 0; border-bottom: 1px solid #eef1f6; display: flex; flex-direction: column; gap: 14px">
+              <h3 style="margin: 0; font-size: 12px; font-weight: 600; color: #64748b">1 · Who</h3>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px">
+                <label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600">First name<input value="Joel" style="height: 44px; border-radius: 10px; border: 1px solid #94a3b8; padding: 0 12px; font-size: 14px; font-weight: 400; min-width: 0"></label>
+                <label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600">Last name<input value="Manalo" style="height: 44px; border-radius: 10px; border: 1px solid #94a3b8; padding: 0 12px; font-size: 14px; font-weight: 400; min-width: 0"></label>
+              </div>
+              <label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600">Work email<input value="vrms.admin@welinc.com" style="height: 44px; border-radius: 10px; border: 1.5px solid #b42318; padding: 0 12px; font-size: 14px; font-weight: 400"><span style="font-size: 13px; font-weight: 400; color: #b42318; display: flex; gap: 6px"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="flex: none; margin-top: 2px"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v5M12 16h.01"></path></svg><span>Victor Ramos already uses this email. <a href="#" style="color: #b42318; font-weight: 600">Open their page</a> to give access instead.</span></span></label>
+            </section>
+            <section style="padding: 18px 0; border-bottom: 1px solid #eef1f6; display: flex; flex-direction: column; gap: 10px">
+              <h3 style="margin: 0; font-size: 12px; font-weight: 600; color: #64748b">2 · Access</h3>
+              <sc-for list="{{sysB}}" as="y" hint-placeholder-count="3">
+                <div style="display: grid; grid-template-columns: 68px 1fr 130px; gap: 10px; align-items: center">
+                  <span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: {{y.codeFg}}; background: {{y.codeBg}}; border-radius: 6px; padding: 6px 0; text-align: center">{{y.code}}</span>
+                  <button onClick="{{y.cycle}}" style="height: 40px; border-radius: 8px; border: 1px solid #94a3b8; background: #fff; padding: 0 10px; font-size: 13px; color: {{y.roleFg}}; display: flex; align-items: center; justify-content: space-between">{{y.role}}<svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"></path></svg></button>
+                  <span style="height: 40px; border-radius: 8px; border: 1px solid {{y.endLine}}; padding: 0 10px; font-size: 13px; color: {{y.endFg}}; display: flex; align-items: center">{{y.end}}</span>
+                </div>
+              </sc-for>
+              <span style="font-size: 13px; color: #64748b">Click a role to change it. Pick “No access” to leave a system out.</span>
+            </section>
+            <section style="padding: 18px 0; display: flex; flex-direction: column; gap: 10px">
+              <h3 style="margin: 0; font-size: 12px; font-weight: 600; color: #64748b">3 · How they get in</h3>
+              <div role="radiogroup" aria-label="How they get in" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px">
+                <sc-for list="{{signB}}" as="o" hint-placeholder-count="2">
+                  <button role="radio" aria-checked="{{o.on}}" onClick="{{o.pick}}" style="border: 0; border-radius: 12px; box-shadow: {{o.ring}}; background: {{o.bg}}; padding: 12px; text-align: left; display: flex; flex-direction: column; gap: 4px; transition: background .12s"><span style="font-size: 14px; font-weight: 600">{{o.name}}</span><span style="font-size: 12px; color: #475569; line-height: 1.4">{{o.sub}}</span></button>
+                </sc-for>
+              </div>
+            </section>
+          </div>
+          <div style="padding: 14px 24px; border-top: 1px solid #eef1f6; display: flex; align-items: center; gap: 10px; background: #fbfcfe">
+            <span style="flex: 1; font-size: 13px; color: #475569">{{summaryB}}</span>
+            <button style="border: 1px solid #cbd5e1; background: #fff; border-radius: 10px; height: 44px; padding: 0 14px; font-size: 14px; font-weight: 500">Cancel</button>
+            <button style="border: 0; background: #1a1f6e; color: #fff; border-radius: 10px; height: 44px; padding: 0 16px; font-size: 14px; font-weight: 600">Add person</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 10px">
+      <span style="font-size: 13px; font-weight: 600; color: #fff">AC · Quick add at the top of the list</span>
+      <div style="background: #fff; border-radius: 16px; box-shadow: 0 24px 64px rgba(11,16,56,.35); overflow: hidden">
+        <div style="padding: 18px 18px 12px; display: flex; justify-content: space-between; align-items: center"><span style="font-family: 'Inter Tight', sans-serif; font-weight: 700; font-size: 22px">People</span><button style="border: 0; background: #eef0f8; color: #1a1f6e; border-radius: 10px; height: 34px; padding: 0 12px; font-size: 13px; font-weight: 600">Close</button></div>
+        <div style="margin: 0 12px 12px; padding: 14px; border-radius: 12px; background: #f8f9fc; box-shadow: inset 0 0 0 1px #e2e6ef; display: flex; flex-direction: column; gap: 10px; animation: foldIn .16s ease-out">
+          <label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600">Work email<input value="joel.manalo@welinc.app" style="height: 40px; border-radius: 8px; border: 1px solid #94a3b8; padding: 0 10px; font-size: 14px; font-weight: 400; background: #fff"></label>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px">
+            <span style="height: 40px; border-radius: 8px; border: 1px solid #94a3b8; background: #fff; padding: 0 10px; font-size: 13px; display: flex; align-items: center; justify-content: space-between">VRMS<svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"></path></svg></span>
+            <span style="height: 40px; border-radius: 8px; border: 1px solid #94a3b8; background: #fff; padding: 0 10px; font-size: 13px; display: flex; align-items: center; justify-content: space-between">Mechanic<svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"></path></svg></span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px">
+            <a href="#" style="font-size: 13px; font-weight: 600; text-decoration: none">More options</a>
+            <span style="flex: 1"></span>
+            <button style="border: 0; background: #1a1f6e; color: #fff; border-radius: 8px; height: 38px; padding: 0 14px; font-size: 13px; font-weight: 600">Send invite</button>
+          </div>
+        </div>
+        <div style="padding: 0 0 10px">
+          <div style="display: flex; align-items: center; gap: 12px; padding: 10px 18px; background: #fffbeb"><span aria-hidden="true" style="width: 34px; height: 34px; border-radius: 999px; background: #fff; box-shadow: inset 0 0 0 1.5px #94a3b8; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: #1a1f6e">JM</span><span style="flex: 1; display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 600">Joel Manalo</span><span style="font-size: 12px; color: #1a1f6e">Just invited</span></span></div>
+          <div style="display: flex; align-items: center; gap: 12px; padding: 10px 18px"><span aria-hidden="true" style="width: 34px; height: 34px; border-radius: 999px; background: #eef0f8; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: #1a1f6e">AB</span><span style="flex: 1; display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 600">Alfredo Bautista</span><span style="font-size: 12px; color: #64748b">Chief mechanic</span></span></div>
+          <div style="display: flex; align-items: center; gap: 12px; padding: 10px 18px"><span aria-hidden="true" style="width: 34px; height: 34px; border-radius: 999px; background: #eef0f8; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: #1a1f6e">BM</span><span style="flex: 1; display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 600">Bernardo Mendoza</span><span style="font-size: 12px; color: #64748b">Admin</span></span></div>
+        </div>
+      </div>
+      <p style="margin: 0; font-size: 13px; color: rgba(255,255,255,.85); line-height: 1.45">For the common case: one system, one role, an invite. The name comes from the person when they accept. “More options” opens AB.</p>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1100}}'>
+const SYS = [['VRMS', 'Vehicle repairs', ['Mechanic', 'Chief mechanic', 'Admin']], ['VMMS', 'Vehicle maintenance', ['Operations', 'Admin']], ['BMS', 'Billing', ['Customer support', 'Admin']]];
+class Component extends DCLogic {
+  renderVals() {
+    const s = this.state || {};
+    const step = s.step || 1;
+    const onA = s.onA || { VRMS: true };
+    const rolesB = s.rolesB || { VRMS: 0, VMMS: -1, BMS: -1 };
+    const sign = s.sign || 'Email an invite';
+    const steps = ['Who', 'Access', 'Check and send'].map((n, i) => ({ name: (i + 1) + '. ' + n, bar: i < step ? '#1a1f6e' : '#e2e8f0', fg: i < step ? '#0f172a' : '#64748b', weight: i + 1 === step ? '600' : '500' }));
+    const sysA = SYS.map(([code, full, roles]) => { const on = !!onA[code]; return { code, full, on, role: roles[0], ring: on ? 'inset 0 0 0 1.5px #1a1f6e' : 'inset 0 0 0 1px #dbe1ea', bg: on ? '#f6f7fc' : '#fff', boxRing: on ? 'none' : 'inset 0 0 0 1.5px #64748b', boxBg: on ? '#1a1f6e' : '#fff', op: on ? '1' : '0', toggle: () => this.setState({ onA: Object.assign({}, onA, { [code]: !on }) }) }; });
+    const sysB = SYS.map(([code, full, roles]) => { const r = rolesB[code]; const has = r >= 0; return { code, role: has ? roles[r] : 'No access', roleFg: has ? '#0f172a' : '#64748b', codeFg: has ? '#1a1f6e' : '#64748b', codeBg: has ? '#eef0f8' : '#f1f5f9', end: has ? 'No end date' : '—', endFg: has ? '#334155' : '#94a3b8', endLine: has ? '#94a3b8' : '#e2e8f0', cycle: () => { const n = r + 1 >= roles.length ? -1 : r + 1; this.setState({ rolesB: Object.assign({}, rolesB, { [code]: n }) }); } }; });
+    const given = SYS.filter(([c]) => rolesB[c] >= 0).map(([c, f, roles]) => c + ' ' + roles[rolesB[c]]);
+    const signB = [['Email an invite', 'They set a password from a link. Lasts 7 days.'], ['One time password', 'You read it to them. They change it on first sign in.']].map(([n, sub]) => { const on = n === sign; return { name: n, sub, on, ring: on ? 'inset 0 0 0 1.5px #1a1f6e' : 'inset 0 0 0 1px #dbe1ea', bg: on ? '#eef0f8' : '#fff', pick: () => this.setState({ sign: n }) }; });
+    return {
+      steps, s1: step === 1, s2: step === 2, s3: step === 3, sysA, sysB, signB,
+      backVis: step > 1 ? 'visible' : 'hidden', nextText: step === 3 ? 'Send invite' : 'Next',
+      next: () => this.setState({ step: step === 3 ? 1 : step + 1 }), back: () => this.setState({ step: Math.max(1, step - 1) }),
+      summaryB: given.length ? 'Joel gets ' + given.join(', ') + '.' : 'Pick at least one system.'
+    };
+  }
+}
+</script>
+</body>
+</html>
