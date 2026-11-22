@@ -1,7 +1,7 @@
 # 0027. Navigation redesign: sections, sub pages with counts, switcher and account menu
 
 **Date**: 2026-11-23
-**Status**: Proposed
+**Status**: In Progress
 **Scope row**: [70](../../../scope/vrms/ui-refresh.md#70-navigation-redesign--planned--needs-a-decision) (`docs/scope/vrms/ui-refresh.md`)
 **Repos**: `welinc-web-vrms`, `welinc-backend-vrms`, `welinc-web-portal` (`AdminShell` sidebar, the launcher's `open` handoff), `welinc-auth` (one field on `/auth/admin/me`)
 **Design source**: board `Sidebars8` (canvas "WeLinc design directions", https://claude.ai/artifact/VFhLSMNhfpAFD4D4c2VQzp, page "Round 8"), with round 1's `BPhone` for the phone. Copies live in [boards/](boards/). The look, the collapse and the phone rule come from suite spec [0016](../../_root/0016-design-direction-refresh/index.md) *Layout and navigation*; this spec decides what goes in the sidebar.

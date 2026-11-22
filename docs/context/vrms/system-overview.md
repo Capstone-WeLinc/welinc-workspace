@@ -48,7 +48,7 @@ Shared tables owned by VRMS (other subsystems reference them): vehicles, garages
 
 ## Still open
 
-1. **AI provider.** The code uses Gemini plus pgvector; Jira WL-E7 says "optional local AI (Ollama)". Its store choices (pgvector, DuckDB, Redis, MongoDB) also need a recorded decision. Decide with `/architect`, then align Jira.
+1. **AI provider.** The code uses Gemini (behind an `AiProvider` adapter) plus pgvector, inside `welinc-backend-vrms` (spec 0013 retired the Python service and its MongoDB, Redis and DuckDB stores); Jira WL-E7 says "optional local AI (Ollama)". Decide the provider with `/architect` (scope feature in `reports-ai.md`), then align Jira.
 2. **Missing Jira tickets.** Stories depend on WL-106 (role-per-process flowchart), WL-213 (cancellation with reason), WL-701/703 (AI), WL-801 (platform) and WL-901 (hosting), but none of them exist in Jira.
 3. **Status names.** WL-200 must fix the final list before the migration from the code's four statuses.
 4. **Schema copy.** `welinc-backend-vrms/prisma/schema.prisma` also defines `Booking` and maintenance models (VMMS/BMS data). Clarify which service owns those tables.
