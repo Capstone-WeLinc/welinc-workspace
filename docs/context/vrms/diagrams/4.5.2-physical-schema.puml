@@ -1,0 +1,411 @@
+@startuml 4.5.2-physical-schema
+!include _style.iuml
+title VRMS physical schema (PostgreSQL 16, database vrms)
+hide circle
+hide empty members
+skinparam linetype ortho
+skinparam class {
+  AttributeFontSize 10
+}
+entity "vehicles" as vehicles {
+  * <<PK>> id : uuid
+  --
+  * plate_number : varchar(20)
+  * model : varchar(100)
+  * capacity : integer
+  * status : VehicleStatus
+  * odometer : integer
+  * is_active : boolean
+  deleted_at : timestamptz(6)
+  * created_at : timestamptz(6)
+  * updated_at : timestamptz(6)
+  vehicle_type_id : uuid <<FK>>
+}
+entity "garages" as garages {
+  * <<PK>> id : uuid
+  --
+  * name : varchar(50)
+  * is_active : boolean
+  deleted_at : timestamptz(6)
+  * created_at : timestamptz(6)
+  * updated_at : timestamptz(6)
+}
+entity "mechanics" as mechanics {
+  * <<PK>> id : uuid
+  --
+  * auth_user_id : uuid
+  email : varchar(255)
+  * name : varchar(100)
+  * is_active : boolean
+  role : varchar(20)
+  * created_at : timestamptz(6)
+  * updated_at : timestamptz(6)
+}
+entity "vrms_people" as vrms_people {
+  * <<PK>> auth_user_id : uuid
+  --
+  * name : varchar(255)
+  * email : varchar(255)
+  picture : text
+  * roles : text[]
+  * temporary_roles : text[]
+  * is_active : boolean
+  * deleted : boolean
+  * updated_at : timestamptz(6)
+}
+entity "drivers" as drivers {
+  * <<PK>> id : uuid
+  --
+  * name : varchar(100)
+  * license_number : varchar(50)
+  * is_verified : boolean
+  * is_active : boolean
+  deleted_at : timestamptz(6)
+  * created_at : timestamptz(6)
+  * updated_at : timestamptz(6)
+}
+entity "repair_tickets" as repair_tickets {
+  * <<PK>> id : uuid
+  --
+  * repair_number : varchar(50)
+  * repair_status : RepairStatus
+  * priority : RepairPriority
+  * vehicle_id : uuid <<FK>>
+  * driver_id : uuid <<FK>>
+  * garage_id : uuid <<FK>>
+  * odometer : integer
+  reported_by_user_id : uuid
+  reported_by_name : varchar(100)
+  verified_by_user_id : uuid
+  verified_by_name : varchar(100)
+  verified_at : timestamptz(6)
+  due_at : timestamptz(6)
+  due_at_source : DueAtSource
+  parts_cost : decimal(10,2)
+  labor_cost : decimal(10,2)
+  total_cost : decimal(10,2)
+  * is_lump_sum : boolean
+  cancellation_reason : text
+  remarks : text
+  * is_unlocked : boolean
+  unlock_reason : text
+  * last_activity_at : timestamptz(6)
+  * status_changed_at : timestamptz(6)
+  * created_at : timestamptz(6)
+  * updated_at : timestamptz(6)
+  closed_at : timestamptz(6)
+  account_type : TicketAccountType
+  corporation : varchar(100)
+  prior_vehicle_status : VehicleStatus
+  work_started_at : timestamptz(6)
+  edited_at : timestamptz(6)
+  edited_by_user_id : uuid
+  edited_by_name : varchar(100)
+}
+entity "ticket_assignments" as ticket_assignments {
+  * <<PK>> id : uuid
+  --
+  * repair_ticket_id : uuid <<FK>>
+  * mechanic_id : uuid <<FK>>
+  * assigned_at : timestamptz(6)
+  assigned_by_user_id : uuid
+  assigned_by_name : varchar(100)
+}
+entity "repair_issues" as repair_issues {
+  * <<PK>> id : uuid
+  --
+  * repair_ticket_id : uuid <<FK>>
+  * description : text
+  category_id : uuid <<FK>>
+  knowledge_entry_id : uuid <<FK>>
+  resolution_note : text
+  hours_spent : decimal(5,2)
+  followed_known_fix : boolean
+  resolved_at : timestamptz(6)
+  suggestion_dismissed_at : timestamptz(6)
+  * checklist_version : integer
+  * created_at : timestamptz(6)
+  * updated_at : timestamptz(6)
+}
+entity "repair_issue_steps" as repair_issue_steps {
+  * <<PK>> id : uuid
+  --
+  * repair_issue_id : uuid <<FK>>
+  * position : integer
+  * text : varchar(300)
+  checked_at : timestamptz(6)
+  checked_by_email : varchar(255)
+  * origin : StepOrigin
+  edited_at : timestamptz(6)
+}
+entity "repair_parts" as repair_parts {
+  * <<PK>> id : uuid
+  --
+  * repair_ticket_id : uuid <<FK>>
+  * description : varchar(255)
+  * unit_cost : decimal(10,2)
+  * quantity : integer
+  * subtotal : decimal(10,2)
+  * created_at : timestamptz(6)
+}
+entity "audit_logs" as audit_logs {
+  * <<PK>> id : uuid
+  --
+  * repair_ticket_id : uuid <<FK>>
+  actor_user_id : uuid
+  actor_name : varchar(100)
+  actor_email : varchar(255)
+  actor_role : varchar(30)
+  * action : varchar(50)
+  * changes : jsonb
+  note : text
+  * created_at : timestamptz(3)
+}
+entity "attachments" as attachments {
+  * <<PK>> id : uuid
+  --
+  * repair_ticket_id : uuid <<FK>>
+  issue_id : uuid <<FK>>
+  * kind : AttachmentKind
+  * storage_key : varchar(300)
+  thumbnail_key : varchar(300)
+  * file_name : varchar(255)
+  * mime_type : varchar(100)
+  * size_bytes : integer
+  width : integer
+  height : integer
+  * sha256 : char(64)
+  taken_at : timestamptz(6)
+  * uploaded_by_user_id : uuid
+  * uploaded_by_name : varchar(100)
+  * created_at : timestamptz(6)
+  deleted_at : timestamptz(6)
+  deleted_by_user_id : uuid
+  deleted_by_name : varchar(100)
+  purged_at : timestamptz(6)
+}
+entity "issue_categories" as issue_categories {
+  * <<PK>> id : uuid
+  --
+  * name : varchar(50)
+  * name_key : varchar(50)
+  description : varchar(200)
+  * is_active : boolean
+  * sort_order : integer
+  * created_at : timestamptz(6)
+  * updated_at : timestamptz(6)
+}
+entity "knowledge_entries" as knowledge_entries {
+  * <<PK>> id : uuid
+  --
+  * name : varchar(100)
+  * name_key : varchar(100)
+  * category_id : uuid <<FK>>
+  * status : KnowledgeEntryStatus
+  * symptoms : text
+  description_template : text
+  * suggested_priority : RepairPriority
+  estimated_hours : decimal(5,2)
+  safety_notes : text
+  * created_by_email : varchar(255)
+  * updated_by_email : varchar(255)
+  * created_at : timestamptz(6)
+  * updated_at : timestamptz(6)
+}
+entity "knowledge_entry_steps" as knowledge_entry_steps {
+  * <<PK>> id : uuid
+  --
+  * entry_id : uuid <<FK>>
+  * position : integer
+  * text : varchar(300)
+}
+entity "knowledge_entry_parts" as knowledge_entry_parts {
+  * <<PK>> id : uuid
+  --
+  * entry_id : uuid <<FK>>
+  * position : integer
+  * name : varchar(100)
+}
+entity "knowledge_suggestions" as knowledge_suggestions {
+  * <<PK>> id : uuid
+  --
+  * kind : SuggestionKind
+  * status : SuggestionStatus
+  entry_id : uuid <<FK>>
+  repair_issue_id : uuid <<FK>>
+  * body : text
+  * created_by_email : varchar(255)
+  resolved_by_email : varchar(255)
+  resolved_at : timestamptz(6)
+  * created_at : timestamptz(6)
+}
+entity "knowledge_entry_changes" as knowledge_entry_changes {
+  * <<PK>> id : uuid
+  --
+  entry_id : uuid <<FK>>
+  category_id : uuid <<FK>>
+  actor_user_id : uuid
+  actor_name : varchar(100)
+  actor_email : varchar(255)
+  actor_role : varchar(30)
+  * action : varchar(50)
+  * changes : jsonb
+  note : text
+  * created_at : timestamptz(3)
+}
+entity "role_permissions" as role_permissions {
+  * <<PK>> role : varchar(30)
+  * <<PK>> permission : varchar(60)
+  --
+  * allowed : boolean
+  * updated_at : timestamptz(3)
+  updated_by_user_id : uuid
+}
+entity "directory_sync_state" as directory_sync_state {
+  * <<PK>> id : text
+  --
+  cursor : text
+  lease_until : timestamptz(3)
+  lease_owner : uuid
+  failing_since : timestamptz(3)
+  * updated_at : timestamptz(3)
+}
+entity "permission_sync_state" as permission_sync_state {
+  * <<PK>> id : text
+  --
+  etag : varchar(40)
+  synced_at : timestamptz(3)
+  failing_since : timestamptz(3)
+  lease_until : timestamptz(3)
+  lease_owner : uuid
+}
+entity "permission_matrix" as permission_matrix {
+  * <<PK>> id : smallint
+  --
+  * version : integer
+  * updated_at : timestamptz(3)
+}
+entity "app_settings" as app_settings {
+  * <<PK>> key : varchar(60)
+  --
+  * value : jsonb
+  * updated_at : timestamptz(3)
+  updated_by_user_id : uuid
+}
+entity "settings_state" as settings_state {
+  * <<PK>> id : smallint
+  --
+  * version : integer
+  * updated_at : timestamptz(3)
+}
+entity "setting_changes" as setting_changes {
+  * <<PK>> id : uuid
+  --
+  * key : varchar(60)
+  * before : jsonb
+  * after : jsonb
+  * action : varchar(10)
+  actor_user_id : uuid
+  actor_name : varchar(100)
+  actor_email : varchar(255)
+  note : text
+  * created_at : timestamptz(3)
+}
+entity "issue_embeddings" as issue_embeddings {
+  * <<PK>> issue_id : uuid <<FK>>
+  --
+  * embedding : vector(768)
+  * model : varchar(60)
+  * text_hash : char(64)
+  * created_at : timestamptz(6)
+  * updated_at : timestamptz(6)
+}
+entity "ai_diagnoses" as ai_diagnoses {
+  * <<PK>> id : uuid
+  --
+  * repair_ticket_id : uuid <<FK>>
+  * requested_by_user_id : uuid
+  * input : jsonb
+  * similar : jsonb
+  * result : jsonb
+  * model : varchar(60)
+  * confidence : varchar(10)
+  * latency_ms : integer
+  * created_at : timestamptz(6)
+}
+entity "ai_diagnosis_feedback" as ai_diagnosis_feedback {
+  * <<PK>> id : uuid
+  --
+  * diagnosis_id : uuid <<FK>>
+  * user_id : uuid
+  * helpful : boolean
+  rating : smallint
+  comment : text
+  * created_at : timestamptz(6)
+  * updated_at : timestamptz(6)
+}
+entity "lookup_values" as lookup_values {
+  * <<PK>> id : uuid
+  --
+  * list : varchar(40)
+  * name : varchar(100)
+  * name_key : varchar(100)
+  * is_active : boolean
+  * sort_order : integer
+  * created_at : timestamptz(6)
+  * updated_at : timestamptz(6)
+}
+entity "lookup_value_changes" as lookup_value_changes {
+  * <<PK>> id : uuid
+  --
+  * lookup_value_id : uuid <<FK>>
+  * action : varchar(12)
+  before : jsonb
+  after : jsonb
+  actor_user_id : uuid
+  actor_name : varchar(100)
+  actor_email : varchar(255)
+  * created_at : timestamptz(3)
+}
+entity "vehicle_changes" as vehicle_changes {
+  * <<PK>> id : uuid
+  --
+  * vehicle_id : uuid <<FK>>
+  * field : varchar(30)
+  before : jsonb
+  after : jsonb
+  actor_user_id : uuid
+  actor_name : varchar(100)
+  actor_email : varchar(255)
+  note : text
+  * created_at : timestamptz(3)
+  repair_ticket_id : uuid <<FK>>
+}
+lookup_values |o--o{ vehicles
+vehicles ||--o{ repair_tickets
+drivers ||--o{ repair_tickets
+garages ||--o{ repair_tickets
+repair_tickets ||--o{ ticket_assignments
+mechanics ||--o{ ticket_assignments
+repair_tickets ||--o{ repair_issues
+issue_categories |o--o{ repair_issues
+knowledge_entries |o--o{ repair_issues
+repair_issues ||--o{ repair_issue_steps
+repair_tickets ||--o{ repair_parts
+repair_tickets ||--o{ audit_logs
+repair_tickets ||--o{ attachments
+repair_issues |o--o{ attachments
+issue_categories ||--o{ knowledge_entries
+knowledge_entries ||--o{ knowledge_entry_steps
+knowledge_entries ||--o{ knowledge_entry_parts
+knowledge_entries |o--o{ knowledge_suggestions
+repair_issues |o--o{ knowledge_suggestions
+knowledge_entries |o--o{ knowledge_entry_changes
+issue_categories |o--o{ knowledge_entry_changes
+repair_issues ||--o| issue_embeddings
+repair_tickets ||--o{ ai_diagnoses
+ai_diagnoses ||--o{ ai_diagnosis_feedback
+lookup_values ||--o{ lookup_value_changes
+vehicles ||--o{ vehicle_changes
+repair_tickets |o--o{ vehicle_changes
+@enduml

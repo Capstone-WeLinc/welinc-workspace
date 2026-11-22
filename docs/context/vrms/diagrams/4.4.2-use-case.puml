@@ -1,0 +1,63 @@
+@startuml 4.4.2-use-case
+!include _style.iuml
+title VRMS use case diagram
+left to right direction
+skinparam linetype polyline
+skinparam packageStyle rectangle
+skinparam nodesep 18
+skinparam ranksep 70
+
+actor "Mechanic" as M
+actor "Chief Mechanic" as C
+actor "Admin" as A
+actor "Google Gemini" as G
+actor "File storage\n(Azure Blob)" as B
+
+rectangle "VRMS" #FFFFFF;line:E8B800;line.bold {
+  rectangle "Tickets" {
+    usecase "View assigned tickets" as UC1
+    usecase "Work the repair\n(start, follow the checklist)" as UC2
+    usecase "Upload photos as proof" as UC3
+    usecase "Send for verification" as UC4
+    usecase "Run AI diagnosis" as UC5
+    usecase "Assign mechanics" as UC6
+    usecase "Verify or return work" as UC7
+  }
+  rectangle "Knowledge base" {
+    usecase "Read the fix library" as UC8
+    usecase "Suggest a fix" as UC9
+    usecase "Edit the fix library" as UC10
+  }
+  rectangle "Administration" {
+    usecase "Create a repair ticket" as UC11
+    usecase "Encode costs" as UC12
+    usecase "Cancel or unlock a ticket" as UC13
+    usecase "Manage team, vehicles\nand settings" as UC14
+    usecase "View audit log\nand analytics" as UC15
+  }
+}
+
+C -|> M
+A -|> C
+
+M --> UC1
+M --> UC2
+M --> UC3
+M --> UC4
+M --> UC5
+M --> UC8
+M --> UC9
+
+C --> UC6
+C --> UC7
+C --> UC10
+
+A --> UC11
+A --> UC12
+A --> UC13
+A --> UC14
+A --> UC15
+
+UC5 --> G
+UC3 --> B
+@enduml

@@ -1,7 +1,7 @@
 # 0016. Design direction refresh: the Control room look for the suite
 
 **Date**: 2026-11-18
-**Status**: Proposed
+**Status**: In Progress
 **Scope row**: suite S18 (`docs/scope/_root/shared-services.md`)
 **Repos**: workspace (`design.md`, `docs/context/vrms/design.md`, `scripts/check-design-tokens.mjs`), `welinc-web-portal`, `welinc-web-vrms`
 **Design source**: the canvas "WeLinc design directions" (https://claude.ai/artifact/VFhLSMNhfpAFD4D4c2VQzp), page "Round 8". The final boards are listed under *Board index*; older boards are history, not the source.
