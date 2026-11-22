@@ -48,6 +48,7 @@ WHATIF_ARGS="--result-format ResourceIdOnly" bash infra/scripts/apply.sh <env> -
 - **Only staging is hosted** (spec 0008 AC-24, since 2026-11-20): production exists as code only (`apply.sh prod`, the production path of each `deploy.yml`) and is never called live. Don't apply `prod`. A manual production run stops at task 19a's guard while `AZURE_CLIENT_ID_PROD` is unset. Every staging app and job ends in `-staging` (task 18a, done 2026-11-20).
 - **Always pass `--domains` to `apply.sh staging`** (and its what if): without it `env.bicep` sends the gateway an empty custom domain list and unbinds `staging-api.welinc.app`.
 - **Azure CLI on the Mac** is `~/.local/bin/az` (not on the agent shell's PATH): call it by full path, or prefix `PATH="$HOME/.local/bin:$PATH"` for `apply.sh`.
+- **1Password CLI on the Mac** is `~/.local/bin/op`, signed in through the desktop app (Touch ID), run with the sandbox off. Use the `WeLinc` vault only (the staging private file is the document "WeLinc private (staging)"); pipe secret values in through stdin, never as arguments, and never print them.
 
 ## Specs
 
