@@ -11,7 +11,7 @@ How to run, recover and shut down the hosted WeLinc suite. **Only staging is hos
 | Resource groups | `rg-welinc-shared` (registry), `rg-welinc-staging` (everything else) |
 | Database server | `psql-welinc-staging`, admin `welincadmin`, password in `infra/private/staging.json` (1Password) |
 | Budget alerts | $50, $100, $150, $180 (Cost Management, Budgets) |
-| Defense days | Nov 28, Dec 4, Dec 5 |
+| Defense days | Moving (since 2026-11-22): the final defense is by Dec 20 at the latest; exact dates to come. A final after Dec 17 falls past the credit end date |
 
 ## The defense freeze
 
@@ -104,7 +104,7 @@ Always `bash infra/scripts/apply.sh staging --domains` (and `--what-if` first). 
 
 Production is code only because the trial refused its B1ms database server (`SkuNotAvailable`). To bring it up: get a server first (an Azure support request for B1ms in Southeast Asia, or AWS RDS `db.t4g.micro` in Singapore; never production's databases on staging's server). Then fill `infra/private/prod.json` from 1Password, `apply.sh prod` (twice: once before and once after the first deploys), add its DNS records, `apply.sh prod --domains`, `set-repo-variables.sh prod`, set `AZURE_CLIENT_ID_PROD` (which lifts the deploy guard), and promote `development` to `main` in each repo. The full steps are spec 0008 task 19.
 
-## Shutdown copy (after Dec 5, before the credit ends)
+## Shutdown copy (after the final defense, before the credit ends)
 
 1. Open the database to your laptop (above).
 2. Dump every database:
@@ -222,7 +222,7 @@ Brevo adds an unsubscribe header to every email, and we can't remove it on our p
     "https://api.brevo.com/v3/smtp/blockedContacts/welinc.demo%2Bvrms.admin%40gmail.com"
   ```
   Encode `+` as `%2B` and `@` as `%40`. It answers 204 when unblocked, 404 when the address wasn't blocked.
-- **Before each defense** (Nov 28, Dec 4, Dec 5): check that the blocked list holds none of the team inbox addresses or your own.
+- **Before each defense:** check that the blocked list holds none of the team inbox addresses or your own.
 - A spam complaint can block an address again; if the same address keeps coming back, mark the email "Not spam" in that inbox.
 
 ## Security grades (feature 69)

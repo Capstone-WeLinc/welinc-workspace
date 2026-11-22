@@ -7,8 +7,8 @@ How VMMS and BMS run online next to the shared services and VRMS. Everything run
 | When | What |
 |---|---|
 | Now | Every merge into `development` deploys staging |
-| Nov 27 to Dec 5 | Every staging app stays awake (no cold starts in front of the panel) |
-| Nov 28, Dec 4, Dec 5 | **Freeze:** no merge to `development` in any repo from 2 hours before each defense until it ends. A fix in that window only if the lead agrees |
+| From the day before the first defense until the final one | Every staging app stays awake (no cold starts in front of the panel) |
+| Each defense day (dates moving; the final is by Dec 20 at the latest) | **Freeze:** no merge to `development` in any repo from 2 hours before each defense until it ends. A fix in that window only if the lead agrees |
 
 ## How it fits together
 
@@ -37,7 +37,7 @@ How VMMS and BMS run online next to the shared services and VRMS. Everything run
 
 Migration jobs: `vmms-migrate`, `vmms-analytics-migrate`, `bms-booking-migrate`, `bms-dispatch-migrate`, `bms-completion-migrate`, `bms-analytics-migrate`. Your deploy starts them.
 
-Until Nov 27 an app with no traffic sleeps, and the first call may take 10 to 30 seconds (or answer 504) while it wakes. Apps that run timers or loops (`vmms-backend`, `vmms-analytics`, `bms-booking`, `bms-dispatch`, `bms-analytics-projection`) never sleep. If another app runs something on a timer, tell the lead.
+Until the day before the first defense, an app with no traffic sleeps, and the first call may take 10 to 30 seconds (or answer 504) while it wakes. Apps that run timers or loops (`vmms-backend`, `vmms-analytics`, `bms-booking`, `bms-dispatch`, `bms-analytics-projection`) never sleep. If another app runs something on a timer, tell the lead.
 
 ## Make your service hosting ready
 
