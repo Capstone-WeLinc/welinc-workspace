@@ -3,6 +3,8 @@
 // refusal, so `git switch -c` and `git commit` could never run unattended. start.sh calls:
 //   node agents/vrms/overnight/lift-settings.mjs lift      before Claude starts
 //   node agents/vrms/overnight/lift-settings.mjs restore   when the run ends (and first, after a crash)
+//   node agents/vrms/overnight/lift-settings.mjs restore-if-stale   a SessionStart hook in normal sessions:
+//        puts the settings back when the run that lifted them is gone (the terminal was closed mid run)
 // The original is kept in the git ignored overnight folder, and git is told to ignore the edit while
 // it lasts, so the workspace still counts as clean. Push, merge, rebase, PRs and the deny list stay.
 import { execFileSync } from 'node:child_process';
@@ -13,6 +15,7 @@ import { fileURLToPath } from 'node:url';
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 const FILE = join(ROOT, '.claude', 'settings.json');
 const BACKUP = join(ROOT, 'docs', '_private', 'vrms', 'overnight', 'project-settings.backup.json');
+const PID = join(ROOT, 'docs', '_private', 'vrms', 'overnight', 'lift.pid');
 const REL = '.claude/settings.json';
 
 // Routine local work the overnight run must do; everything else in the ask list stays.
@@ -21,6 +24,7 @@ export const LIFTED = [
   'Bash(git checkout -b*)',
   'Bash(git switch -c*)',
   'Bash(npm install*)',
+  'Bash(npm uninstall*)',
   'Bash(docker compose up*)',
   'Bash(npx prisma migrate dev*)',
 ];
@@ -31,6 +35,7 @@ function restore() {
   if (!existsSync(BACKUP)) return false;
   copyFileSync(BACKUP, FILE);
   rmSync(BACKUP);
+  rmSync(PID, { force: true });
   git('update-index', '--no-assume-unchanged', REL);
   return true;
 }
@@ -45,13 +50,33 @@ function lift() {
   git('update-index', '--assume-unchanged', REL);
   settings.permissions.ask = kept;
   writeFileSync(FILE, `${JSON.stringify(settings, null, 2)}\n`);
+  if (process.argv[3]) writeFileSync(PID, process.argv[3]); // start.sh passes its own process id
   return true;
+}
+
+function alive(pid) {
+  try {
+    process.kill(Number(pid), 0);
+    return true;
+  } catch (err) {
+    return err.code === 'EPERM';
+  }
+}
+
+// Restore only when no run owns the lift any more, so a normal session opened mid run leaves it alone.
+function restoreIfStale() {
+  if (!existsSync(BACKUP)) return false;
+  if (existsSync(PID) && alive(readFileSync(PID, 'utf8').trim())) return false;
+  return restore();
 }
 
 const cmd = process.argv[2];
 if (cmd === 'lift') console.log(lift() ? 'Lifted the routine ask rules for this run.' : 'Nothing to lift.');
 else if (cmd === 'restore') console.log(restore() ? 'Restored .claude/settings.json.' : 'Nothing to restore.');
+else if (cmd === 'restore-if-stale') {
+  if (restoreIfStale()) console.log('An overnight run ended without putting .claude/settings.json back; restored it.');
+}
 else {
-  console.error('Usage: node lift-settings.mjs lift|restore');
+  console.error('Usage: node lift-settings.mjs lift [pid]|restore|restore-if-stale');
   process.exit(2);
 }
