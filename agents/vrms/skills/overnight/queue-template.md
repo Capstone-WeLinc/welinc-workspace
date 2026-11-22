@@ -14,7 +14,7 @@ Until: 07:00
 ```
 
 Rules the run applies:
-- Each numbered line is one item, run in that order. A feature number alone means "its next open box".
+- Each numbered line is one item, run in that order. A feature number alone (`69`, or `S19` for a suite row) means "its next open box".
 - Text after the feature is the user's answers and limits for that item. Follow it, and don't park a question it already answers.
 - `After these:` says what happens when the list is done:
   - `stop`: close out and finish.

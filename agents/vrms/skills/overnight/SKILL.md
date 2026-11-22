@@ -35,7 +35,7 @@ Files, all under `docs/_private/vrms/overnight/` (git ignores it):
 
 1. `echo $OVERNIGHT_RUN` prints `1`. If not, the session was not started through `start.sh`: tell the user to use `bash agents/vrms/overnight/start.sh` and stop. Never run unattended without the guard.
 2. Prove the guard is wired: run `git push --dry-run origin HEAD:refs/heads/overnight-guard-check` in the workspace. It must be **blocked**. If it runs, stop at once and report that the guard is not loaded.
-3. Read, in this order: `queue.md` if present, the previous night's report (newest `YYYY-MM-DD.md` before today) for parked and failed items, the newest `docs/context/vrms/handoff-*.md`, then the scope (`docs/scope/vrms/index.md` and the epic files). Note any defense within 24 hours for a warning at the top of the report.
+3. Read, in this order: `queue.md` if present, the previous night's report (newest `YYYY-MM-DD.md` before today) for parked and failed items, the newest `docs/context/vrms/handoff-*.md`, then the scopes: VRMS (`docs/scope/vrms/index.md` and its epic files) and the suite (`docs/scope/_root/`, rows S1 and up: the shared services the user owns: welinc-auth, welinc-web-portal, the gateway). Note any defense within 24 hours for a warning at the top of the report.
 4. Docker: `docker ps` shows the shared and VRMS stacks (`welinc_*`). If not, start them (shared first, then VRMS) and wait for the backends' health routes on localhost. Still down after 10 minutes: stop the run (nothing can be verified).
 5. For each repo you may touch (the workspace, `welinc-backend-vrms`, `welinc-web-vrms`, `welinc-auth`, `welinc-web-portal`, `welinc-mobile-vrms_vmms`): `git fetch --quiet`, note the branch and `git status --short`. A repo with uncommitted changes that are not from this run is **dirty**: never switch its branch, never commit in it, and skip items that need it. The user's own work always wins.
 6. **Drift check.** Compare the docs against reality before trusting them:
@@ -49,15 +49,17 @@ Logins: use the seeded accounts in `docs/integration/seed-accounts.md` (never `.
 
 Sources, in order:
 1. **`queue.md`**, when present: the user's items, in their order. Their notes on an item are the user's answers: follow them, and don't park a question they already answered. A queued item that is not runnable (needs `/architect`, is dated, touches staging) is not skipped silently: record why in the plan and, for a design item, write the questions it would need into `needsYou` so the user can answer them in the next `queue.md`.
-2. **Command line feature numbers** (`start.sh 69 58`): same as queue lines with no notes.
+2. **Command line feature numbers** (`start.sh 69 58 S19`): same as queue lines with no notes.
 3. **Carried over:** items parked or failed last night whose blocker is now resolved (the user answered in `queue.md`, or the fix landed). Otherwise they stay in the report's carried list, not the queue.
 4. **The scope fill**, only as the `queue.md` "After these" line allows (default: checks and tests). When there is no `queue.md` and no feature numbers, the fill is the whole queue.
 
-Scope fill: take every `in-progress` feature, plus `planned` features whose `Design it (spec)` box is ticked, and for each its **first unticked box**. A `planned` feature with no spec joins only when the user names it (its row can carry stale intent). The box is eligible only when all of these hold:
+Scope fill (both scopes; suite rows are named by their id, `S19`, VRMS rows by their number): take every `in-progress` feature, plus `planned` features whose `Design it (spec)` box is ticked, and for each its **first unticked box**. A `planned` feature with no spec joins only when the user names it (its row can carry stale intent). The box is eligible only when all of these hold:
 - It is a `Build it` milestone, `Verify it` or `Test it` box (commands `/develop`, `/check verify`, `/test`). With "After these: checks and tests", only `Verify it` and `Test it`.
 - The feature's `Design it (spec)` box is ticked, or the feature has no decision box and no `needs a decision` tag.
 - No note anywhere in the scope says a later decision changes this feature (search for its number, for example "features 36 to 39"), and the drift check raised nothing on it.
-- The box is not deferred, dated or waiting on someone ("deferred", "the day before", "after the final defense", "waits for", "BMS", "VMMS", "staging", "Azure", "sign off").
+- The box is not deferred, dated or waiting on someone or on the user's go ("deferred", "the day before", "after the final defense", "waits for", "wait for", "BMS", "VMMS", "staging", "Azure", "sign off", "when you say go", "your go"). A box held for the user's go runs only when `queue.md` or the command line names it and says go.
+- When a `Build it` box or its note says only some milestones can start now (for example "the welinc-auth milestone can start now; the portal milestones wait for S18"), queue only those milestones; the rest stay for a later night.
+- A suite row's work in a shared repo follows the same git rules (a `feat/` branch from `origin/development`), and its spec's contract changes are part of the milestone, never a separate push.
 - It is not an `Extra skills` or `Polish it` box.
 
 Never queue: `/architect`, `/scope` planning, `/check review`, `/document`, `/audit`, any ask first or Azure skill, anything on staging.
