@@ -1,7 +1,8 @@
 # Crew leave and emergency approvals
 
 Status: built and merged into `development` (`welinc-backend-bms` #57, `welinc-web-bms` #22).
-Follow-up changes are in spec 0004.
+Follow-up changes are in spec 0004. **Spec 0005 replaces who files:** drivers and helpers
+file their own requests, and the Operations For Approvals page is removed.
 
 Drivers and helpers have no BMS screen yet; their roles are meant for the future
 BMS mobile app. Until then, **Operations files leave and emergency requests on the
