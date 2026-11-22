@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Picks, round 8</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Inter+Tight:wght@500;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+button{font:inherit;cursor:pointer}
+button:focus-visible{outline:2px solid #1a1f6e;outline-offset:2px}
+.fc{height:42px;border-radius:10px;border:1px solid #dfe3ec;box-shadow:0 1px 2px rgba(15,20,69,.05);background:#fff;padding:0 12px;font:inherit;font-size:14px;outline:none;width:100%;box-sizing:border-box;transition:border-color .15s}
+.fc:focus{border-color:#1a1f6e}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes foldIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+@keyframes cardIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+@keyframes toastIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes fadeOut{0%,70%{opacity:1}100%{opacity:0}}
+@media (prefers-reduced-motion: reduce){*{animation-duration:1ms!important;transition-duration:1ms!important}}
+</style>
+</helmet>
+<div style="width: 1440px; height: 1300px; box-sizing: border-box; padding: 32px 40px; font-family: Inter, system-ui, sans-serif; color: #0f172a; background: #e9ecf3; display: flex; flex-direction: column; gap: 20px">
+  <div style="display: flex; flex-direction: column; gap: 4px">
+    <h1 style="margin: 0; font-family: 'Inter Tight', sans-serif; font-weight: 700; font-size: 28px; letter-spacing: -0.02em">Review, leaving and saving: final rules</h1>
+    <span style="font-size: 13px; color: #475569">RC as you liked it. Leaving keeps a draft with nothing to click. Saving: anything that changes things for other people is saved as a whole, never field by field.</span>
+  </div>
+  <div style="display: grid; grid-template-columns: 440px minmax(0, 1fr); gap: 24px; flex: 1; min-height: 0">
+
+    <div style="display: flex; flex-direction: column; gap: 10px">
+      <span style="font-size: 13px; font-weight: 600">RC · Review and save, note folded</span>
+      <div style="background: #4a5070; border-radius: 16px; padding: 24px; flex: 1; display: flex; align-items: flex-start">
+        <div role="dialog" aria-label="Review changes" style="width: 100%; background: #fff; border-radius: 16px; box-shadow: 0 24px 64px rgba(11,16,56,.35); display: flex; flex-direction: column">
+          <div style="padding: 22px 22px 14px; display: flex; flex-direction: column; gap: 10px">
+            <h2 style="margin: 0; font-family: 'Inter Tight', sans-serif; font-size: 21px; font-weight: 700; letter-spacing: -0.02em">Save 5 changes?</h2>
+            <div style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; background: #f3f5f9">
+              <span aria-hidden="true" style="display: flex"><sc-for list="{{faces}}" as="f" hint-placeholder-count="4"><span style="width: 26px; height: 26px; border-radius: 999px; background: #eef0f8; color: #1a1f6e; box-shadow: 0 0 0 2px #f3f5f9; margin-right: -6px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700">{{f}}</span></sc-for></span>
+              <span style="font-size: 13px; color: #334155; padding-left: 8px"><strong style="font-weight: 600">Chief mechanic</strong> · Ramon, Alfredo and 6 others</span>
+            </div>
+          </div>
+          <div style="border-top: 1px solid #eef1f6; border-bottom: 1px solid #eef1f6">
+            <sc-for list="{{fold}}" as="g" hint-placeholder-count="3">
+              <div style="border-bottom: 1px solid #f3f5f9">
+                <button onClick="{{g.toggle}}" aria-expanded="{{g.open}}" style="width: 100%; border: 0; background: transparent; padding: 12px 22px; display: flex; align-items: center; gap: 10px; text-align: left">
+                  <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2" style="transform: {{g.rot}}; transition: transform .16s"><path d="m9 6 6 6-6 6"></path></svg>
+                  <span style="flex: 1; font-size: 14px; font-weight: 600">{{g.name}}</span>
+                  <sc-if value="{{g.hasAdd}}" hint-placeholder-val="{{true}}"><span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #067647">+{{g.add}}</span></sc-if><sc-if value="{{g.hasRem}}" hint-placeholder-val="{{true}}"><span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #b42318">−{{g.rem}}</span></sc-if>
+                </button>
+                <sc-if value="{{g.open}}" hint-placeholder-val="{{true}}">
+                  <div style="padding: 0 22px 10px 46px; display: flex; flex-direction: column; gap: 2px; animation: foldIn .16s ease-out">
+                    <sc-for list="{{g.items}}" as="c" hint-placeholder-count="2"><span style="font-size: 13px; display: flex; flex-direction: column; gap: 2px; padding: 3px 0"><span style="display: flex; gap: 10px"><span style="font-family: 'JetBrains Mono', monospace; width: 10px; color: {{c.fg}}">{{c.sign}}</span><span style="color: {{c.text}}">{{c.label}}</span></span><sc-if value="{{c.hasWarn}}" hint-placeholder-val="{{false}}"><span style="margin-left: 20px; font-size: 12px; color: #93370d">{{c.warn}}</span></sc-if></span></sc-for>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+          <div style="padding: 12px 22px 0">
+            <sc-if value="{{noteClosed}}" hint-placeholder-val="{{true}}">
+              <button onClick="{{openNote}}" style="border: 0; background: transparent; padding: 6px 0; color: #1a1f6e; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"></path></svg>Add a note for the activity log</button>
+            </sc-if>
+            <sc-if value="{{noteOpen}}" hint-placeholder-val="{{false}}">
+              <label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600; animation: foldIn .16s ease-out">Note for the activity log
+                <input class="fc" placeholder="Why, for whoever reads the history later" style="font-weight: 400">
+              </label>
+            </sc-if>
+          </div>
+          <div style="padding: 14px 22px 20px; display: flex; justify-content: flex-end; gap: 10px">
+            <button style="border: 1px solid #cbd5e1; background: #fff; color: #0f172a; border-radius: 10px; height: 44px; padding: 0 16px; font-size: 14px; font-weight: 500">Keep editing</button>
+            <button style="border: 0; background: #1a1f6e; color: #fff; border-radius: 10px; height: 44px; padding: 0 18px; font-size: 14px; font-weight: 600">Save 5 changes</button>
+          </div>
+        </div>
+      </div>
+      <p style="margin: 0; font-size: 13px; color: #475569; line-height: 1.45">The note stays here: you write the reason at the moment you commit, and it shows under that change on the role's History tab. Folded, so it costs nothing when you skip it.</p>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 24px; min-width: 0">
+      <div style="display: flex; flex-direction: column; gap: 10px">
+        <span style="font-size: 13px; font-weight: 600">LC · Leaving with unsaved changes: three moments, nothing to click</span>
+        <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px">
+          <sc-for list="{{frames}}" as="f" hint-placeholder-count="3">
+            <figure style="margin: 0; display: flex; flex-direction: column; gap: 8px">
+              <div style="position: relative; height: 230px; border-radius: 14px; overflow: hidden; background: #f3f5f9; box-shadow: 0 0 0 1px rgba(15,20,69,.08), 0 8px 24px rgba(15,20,69,.08)">
+                <div style="padding: 14px 16px; display: flex; flex-direction: column; gap: 8px">
+                  <span style="font-size: 11px; color: #475569">{{f.crumb}}</span>
+                  <span style="font-family: 'Inter Tight', sans-serif; font-weight: 700; font-size: 17px">{{f.title}}</span>
+                  <sc-for list="{{f.rows}}" as="r" hint-placeholder-count="3">
+                    <span style="height: 30px; border-radius: 8px; background: {{r.bg}}; box-shadow: 0 0 0 1px rgba(15,20,69,.07); display: flex; align-items: center; justify-content: space-between; padding: 0 10px; font-size: 12px">{{r.label}}<sc-if value="{{r.tag}}" hint-placeholder-val="{{false}}"><span style="font-size: 10px; font-weight: 600; color: #7a5b00; background: #fdf3cc; border-radius: 999px; padding: 1px 6px">Not saved</span></sc-if></span>
+                  </sc-for>
+                </div>
+                <sc-if value="{{f.bar}}" hint-placeholder-val="{{false}}">
+                  <div style="position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); background: #0f1445; color: #fff; border-radius: 10px; padding: 6px 6px 6px 12px; display: flex; align-items: center; gap: 8px; white-space: nowrap; box-shadow: 0 10px 24px rgba(15,20,69,.3)">
+                    <span style="display: flex; flex-direction: column"><span style="font-size: 12px; font-weight: 600">2 unsaved changes</span><span style="font-size: 10px; color: rgba(255,255,255,.7)">{{f.barSub}}</span></span>
+                    <span style="background: #e8b800; color: #0f1445; border-radius: 6px; padding: 5px 8px; font-size: 11px; font-weight: 600">Review and save</span>
+                  </div>
+                </sc-if>
+                <sc-if value="{{f.toast}}" hint-placeholder-val="{{false}}">
+                  <div role="status" style="position: absolute; bottom: 12px; right: 12px; left: 12px; background: #fff; border-radius: 10px; padding: 9px 11px; box-shadow: 0 0 0 1px rgba(15,20,69,.08), 0 10px 24px rgba(15,20,69,.16); font-size: 12px; display: flex; gap: 8px; align-items: center">
+                    <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1a1f6e" stroke-width="2"><path d="M14 3H6v18h12V7zM14 3v4h4"></path></svg>Your 2 changes to Chief mechanic are kept for when you come back
+                  </div>
+                </sc-if>
+              </div>
+              <figcaption style="font-size: 13px; color: #334155; line-height: 1.4"><strong style="font-weight: 600">{{f.step}}</strong> {{f.caption}}</figcaption>
+            </figure>
+          </sc-for>
+        </div>
+        <p style="margin: 0; font-size: 13px; color: #475569; line-height: 1.45">No keep or throw away buttons: the draft simply comes back, and Discard on the bar is how you throw it away. Drafts live in this browser only and clear after a save or a discard. Closing or reloading the tab still gets the browser's own “Leave site?” prompt.</p>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 10px">
+        <span style="font-size: 13px; font-weight: 600">Saving · my suggestion: save the whole thing, not field by field</span>
+        <div style="display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 16px">
+          <section style="position: relative; background: #fff; border-radius: 14px; box-shadow: 0 0 0 1px rgba(15,20,69,.07), 0 1px 3px rgba(15,20,69,.06); padding: 16px 16px 76px; display: flex; flex-direction: column; gap: 12px">
+            <span style="display: flex; flex-direction: column; gap: 2px"><span style="font-family: 'Inter Tight', sans-serif; font-size: 15px; font-weight: 700">Settings · Thresholds</span><span style="font-size: 12px; color: #64748b">Shared settings change things for everyone, so they use the save bar, like roles. <span style="color: #b42318">*</span> Required.</span></span>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px">
+              <sc-for list="{{fields}}" as="f" hint-placeholder-count="2">
+                <label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600"><span>{{f.label}} <span aria-hidden="true" style="color: #b42318">*</span></span>
+                  <input class="fc" value="{{f.value}}" onInput="{{f.set}}" style="font-weight: 400; border-color: {{f.border}}; background: {{f.bg}}">
+                </label>
+              </sc-for>
+            </div>
+            <span style="font-size: 12px; color: #64748b">Change a number to see the bar.</span>
+            <sc-if value="{{dirty}}" hint-placeholder-val="{{true}}">
+              <div style="position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%); background: #0f1445; color: #fff; border-radius: 10px; padding: 6px 6px 6px 12px; display: flex; align-items: center; gap: 8px; white-space: nowrap; box-shadow: 0 10px 24px rgba(15,20,69,.3); animation: toastIn .2s cubic-bezier(.2,.8,.2,1)">
+                <span style="font-size: 13px; font-weight: 600">{{dirtyText}}</span>
+                <button onClick="{{resetFields}}" style="border: 1px solid rgba(255,255,255,.4); background: transparent; color: #fff; border-radius: 8px; height: 32px; padding: 0 10px; font-size: 12px">Discard</button>
+                <button onClick="{{resetFields}}" style="border: 0; background: #e8b800; color: #0f1445; border-radius: 8px; height: 32px; padding: 0 10px; font-size: 12px; font-weight: 600">Review and save</button>
+              </div>
+            </sc-if>
+          </section>
+          <section style="background: #fff; border-radius: 14px; box-shadow: 0 0 0 1px rgba(15,20,69,.07), 0 1px 3px rgba(15,20,69,.06); padding: 16px; display: flex; flex-direction: column; gap: 12px">
+            <span style="display: flex; flex-direction: column; gap: 2px"><span style="font-family: 'Inter Tight', sans-serif; font-size: 15px; font-weight: 700">New vehicle · a form with Save</span><span style="font-size: 12px; color: #64748b">Making something new: one Save button that shows Saving… (SD).</span></span>
+            <label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600"><span>Plate number <span aria-hidden="true" style="color: #b42318">*</span></span><input class="fc" value="ABC 1234" style="font-weight: 400"></label>
+            <button onClick="{{saveForm}}" style="align-self: flex-start; border: 0; background: #1a1f6e; color: #fff; border-radius: 10px; height: 40px; padding: 0 16px; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px"><sc-if value="{{formSaving}}" hint-placeholder-val="{{false}}"><span aria-hidden="true" style="width: 13px; height: 13px; border-radius: 999px; border: 2px solid rgba(255,255,255,.35); border-top-color: #fff; animation: spin .7s linear infinite"></span></sc-if>{{formText}}</button>
+          </section>
+        </div>
+        <p style="margin: 0; font-size: 13px; color: #475569; line-height: 1.45">So there are only two ways to save: the save bar for changing what exists (roles, settings, modules), and a Save button for making something new. Saving inside a field (SB) is dropped: a typo would go live for everyone the moment you click away. The star now sits right after the label.</p>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1300}}'>
+const CH = [
+  ['Tickets', 'See every ticket', 0, 'They will only see tickets assigned to them.'], ['Tickets', 'Encode costs', 1], ['Tickets', 'Unlock closed tickets', 1],
+  ['Records', 'See the audit log', 1], ['Admin', 'Edit lookup lists', 0]
+];
+class Component extends DCLogic {
+  renderVals() {
+    const s = this.state || {};
+    const closed = s.closed || {};
+    const names = ['Tickets', 'Records', 'Admin'];
+    const fold = names.map((n, i) => {
+      const items = CH.filter((c) => c[0] === n);
+      const open = !closed[i];
+      const add = items.filter((c) => c[2]).length, rem = items.filter((c) => !c[2]).length;
+      return { name: n, open, rot: open ? 'rotate(90deg)' : 'none', add: String(add), rem: String(rem), hasAdd: add > 0, hasRem: rem > 0,
+        items: items.map((c) => ({ label: c[1], sign: c[2] ? '+' : '−', fg: c[2] ? '#067647' : '#b42318', text: c[2] ? '#0f172a' : '#475569', hasWarn: !!c[3], warn: c[3] || '' })),
+        toggle: () => this.setState({ closed: Object.assign({}, closed, { [i]: open }) }) };
+    });
+    const F = [['Days before a ticket counts as overdue', '7'], ['Hours before a repair needs sign off', '48']];
+    const vals = s.vals || {};
+    let dirtyN = 0;
+    const fields = F.map((f, i) => { const v = vals[i] === undefined ? f[1] : vals[i]; const d = v !== f[1]; if (d) dirtyN++; return { label: f[0], value: v, border: d ? '#e8b800' : '#dfe3ec', bg: d ? '#fffdf5' : '#fff', set: (e) => this.setState({ vals: Object.assign({}, vals, { [i]: e.target.value }) }) }; });
+    const rowsA = [{ label: 'See every ticket', tag: true, bg: '#fffbeb' }, { label: 'Encode costs', tag: true, bg: '#fffbeb' }, { label: 'Assign mechanics', tag: false, bg: '#fff' }];
+    const rowsB = [{ label: 'Joel Manalo', tag: false, bg: '#fff' }, { label: 'Ramon Villanueva', tag: false, bg: '#fff' }, { label: 'Victor Ramos', tag: false, bg: '#fff' }];
+    return {
+      fold, faces: ['RV', 'AB', 'DS', '+5'],
+      noteOpen: !!s.note, noteClosed: !s.note, openNote: () => this.setState({ note: true }),
+      frames: [
+        { step: '1 · You edit.', caption: 'Two switches changed on Chief mechanic. The save bar shows.', crumb: 'Roles', title: 'Chief mechanic', rows: rowsA, bar: true, barSub: 'Chief mechanic · affects 8 people', toast: false },
+        { step: '2 · You leave.', caption: 'You open People without saving. No dialog; a toast says the changes are kept.', crumb: 'Accounts', title: 'People', rows: rowsB, bar: false, barSub: '', toast: true },
+        { step: '3 · You come back.', caption: 'Chief mechanic opens with both changes still marked, and the bar is back. Save or Discard as usual.', crumb: 'Roles', title: 'Chief mechanic', rows: rowsA, bar: true, barSub: 'Kept from [time] · affects 8 people', toast: false }
+      ],
+      fields, dirty: dirtyN > 0, dirtyText: dirtyN + (dirtyN === 1 ? ' unsaved change' : ' unsaved changes'), resetFields: () => this.setState({ vals: {} }),
+      formSaving: !!s.formSaving, formText: s.formSaving ? 'Saving…' : 'Save vehicle',
+      saveForm: () => { this.setState({ formSaving: true }); setTimeout(() => this.setState({ formSaving: false }), 1400); }
+    };
+  }
+}
+</script>
+</body>
+</html>

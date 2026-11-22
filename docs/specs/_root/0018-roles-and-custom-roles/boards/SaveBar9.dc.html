@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Save bar, round 9</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Inter+Tight:wght@500;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+button{font:inherit;cursor:pointer}
+button:focus-visible{outline:2px solid #e8b800;outline-offset:2px}
+.undo:hover{background:#f1f5f9!important;color:#0f172a!important}
+.chg:hover .undo{opacity:1}
+@keyframes barIn{from{transform:translateY(20px);opacity:0}to{transform:none;opacity:1}}
+@keyframes popIn{from{transform:translateY(6px) scale(.98);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion: reduce){*{animation-duration:1ms!important;transition-duration:1ms!important}}
+</style>
+</helmet>
+<div style="width: 1280px; height: 1000px; box-sizing: border-box; padding: 40px 48px; font-family: Inter, system-ui, sans-serif; color: #0f172a; background: #e9ecf3; display: flex; flex-direction: column; gap: 20px">
+  <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 16px">
+    <div style="display: flex; flex-direction: column; gap: 6px">
+      <h1 style="margin: 0; font-family: 'Inter Tight', sans-serif; font-weight: 700; font-size: 30px; letter-spacing: -0.02em">Save bar: a fuller change list</h1>
+      <p style="margin: 0; font-size: 15px; color: #475569; max-width: 760px">More detail, kept quiet: the role and a small +2 −1 on top, changes grouped like the page with what each was and becomes, a labelled Undo, and who gets it at the bottom. Discard on the bar undoes everything.</p>
+    </div>
+    <div role="group" aria-label="How many changes" style="display: flex; background: #dfe3ec; border-radius: 10px; padding: 4px; gap: 2px">
+      <sc-for list="{{presets}}" as="m" hint-placeholder-count="2">
+        <button aria-pressed="{{m.on}}" onClick="{{m.pick}}" style="border: 0; border-radius: 7px; height: 36px; padding: 0 14px; font-size: 14px; font-weight: 600; background: {{m.bg}}; color: {{m.fg}}; box-shadow: {{m.sh}}">{{m.name}}</button>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="flex: 1; min-height: 0; display: flex; border-radius: 16px; overflow: hidden; box-shadow: 0 0 0 1px rgba(15,20,69,.08), 0 24px 60px rgba(15,20,69,.16); background: #f3f5f9">
+    <div aria-hidden="true" style="flex: 0 0 200px; background: #0f1445; padding: 18px 14px; box-sizing: border-box; display: flex; flex-direction: column; gap: 8px">
+      <span style="width: 120px; height: 12px; border-radius: 4px; background: rgba(255,255,255,.25); margin-bottom: 18px"></span>
+      <span style="height: 32px; border-radius: 8px; background: rgba(255,255,255,.06)"></span>
+      <span style="height: 32px; border-radius: 8px; background: rgba(255,255,255,.14)"></span>
+      <span style="height: 32px; border-radius: 8px; background: rgba(255,255,255,.06)"></span>
+    </div>
+    <div style="flex: 1; min-width: 0; height: 100%; overflow: auto; position: relative; display: flex; flex-direction: column">
+      <div style="padding: 28px 32px 120px; display: flex; flex-direction: column; gap: 16px; flex: 1">
+        <div style="display: flex; flex-direction: column; gap: 4px">
+          <span style="font-size: 13px; color: #475569">Roles / VRMS</span>
+          <h2 style="margin: 0; font-family: 'Inter Tight', sans-serif; font-weight: 700; font-size: 26px; letter-spacing: -0.02em">Chief mechanic</h2>
+        </div>
+        <sc-for list="{{groups}}" as="g" hint-placeholder-count="2">
+          <section style="background: #fff; border-radius: 14px; box-shadow: 0 0 0 1px rgba(15,20,69,.07), 0 1px 3px rgba(15,20,69,.06); overflow: hidden">
+            <h3 style="margin: 0; padding: 14px 20px; font-family: 'Inter Tight', sans-serif; font-size: 16px; font-weight: 600; border-bottom: 1px solid #eef1f6">{{g.name}}</h3>
+            <sc-for list="{{g.items}}" as="it" hint-placeholder-count="5">
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 10px 20px; border-top: 1px solid #f3f5f9; background: {{it.rowBg}}; transition: background .2s">
+                <span style="font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 8px">{{it.label}}<sc-if value="{{it.changed}}" hint-placeholder-val="{{false}}"><span style="font-size: 11px; font-weight: 600; color: #7a5b00; background: #fdf3cc; border-radius: 999px; padding: 2px 8px">Not saved</span></sc-if></span>
+                <button aria-pressed="{{it.on}}" aria-label="{{it.label}}" onClick="{{it.toggle}}" style="flex: none; width: 44px; height: 26px; border-radius: 999px; border: {{it.border}}; background: {{it.track}}; position: relative; padding: 0; box-sizing: border-box; transition: background .18s"><span style="position: absolute; top: 2px; left: {{it.knob}}; width: 20px; height: 20px; border-radius: 999px; background: #fff; box-shadow: 0 1px 3px rgba(15,23,42,.3); transition: left .18s cubic-bezier(.2,.8,.2,1)"></span></button>
+              </div>
+            </sc-for>
+          </section>
+        </sc-for>
+      </div>
+
+      <sc-if value="{{show}}" hint-placeholder-val="{{true}}">
+        <div style="position: sticky; bottom: 24px; z-index: 4; display: flex; justify-content: center; pointer-events: none; animation: barIn .2s cubic-bezier(.2,.8,.2,1)">
+          <div style="position: relative; pointer-events: auto; width: fit-content; min-width: 580px; max-width: calc(100% - 32px)">
+            <sc-if value="{{listOpen}}" hint-placeholder-val="{{true}}">
+              <div role="region" aria-label="Unsaved changes" style="position: absolute; bottom: calc(100% + 8px); left: 0; right: 0; background: #fff; border-radius: 14px; box-shadow: 0 0 0 1px rgba(15,20,69,.08), 0 20px 48px rgba(15,20,69,.22); overflow: hidden; animation: popIn .16s cubic-bezier(.2,.8,.2,1)">
+                <div style="display: flex; align-items: center; gap: 12px; padding: 14px 16px 10px">
+                  <span style="flex: 1; font-family: 'Inter Tight', sans-serif; font-size: 15px; font-weight: 600">Changes to Chief mechanic</span>
+                  <span style="display: flex; gap: 10px; font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 500"><sc-if value="{{hasAdd}}" hint-placeholder-val="{{true}}"><span title="{{addTitle}}" style="color: #067647">+{{nAdd}}</span></sc-if><sc-if value="{{hasRem}}" hint-placeholder-val="{{true}}"><span title="{{remTitle}}" style="color: #b42318">−{{nRem}}</span></sc-if></span>
+                </div>
+                <div style="max-height: 300px; overflow: auto; padding: 0 0 6px; border-top: 1px solid #eef1f6">
+                  <sc-for list="{{cgroups}}" as="cg" hint-placeholder-count="2">
+                    <div>
+                      <span style="display: block; padding: 12px 16px 2px; font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #64748b">{{cg.name}}</span>
+                      <ul style="list-style: none; margin: 0; padding: 0 6px">
+                        <sc-for list="{{cg.items}}" as="c" hint-placeholder-count="2">
+                          <li class="chg" style="display: grid; grid-template-columns: 26px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 7px 6px 7px 10px; border-radius: 10px">
+                            <span aria-hidden="true" style="width: 26px; height: 26px; border-radius: 7px; background: {{c.tileBg}}; color: {{c.fg}}; display: flex; align-items: center; justify-content: center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="{{c.icon}}"></path></svg></span>
+                            <span style="min-width: 0; display: flex; flex-direction: column; gap: 1px">
+                              <span style="font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{c.label}}</span>
+                              <span aria-label="{{c.verb}}" style="display: flex; align-items: center; gap: 5px; font-size: 12px; color: #94a3b8"><span style="text-decoration: line-through">{{c.from}}</span><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M13 6l6 6-6 6"></path></svg><span style="font-weight: 600; color: {{c.fg}}">{{c.to}}</span></span>
+                            </span>
+                            <button class="undo" onClick="{{c.undo}}" aria-label="{{c.undoLabel}}" style="border: 0; background: transparent; color: #64748b; border-radius: 8px; height: 30px; padding: 0 8px; font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 5px"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7v6h6M3 13a9 9 0 1 0 3-7.7L3 8"></path></svg>Undo</button>
+                          </li>
+                        </sc-for>
+                      </ul>
+                    </div>
+                  </sc-for>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px; padding: 10px 16px; background: #f8f9fc; border-top: 1px solid #eef1f6">
+                  <span aria-hidden="true" style="display: flex; flex: none">
+                    <sc-for list="{{faces}}" as="f" hint-placeholder-count="3"><span style="width: 28px; height: 28px; border-radius: 999px; background: #e3e7f4; color: #1a1f6e; box-shadow: 0 0 0 2px #f8f9fc; margin-right: -4px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; letter-spacing: -0.02em">{{f}}</span></sc-for>
+                  </span>
+                  <span style="flex: 1; min-width: 0; font-size: 12px; color: #475569; padding-left: 4px; line-height: 1.4"><strong style="font-weight: 600; color: #0f172a">Ramon, Alfredo, Danilo and 5 more</strong> get this the next time they open VRMS</span>
+                </div>
+              </div>
+            </sc-if>
+            <div style="background: #0f1445; color: #fff; border-radius: 12px; padding: 8px 8px 8px 6px; display: flex; align-items: center; gap: 8px; box-shadow: 0 18px 44px rgba(15,20,69,.32)">
+              <button onClick="{{toggleList}}" aria-expanded="{{listOpen}}" style="border: 0; background: {{chipBg}}; color: #fff; border-radius: 8px; padding: 6px 10px; flex: 1; min-width: 0; display: flex; align-items: center; justify-content: space-between; gap: 12px; text-align: left; transition: background .15s">
+                <span style="display: flex; flex-direction: column; gap: 1px"><span style="font-size: 14px; font-weight: 600; white-space: nowrap">{{sentence}}</span><span style="font-size: 12px; color: rgba(255,255,255,.7); white-space: nowrap">Chief mechanic · affects 8 people</span></span>
+                <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform: {{rot}}; transition: transform .16s"><path d="m18 15-6-6-6 6"></path></svg>
+              </button>
+              <span aria-hidden="true" style="width: 1px; height: 28px; background: rgba(255,255,255,.14); margin: 0 4px"></span>
+              <button onClick="{{discard}}" style="border: 1px solid rgba(255,255,255,.4); background: transparent; color: #fff; border-radius: 8px; height: 40px; padding: 0 16px; font-size: 14px; font-weight: 500">Discard</button>
+              <button style="border: 0; background: #e8b800; color: #0f1445; border-radius: 8px; height: 40px; padding: 0 18px; font-size: 14px; font-weight: 600; white-space: nowrap">Review and save</button>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1000}}'>
+const CAT = [
+  { g: 'Tickets', items: [['See every ticket', 1], ['Assign mechanics', 1], ['Encode costs', 0], ['Verify or send back finished work', 1], ['Unlock closed tickets', 0], ['Use AI diagnosis', 1]] },
+  { g: 'Records', items: [['See the audit log', 0], ['See the Analytics page', 0], ["See the team’s workload", 1], ['Manage vehicles', 0]] },
+  { g: 'Knowledge', items: [['Read the fix library', 1], ['Edit the fix library and review suggestions', 1]] }
+];
+const PRESETS = [['3 changes', { '0|2': true, '0|0': true, '1|0': true }], ['8 changes', { '0|0': true, '0|2': true, '0|4': true, '0|5': true, '1|0': true, '1|1': true, '1|3': true, '2|1': true }]];
+class Component extends DCLogic {
+  renderVals() {
+    const s = this.state || {};
+    const preset = s.preset === undefined ? 0 : s.preset;
+    const flip = s.flip || PRESETS[preset][1];
+    const listOpen = s.list === undefined ? true : !!s.list;
+    let nAdd = 0, nRem = 0;
+    const changes = []; const byGroup = {};
+    const groups = CAT.map((g, gi) => {
+      const items = g.items.map((it, ii) => {
+        const key = gi + '|' + ii;
+        const changed = !!flip[key];
+        const on = changed ? !it[1] : !!it[1];
+        if (changed) {
+          if (on) nAdd++; else nRem++;
+          const ch = { label: it[0], group: g.g, icon: on ? 'M12 5v14M5 12h14' : 'M5 12h14', tileBg: on ? '#ecfdf3' : '#fef3f2', verb: on ? 'Allowed' : 'Taken away', from: on ? 'Off' : 'On', to: on ? 'On' : 'Off', fg: on ? '#067647' : '#b42318', undoLabel: 'Undo ' + it[0], undo: () => { const f = Object.assign({}, flip); delete f[key]; this.setState({ flip: f }); } };
+          changes.push(ch); (byGroup[g.g] = byGroup[g.g] || []).push(ch);
+        }
+        return { label: it[0], on, changed, rowBg: changed ? '#fffbeb' : '#fff', track: on ? '#1a1f6e' : '#e2e8f0', border: on ? '0' : '1px solid #64748b', knob: on ? '21px' : '2px', toggle: () => { const f = Object.assign({}, flip); if (f[key]) delete f[key]; else f[key] = true; this.setState({ flip: f }); } };
+      });
+      return { name: g.g, items };
+    });
+    const n = nAdd + nRem;
+    const presets = PRESETS.map((p, i) => { const on = i === preset && !s.flip; return { name: p[0], on, bg: on ? '#fff' : 'transparent', fg: on ? '#0f172a' : '#475569', sh: on ? '0 1px 2px rgba(15,20,69,.15)' : 'none', pick: () => this.setState({ preset: i, flip: undefined, list: true }) }; });
+    return {
+      presets, groups, changes, cgroups: Object.keys(byGroup).map((k) => ({ name: k, items: byGroup[k] })), faces: ['RV', 'AB', 'DS'], hasAdd: nAdd > 0, hasRem: nRem > 0, nAdd: String(nAdd), nRem: String(nRem), addTitle: nAdd + ' allowed', remTitle: nRem + ' taken away', listOpen: listOpen && n > 0, show: n > 0,
+      sentence: n + (n === 1 ? ' unsaved change' : ' unsaved changes'),
+      chipBg: listOpen ? 'rgba(255,255,255,.06)' : 'transparent',
+      rot: listOpen ? 'rotate(180deg)' : 'none',
+      toggleList: () => this.setState({ list: !listOpen }),
+      discard: () => this.setState({ flip: {}, list: false })
+    };
+  }
+}
+</script>
+</body>
+</html>

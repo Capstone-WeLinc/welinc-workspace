@@ -273,6 +273,7 @@ WL-304. The shared notification service every alert uses, across in app, email a
 WL-301. Unread count on the bell and counts on queue menus.
 **Done when:** the bell shows the unread count (99+ above 99) updating without a refresh, and sidebar queues show their pending counts.
 - Note (2026-11-01, replan): from spec 0015. The verification queue has no sidebar item, so its count lives in the summary band and the For verification section of the Chief's dashboard (the tiles are gone, spec 0022). Reconsider a badge there.
+- Note (2026-11-23, from spec 0027): the sidebar queue counts are delivered by feature 70 (`/vrms/nav/counts`); what is left here is the bell and its unread count, after feature 28.
 - [ ] Build it: `/develop notification badge`
 - [ ] Polish it (optional, ask first): `emil-design-eng` (badge changes) · `web-design-guidelines` · `break-ui` (0, 99 and 1000+ counts)
 

@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Permissions on a phone</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Inter+Tight:wght@500;600;700&amp;family=JetBrains+Mono:wght@500&amp;family=Newsreader:opsz,wght@6..72,500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+button{font:inherit;cursor:pointer}
+button:focus-visible{outline:2px solid #1a1f6e;outline-offset:2px}
+</style>
+</helmet>
+<div style="width: 390px; height: 1500px; overflow: hidden; font-family: Inter, system-ui, sans-serif; color: #0f172a; background: #f3f5f9; display: flex; flex-direction: column; position: relative">
+  <header style="background: #0f1445; color: #fff; padding: 14px 16px; display: flex; align-items: center; gap: 12px">
+    <button aria-label="Open menu" style="border: 0; background: rgba(255,255,255,.1); border-radius: 10px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"></path></svg></button>
+    <span style="font-family: 'Inter Tight', sans-serif; font-weight: 700; font-size: 17px; flex: 1">WeLinc</span>
+    <span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #e8b800">VRMS</span>
+  </header>
+
+  <div style="padding: 20px 16px 120px; display: flex; flex-direction: column; gap: 16px">
+    <div style="display: flex; flex-direction: column; gap: 4px">
+      <h1 style="margin: 0; font-family: Newsreader, serif; font-weight: 500; font-size: 32px; letter-spacing: -0.015em">Permissions</h1>
+      <p style="margin: 0; font-size: 14px; color: #475569">Pick a role, then switch what it may do.</p>
+    </div>
+
+    <div role="tablist" aria-label="Role" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; background: #e6e9f2; border-radius: 12px; padding: 4px">
+      <sc-for list="{{roles}}" as="r" hint-placeholder-count="3">
+        <button role="tab" aria-selected="{{r.active}}" onClick="{{r.pick}}" style="border: 0; border-radius: 9px; padding: 8px 4px; min-height: 52px; background: {{r.bg}}; color: {{r.fg}}; box-shadow: {{r.shadow}}; display: flex; flex-direction: column; align-items: center; gap: 2px">
+          <span style="font-size: 13px; font-weight: 600; line-height: 1.2; text-align: center">{{r.short}}</span>
+          <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; opacity: .8">{{r.count}}/27</span>
+        </button>
+      </sc-for>
+    </div>
+
+    <sc-for list="{{groups}}" as="g" hint-placeholder-count="4">
+      <section style="background: #fff; border-radius: 14px; box-shadow: 0 0 0 1px rgba(15,20,69,.07), 0 1px 3px rgba(15,20,69,.06); overflow: hidden">
+        <button onClick="{{g.toggle}}" aria-expanded="{{g.isOpen}}" style="width: 100%; border: 0; background: transparent; display: flex; align-items: center; gap: 10px; padding: 14px 16px; text-align: left; min-height: 52px">
+          <span style="font-family: 'Inter Tight', sans-serif; font-weight: 600; font-size: 16px; flex: 1">{{g.name}}</span>
+          <span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #1a1f6e; background: #eef0f8; border-radius: 6px; padding: 3px 7px">{{g.allowed}}/{{g.total}}</span>
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2" style="transform: {{g.rot}}"><path d="m6 9 6 6 6-6"></path></svg>
+        </button>
+        <sc-if value="{{g.isOpen}}" hint-placeholder-val="{{true}}">
+          <div>
+            <sc-for list="{{g.items}}" as="it" hint-placeholder-count="5">
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 16px; border-top: 1px solid #eef1f6; min-height: 52px; box-sizing: border-box">
+                <span style="font-size: 14px; font-weight: 500; line-height: 1.35; display: flex; flex-direction: column; gap: 2px">{{it.label}}
+                  <sc-if value="{{it.changed}}" hint-placeholder-val="{{false}}"><span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #5b4a00">EDITED</span></sc-if>
+                </span>
+                <sc-if value="{{it.on}}" hint-placeholder-val="{{true}}">
+                  <button aria-pressed="true" aria-label="{{it.label}}" onClick="{{it.toggle}}" style="flex: none; width: 52px; height: 44px; border: 0; background: transparent; padding: 0; display: flex; align-items: center; justify-content: center"><span style="width: 44px; height: 26px; border-radius: 999px; background: #1a1f6e; position: relative; display: block"><span style="position: absolute; top: 3px; left: 21px; width: 20px; height: 20px; border-radius: 999px; background: #fff"></span></span></button>
+                </sc-if>
+                <sc-if value="{{it.off}}" hint-placeholder-val="{{false}}">
+                  <button aria-pressed="false" aria-label="{{it.label}}" onClick="{{it.toggle}}" style="flex: none; width: 52px; height: 44px; border: 0; background: transparent; padding: 0; display: flex; align-items: center; justify-content: center"><span style="width: 44px; height: 26px; border-radius: 999px; background: #f1f5f9; border: 1px solid #64748b; box-sizing: border-box; position: relative; display: block"><span style="position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; border-radius: 999px; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.25)"></span></span></button>
+                </sc-if>
+                <sc-if value="{{it.locked}}" hint-placeholder-val="{{false}}">
+                  <span style="flex: none; font-size: 12px; color: #475569; display: flex; align-items: center; gap: 4px"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="4" y="11" width="16" height="10" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg>{{it.lockText}}</span>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+      </section>
+    </sc-for>
+  </div>
+
+  <sc-if value="{{hasPending}}" hint-placeholder-val="{{true}}">
+    <div style="position: absolute; left: 0; right: 0; bottom: 0; background: #0f1445; color: #fff; padding: 12px 16px 20px; display: flex; align-items: center; gap: 10px; box-shadow: 0 -8px 24px rgba(15,20,69,.25)">
+      <span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; background: #e8b800; color: #0f1445; border-radius: 999px; padding: 3px 9px">{{pending}}</span>
+      <span style="font-size: 14px; flex: 1">{{pendingText}}</span>
+      <button onClick="{{discard}}" style="border: 0; background: transparent; color: rgba(255,255,255,.85); height: 44px; padding: 0 10px; font-size: 14px">Discard</button>
+      <button style="border: 0; background: #fff; color: #0f1445; border-radius: 10px; height: 44px; padding: 0 14px; font-size: 14px; font-weight: 600">Review</button>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1500}}'>
+const ROLES = [
+  { code: 'ADMIN', short: 'Admin' },
+  { code: 'CHIEF_MECHANIC', short: 'Chief mechanic' },
+  { code: 'MECHANIC', short: 'Mechanic' }
+];
+const RI = { ADMIN: 0, CHIEF_MECHANIC: 1, MECHANIC: 2 };
+const CAT = [
+  { g: 'Tickets', items: [
+    ['See tickets assigned to you', [1,1,1]],
+    ['See every ticket', [1,1,0]],
+    ['Create tickets and pick mechanics', [1,0,0]],
+    ['Work your assigned tickets', [0,1,1]],
+    ['Cancel tickets and make work moves on any ticket', [1,0,0]],
+    ['Verify or send back finished work', [1,1,0]],
+    ['See costs', [1,1,0]],
+    ['Encode costs', [1,0,0]],
+    ['Assign mechanics', [1,1,0]],
+    ['Edit ticket details and issues', [1,0,0]],
+    ['Unlock closed tickets', [1,0,0]],
+    ['Edit ticket checklists', [1,1,1]],
+    ['Add vehicle photos and proof', [1,1,1]],
+    ['Add receipts and other documents', [1,1,0]],
+    ['Remove anyone’s files', [1,1,0], 'MECHANIC'],
+    ['Use AI diagnosis', [1,1,1]]
+  ]},
+  { g: 'Records', items: [
+    ['See the audit log', [1,0,0]],
+    ['See the Analytics page', [1,0,0]],
+    ['Read garages, vehicles, drivers and mechanics', [1,1,1]],
+    ["See the team’s workload", [1,1,0]],
+    ['Manage vehicles', [1,0,0]]
+  ]},
+  { g: 'Knowledge', items: [
+    ['Read the fix library', [1,1,1]],
+    ['Suggest a fix library entry', [1,1,1]],
+    ['Edit the fix library and review suggestions', [1,1,0]]
+  ]},
+  { g: 'Admin', items: [
+    ['Manage the team', [1,0,0], 'ADMIN'],
+    ['Change settings and modules', [1,0,0], 'ADMIN'],
+    ['Edit lookup lists', [1,1,0]]
+  ]}
+];
+class Component extends DCLogic {
+  renderVals() {
+    const s = this.state || {};
+    const role = s.role || 'CHIEF_MECHANIC';
+    const flip = s.flip || { 'CHIEF_MECHANIC|0|7': true };
+    const open = s.open || { 0: true, 1: false, 2: false, 3: false };
+    const val = (r, gi, ii, it) => {
+      const base = !!it[1][RI[r]];
+      if (it[2] === r) return base;
+      return flip[r + '|' + gi + '|' + ii] ? !base : base;
+    };
+    const roles = ROLES.map((r) => {
+      let n = 0;
+      CAT.forEach((g, gi) => g.items.forEach((it, ii) => { if (val(r.code, gi, ii, it)) n++; }));
+      const active = r.code === role;
+      return { short: r.short, count: n, active, bg: active ? '#ffffff' : 'transparent', fg: active ? '#0f1445' : '#475569', shadow: active ? '0 1px 3px rgba(15,20,69,.15)' : 'none', pick: () => this.setState({ role: r.code }) };
+    });
+    const groups = CAT.map((g, gi) => {
+      const items = g.items.map((it, ii) => {
+        const key = role + '|' + gi + '|' + ii;
+        const locked = it[2] === role;
+        const on = val(role, gi, ii, it);
+        return {
+          label: it[0], on: on && !locked, off: !on && !locked, locked,
+          lockText: on ? 'Always on' : 'Always off',
+          changed: !locked && !!flip[key],
+          toggle: () => { const f = Object.assign({}, flip); if (f[key]) delete f[key]; else f[key] = true; this.setState({ flip: f }); }
+        };
+      });
+      const allowed = items.filter((i) => i.on || (i.locked && i.lockText === 'Always on')).length;
+      return {
+        name: g.g, items, allowed, total: items.length,
+        isOpen: !!open[gi], rot: open[gi] ? 'rotate(180deg)' : 'none',
+        toggle: () => this.setState({ open: Object.assign({}, open, { [gi]: !open[gi] }) })
+      };
+    });
+    const pending = Object.keys(flip).length;
+    return {
+      roles, groups,
+      pending, hasPending: pending > 0, pendingText: pending === 1 ? 'unsaved change' : 'unsaved changes',
+      discard: () => this.setState({ flip: {} })
+    };
+  }
+}
+</script>
+</body>
+</html>
