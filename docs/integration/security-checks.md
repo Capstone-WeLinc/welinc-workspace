@@ -9,7 +9,7 @@ The VRMS side is scope feature 69 (`docs/scope/vrms/platform.md`). This page is 
 | Check | What it looks at | When | Where the results are |
 |---|---|---|---|
 | **OWASP ZAP baseline** | Your web app on staging, from the outside | Mondays 02:00 Philippine time, and on demand | Workspace repo → Actions → ZAP baseline → a run → Artifacts (`zap-vmms`, `zap-bms`, …) |
-| **GitHub secret scanning with push protection** | Every push to your repos | Always (while the repos are public, until Dec 5) | Your repo → Security → Secret scanning |
+| **GitHub secret scanning with push protection** | Every push to your repos | Always (while the repos are public, until the final defense) | Your repo → Security → Secret scanning |
 | **gitleaks** (optional for you) | A pull request's commits | Every PR | The PR's checks |
 
 ## The ZAP scan

@@ -18,7 +18,7 @@ VRMS (Vehicle Repair Management System) rules, loaded on top of the root `AGENTS
 
 ## Build approach
 
-Tracer Bullet: each feature is built end to end through every layer and working before the next. The UI refresh phase overrides this with Facade: build the UI first on the data it already has. Workflow level is Beta (after `/develop`: `/check verify`, then `/test`). Never run or suggest `/check review` in this project, VRMS or shared work, and never add a `Review it` box. Deadline: deployed by the end of November 2026. The plan lives in `docs/scope/vrms/index.md`.
+Tracer Bullet: each feature is built end to end through every layer and working before the next. The UI refresh phase overrides this with Facade: build the UI first on the data it already has. Workflow level is Beta (after `/develop`: `/check verify`, then `/test`). Never run or suggest `/check review` in this project, VRMS or shared work, and never add a `Review it` box. Deadline: staging is the demo; the defense dates are moving (since 2026-11-22: final by Dec 20 at the latest, exact dates to come), and the Azure credit ends Dec 18. The plan lives in `docs/scope/vrms/index.md`.
 
 ## Commands
 
@@ -71,7 +71,7 @@ Product backlog lives in Jira (read it through the Atlassian MCP); Jira wins whe
 - branch prefix: feat/
 - commit: per-milestone
 - attribution: none. Never add a `Co-Authored-By` trailer or a "Generated with Claude Code" line to commits or PR descriptions; commits are authored by the developer alone.
-- rulesets (since 2026-11-20, enforced only while the repos are public, until Dec 5): in all 13 public repos `development` and `main` refuse force pushes and deletion; `development` in every service repo takes changes only through a PR with green required checks (`ci` and `gitleaks` in ours, plus `db` in auth; `ci` in VMMS and BMS, none yet in `welinc-mobile-bms` until it has CI); the workspace `main` is PR only with `gitleaks` required. Repository admins can bypass. A service repo's `main` still moves by the hand fast forward in spec 0008. Workspace CI skips docs only changes (`ci.yml` paths filter); `gitleaks` still runs.
+- rulesets (since 2026-11-20, enforced only while the repos are public, until the final defense): in all 13 public repos `development` and `main` refuse force pushes and deletion; `development` in every service repo takes changes only through a PR with green required checks (`ci` and `gitleaks` in ours, plus `db` in auth; `ci` in VMMS and BMS, none yet in `welinc-mobile-bms` until it has CI); the workspace `main` is PR only with `gitleaks` required. Repository admins can bypass. A service repo's `main` still moves by the hand fast forward in spec 0008. Workspace CI skips docs only changes (`ci.yml` paths filter); `gitleaks` still runs.
 
 ## Agent skills
 
