@@ -21,7 +21,7 @@ OVERNIGHT_LIMIT=90 bash agents/vrms/overnight/start.sh   # wait at 90% of the 5 
 
 **Fresh mode (the default)** runs each item in its own headless session, so item 6 is as sharp and as cheap as item 1: one long session re-reads its whole, growing context on every turn (the Nov 23 run reached 508k tokens in 35 minutes). Each item runs on its own model: a `[sonnet]` or `[opus high]` tag on its `queue.md` line, else Opus at medium effort for `/develop` and Sonnet at medium for everything else. Follow along with `tail -f docs/_private/vrms/overnight/runs/<run id>/runner.log`.
 
-**Usage meter.** Before every step a tiny Haiku call reads your 5 hour and weekly usage, and each step records its own. While the 5 hour window is at 95% or more, the run waits until it resets; with the week at 95% it closes out. The report ends with the table (step, model, turns, minutes, usage).
+**Usage meter.** At the start, the end and when each queue line begins (S19 is one line, however many milestones it has) a tiny Haiku call reads your 5 hour and weekly usage; every step also records the usage its own session saw, so the run knows where you are between checks. While the 5 hour window is at 95% or more, the run waits until it resets; with the week at 95% it closes out. The report ends with the table (step, model, turns, minutes, usage).
 
 **`--watch`** is the single session you can watch and message from the Claude app (Remote Control). It costs more and uses one model for everything; keep it for nights you want to follow along.
 
