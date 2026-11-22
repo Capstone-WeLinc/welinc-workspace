@@ -30,6 +30,7 @@ spec [0002](../../specs/vrms/0002-dashboard-attention-first/index.md) · code in
   - [x] Mechanic view: four tiles, urgency ordered work list, banner removed (AC-9 to AC-11, AC-17)
   - [x] States and sweep: skeleton, error and retry, dead widgets deleted, tokens only, 375px and 1280px with axe (AC-12, AC-15, AC-16)
 - [x] Verify it: `/check verify dashboard refresh` (2026-10-25: passed; midnight and last month checks not run)
+- Note (2026-11-23): picked in the S18 rounds (`Kpis13`, spec 0016 AC-14 and Follow-up): the KPI tiles become K15 `StatCard`s (caption, big mono number, a gold "Needs you" tag when hot, one context line, the whole card a link to the filtered list, no icon), and the dashboard gets a **period and garage filter** so no card says "last 7 days" (the period comes from the filter). S18's sweep restyles the tiles; the filter itself is this feature's work and still needs a ticket line for the PM. Retest after that settles.
 - [ ] Test it: `/test dashboard refresh` (deferred 2026-11-02: the UI may be redone, so tests wait until it settles)
 - [ ] Polish it (optional, ask first): `impeccable` · `web-design-guidelines` · `break-ui` (zero and huge counts, empty lists, long plates)
 
@@ -141,6 +142,7 @@ You find the current Audit log page ugly, and want it redone. It should be redes
 - Note (2026-11-08, replan): from spec 0024. Group one checklist save's step rows in Activity (a save can write up to about 40 rows, spec 0023).
 - Note (2026-11-10, replan): from spec 0023. Include its four new checklist event types in the Checklist chip.
 - Note (2026-11-12, replan, from suite spec 0011): the day grouped row style built for My profile Recent activity and the Users Activity dialog can be reused here.
+- Note (2026-11-23): your direction so far (carried in the handoffs since Nov 21, parked): a filterable table with a side panel for a row's changes (the GitHub, Okta and Stripe pattern), and two tabs, Timeline and **Deliveries** (feature 56's integration message record). No board exists yet: offer clickable mockups on the S18 look when this starts. Build it on spec 0016 (tables, side sheet, states).
 - [ ] Design it (spec): `/architect audit log page redesign`
 - [ ] Polish it (optional, ask first): `impeccable` · `web-design-guidelines` · `break-ui` (long actor names, many step ticks, long remarks, empty filters)
 
@@ -178,4 +180,6 @@ spec [0024](../../specs/vrms/0024-ticket-detail-redesign/index.md) · code in `w
 Rework the VRMS sidebar (and the portal Admin sidebar to match): a system switcher dropdown at the top, folding sections, a primary New repair button, queue counts, and an account menu at the bottom, instead of today's flat list.
 **Done when:** the chosen sidebar ships in web-vrms and the portal Admin, keeps the permission gating of `navItems.ts`, folds to icons on desktop, and still becomes the tab bar or sheet on phones.
 - Note (2026-11-18): raised by you: the sidebar is too plain. Four options are mocked up (N1 to N4 on the design directions canvas). Build it on the S18 design direction; the portal Admin half rides with S19 and S20.
+- Note (2026-11-23): the sidebar's look is settled by `Sidebars8` (canvas "WeLinc design directions", page "Round 8") and spec 0016 *Layout and navigation*: section labels with lines between them and **no folding** (only a page with pages under it, such as Repair tickets and Knowledge base, opens), section names Work, Fleet, Insights and Admin, counts as mono bubbles (gold only when hot), and the icon collapse. So "folding sections" in the intent above is out of date. What's left for this feature's `/architect` is which pages each role sees, the New repair button, and the phone tab bar or sheet (spec 0016 AC-16 leaves those here).
+- Note (2026-11-23, board check): also open, since `Sidebars8` doesn't draw them: what the system switcher and the account menu hold, the "Back to the portal" link, and the phone layout (only round 1's `BPhone` drew one; spec 0016 says a bottom tab bar for roles with at most 5 items, a sheet otherwise). Settled in round 6: no Inbox, Settings without a dropdown, Audit logs uses the ScrollText icon and Settings a cog.
 - [ ] Design it (spec): `/architect navigation redesign`
