@@ -16,7 +16,8 @@
     },
     "enabledGroups": {
       "value": [
-        "bms"
+        "bms",
+        "vmms"
       ]
     },
     "groupApps": {
@@ -76,6 +77,18 @@
             "BOOKING_API_URL": "https://bms-booking-staging.internal.mangocliff-6bf65d8d.southeastasia.azurecontainerapps.io",
             "DISPATCH_API_URL": "https://bms-dispatch-staging.internal.mangocliff-6bf65d8d.southeastasia.azurecontainerapps.io",
             "COMPLETION_API_URL": "https://bms-completion-staging.internal.mangocliff-6bf65d8d.southeastasia.azurecontainerapps.io"
+          }
+        },
+        "vmms-backend": {
+          "settings": {
+            "AUTH_CLIENT_ID": "vmms",
+            "CORS_ORIGINS": "https://staging-vmms.welinc.app,https://staging-portal.welinc.app"
+          }
+        },
+        "vmms-analytics": {
+          "settings": {
+            "VMMS_API_BASE_URL": "https://vmms-backend-staging.internal.mangocliff-6bf65d8d.southeastasia.azurecontainerapps.io/vmms",
+            "DUCKDB_PATH": "/tmp/vmms_datamart.duckdb"
           }
         }
       }
