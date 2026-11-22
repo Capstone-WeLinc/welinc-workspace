@@ -38,7 +38,12 @@
             "BMS_BOOKING_HOST": "true",
             "CORS_ORIGINS": "https://staging-bms.welinc.app,https://staging-portal.welinc.app",
             "DISPATCH_API_URL": "https://bms-dispatch-staging.internal.mangocliff-6bf65d8d.southeastasia.azurecontainerapps.io",
-            "COMPLETION_API_URL": "https://bms-completion-staging.internal.mangocliff-6bf65d8d.southeastasia.azurecontainerapps.io"
+            "COMPLETION_API_URL": "https://bms-completion-staging.internal.mangocliff-6bf65d8d.southeastasia.azurecontainerapps.io",
+            "SMTP_HOST": "smtp-relay.brevo.com",
+            "SMTP_PORT": "587",
+            "SMTP_USER": "c36f7f001@smtp-brevo.com",
+            "SMTP_FROM": "WeLinc Logistics <noreply@welinc.app>",
+            "CUSTOMER_SUPPORT_EMAIL": "welinc.demo+bms.support@gmail.com"
           }
         },
         "bms-dispatch": {
