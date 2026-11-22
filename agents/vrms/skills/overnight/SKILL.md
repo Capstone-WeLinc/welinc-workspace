@@ -137,7 +137,7 @@ For each `pending` item, in order:
 
 **Diagrams and images:** export PNG only (no SVG, no DBML); the sources (`.puml`, `.drawio`) can export SVG later. Sign in only with seeded `@welinc.com` accounts; never type a real email address anywhere (local auth sends real mail). Steps in a `verify.md` that need staging, another group, a real person or a real device: mark them "left for you" and verify the local steps.
 
-**Usage:** `start.sh` checks your usage before every step and waits while the 5 hour window is at 95% or more, so never stop or slow down on your own because of usage.
+**Usage:** `start.sh` checks your usage when each queue line starts (and every step records the usage its own session saw) and waits while the 5 hour window is at 95% or more, so never stop or slow down on your own because of usage.
 
 **Halt the whole run** (set `status` to `halted`, write `haltReason`, go to Step 3) when: auto mode stops allowing actions (several blocks in a row, or Claude Code starts asking for permission), three items in a row fail for the same cause (usually the environment, not the code), Docker or the databases go down and won't come back, or you are about to do something the overrides forbid.
 

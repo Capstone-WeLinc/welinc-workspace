@@ -136,9 +136,11 @@ wait_for_room() {
 # usage limit waits for the reset and runs again (up to 3 times); any other failure returns 1 at once, so
 # one bad item costs one session, not three. Returns 2 when the week is full.
 step() {
-  local mode="$1" prompt="$2" model="$3" effort="$4" label="$5" tries=0
+  local mode="$1" prompt="$2" model="$3" effort="$4" label="$5" probe="${6:-0}" tries=0
   while true; do
-    node "$RUNNER" probe "before $label" >>"$LOG" 2>&1 || true
+    # The usage check runs once per queue line (probe=1), not once per milestone session. Between checks
+    # every step records the usage its own session saw, and wait_for_room reads that, so it costs nothing.
+    [ "$probe" = 1 ] && node "$RUNNER" probe "before $label" >>"$LOG" 2>&1 || true
     wait_for_room || return 2
     echo "[$(date +%H:%M)] $label on $model $effort: $prompt" >>"$LOG"
     if OVERNIGHT_MODE="$mode" "$CLAUDE_BIN" -p "$prompt" --settings "$SETTINGS" --permission-mode auto \
@@ -171,11 +173,16 @@ if ! step prepare "/overnight --prepare ${ARGS[*]:-}" sonnet medium prepare || [
   exit 1
 fi
 rounds=0
+last_group=""
 while [ "$rounds" -lt 50 ]; do
   NEXT="$(node agents/vrms/overnight/guard.mjs next </dev/null 2>/dev/null)" || break
   read -r _left model effort item <<<"$NEXT"
   code=0
-  step one "/overnight --one" "$model" "$effort" "$item" || code=$?
+  group="${item%-m[0-9]*}" # S19-m1, S19-m2 and so on are one queue line: S19
+  probe=0
+  [ "$group" != "$last_group" ] && probe=1
+  last_group="$group"
+  step one "/overnight --one" "$model" "$effort" "$item" "$probe" || code=$?
   [ "$code" = 2 ] && break # the week is full
   # The session ended but the item is still open (it crashed, ran out of turns, or never saved): fail it,
   # so the loop moves on instead of starting it again.
