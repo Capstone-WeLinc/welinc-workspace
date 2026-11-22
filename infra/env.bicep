@@ -140,7 +140,8 @@ var dbHost = 'psql-welinc-${envName}.postgres.database.azure.com'
 var internal = 'internal.${platform.outputs.defaultDomain}'
 
 // Base names (contract 0001 section 2); the deployed names add nameSuffix
-var coreApps = ['api-gateway', 'auth-service', 'vrms-backend']
+var coreApps = [
+  'aaaaaaaaaaaaaaaaaaaaaaaaa''api-gateway', 'auth-service', 'vrms-backend']
 var coreJobs = ['auth-migrate', 'auth-seed', 'vrms-migrate', 'vrms-seed']
 
 // https://<app name with its ending>.internal.<environment domain> (spec 0008, Internal addresses)
