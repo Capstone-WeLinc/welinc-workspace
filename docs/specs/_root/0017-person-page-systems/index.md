@@ -1,7 +1,7 @@
 # 0017. Person page shows the whole person (People list and detail)
 
 **Date**: 2026-11-23
-**Status**: In Progress
+**Status**: Accepted
 **Scope row**: [S19](../../../scope/_root/shared-services.md#s19-person-page-shows-only-the-persons-systems--in-progress--beta)
 **Design source**: board `People8` (canvas "WeLinc design directions", page "Round 8"), the Access rows of `People4`, and the Add person dialog AA of `AddPerson6`. Copies live in [boards/](boards/) (`.dc.html` source, readable from any account); the canvas is https://claude.ai/artifact/VFhLSMNhfpAFD4D4c2VQzp. Your picks: `docs/context/vrms/handoff-2026-11-18.md` (git, commit 33db0d0). The look follows spec [0016](../0016-design-direction-refresh/index.md).
 
@@ -62,7 +62,8 @@ The person page stops being "a person inside one system": systems become rows, t
 
 **Data model sketch** (welinc-auth only; the portal stores nothing new):
 - `users.last_signed_in_at` `timestamptz(3)` (milliseconds, so a cursor round trip through JavaScript never loses precision), nullable, `@map("last_signed_in_at")`. Index in the migration SQL: `(last_signed_in_at DESC NULLS LAST, id)`.
-- No other table changes. `created_at` gets no index (the suite is small; revisit past a few thousand people).
+- `users.created_at` goes from `timestamptz(6)` to `timestamptz(3)` (amended 2026-11-23, during `/develop`), in its own migration (`20261123000100_users_created_at_ms`): the "Newest first" cursor goes through JavaScript, which keeps milliseconds only, so at microseconds a cursor could skip people made in the same millisecond. Existing values round by under a millisecond; changing a column type fires no row trigger, so the directory feed writes nothing. It gets no index (the suite is small; revisit past a few thousand people).
+- No other table changes.
 
 **Scope shape** (welinc-auth): `AccountScope` carries `systems: SystemType[] | null` instead of one `system`: one system given is a list of one, a suite admin with no system is `null`, a system admin with no system is their `adminOf` at request time. `assertInScope`, `mapScopedUser`, `listPeople`, `getPerson` and the activity service's `listForUser` take that shape ("a role in any of `systems`"; null = everyone). `otherSystems` fills only when `systems` has one entry (today's shape). Only the three read routes accept a list longer than one; write routes keep `systemScope` and a required `system`.
 
@@ -125,20 +126,20 @@ Contract 0001: an additive amendment (no version bump: a former 400 now answers 
 
 The welinc-auth steps (1 to 3) don't need S18 and can ship first. The portal steps (4 to 8) start after S18's milestones 1 to 3 (tokens and fonts, base components, `PageHeader`, `InitialsTile`, `RoleChip`, the sidebar and the app shell). Tracer Bullet inside each half.
 
-1. welinc-auth: migration for `last_signed_in_at` with its index and the backfill in SQL; the forward only write at both sign in sites with a unit test each, satisfies **AC-22**
-2. welinc-auth: the `systems` scope shape on the three read routes (person, activity, list), every role with per role `temporaryUntil`, AC-21's person fields, tests for each scope rule, satisfies **AC-19**, **AC-21**
-3. welinc-auth: `group` with `counts`, `sort` with keyset cursors that carry sort and filters, `status` lists, `q` on role labels; then the contract 0001 amendment, regenerated `docs/openapi.json`, `check-contract-routes.mjs`, satisfies **AC-20**, **AC-23**
-4. Portal tracer: the `People8` page on the app shell with the list (Name sort, All filter, one group) and the person pane (header, facts strip, Overview's Access card) for `multi.admin@`; routes, deep links, `?system` handling, satisfies **AC-1**, **AC-2**, **AC-7**, **AC-9**, **AC-10**
-5. Access tab with the three row kinds and hidden cases, the Change role dialog with its messages, and the AA dialog (replacing `AddPersonPage`) for Give access and Add person, satisfies **AC-12**, **AC-13**, **AC-14**, **AC-17**
-6. Header actions by status, the ⋮ menu with its hidden and disabled cases, AC-16's system rule, reauth, the Sign in card, Signed in devices and Activity tabs, refresh and conflict handling, satisfies **AC-8**, **AC-11**, **AC-15**, **AC-16**, **AC-18**
-7. The full list pane: three groups with counts and Load more, sorts, search, filters per admin kind, code chips, no match and empty states, phones as separate screens; retire `PeopleView`, `PersonPage` and `AddPersonPage`, and repoint their callers (`adminViews.ts`, the `AdminShell` nav, the Overview and Suite admins pages' person links), satisfies **AC-3**, **AC-4**, **AC-5**, **AC-6**
-8. Sweep: 375px and 1280px, keyboard, axe, lint, typecheck, builds, tests, and the board comparison, satisfies **AC-23**, **AC-24**
+1. [x] welinc-auth: migration for `last_signed_in_at` with its index and the backfill in SQL; the forward only write at both sign in sites with a unit test each, satisfies **AC-22**
+2. [x] welinc-auth: the `systems` scope shape on the three read routes (person, activity, list), every role with per role `temporaryUntil`, AC-21's person fields, tests for each scope rule, satisfies **AC-19**, **AC-21**
+3. [x] welinc-auth: `group` with `counts`, `sort` with keyset cursors that carry sort and filters, `status` lists, `q` on role labels; then the contract 0001 amendment, regenerated `docs/openapi.json`, `check-contract-routes.mjs`, satisfies **AC-20**, **AC-23**
+4. [x] Portal tracer: the `People8` page on the app shell with the list (Name sort, All filter, one group) and the person pane (header, facts strip, Overview's Access card) for `multi.admin@`; routes, deep links, `?system` handling, satisfies **AC-1**, **AC-2**, **AC-7**, **AC-9**, **AC-10**
+5. [x] Access tab with the three row kinds and hidden cases, the Change role dialog with its messages, and the AA dialog (replacing `AddPersonPage`) for Give access and Add person, satisfies **AC-12**, **AC-13**, **AC-14**, **AC-17**
+6. [x] Header actions by status, the ⋮ menu with its hidden and disabled cases, AC-16's system rule, reauth, the Sign in card, Signed in devices and Activity tabs, refresh and conflict handling, satisfies **AC-8**, **AC-11**, **AC-15**, **AC-16**, **AC-18**
+7. [x] The full list pane: three groups with counts and Load more, sorts, search, filters per admin kind, code chips, no match and empty states, phones as separate screens; retire `PeopleView`, `PersonPage` and `AddPersonPage`, and repoint their callers (`adminViews.ts`, the `AdminShell` nav, the Overview and Suite admins pages' person links), satisfies **AC-3**, **AC-4**, **AC-5**, **AC-6**
+8. [x] Sweep: 375px and 1280px, keyboard, axe, lint, typecheck, builds, tests, and the board comparison, satisfies **AC-23**, **AC-24**
 
 ## Migration plan
 
 **Strategy**: strangler, two deploys.
 **Phases**:
-1. welinc-auth (steps 1 to 3): the column with its backfill inside the migration, the wider read scope, `group`, `sort`, the new fields, the contract amendment. Additive only: today's portal, VMMS and BMS keep working unchanged.
+1. welinc-auth (steps 1 to 3): the column with its backfill inside the migration, `created_at` at milliseconds (a second migration), the wider read scope, `group`, `sort`, the new fields, the contract amendment. Additive only: today's portal, VMMS and BMS keep working unchanged.
 2. Portal (steps 4 to 8): the new People page replaces `PeopleView`, `PersonPage` and `AddPersonPage` in one PR, with the spec 0013 deep links kept.
 **Rollback**: revert the portal PR to bring the old pages back (they still work against the new auth); the welinc-auth changes can stay, or revert them too (the column is nullable and nothing else reads it).
 **Risks**: the backfill scans `account_events` per account (fine at the suite's size; deploy outside a defense window, spec 0008's freeze rule); a missed sign in site leaves the column stale, which the per site tests catch.
@@ -158,7 +159,7 @@ The welinc-auth steps (1 to 3) don't need S18 and can ship first. The portal ste
 - Restore stays a suite admin action reached from Deletion requests, as today.
 
 **Neutral**:
-- One small migration in welinc-auth; the column stays nullable, and accounts whose sign ins were pruned by event retention start as "Never".
+- Two small migrations in welinc-auth; the column stays nullable, and accounts whose sign ins were pruned by event retention start as "Never". `created_at` keeps milliseconds from now on; nothing reads its microseconds.
 - The account wide actions keep sending one system behind the scenes (AC-16).
 
 ## Follow-up

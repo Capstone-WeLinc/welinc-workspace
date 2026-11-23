@@ -176,6 +176,18 @@ Then update the feature's **status**, in the `At-a-glance` table AND beside its 
 - **Conservative**: tick only on clearly present evidence; when unsure, leave it.
 - **Git**: if root `AGENTS.md` `## Git` says `integration: on` and `commit` is not `manual`, offer to commit the reconciliation with a one line subject (`chore(sync): reconcile docs`) plus the `Co-Authored-By` trailer; never push.
 
+### 6b. Update the handoff and the docs the change made wrong
+
+**Handoff.** If the project keeps a handoff file (the root or group `AGENTS.md`, or a personal `CLAUDE.local.md`, names where, e.g. the newest `docs/context/<system>/handoff-YYYY-MM-DD.md`; there is only ever one), bring it up to date with the change:
+- Mark finished items finished, or drop them, and add what is now open because of this change: open PRs with their merge order, migrations that ship, local choices still waiting on the engineer, follow ups found during the build.
+- Check PR and branch states with `gh` before you write them, never from memory (for example, an earlier feature's PRs may have merged since).
+- Keep it as one file. Rename it to today's date if its date is older, and fix any link to the old name.
+- Keep the *Decided* list for lasting decisions. Never rewrite one; if this change contradicts one, flag it under `CONFLICTS`.
+
+**Other docs.** Fix a line in a doc that this change made wrong: a guide in `docs/integration/`, a context file in `docs/context/`, or a `README.md` that names a file, route, field, command or screen the change moved, removed or renamed. Edit only that line (surgical and corrective, same rules as Step 1). Never edit spec content (Step 5 flags those) or the scope beyond Step 6. A contract or shared doc change that needs other groups goes under `CONFLICTS`, not into the file.
+
+Record both under `HANDOFF_AND_DOCS`.
+
 ### 7. Report
 
 Output exactly this block, verbatim, no extra prose. Omit any section that's empty.
@@ -197,6 +209,9 @@ SCOPE_RECONCILED:
 
 SPEC_STATUS_RECONCILED:
 - <docs/specs/file>, <Status line: Proposed→In Progress→Accepted to match the feature's scope status>
+
+HANDOFF_AND_DOCS:
+- <path>, <items closed or added in the handoff / the one line corrected>
 
 STALE_SPECS:
 - <docs/specs/file>, <why the change makes it stale, or a status mismatch you couldn't safely reconcile>
