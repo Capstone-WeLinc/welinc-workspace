@@ -125,9 +125,9 @@ Contract 0001: an additive amendment (no version bump: a former 400 now answers 
 
 The welinc-auth steps (1 to 3) don't need S18 and can ship first. The portal steps (4 to 8) start after S18's milestones 1 to 3 (tokens and fonts, base components, `PageHeader`, `InitialsTile`, `RoleChip`, the sidebar and the app shell). Tracer Bullet inside each half.
 
-1. welinc-auth: migration for `last_signed_in_at` with its index and the backfill in SQL; the forward only write at both sign in sites with a unit test each, satisfies **AC-22**
-2. welinc-auth: the `systems` scope shape on the three read routes (person, activity, list), every role with per role `temporaryUntil`, AC-21's person fields, tests for each scope rule, satisfies **AC-19**, **AC-21**
-3. welinc-auth: `group` with `counts`, `sort` with keyset cursors that carry sort and filters, `status` lists, `q` on role labels; then the contract 0001 amendment, regenerated `docs/openapi.json`, `check-contract-routes.mjs`, satisfies **AC-20**, **AC-23**
+1. [x] welinc-auth: migration for `last_signed_in_at` with its index and the backfill in SQL; the forward only write at both sign in sites with a unit test each, satisfies **AC-22**
+2. [x] welinc-auth: the `systems` scope shape on the three read routes (person, activity, list), every role with per role `temporaryUntil`, AC-21's person fields, tests for each scope rule, satisfies **AC-19**, **AC-21**
+3. [x] welinc-auth: `group` with `counts`, `sort` with keyset cursors that carry sort and filters, `status` lists, `q` on role labels; then the contract 0001 amendment, regenerated `docs/openapi.json`, `check-contract-routes.mjs`, satisfies **AC-20**, **AC-23**
 4. Portal tracer: the `People8` page on the app shell with the list (Name sort, All filter, one group) and the person pane (header, facts strip, Overview's Access card) for `multi.admin@`; routes, deep links, `?system` handling, satisfies **AC-1**, **AC-2**, **AC-7**, **AC-9**, **AC-10**
 5. Access tab with the three row kinds and hidden cases, the Change role dialog with its messages, and the AA dialog (replacing `AddPersonPage`) for Give access and Add person, satisfies **AC-12**, **AC-13**, **AC-14**, **AC-17**
 6. Header actions by status, the ⋮ menu with its hidden and disabled cases, AC-16's system rule, reauth, the Sign in card, Signed in devices and Activity tabs, refresh and conflict handling, satisfies **AC-8**, **AC-11**, **AC-15**, **AC-16**, **AC-18**
