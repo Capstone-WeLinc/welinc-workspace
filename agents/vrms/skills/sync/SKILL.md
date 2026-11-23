@@ -1,7 +1,7 @@
 ---
 name: sync
 allowed-tools: Bash, Read, Grep, Glob, Write, Edit, Agent
-description: "Run /sync as the last step after a change is complete, around merge, to keep durable knowledge current. Updates root and nested AGENTS.md, reconciles the scope from repo evidence, and flags specs the change made stale. Surgical edits only: it adds lines, and rewrites single lines it owns. Never a whole section, never curated prose."
+description: "Run /sync as the last step after a change is complete, around merge, to keep durable knowledge current. Updates root and nested AGENTS.md, reconciles the scope from repo evidence, updates the handoff file and any doc line the change made wrong, and flags specs the change made stale. Surgical edits only: it adds lines, and rewrites single lines it owns. Never a whole section, never curated prose."
 ---
 
 ## Output style (plain words, no dashes, no hyphens)
@@ -12,7 +12,7 @@ Write everything this skill produces, files and messages alike, in plain simple 
 
 ## What this skill does
 
-Closes the loop on a completed change: syncs AGENTS.md files, the scope, and linked spec `**Status**:` lines to what the repo now shows, and flags what it must not edit (stale specs, curated prose). The Boundaries table below is the exact contract.
+Closes the loop on a completed change: syncs AGENTS.md files, the scope, linked spec `**Status**:` lines, the handoff file, and doc lines the change made wrong to what the repo now shows, and flags what it must not edit (stale specs, curated prose). The Boundaries table below is the exact contract.
 
 **`agent-prompt.md`** is the single source of truth for the maintenance rules; SKILL.md covers only orchestration. The main thread reads it and does the maintenance itself (see Step 3).
 
@@ -28,6 +28,8 @@ Closes the loop on a completed change: syncs AGENTS.md files, the scope, and lin
 | Create nested `<area>/AGENTS.md` for an area **net new in this change** | ✅ creates (diff = full area context) + adds root pointer | /sync |
 | Create nested doc for an **already existing** undocumented area (only sliced by the diff) | ❌ flags "run /audit" | /audit |
 | Create or restructure the **root** AGENTS.md | ❌ flags "run /audit" | /audit |
+| Update the handoff file (close finished items, add what this change left open, PR states checked with `gh`) | ✅ maintains; never rewrites a *Decided* line | /sync |
+| Correct a line in `docs/integration/`, `docs/context/` or a `README.md` that names something the change moved, removed or renamed | ✅ that one line only | /sync |
 | Reconcile a spec's `**Status**:` line to its feature's scope status (`planned`→`Proposed`, `in-progress`→`In Progress`, `done`→`Accepted`; an `Assumed` spec is the exception: leave it `Assumed` and surface it, never reconcile it to `Accepted`) | ✅ Status line only | /sync |
 | Clear an `Assumed` spec (move it out of `Assumed`) | ❌ flags as decision debt "run /architect to ratify" (never reconciled to the feature status; only ratification clears it) | /architect |
 | Edit a spec's **content** / supersede it | ❌ flags as stale | /architect |
@@ -74,7 +76,7 @@ Remove duplicates, then **filter to source files** to sync *from*:
 - **Keep the `D` (deleted) entries** in a separate list; they drive orphan cleanup (Step 3) though they aren't synced *from*.
 - **Keep dependency manifest changes in a separate list** for tool discovery, even if they are config rather than source: `package.json`, `pyproject.toml`, `requirements*.txt`, `go.mod`, `Cargo.toml`, `composer.json`, `Gemfile`, `pubspec.yaml`, `mix.exs`, `*.csproj`, and equivalent package manifests. Lock files are signals only; do not pass lockfile contents.
 
-**If no source files and no dependency manifest changes remain** (only docs/tests/lock/generated files changed), stop, nothing to sync. Do not spawn.
+**If no source files and no dependency manifest changes remain** (only docs/tests/lock/generated files changed), skip Steps 1 to 6 of the maintenance and do only the handoff update (agent-prompt.md Step 6b) when a handoff file exists; otherwise stop, nothing to sync. Do not spawn.
 
 ### 2. Locate the context files and specs (paths only, do NOT read them here)
 
