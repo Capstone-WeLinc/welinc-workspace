@@ -1,7 +1,8 @@
 # Top bar, breadcrumb and sidebar account menu
 
-Status: committed, not yet pushed. Branch `BMS/top-bar-and-breadcrumb` in
-`welinc-web-bms` (`c5168dc`), into `development`.
+Status: in review. Branch `BMS/top-bar-and-breadcrumb` in `welinc-web-bms`,
+pull request [#29](https://github.com/Capstone-WeLinc/welinc-web-bms/pull/29)
+into `development`.
 
 These changes copy the navigation update the VMMS front end (`welinc-web-vmms`,
 PR #26, `f3e31ee`) made to its sidebar, breadcrumb and notification bell. BMS
