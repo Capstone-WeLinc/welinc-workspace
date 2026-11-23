@@ -1,7 +1,7 @@
 # 0017. Person page shows the whole person (People list and detail)
 
 **Date**: 2026-11-23
-**Status**: In Progress
+**Status**: Accepted
 **Scope row**: [S19](../../../scope/_root/shared-services.md#s19-person-page-shows-only-the-persons-systems--in-progress--beta)
 **Design source**: board `People8` (canvas "WeLinc design directions", page "Round 8"), the Access rows of `People4`, and the Add person dialog AA of `AddPerson6`. Copies live in [boards/](boards/) (`.dc.html` source, readable from any account); the canvas is https://claude.ai/artifact/VFhLSMNhfpAFD4D4c2VQzp. Your picks: `docs/context/vrms/handoff-2026-11-18.md` (git, commit 33db0d0). The look follows spec [0016](../0016-design-direction-refresh/index.md).
 

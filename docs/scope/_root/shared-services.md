@@ -41,7 +41,7 @@ _These are recommendations to keep the build orderly, not requirements. Skip any
 | S16 | Temporary lockout and a clear deactivated answer | Account | done |
 | S17 | Contract and code agree on errors | Contract | planned |
 | S18 | Design direction refresh | Design | done |
-| S19 | Person page shows only the person's systems | Design | in-progress |
+| S19 | Person page shows only the person's systems | Design | done |
 | S20 | Permissions page redesign | Design | in-progress |
 | S21 | Custom roles per system | Configuration | in-progress |
 
@@ -401,7 +401,7 @@ Rewrite the suite `design.md` so screens stop coming out as the default shadcn l
 - [x] Verify it: `/check verify design direction refresh` (2026-11-23: all steps in verify.md ticked; step 31 and 46 fixed and re-run, VoiceOver listen skipped by decision)
 - [x] Test it: `/test design direction refresh` (2026-11-23: no new tests; the work is fonts, tokens and restyling, which `/test` leaves out. `scripts/check-design-tokens.mjs` covers the token match, the existing vitest suites pass (201 portal, 571 web-vrms) and `/check verify` passed. Ticked by your call)
 
-### S19. Person page shows only the person's systems · in-progress · Beta
+### S19. Person page shows only the person's systems · done · Beta
 A suite admin, or an admin of two or more systems, opening a person who isn't in the selected system hits a dead end with no name or email. Build the person as the detail pane of the approved People page (spec 0016 board `People8`): the person is shown whole, never "inside one system". The header, facts strip and the Overview, Access, Signed in devices and Activity tabs always show; each system is a row in Access (role, temporary end date, Change role or Give access), so nothing on the page depends on picking a system.
 **Done when:** opening any person from People never shows the "isn't in this system" dead end; Access lists every system the person is in (rows for systems the viewer doesn't admin are read only) and offers Give access for the rest; a person with no role shows the header and "No access to VRMS, VMMS or BMS"; and welinc-auth answers an admin of two or more systems with the person across the systems they admin in one call (an additive contract change; suite admins already get it).
 - Note (2026-11-23, `/architect`): the first draft of this row asked for system tabs. The approved board `People8` (canvas "WeLinc design directions", page "Round 8") replaces them with section tabs and an Access card, and you chose to keep that. Decided so far: covers suite admins and admins of two or more systems (seed `multi.admin@welinc.com`); the additive auth change; a no role person gets the header plus Give access; systems the viewer doesn't admin show read only. Builds on S18's app shell (sidebar, list beside detail). Working notes: `docs/_private/vrms/s19-architect-notes.md`.
