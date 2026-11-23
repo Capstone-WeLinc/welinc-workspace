@@ -62,7 +62,8 @@ The person page stops being "a person inside one system": systems become rows, t
 
 **Data model sketch** (welinc-auth only; the portal stores nothing new):
 - `users.last_signed_in_at` `timestamptz(3)` (milliseconds, so a cursor round trip through JavaScript never loses precision), nullable, `@map("last_signed_in_at")`. Index in the migration SQL: `(last_signed_in_at DESC NULLS LAST, id)`.
-- No other table changes. `created_at` gets no index (the suite is small; revisit past a few thousand people).
+- `users.created_at` goes from `timestamptz(6)` to `timestamptz(3)` (amended 2026-11-23, during `/develop`), in its own migration (`20261123000100_users_created_at_ms`): the "Newest first" cursor goes through JavaScript, which keeps milliseconds only, so at microseconds a cursor could skip people made in the same millisecond. Existing values round by under a millisecond; changing a column type fires no row trigger, so the directory feed writes nothing. It gets no index (the suite is small; revisit past a few thousand people).
+- No other table changes.
 
 **Scope shape** (welinc-auth): `AccountScope` carries `systems: SystemType[] | null` instead of one `system`: one system given is a list of one, a suite admin with no system is `null`, a system admin with no system is their `adminOf` at request time. `assertInScope`, `mapScopedUser`, `listPeople`, `getPerson` and the activity service's `listForUser` take that shape ("a role in any of `systems`"; null = everyone). `otherSystems` fills only when `systems` has one entry (today's shape). Only the three read routes accept a list longer than one; write routes keep `systemScope` and a required `system`.
 
@@ -138,7 +139,7 @@ The welinc-auth steps (1 to 3) don't need S18 and can ship first. The portal ste
 
 **Strategy**: strangler, two deploys.
 **Phases**:
-1. welinc-auth (steps 1 to 3): the column with its backfill inside the migration, the wider read scope, `group`, `sort`, the new fields, the contract amendment. Additive only: today's portal, VMMS and BMS keep working unchanged.
+1. welinc-auth (steps 1 to 3): the column with its backfill inside the migration, `created_at` at milliseconds (a second migration), the wider read scope, `group`, `sort`, the new fields, the contract amendment. Additive only: today's portal, VMMS and BMS keep working unchanged.
 2. Portal (steps 4 to 8): the new People page replaces `PeopleView`, `PersonPage` and `AddPersonPage` in one PR, with the spec 0013 deep links kept.
 **Rollback**: revert the portal PR to bring the old pages back (they still work against the new auth); the welinc-auth changes can stay, or revert them too (the column is nullable and nothing else reads it).
 **Risks**: the backfill scans `account_events` per account (fine at the suite's size; deploy outside a defense window, spec 0008's freeze rule); a missed sign in site leaves the column stale, which the per site tests catch.
@@ -158,7 +159,7 @@ The welinc-auth steps (1 to 3) don't need S18 and can ship first. The portal ste
 - Restore stays a suite admin action reached from Deletion requests, as today.
 
 **Neutral**:
-- One small migration in welinc-auth; the column stays nullable, and accounts whose sign ins were pruned by event retention start as "Never".
+- Two small migrations in welinc-auth; the column stays nullable, and accounts whose sign ins were pruned by event retention start as "Never". `created_at` keeps milliseconds from now on; nothing reads its microseconds.
 - The account wide actions keep sending one system behind the scenes (AC-16).
 
 ## Follow-up
