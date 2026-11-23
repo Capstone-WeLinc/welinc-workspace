@@ -40,7 +40,7 @@ _These are recommendations to keep the build orderly, not requirements. Skip any
 | S15 | Authenticator app sign in for admins | Admin | planned |
 | S16 | Temporary lockout and a clear deactivated answer | Account | done |
 | S17 | Contract and code agree on errors | Contract | planned |
-| S18 | Design direction refresh | Design | in-progress |
+| S18 | Design direction refresh | Design | done |
 | S19 | Person page shows only the person's systems | Design | in-progress |
 | S20 | Permissions page redesign | Design | in-progress |
 | S21 | Custom roles per system | Configuration | in-progress |
@@ -382,7 +382,7 @@ Settle every place where contract 0001 and welinc-auth disagree, found while bui
 
 ## Design
 
-### S18. Design direction refresh · in-progress · Beta
+### S18. Design direction refresh · done · Beta
 Rewrite the suite `design.md` so screens stop coming out as the default shadcn look: keep the guardrails (tokens, contrast, status pills, four states, touch targets, no cards in cards) and add what makes WeLinc recognizable (a stronger type scale with display headings, layered surfaces, gold as a real accent, a short Signature section, a small motion vocabulary). Drop the tinted icon square KPI rule. VRMS's own `docs/context/vrms/design.md` follows where it repeats the old rules.
 **Done when:** a suite spec records the chosen direction, `design.md` is rewritten from it in a PR, and the portal and web-vrms tokens and base components match it.
 - Note (2026-11-18): raised by you: screens look plain, stale and AI made. Before the mock defense (Nov 28) apply the new direction to S19, S20 and the VRMS screens you demo, not to every page. Compare 2 or 3 visual directions before the spec.
@@ -399,7 +399,7 @@ Rewrite the suite `design.md` so screens stop coming out as the default shadcn l
   - [x] Fonts back to Inter: Inter for text, Plex Mono stays for numbers, `design.md` Fonts line (AC-1, AC-3; build step 2a, added 2026-11-23; a swap in `fonts.css`, not a revert of `05ace1c` and `fd156e0`) (2026-11-23: portal `42ac185`, web-vrms `c3a9eee`, `design.md` line 89 in the workspace; lint 0 errors, builds, vitest 196 and 571)
   - [x] Page sweep and checks: every page in both apps, contrast, axe, lint, typecheck, builds (AC-18 to AC-21) (2026-11-23: portal `9af711f`, web-vrms `ee360c3` and `17efe2e`; old sizes and shadows are lint errors now, the sign in hero keeps its glows (AC-20), `KpiCard` lost its icon square, Analytics moved to the shared header, tabs and segmented control, the sign out dialog names only your own systems; no page scrolls sideways at 375px or 1280px; lint, typecheck, builds, vitest 201 portal and 571 web-vrms pass. The axe and keyboard pass of AC-19 runs at verify. Left as is: Analytics' inner report tables still use inline styles, and the portal's `src/pages/admin/AGENTS.md` line "lists sit on the canvas in their own bordered tables" now means table cards, for `/sync`)
 - [x] Verify it: `/check verify design direction refresh` (2026-11-23: all steps in verify.md ticked; step 31 and 46 fixed and re-run, VoiceOver listen skipped by decision)
-- [ ] Test it: `/test design direction refresh`
+- [x] Test it: `/test design direction refresh` (2026-11-23: no new tests; the work is fonts, tokens and restyling, which `/test` leaves out. `scripts/check-design-tokens.mjs` covers the token match, the existing vitest suites pass (201 portal, 571 web-vrms) and `/check verify` passed. Ticked by your call)
 
 ### S19. Person page shows only the person's systems · in-progress · Beta
 A suite admin, or an admin of two or more systems, opening a person who isn't in the selected system hits a dead end with no name or email. Build the person as the detail pane of the approved People page (spec 0016 board `People8`): the person is shown whole, never "inside one system". The header, facts strip and the Overview, Access, Signed in devices and Activity tabs always show; each system is a row in Access (role, temporary end date, Change role or Give access), so nothing on the page depends on picking a system.

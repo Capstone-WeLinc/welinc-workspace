@@ -1,7 +1,7 @@
 # 0016. Design direction refresh: the Control room look for the suite
 
 **Date**: 2026-11-18
-**Status**: In Progress
+**Status**: Accepted
 **Scope row**: suite S18 (`docs/scope/_root/shared-services.md`)
 **Amended**: 2026-11-23, AC-12 option B: the signing out soon banner replaces spec 0003's idle dialog in web-vrms, and the portal gets it too (AC-12a, AC-12b, build plan step 4a; welinc-auth joins the repos; contract 0001 additive) · 2026-11-23, AC-12b: Admin with an empty store calls `/auth/sso` once at mount, since `/auth/admin/me` carries no cutoffs (found during the build) · 2026-11-23, AC-12b failures: the banner shows under the offline banner on a network failure and right away on a plain server error · 2026-11-23, fonts: Inter for text as on staging, Plex Mono stays for numbers and codes (AC-1, AC-3, AC-18, *Typography*, the `Fonts10` row, build plan step 2a)
 **Repos**: workspace (`design.md`, `docs/context/vrms/design.md`, `scripts/check-design-tokens.mjs`), `welinc-web-portal`, `welinc-web-vrms`, `welinc-auth` (AC-12a only)
