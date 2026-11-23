@@ -120,7 +120,7 @@ Requirements: BR-07 to BR-11; FR-07.* to FR-11.*; SC-05 to SC-07, SC-18, SC-19, 
 
 Support assigned work, checklist completion, parts and labor details, mechanic submission, Chief Mechanic review, and searchable per-vehicle maintenance history.
 
-Done when: assigned-work access, complete-checklist submission, approval and rejection, cost visibility by role, history, and next-service calculations meet their acceptance criteria.
+Done when: assigned-work access, complete-checklist submission, approval and rejection, cost visibility by role, history, and next-service calculations meet their acceptance criteria. On mobile, list content remains reachable through a single scroll area on short screens, and work-order detail remains scrollable around its fixed actions and keyboard.
 
 Requirements: BR-12 to BR-15; FR-12.* to FR-15.*; SC-08, SC-09, SC-20.
 
@@ -141,6 +141,8 @@ Requirements: BR-12 to BR-15; FR-12.* to FR-15.*; SC-08, SC-09, SC-20.
   - FR-15.1: Implemented. API `scheduleScope` limits Mechanics to `assignedMechanicId`; mobile loads and updates only locally synchronized assigned work.
   - FR-15.2: Implemented. Admin has the delete/cancel-log exception; Operations uses void/cancellation requests and cannot delete log records.
   - FR-15.3: Implemented. Web maintenance history has plate/log/work-order search and status/date filtering; vehicle-specific API/history views are also present.
+  - Mobile scroll acceptance: the full work-order list, including search/filter controls and pagination, scrolls as one area; detail-step content scrolls beneath fixed step/actions, returns to the top when changing step/order, and adjusts for the keyboard. Device-level acceptance remains pending.
+  - Mobile PDF export acceptance: the saved work-order PDF contains both Details and Execution content regardless of the currently selected step. Android saves to the user-granted folder (initially opening Downloads); iOS saves to the app's Documents folder exposed in Files. Device-level save acceptance remains pending.
   - Runtime evidence: unit coverage exists for checklist submission, assignment, approval/rejection, closed-log locks, unlock/audit, cancellation and overdue daily evaluation. Browser/mobile/runtime acceptance remains unexecuted, so status stays **in progress**.
 
 ## Cost and reporting
@@ -253,6 +255,7 @@ Requirements: BR-27 and BR-28; FR-27.1 to FR-27.12 and FR-28.1 to FR-28.3; SC-16
   - FR-28.1: Implemented. Mobile sync retrieves `/vehicles`, `/maintenance-schedules` and `/checklists` and stores records in SQLite.
   - FR-28.2: Implemented. Snapshot reconciliation occurs inside an SQLite exclusive transaction; partial HTTP failures occur before cache replacement and retain the last successful cache.
   - FR-28.3: Implemented. Checklist state is preserved across reconciliation, `lastSuccessfulSyncAt` is written only after success, and network reconnection starts automatic sync.
+  - Mobile global search is an approved scope extension: search role-visible cached work orders/schedules (including associated vehicle plate/model) and current-user notifications, then open the existing workflow. Global Search and Work Orders search also maintain separate per-account recent query histories. See [spec 0011](../../specs/vmms/0011-mobile-global-search/index.md); device acceptance remains pending.
   - Additional gaps:
   - Mobile staging currently contains the offline-sync continuation and revision guards, but no mobile test/build run confirms them.
   - Analytics HTTP authorization tests exist, but DuckDB/pgvector runtime migration, validation and source consistency are not executed.
