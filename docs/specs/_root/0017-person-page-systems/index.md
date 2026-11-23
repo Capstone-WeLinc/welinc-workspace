@@ -133,7 +133,7 @@ The welinc-auth steps (1 to 3) don't need S18 and can ship first. The portal ste
 5. [x] Access tab with the three row kinds and hidden cases, the Change role dialog with its messages, and the AA dialog (replacing `AddPersonPage`) for Give access and Add person, satisfies **AC-12**, **AC-13**, **AC-14**, **AC-17**
 6. [x] Header actions by status, the ⋮ menu with its hidden and disabled cases, AC-16's system rule, reauth, the Sign in card, Signed in devices and Activity tabs, refresh and conflict handling, satisfies **AC-8**, **AC-11**, **AC-15**, **AC-16**, **AC-18**
 7. [x] The full list pane: three groups with counts and Load more, sorts, search, filters per admin kind, code chips, no match and empty states, phones as separate screens; retire `PeopleView`, `PersonPage` and `AddPersonPage`, and repoint their callers (`adminViews.ts`, the `AdminShell` nav, the Overview and Suite admins pages' person links), satisfies **AC-3**, **AC-4**, **AC-5**, **AC-6**
-8. Sweep: 375px and 1280px, keyboard, axe, lint, typecheck, builds, tests, and the board comparison, satisfies **AC-23**, **AC-24**
+8. [x] Sweep: 375px and 1280px, keyboard, axe, lint, typecheck, builds, tests, and the board comparison, satisfies **AC-23**, **AC-24**
 
 ## Migration plan
 
