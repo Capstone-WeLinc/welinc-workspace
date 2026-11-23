@@ -6,7 +6,7 @@ Run at `/check verify person page systems`, locally, with the shared and VRMS st
 
 1. Read the board source from [boards/](boards/) (`People8.dc.html`, `People4.dc.html`, `AddPerson6.dc.html`; copies of the canvas boards, so any account works). Pull each element's values from the markup and its script: text, font size and weight, colors, gaps, paddings, radii, shadows, and the states its board switch shows.
 2. Open the built page at 1280px with Playwright and take one `browser_snapshot` (structure and wording) and one `browser_evaluate` that returns `getComputedStyle` for the same elements (list pane, row, filter, groups, header tile, name, pill, facts strip, tabs, Access rows, Sign in card, AA dialog steps).
-3. List every difference. Allowed only: (a) IBM Plex instead of the boards' Inter, Inter Tight and JetBrains Mono (spec 0016 F1); (b) spec 0016 token values that changed after the boards (`muted-foreground` `#5b6779`, `destructive` and `error` `#b42318`, `background` `#f3f5f9`, its radius and shadow tables); (c) shadcn based parts with their spec 0016 styles; (d) real data lengths. Anything else is a bug to fix before the PR.
+3. List every difference. Allowed only: (a) Plex Mono instead of the boards' JetBrains Mono, and Inter instead of Inter Tight for headings (spec 0016, amended 2026-11-23); (b) spec 0016 token values that changed after the boards (`muted-foreground` `#5b6779`, `destructive` and `error` `#b42318`, `background` `#f3f5f9`, its radius and shadow tables); (c) shadcn based parts with their spec 0016 styles; (d) real data lengths. Anything else is a bug to fix before the PR.
 
 ## Major flows
 

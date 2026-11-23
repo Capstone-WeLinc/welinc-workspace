@@ -86,7 +86,7 @@ Components use semantic tokens only (`bg-primary`, `text-muted-foreground`). Nev
 
 ## Typography
 
-- **Fonts:** IBM Plex Sans for everything (variable, 400 to 700) and IBM Plex Mono 500 and 600 for numbers and codes, self hosted through fontsource (`@fontsource-variable/ibm-plex-sans`, `@fontsource/ibm-plex-mono`) with the latin and latin-ext subsets (the peso sign is in latin-ext), `font-display: swap`. No Google Fonts call. Preload only the Plex Sans latin file. `--font-sans: 'IBM Plex Sans Variable', system-ui, sans-serif`; `--font-mono: 'IBM Plex Mono', ui-monospace, monospace`.
+- **Fonts:** Inter for everything (variable, 400 to 700) and IBM Plex Mono 500 and 600 for numbers and codes, self hosted through fontsource (`@fontsource-variable/inter`, `@fontsource/ibm-plex-mono`) with the latin and latin-ext subsets (the peso sign is in latin-ext), `font-display: swap`. No Google Fonts call, no font features, no preload. `--font-sans: 'Inter Variable', system-ui, sans-serif`; `--font-mono: 'IBM Plex Mono', ui-monospace, monospace`.
 - **Scale:**
 
 | Utility | Size / line height | Weight | Use |

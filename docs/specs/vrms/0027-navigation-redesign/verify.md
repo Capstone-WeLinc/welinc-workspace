@@ -6,7 +6,7 @@ Run at `/check verify navigation redesign`, locally, with the shared and VRMS st
 
 1. Read [boards/Sidebars8.dc.html](boards/Sidebars8.dc.html) (and `BPhone.dc.html` for the phone): text, icons, font sizes and weights, colors, gaps, paddings, radii and states from the markup and its script.
 2. Open web-vrms as `vrms.admin@` and as a mechanic, and the portal Admin as `suite.admin@`, at 1280px; one `browser_snapshot` and one `browser_evaluate` with `getComputedStyle` for the switcher, New repair, section label, line, item, current item, sub item, count bubble (hot and not), account menu and collapse toggle.
-3. Allowed differences: (a) IBM Plex instead of the boards' fonts; (b) spec 0016 token values that changed after the boards; (c) shadcn based parts with their spec 0016 styles; (d) real data lengths. Also expected: no Fleet section, no On hold sub page. Anything else is a bug.
+3. Allowed differences: (a) Plex Mono instead of the boards' JetBrains Mono, and Inter instead of Inter Tight for headings (spec 0016, amended 2026-11-23); (b) spec 0016 token values that changed after the boards; (c) shadcn based parts with their spec 0016 styles; (d) real data lengths. Also expected: no Fleet section, no On hold sub page. Anything else is a bug.
 
 ## Major flows
 

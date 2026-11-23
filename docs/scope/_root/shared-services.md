@@ -40,7 +40,7 @@ _These are recommendations to keep the build orderly, not requirements. Skip any
 | S15 | Authenticator app sign in for admins | Admin | planned |
 | S16 | Temporary lockout and a clear deactivated answer | Account | done |
 | S17 | Contract and code agree on errors | Contract | planned |
-| S18 | Design direction refresh | Design | in-progress |
+| S18 | Design direction refresh | Design | done |
 | S19 | Person page shows only the person's systems | Design | in-progress |
 | S20 | Permissions page redesign | Design | in-progress |
 | S21 | Custom roles per system | Configuration | in-progress |
@@ -382,7 +382,7 @@ Settle every place where contract 0001 and welinc-auth disagree, found while bui
 
 ## Design
 
-### S18. Design direction refresh · in-progress · Beta
+### S18. Design direction refresh · done · Beta
 Rewrite the suite `design.md` so screens stop coming out as the default shadcn look: keep the guardrails (tokens, contrast, status pills, four states, touch targets, no cards in cards) and add what makes WeLinc recognizable (a stronger type scale with display headings, layered surfaces, gold as a real accent, a short Signature section, a small motion vocabulary). Drop the tinted icon square KPI rule. VRMS's own `docs/context/vrms/design.md` follows where it repeats the old rules.
 **Done when:** a suite spec records the chosen direction, `design.md` is rewritten from it in a PR, and the portal and web-vrms tokens and base components match it.
 - Note (2026-11-18): raised by you: screens look plain, stale and AI made. Before the mock defense (Nov 28) apply the new direction to S19, S20 and the VRMS screens you demo, not to every page. Compare 2 or 3 visual directions before the spec.
@@ -391,13 +391,15 @@ Rewrite the suite `design.md` so screens stop coming out as the default shadcn l
 - Note (2026-11-23): fix in the page sweep: the portal's sign out dialog (`welinc-web-portal/src/pages/launcher/SignOutDialog.tsx`) always says "signed out of VRMS, VMMS and BMS", even for someone in one system. Name only the person's own systems from the launcher's `systems` ("Sign out of WeLinc?", "…of VMMS on this browser"), and a plain "You'll need to sign in again" on the no access page.
 - [x] Design it (spec): `/architect design direction refresh`
 - Note (2026-11-23, overnight run): you gave the go. Milestone 1 is built except the Plex fonts (AC-3): `design.md` and the token check merged in workspace #107; tokens, type scale, `Button` and `Card` are on local `feat/design-direction-refresh` branches in welinc-web-portal and welinc-web-vrms, not pushed yet. The `Button` variants changed: `destructive` is quiet red text, `secondary` is gone, a gold `commit` variant is new.
-- [ ] Build it: `/develop design direction refresh`
-  - [ ] Standard and tracer slice: `design.md` rewrite, token check, Plex fonts, tokens, `Button` and `Card` on one page per app (AC-1 to AC-6, AC-10)
-  - [ ] Base components: fields, switch, segmented control, tabs, dialogs, menus, tables, toasts, banners (AC-5, AC-7 to AC-12)
-  - [ ] New components and shell: `PageHeader`, `StatCard`, `RoleChip`, `InitialsTile`, `SaveBar` with drafts, sidebar collapse, lint additions (AC-13 to AC-17)
-  - [ ] Page sweep and checks: every page in both apps, contrast, axe, lint, typecheck, builds (AC-18 to AC-21)
-- [ ] Verify it: `/check verify design direction refresh`
-- [ ] Test it: `/test design direction refresh`
+- Note (2026-11-23, overnight): milestone 1 is built (the fonts are in; you chose to go back to Inter, so AC-3 changes), milestone 2 is built except AC-12's idle banner (waiting on your pick, option B recommended), milestone 3 is half built (web-vrms committed, the portal's new components uncommitted). All on local `feat/design-direction-refresh` branches, nothing pushed.
+- [x] Build it: `/develop design direction refresh`
+  - [x] Standard and tracer slice: `design.md` rewrite, token check, Plex fonts, tokens, `Button` and `Card` on one page per app (AC-1 to AC-6, AC-10)
+  - [x] Base components: fields, switch, segmented control, tabs, dialogs, menus, tables, toasts, banners (AC-5, AC-7 to AC-12) (2026-11-23: all built except signing out soon; you picked option B, and the portal gets it too: build step 4a, AC-12, AC-12a, AC-12b, in welinc-auth, web-vrms and the portal) (later on 2026-11-23: welinc-auth `3f6d52f` on `feat/launcher-session-cutoffs` and web-vrms `b57ef18` built, local; `/architect` settled that Admin with an empty store calls `/auth/sso` once at mount, AC-12b amended; the portal half is built in `75f277e`: activity pings, the cutoff watch, the banner. Milestone 2 is done in all three repos, all local)
+  - [x] New components and shell: `PageHeader`, `StatCard`, `RoleChip`, `InitialsTile`, `SaveBar` with drafts, sidebar collapse, lint additions (AC-13 to AC-17) (2026-11-23: web-vrms `2fcb5fe`, portal `224cb66`; the old text and shadow sizes only warn until the page sweep, then they become errors; the portal gets `PlateChip` when it first shows a truck)
+  - [x] Fonts back to Inter: Inter for text, Plex Mono stays for numbers, `design.md` Fonts line (AC-1, AC-3; build step 2a, added 2026-11-23; a swap in `fonts.css`, not a revert of `05ace1c` and `fd156e0`) (2026-11-23: portal `42ac185`, web-vrms `c3a9eee`, `design.md` line 89 in the workspace; lint 0 errors, builds, vitest 196 and 571)
+  - [x] Page sweep and checks: every page in both apps, contrast, axe, lint, typecheck, builds (AC-18 to AC-21) (2026-11-23: portal `9af711f`, web-vrms `ee360c3` and `17efe2e`; old sizes and shadows are lint errors now, the sign in hero keeps its glows (AC-20), `KpiCard` lost its icon square, Analytics moved to the shared header, tabs and segmented control, the sign out dialog names only your own systems; no page scrolls sideways at 375px or 1280px; lint, typecheck, builds, vitest 201 portal and 571 web-vrms pass. The axe and keyboard pass of AC-19 runs at verify. Left as is: Analytics' inner report tables still use inline styles, and the portal's `src/pages/admin/AGENTS.md` line "lists sit on the canvas in their own bordered tables" now means table cards, for `/sync`)
+- [x] Verify it: `/check verify design direction refresh` (2026-11-23: all steps in verify.md ticked; step 31 and 46 fixed and re-run, VoiceOver listen skipped by decision)
+- [x] Test it: `/test design direction refresh` (2026-11-23: no new tests; the work is fonts, tokens and restyling, which `/test` leaves out. `scripts/check-design-tokens.mjs` covers the token match, the existing vitest suites pass (201 portal, 571 web-vrms) and `/check verify` passed. Ticked by your call)
 
 ### S19. Person page shows only the person's systems · in-progress · Beta
 A suite admin, or an admin of two or more systems, opening a person who isn't in the selected system hits a dead end with no name or email. Build the person as the detail pane of the approved People page (spec 0016 board `People8`): the person is shown whole, never "inside one system". The header, facts strip and the Overview, Access, Signed in devices and Activity tabs always show; each system is a row in Access (role, temporary end date, Change role or Give access), so nothing on the page depends on picking a system.
