@@ -55,8 +55,10 @@ stack running the change, with the migration applied.
 
 ## Mobile
 
-- [ ] bms-mobile (not in this workspace): leave requests still show correctly without
-  `crewEmpId`
+- [x] bms-mobile is not affected. Checked in `welinc-mobile-bms` (`development`, `756845c`): it
+  never reads `crewEmpId`, `empId`, `initials` or `totalTrips` from the API, works out initials
+  from names itself, and doesn't call the crew-leave or crew list routes yet (leave requests
+  are kept on the device)
 
 ## Commands
 
