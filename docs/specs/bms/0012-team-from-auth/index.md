@@ -150,8 +150,8 @@ Files: `src/pages/admin/CrewManagement.tsx`, `src/components/availability/CrewEd
   row will be turned off by the migration.
 - `npm run seed` (`scripts/seed-crew.mjs`) now adds rows by account and only sets a demo license
   number. It no longer writes names or employee IDs.
-- **bms-mobile**: the app isn't in this workspace, so it wasn't checked. If it shows `crewEmpId`
-  on a leave request, that field is gone now.
+- **bms-mobile**: not affected. It doesn't read any of the removed fields, and it doesn't call
+  the crew-leave or crew list routes yet.
 
 ## Decisions
 

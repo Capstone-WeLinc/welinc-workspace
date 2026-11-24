@@ -55,8 +55,10 @@ stack running the change, with the migration applied.
 
 ## Mobile
 
-- [ ] bms-mobile (not in this workspace): leave requests still show correctly without
-  `crewEmpId`
+- [x] bms-mobile is not affected. Checked in `welinc-mobile-bms` (`development`, `756845c`): it
+  never reads `crewEmpId`, `empId`, `initials` or `totalTrips` from the API, works out initials
+  from names itself, and doesn't call the crew-leave or crew list routes yet (leave requests
+  are kept on the device)
 
 ## Commands
 
@@ -67,3 +69,8 @@ stack running the change, with the migration applied.
 - [x] `welinc-web-bms`: eslint on the changed files (no errors; 5 warnings, all pre-existing)
 - [x] `welinc-web-bms`: `npm test` (18 tests)
 - [ ] `welinc-web-bms`: `npx playwright test tests/vehicle-team-availability.spec.ts`
+- [x] `welinc-backend-bms` CI passes on `BMS/team-from-auth` (PR #69). The first run failed at
+  `npm run lint:ci` (repo-wide `eslint .`): `test/demo-seed.integration.cjs` didn't parse
+  because of a quote inside a single-quoted string. Fixed in `28b7b38`; the full CI sequence
+  (lint, typecheck, build, test) was run locally before pushing.
+- [x] `welinc-web-bms` CI passes on `BMS/team-from-auth`
