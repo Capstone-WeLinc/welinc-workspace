@@ -44,7 +44,7 @@ _These are recommendations to keep the build orderly, not requirements. Skip any
 | S19 | Person page shows only the person's systems | Design | done |
 | S20 | Permissions page redesign | Design | in-progress |
 | S21 | Custom roles per system | Configuration | in-progress |
-| S22 | Portal redesign from the design rounds | Design | planned |
+| S22 | Portal redesign from the design rounds | Design | in-progress |
 | S23 | Profile page for the suite | Account | planned |
 
 ## Contract
@@ -455,11 +455,20 @@ spec [0018](../../specs/_root/0018-roles-and-custom-roles/index.md) (child [0002
 
 ## Portal and profile (from the Nov 24 design rounds)
 
-### S22. Portal redesign from the design rounds · planned · needs a decision · Beta
+### S22. Portal redesign from the design rounds · in-progress · Beta
 Build the portal screens you picked on Nov 24 (canvas "WeLinc design directions", Rounds 12 to 37): the launcher (navy band with the line drawing, the road and the livery trucks, Arrival 2 and the loop, system cards, the Suite management strip), sign-in A with the branch map, the four step forgot password, the Suite management shell (sidebar footer, account menu, system switcher), the filter popover, the one screen Add a user dialog, the steering wheel wait, the signed out and session ended toasts, the idle warning toast in place of the "Signed in until" pill, the 404 page, the reset code email, the ///L favicon and page titles.
 **Done when:** every screen above matches its board within the allowed differences (handoff 2026-11-24); the launcher fits one 1440×900 screen for every role and count rule on `R30Launcher`; a suite admin whose only role is temporary reaches Suite management (the `screenForAnswer` gap in `welinc-web-portal/src/lib/auth.ts`); the idle warning offers "Stay signed in" before the 30 min limit; motion respects reduced motion and the trucks are never live data.
 - Note (2026-11-24, replan): enrolled from the handoff's item 1. The picks are complete; `/architect` decides the motion library (the portal has only `tw-animate-css` today), the idle warning timing and wording, and how much of it ships before the mock defense. The boards on the canvas are the source (their generator scripts are gone); keep copies in the spec's `boards/`.
-- [ ] Design it (spec): `/architect portal redesign`
+- Note (2026-11-24, `/architect`): designed in suite spec 0019. Decided: all of it before the mock defense with motion as the last milestone; Motion (`motion/react`) lazy loaded on sign in and the launcher only; Launch 3 is in (about 900 ms, never delays the page); Arrival 2 only right after the portal's own sign in form; reduced motion and phones get a parked scene; the loop pauses when hidden. welinc-auth gains `suiteAdmin` in the launcher answer, a counts only `GET /auth/admin/summary` (no step up), an exact `GET /auth/admin/users/email-check`, an optional `contact` on create and one code email layout. The idle warning is a "Still there?" toast 2 minutes before the cutoff in the portal **and web-vrms**, replacing the banner. The 25 boards it builds from are copied into the spec's `boards/`.
+spec [0019](../../specs/_root/0019-portal-redesign/index.md) · code in `welinc-web-portal/src/pages/`, `welinc-web-portal/src/lib/`, `welinc-auth/src/auth/admin/`, `welinc-auth/src/auth/codes/`, `welinc-web-vrms/src/lib/session/`
+- [x] Design it (spec): `/architect portal redesign`
+- [ ] Build it: `/develop portal redesign`
+  - [ ] welinc-auth: `suiteAdmin`, the summary and email check routes, `contact` on create, the code email layout, contract 0001 Changes line (AC-6, AC-7, AC-23, AC-27)
+  - [ ] Portal foundations, session toasts in the portal and web-vrms, the Suite management shell, filter popover and Add a user (AC-15, AC-17 to AC-26, AC-28)
+  - [ ] Sign in, forgot password, Signed out and No access, then the static launcher with the screen choice fix (AC-1 to AC-5, AC-11, AC-13, AC-14, AC-16)
+  - [ ] Motion (Arrival 2, the loop, Launch 3, reduced motion), then the sweep and board comparison, `design.md` and the spec 0016 amendment lines (AC-8 to AC-12, AC-29)
+- [ ] Verify it: `/check verify portal redesign`
+- [ ] Test it: `/test portal redesign`
 
 ### S23. Profile page for the suite · planned · needs a decision
 One profile page in the portal that every system links to, replacing the three separate ones (VRMS, VMMS and BMS web each have their own; VMMS and BMS upload pictures, VRMS does not). Direction A, settings page, as reworked on `Profile19`.

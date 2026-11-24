@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Motion and feedback, round 18</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+button{font:inherit;cursor:pointer}
+button:focus-visible{outline:2px solid #1a1f6e;outline-offset:2px}
+button:active{transform:scale(.97)}
+.btn{transition:transform 100ms cubic-bezier(.2,.8,.2,1),background 100ms}
+.trig{border:0;width:100%;height:38px;border-radius:10px;background:#fff;box-shadow:inset 0 0 0 1px #dfe3ec;font-size:13px;font-weight:600;color:#0f172a;text-align:left;padding:0 12px;display:flex;align-items:center;gap:8px}
+.trig:hover{background:#f6f7fb}
+.sec{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#94a3b8;margin-top:10px}
+.mono{font-family:'IBM Plex Mono',monospace}
+.fld{height:44px;border-radius:10px;background:#fff;display:flex;align-items:center;padding:0 12px;font-size:14px;box-sizing:border-box}
+@keyframes toastIn{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}
+@keyframes toastOut{to{opacity:0;transform:translateX(12px)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes fadeOut{to{opacity:0}}
+@keyframes dlgIn{from{opacity:0;transform:translateY(6px) scale(.96)}to{opacity:1;transform:none}}
+@keyframes dlgOut{to{opacity:0;transform:scale(.97)}}
+@keyframes menuIn{from{opacity:0;transform:translateY(-4px) scale(.98)}to{opacity:1;transform:none}}
+@keyframes barIn{from{transform:translateY(110%)}to{transform:none}}
+@keyframes shake{10%,90%{transform:translateX(-1px)}20%,80%{transform:translateX(3px)}30%,50%,70%{transform:translateX(-5px)}40%,60%{transform:translateX(5px)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes shimmer{0%{background-position:-300px 0}100%{background-position:300px 0}}
+@keyframes land{0%{background:#fff4cc}100%{background:transparent}}
+.sk{background:linear-gradient(90deg,#eef1f6 0,#f6f7fb 40%,#eef1f6 80%);background-size:600px 100%;animation:shimmer 1.2s linear infinite;border-radius:6px}
+@media (prefers-reduced-motion: reduce){*{animation-duration:1ms!important;animation-iteration-count:1!important}}
+</style>
+</helmet>
+<div style="width: 1440px; height: 1000px; font-family: Inter, system-ui, sans-serif; color: #0f172a; background: #f3f5f9; display: flex">
+  <aside style="flex: 0 0 280px; background: #fff; border-right: 1px solid #e2e8f0; padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; gap: 8px; overflow: auto">
+    <span style="font-size: 17px; font-weight: 700">Try them</span>
+        <span class="sec">Toasts</span>
+    <button class="trig btn" onClick="{{tSuccess}}"><span style="width: 8px; height: 8px; border-radius: 99px; background: #12b76a"></span>Success</button>
+    <button class="trig btn" onClick="{{tError}}"><span style="width: 8px; height: 8px; border-radius: 99px; background: #d92d20"></span>Error with Retry</button>
+    <button class="trig btn" onClick="{{tUndo}}"><span style="width: 8px; height: 8px; border-radius: 99px; background: #1a1f6e"></span>Info with Undo</button>
+    <span class="sec">Dialogs and prompts</span>
+    <button class="trig btn" onClick="{{openConfirm}}">Confirm a destructive action</button>
+    <button class="trig btn" onClick="{{openCode}}">“Confirm it’s you” code</button>
+    <button class="trig btn" onClick="{{openForm}}">Form with errors</button>
+    <span class="sec">On the page</span>
+    <button class="trig btn" onClick="{{toggleMenu}}">Open a menu</button>
+    <button class="trig btn" onClick="{{toggleBar}}">Unsaved changes bar</button>
+    <button class="trig btn" onClick="{{reload}}">Load the list again</button>
+    <button class="trig btn" onClick="{{cycleList}}">List state: {{listState}}</button>
+  </aside>
+
+  <main style="flex: 1; position: relative; overflow: hidden; display: flex; flex-direction: column">
+    <div style="height: 56px; flex: none; background: #fff; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; gap: 8px; padding: 0 28px; position: relative">
+      <span style="font-size: 14px; color: #64748b">Suite management</span><span style="color: #94a3b8">›</span><span style="font-size: 14px; font-weight: 500">Users</span>
+      <span style="flex: 1"></span>
+      <button onClick="{{toggleMenu}}" class="btn" aria-expanded="{{menuAria}}" style="border: 0; height: 36px; padding: 0 12px; border-radius: 10px; background: {{menuBtnBg}}; box-shadow: inset 0 0 0 1px #dfe3ec; font-size: 13px; font-weight: 600">Actions ▾</button>
+      <sc-if value="{{menu}}" hint-placeholder-val="{{false}}">
+        <div role="menu" style="position: absolute; right: 28px; top: 50px; width: 230px; background: #fff; border-radius: 14px; box-shadow: 0 0 0 1px rgba(15,20,69,.08), 0 16px 40px rgba(15,20,69,.18); padding: 6px; z-index: 20; transform-origin: top right; animation: menuIn 140ms cubic-bezier(.2,.8,.2,1)">
+          <button onClick="{{menuReset}}" style="width: 100%; border: 0; background: transparent; height: 38px; border-radius: 8px; text-align: left; padding: 0 10px; font-size: 14px">Send a password reset</button>
+          <button onClick="{{menuLock}}" style="width: 100%; border: 0; background: transparent; height: 38px; border-radius: 8px; text-align: left; padding: 0 10px; font-size: 14px">Lock the account</button>
+          <div style="height: 1px; background: #eef1f6; margin: 4px 0"></div>
+          <button onClick="{{openConfirm}}" style="width: 100%; border: 0; background: transparent; height: 38px; border-radius: 8px; text-align: left; padding: 0 10px; font-size: 14px; color: #b42318">Remove VRMS access</button>
+        </div>
+      </sc-if>
+    </div>
+
+    <div style="flex: 1; padding: 28px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-content: start">
+      <section style="background: #fff; border-radius: 16px; box-shadow: 0 0 0 1px rgba(15,20,69,.06); overflow: hidden; grid-row: span 2">
+        <div style="padding: 16px 20px; display: flex; align-items: center; border-bottom: 1px solid #eef1f6"><span style="flex: 1; font-size: 15px; font-weight: 600">Users</span><span class="mono" style="font-size: 12px; color: #94a3b8">{{countLabel}}</span></div>
+        <sc-if value="{{isLoading}}" hint-placeholder-val="{{false}}">
+          <div aria-busy="true" aria-label="Loading users" style="display: flex; flex-direction: column">
+            <sc-for list="{{skel}}" as="k" hint-placeholder-count="6"><div style="display: flex; align-items: center; gap: 12px; padding: 12px 20px"><span class="sk" style="width: 36px; height: 36px; border-radius: 99px"></span><span style="flex: 1; display: flex; flex-direction: column; gap: 7px"><span class="sk" style="height: 10px; width: {{k.w}}"></span><span class="sk" style="height: 8px; width: 60%"></span></span></div></sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{isReady}}" hint-placeholder-val="{{true}}">
+          <div>
+            <sc-for list="{{people}}" as="p" hint-placeholder-count="6">
+              <div style="display: flex; align-items: center; gap: 12px; padding: 12px 20px; animation: {{p.anim}}">
+                <span style="width: 36px; height: 36px; border-radius: 99px; background: #eef0f8; color: #1a1f6e; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600">{{p.ini}}</span>
+                <span style="flex: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 14px; font-weight: 600">{{p.name}}</span><span style="font-size: 12px; color: #64748b">{{p.email}}</span></span>
+                <span style="font-size: 11px; font-weight: 600; border-radius: 99px; padding: 2px 8px; color: {{p.fg}}; background: {{p.bg}}">{{p.pill}}</span>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{isEmpty}}" hint-placeholder-val="{{false}}">
+          <div style="padding: 56px 24px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; animation: fadeIn 180ms">
+            <span style="width: 48px; height: 48px; border-radius: 14px; background: #f1f3f8; color: #64748b; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg></span>
+            <span style="font-size: 15px; font-weight: 600">No one matches these filters</span>
+            <span style="font-size: 13px; color: #64748b">Locked · VRMS (Inventory clerk)</span>
+            <button onClick="{{cycleList}}" class="btn" style="margin-top: 4px; border: 0; height: 36px; padding: 0 14px; border-radius: 10px; background: #fff; box-shadow: inset 0 0 0 1px #d6dbe6; font-size: 13px; font-weight: 600">Clear filters</button>
+          </div>
+        </sc-if>
+        <sc-if value="{{isError}}" hint-placeholder-val="{{false}}">
+          <div style="padding: 56px 24px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; animation: fadeIn 180ms">
+            <span style="width: 48px; height: 48px; border-radius: 14px; background: #fef3f2; color: #d92d20; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"></path></svg></span>
+            <span style="font-size: 15px; font-weight: 600">We couldn’t load users</span>
+            <span style="font-size: 13px; color: #64748b; max-width: 300px">The server didn’t answer. Your filters are kept.</span>
+            <button onClick="{{reload}}" class="btn" style="margin-top: 4px; border: 0; height: 36px; padding: 0 14px; border-radius: 10px; background: #1a1f6e; color: #fff; font-size: 13px; font-weight: 600">Try again</button>
+          </div>
+        </sc-if>
+      </section>
+
+      <section style="background: #fff; border-radius: 16px; box-shadow: 0 0 0 1px rgba(15,20,69,.06); padding: 18px 20px; display: flex; flex-direction: column; gap: 12px">
+        <span style="font-size: 15px; font-weight: 600">Inline field errors</span>
+        <div style="display: flex; flex-direction: column; gap: 6px"><span style="font-size: 13px; font-weight: 600; color: #334155">Work email</span><span class="fld" style="box-shadow: inset 0 0 0 1.5px #d92d20">cristina.delacruz@welinc</span><span style="display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: #b42318"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v4M12 16h.01"></path></svg>Enter the whole email, like name@welinc.com.</span></div>
+        <div style="display: flex; flex-direction: column; gap: 6px"><span style="font-size: 13px; font-weight: 600; color: #334155">Reason</span><span class="fld" style="box-shadow: inset 0 0 0 1px #d6dbe6; color: #94a3b8">Left the team</span><span style="display: flex; justify-content: space-between; font-size: 12px; color: #64748b"><span>At least 10 characters.</span><span class="mono">13 / 500</span></span></div>
+      </section>
+
+      <section style="background: #fff; border-radius: 16px; box-shadow: 0 0 0 1px rgba(15,20,69,.06); padding: 18px 20px; display: flex; flex-direction: column; gap: 12px">
+        <span style="font-size: 15px; font-weight: 600">Banners</span>
+        <div style="border-radius: 12px; background: #fef3f2; padding: 12px 14px; display: flex; gap: 10px; align-items: flex-start"><span style="flex: none; width: 22px; height: 22px; border-radius: 99px; background: #fee4e2; color: #d92d20; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 12px">!</span><span style="flex: 1; font-size: 13px; line-height: 1.5; color: #7a271a"><b>We couldn’t save.</b> Check your connection and try again; nothing was changed.</span><button style="border: 0; background: transparent; color: #b42318; font-weight: 600; font-size: 13px">Retry</button></div>
+        <div style="border-radius: 12px; background: #fffaeb; padding: 12px 14px; display: flex; gap: 10px; align-items: flex-start"><span style="flex: none; width: 22px; height: 22px; border-radius: 99px; background: #fef0c7; color: #b54708; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 12px">!</span><span style="flex: 1; font-size: 13px; line-height: 1.5; color: #7a2e0e">Hector’s VRMS access ends <b>Friday</b>. Extend it from Temporary access.</span></div>
+        <div style="border-radius: 12px; background: #eef0f8; padding: 12px 14px; display: flex; gap: 10px; align-items: flex-start"><span style="flex: none; width: 22px; height: 22px; border-radius: 99px; background: #dfe3f5; color: #1a1f6e; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 12px">i</span><span style="flex: 1; font-size: 13px; line-height: 1.5; color: #1a1f6e">Someone else changed this person while you were here. Showing the latest.</span></div>
+      </section>
+    </div>
+
+    <sc-if value="{{bar}}" hint-placeholder-val="{{false}}">
+      <div style="position: absolute; left: 50%; bottom: 24px; width: 640px; margin-left: -320px; z-index: 15; animation: barIn 200ms cubic-bezier(.2,.8,.2,1)">
+        <sc-if value="{{listOpen}}" hint-placeholder-val="{{false}}">
+          <div style="position: absolute; left: 0; right: 0; bottom: 72px; background: #fff; border-radius: 14px; box-shadow: 0 0 0 1px rgba(15,20,69,.08), 0 18px 44px rgba(15,20,69,.22); overflow: hidden; animation: menuIn 140ms cubic-bezier(.2,.8,.2,1)">
+            <div style="display: flex; align-items: baseline; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid #eef1f6"><span style="font-size: 14px; font-weight: 600">Changes to Chief mechanic</span><span class="mono" style="font-size: 12px; color: #64748b">3 changes</span></div>
+            <div style="padding: 6px 16px">
+              <sc-for list="{{changes}}" as="g" hint-placeholder-count="2">
+                <div style="padding: 4px 0"><span style="display: block; padding: 4px 0; font-size: 12px; font-weight: 600; color: #475569">{{g.group}}</span>
+                  <sc-for list="{{g.rows}}" as="r" hint-placeholder-count="2">
+                    <div style="display: flex; align-items: center; gap: 10px; height: 36px"><span aria-hidden="true" style="width: 20px; height: 20px; border-radius: 6px; background: {{r.tileBg}}; color: {{r.tileFg}}; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px">{{r.sign}}</span><span style="flex: 1; font-size: 13.5px">{{r.label}}</span><span style="font-size: 12px; color: #64748b">{{r.from}} → {{r.to}}</span><button style="border: 0; background: transparent; color: #1a1f6e; font-size: 12.5px; font-weight: 600; height: 28px">Undo</button></div>
+                  </sc-for>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px; padding: 10px 16px; border-top: 1px solid #eef1f6"><span style="display: flex"><span style="width: 24px; height: 24px; border-radius: 7px; background: #eef0f8; color: #1a1f6e; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 2px #fff">RA</span><span style="margin-left: -6px; width: 24px; height: 24px; border-radius: 7px; background: #eef0f8; color: #1a1f6e; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 2px #fff">FO</span><span style="margin-left: -6px; width: 24px; height: 24px; border-radius: 7px; background: #eef0f8; color: #1a1f6e; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 2px #fff">+6</span></span><span style="font-size: 12.5px; color: #64748b">Affects 8 people who are Chief mechanic</span></div>
+          </div>
+        </sc-if>
+        <div role="region" aria-label="Unsaved changes to Chief mechanic" style="height: 64px; border-radius: 16px; background: #0f1445; color: #fff; display: flex; align-items: center; gap: 10px; padding: 0 12px 0 8px; box-shadow: 0 18px 40px rgba(15,20,69,.35)">
+          <button onClick="{{toggleList}}" aria-expanded="{{listAria}}" style="flex: 1; min-width: 0; border: 0; background: {{listBtnBg}}; color: #fff; min-height: 44px; border-radius: 10px; padding: 0 10px; display: flex; align-items: center; gap: 8px; text-align: left">
+            <span style="flex: 1; min-width: 0; display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 600">3 changes</span><span style="font-size: 12px; color: rgba(255,255,255,.6); white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Chief mechanic · affects 8 people</span></span>
+            <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="2.2" stroke-linecap="round" style="transform: rotate({{listRot}}); transition: transform 140ms"><path d="M6 15l6-6 6 6"></path></svg>
+          </button>
+          <span aria-hidden="true" style="width: 1px; height: 32px; background: rgba(255,255,255,.14)"></span>
+          <button onClick="{{toggleBar}}" class="btn" style="border: 0; height: 40px; padding: 0 14px; border-radius: 10px; background: transparent; box-shadow: inset 0 0 0 1px rgba(255,255,255,.4); color: #fff; font-size: 13.5px; font-weight: 600">Discard</button>
+          <button onClick="{{saveBar}}" class="btn" style="border: 0; height: 40px; min-width: 150px; padding: 0 16px; border-radius: 10px; background: #e8b800; color: #0f1445; font-size: 13.5px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px"><sc-if value="{{saving}}" hint-placeholder-val="{{false}}"><span aria-hidden="true" style="width: 14px; height: 14px; border-radius: 99px; border: 2px solid rgba(15,20,69,.25); border-top-color: #0f1445; box-sizing: border-box; animation: spin .7s linear infinite"></span></sc-if>{{saveLabel}}</button>
+        </div>
+      </div>
+    </sc-if>
+
+    <div aria-live="polite" style="position: absolute; right: 24px; bottom: {{toastBottom}}; display: flex; flex-direction: column; gap: 10px; z-index: 30; width: 380px">
+      <sc-for list="{{toasts}}" as="t" hint-placeholder-count="0">
+        <div role="status" style="display: flex; align-items: flex-start; gap: 12px; background: #fff; border-radius: 14px; padding: 12px; box-shadow: 0 0 0 1px rgba(15,20,69,.06), 0 14px 36px rgba(15,20,69,.18); animation: {{t.anim}}">
+          <span aria-hidden="true" style="flex: none; margin-top: 1px; width: 24px; height: 24px; border-radius: 99px; background: {{t.tileBg}}; color: {{t.tileFg}}; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800">{{t.glyph}}</span>
+          <span style="flex: 1; display: flex; flex-direction: column; gap: 2px; padding-top: 2px"><span style="font-size: 14px; font-weight: 600">{{t.title}}</span><span style="font-size: 12.5px; color: #64748b">{{t.body}}</span>
+            <sc-if value="{{t.hasAction}}" hint-placeholder-val="{{false}}"><span style="padding-top: 8px"><button onClick="{{t.act}}" class="btn" style="border: 0; height: 32px; padding: 0 12px; border-radius: 8px; background: #fff; box-shadow: inset 0 0 0 1px #d6dbe6; font-size: 12.5px; font-weight: 600">{{t.action}}</button></span></sc-if>
+          </span>
+          <button onClick="{{t.close}}" aria-label="Dismiss" style="border: 0; background: transparent; color: #94a3b8; width: 28px; height: 28px; border-radius: 8px">✕</button>
+        </div>
+      </sc-for>
+    </div>
+
+    <sc-if value="{{dlg}}" hint-placeholder-val="{{false}}">
+      <div style="position: absolute; inset: 0; background: rgba(15,20,69,.4); z-index: 40; animation: {{overlayAnim}}; display: flex; align-items: center; justify-content: center">
+        <div role="dialog" aria-modal="true" style="width: 460px; background: #fff; border-radius: 20px; box-shadow: 0 24px 64px rgba(15,20,69,.32); animation: {{dlgAnim}}; overflow: hidden">
+
+          <sc-if value="{{isConfirm}}" hint-placeholder-val="{{false}}">
+            <div style="padding: 24px; display: flex; flex-direction: column; gap: 14px">
+              <span style="width: 44px; height: 44px; border-radius: 12px; background: #fef3f2; color: #d92d20; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM2 21c0-4 3-6 7-6 1.5 0 2.8.3 4 .8M16 17h6"></path></svg></span>
+              <div><h2 style="margin: 0; font-size: 18px; font-weight: 700">Remove Dana’s VRMS access?</h2><p style="margin: 6px 0 0; font-size: 14px; color: #475569; line-height: 1.5">She is signed out of VRMS straight away. Her work stays in the records. You can give it back later.</p></div>
+            </div>
+            <div style="padding: 14px 24px 20px; display: flex; justify-content: flex-end; gap: 8px">
+              <button onClick="{{closeDlg}}" class="btn" style="border: 0; height: 40px; padding: 0 14px; border-radius: 10px; background: transparent; font-size: 14px; font-weight: 600; color: #475569">Cancel</button>
+              <button onClick="{{confirmRemove}}" aria-busy="{{busyAria}}" class="btn" style="border: 0; height: 40px; min-width: 150px; padding: 0 16px; border-radius: 10px; background: #fff; box-shadow: inset 0 0 0 1px #f3c7c3; color: #b42318; font-size: 14px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px"><sc-if value="{{busy}}" hint-placeholder-val="{{false}}"><span aria-hidden="true" style="width: 14px; height: 14px; border-radius: 99px; border: 2px solid #f3c7c3; border-top-color: #b42318; box-sizing: border-box; animation: spin .7s linear infinite"></span></sc-if>{{removeLabel}}</button>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{isCode}}" hint-placeholder-val="{{false}}">
+            <div style="padding: 24px; display: flex; flex-direction: column; gap: 16px">
+              <span style="width: 44px; height: 44px; border-radius: 12px; background: #eef0f8; color: #1a1f6e; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"></path></svg></span>
+              <div><h2 style="margin: 0; font-size: 18px; font-weight: 700">Confirm it’s you</h2><p style="margin: 6px 0 0; font-size: 14px; color: #475569">We sent a 6 digit code to suite.admin@welinc.com.</p></div>
+              <div style="display: flex; gap: 8px; animation: {{codeAnim}}">
+                <sc-for list="{{digits}}" as="d" hint-placeholder-count="6"><span class="mono" style="width: 52px; height: 58px; border-radius: 12px; background: #fff; box-shadow: {{d.sh}}; display: flex; align-items: center; justify-content: center; font-size: 22px">{{d.v}}</span></sc-for>
+              </div>
+              <sc-if value="{{codeWrong}}" hint-placeholder-val="{{false}}"><span style="font-size: 13px; color: #b42318">That code is wrong. 2 tries left.</span></sc-if>
+              <span style="font-size: 13px; color: #64748b">Resend code in <span class="mono">0:42</span></span>
+            </div>
+            <div style="padding: 0 24px 20px; display: flex; justify-content: flex-end; gap: 8px">
+              <button onClick="{{closeDlg}}" class="btn" style="border: 0; height: 40px; padding: 0 14px; border-radius: 10px; background: transparent; font-size: 14px; font-weight: 600; color: #475569">Cancel</button>
+              <button onClick="{{codeWrongBtn}}" class="btn" style="border: 0; height: 40px; padding: 0 14px; border-radius: 10px; background: #fff; box-shadow: inset 0 0 0 1px #d6dbe6; font-size: 14px; font-weight: 600">Try a wrong code</button>
+              <button onClick="{{codeRight}}" class="btn" style="border: 0; height: 40px; padding: 0 16px; border-radius: 10px; background: #1a1f6e; color: #fff; font-size: 14px; font-weight: 600">Verify</button>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{isForm}}" hint-placeholder-val="{{false}}">
+            <div style="padding: 24px 24px 8px; display: flex; flex-direction: column; gap: 14px">
+              <h2 style="margin: 0; font-size: 18px; font-weight: 700">Give temporary access</h2>
+              <sc-if value="{{formTried}}" hint-placeholder-val="{{false}}"><div style="border-radius: 12px; background: #fef3f2; padding: 10px 12px; font-size: 13px; color: #7a271a; animation: fadeIn 180ms">Fix 2 things to continue.</div></sc-if>
+              <div style="display: flex; flex-direction: column; gap: 6px"><span style="font-size: 13px; font-weight: 600; color: #334155">Ends on</span><span class="fld" style="box-shadow: {{f1}}; color: #94a3b8">Pick a date</span><sc-if value="{{formTried}}" hint-placeholder-val="{{false}}"><span style="font-size: 12.5px; color: #b42318">Pick when the access ends.</span></sc-if></div>
+              <div style="display: flex; flex-direction: column; gap: 6px"><span style="font-size: 13px; font-weight: 600; color: #334155">Reason</span><span class="fld" style="box-shadow: {{f1}}">Cover</span><sc-if value="{{formTried}}" hint-placeholder-val="{{false}}"><span style="display: flex; justify-content: space-between; font-size: 12.5px; color: #b42318"><span>Write at least 10 characters.</span><span class="mono">5 / 500</span></span></sc-if></div>
+            </div>
+            <div style="padding: 14px 24px 20px; display: flex; justify-content: flex-end; gap: 8px">
+              <button onClick="{{closeDlg}}" class="btn" style="border: 0; height: 40px; padding: 0 14px; border-radius: 10px; background: transparent; font-size: 14px; font-weight: 600; color: #475569">Cancel</button>
+              <button onClick="{{tryForm}}" class="btn" style="border: 0; height: 40px; padding: 0 16px; border-radius: 10px; background: #1a1f6e; color: #fff; font-size: 14px; font-weight: 600">Give access</button>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+    </sc-if>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1000}}'>
+const PEOPLE = [['Ramon Aquino', 'ramon.aquino@welinc.com', 'Locked', '#b42318', '#fef3f2'], ['Bea Dizon', 'bea.dizon@welinc.com', 'Pending', '#1a1f6e', '#eef0f8'], ['Dana Reyes', 'dana.reyes@welinc.com', 'Active', '#067647', '#ecfdf3'], ['Felix Ong', 'felix.ong@welinc.com', 'Active', '#067647', '#ecfdf3'], ['Gina Ramos', 'gina.ramos@welinc.com', 'Inactive', '#64748b', '#f1f3f8'], ['Hector Villanueva', 'hector.v@welinc.com', 'Active', '#067647', '#ecfdf3']];
+const KIND = { success: ['#ecfdf3', '#067647', '✓'], error: ['#fef3f2', '#d92d20', '✕'], info: ['#eef0f8', '#1a1f6e', 'i'] };
+let seq = 0;
+class Component extends DCLogic {
+  renderVals() {
+    const s = this.state || {};
+    const set = (p) => this.setState(p);
+    const toasts = s.toasts || [];
+    const push = (kind, title, body, action) => {
+      const id = ++seq;
+      const cur = (this.state && this.state.toasts) || [];
+      set({ toasts: [...cur.slice(-2), { id, kind, title, body, action }] });
+      setTimeout(() => this.setState({ toasts: ((this.state && this.state.toasts) || []).map((t) => (t.id === id ? { ...t, leaving: true } : t)) }), 4200);
+      setTimeout(() => this.setState({ toasts: ((this.state && this.state.toasts) || []).filter((t) => t.id !== id) }), 4340);
+    };
+    const dismiss = (id) => {
+      set({ toasts: toasts.map((t) => (t.id === id ? { ...t, leaving: true } : t)) });
+      setTimeout(() => this.setState({ toasts: ((this.state && this.state.toasts) || []).filter((t) => t.id !== id) }), 140);
+    };
+    const dlg = s.dlg || null;
+    const closing = !!s.closing;
+    const closeDlg = () => { set({ closing: true }); setTimeout(() => this.setState({ dlg: null, closing: false, busy: false, wrong: false, tried: false }), 120); };
+    const list = s.list || 'ready';
+    const order = ['ready', 'empty', 'error'];
+    return {
+      tSuccess: () => push('success', 'Access given', 'Ma. Cristina is a Mechanic in VRMS.'),
+      tError: () => push('error', 'We couldn’t lock Ramon’s account', 'The server didn’t answer.', 'Retry'),
+      tUndo: () => push('info', 'Dana moved to Inactive', 'She can’t sign in until you turn her back on.', 'Undo'),
+      toasts: toasts.map((t) => { const [bg, fg, glyph] = KIND[t.kind]; return { ...t, tileBg: bg, tileFg: fg, glyph, hasAction: !!t.action, act: () => dismiss(t.id), close: () => dismiss(t.id), anim: t.leaving ? 'toastOut 130ms cubic-bezier(.4,0,1,1) forwards' : 'toastIn 200ms cubic-bezier(.2,.8,.2,1)' }; }),
+      toastBottom: s.bar ? '112px' : '24px',
+      dlg: !!dlg, isConfirm: dlg === 'confirm', isCode: dlg === 'code', isForm: dlg === 'form',
+      overlayAnim: closing ? 'fadeOut 120ms forwards' : 'fadeIn 180ms', dlgAnim: closing ? 'dlgOut 120ms cubic-bezier(.4,0,1,1) forwards' : 'dlgIn 180ms cubic-bezier(.2,.8,.2,1)',
+      openConfirm: () => set({ dlg: 'confirm', menu: false, busy: false }), openCode: () => set({ dlg: 'code', wrong: false }), openForm: () => set({ dlg: 'form', tried: false }),
+      closeDlg,
+      busy: !!s.busy, busyAria: s.busy ? 'true' : 'false', removeLabel: s.busy ? 'Removing' : 'Remove access',
+      confirmRemove: () => { set({ busy: true }); setTimeout(() => { closeDlg(); push('success', 'VRMS access removed', 'Dana was signed out of VRMS.', 'Undo'); }, 1100); },
+      digits: (s.wrong ? '482913' : '48291').padEnd(6, ' ').split('').map((v, i) => ({ v, sh: s.wrong ? 'inset 0 0 0 1.5px #d92d20' : i === 5 ? 'inset 0 0 0 2px #1a1f6e' : 'inset 0 0 0 1px #d6dbe6' })),
+      codeWrong: !!s.wrong, codeAnim: s.wrong ? 'shake 320ms' : 'none',
+      codeWrongBtn: () => { set({ wrong: false }); setTimeout(() => this.setState({ wrong: true }), 10); },
+      codeRight: () => { closeDlg(); push('success', 'Confirmed', 'You won’t be asked again for 15 minutes.'); },
+      formTried: !!s.tried, f1: s.tried ? 'inset 0 0 0 1.5px #d92d20' : 'inset 0 0 0 1px #d6dbe6', tryForm: () => set({ tried: true }),
+      menu: !!s.menu, menuAria: s.menu ? 'true' : 'false', menuBtnBg: s.menu ? '#eef0f8' : '#fff', toggleMenu: () => set({ menu: !s.menu }),
+      menuReset: () => { set({ menu: false }); push('success', 'Reset link sent', 'It works for 1 hour.'); },
+      menuLock: () => { set({ menu: false }); push('info', 'Ramon’s account is locked', 'He is signed out everywhere.', 'Undo'); },
+      bar: !!s.bar, toggleBar: () => set({ bar: !s.bar, list: false, saving: false }),
+      saveBar: () => { set({ saving: true, list: false }); setTimeout(() => { this.setState({ bar: false, saving: false }); push('success', 'Chief mechanic saved', '3 changes, for 8 people.'); }, 1100); },
+      listOpen: !!s.list, listAria: s.list ? 'true' : 'false', listRot: s.list ? '180deg' : '0deg', listBtnBg: s.list ? 'rgba(255,255,255,.08)' : 'transparent', toggleList: () => set({ list: !s.list }),
+      saving: !!s.saving, saveLabel: s.saving ? 'Saving…' : 'Review and save',
+      changes: [{ group: 'Repairs', rows: [['+', 'Approve repair estimates', 'Off', 'On'], ['−', 'Delete repair orders', 'On', 'Off']] }, { group: 'Inventory', rows: [['+', 'Adjust stock counts', 'Off', 'On']] }].map((g) => ({ group: g.group, rows: g.rows.map(([sign, label, from, to]) => ({ sign, label, from, to, tileBg: sign === '+' ? '#ecfdf3' : '#fef3f2', tileFg: sign === '+' ? '#067647' : '#b42318' })) })),
+      reload: () => { set({ loading: true, list: 'ready' }); setTimeout(() => this.setState({ loading: false, landed: Date.now() }), 1300); },
+      isLoading: !!s.loading, isReady: !s.loading && list === 'ready', isEmpty: !s.loading && list === 'empty', isError: !s.loading && list === 'error',
+      cycleList: () => set({ list: order[(order.indexOf(list) + 1) % 3], loading: false }),
+      listState: { ready: 'loaded', empty: 'no matches', error: 'failed' }[list],
+      countLabel: s.loading ? 'loading' : list === 'ready' ? '149' : '0',
+      skel: [70, 55, 62, 48, 66, 52].map((w) => ({ w: `${w}%` })),
+      people: PEOPLE.map(([name, email, pill, fg, bg], i) => ({ name, email, pill, fg, bg, ini: name.split(' ').map((x) => x[0]).join(''), anim: s.landed ? `fadeIn 180ms ${i * 30}ms both` : 'none' })),
+    };
+  }
+}
+</script>
+</body>
+</html>
