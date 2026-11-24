@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>People filter, round 18</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+button{font:inherit;cursor:pointer}
+button:focus-visible{outline:2px solid #1a1f6e;outline-offset:2px}
+.pop{width:100%;background:#fff;border-radius:18px;box-shadow:0 0 0 1px rgba(15,20,69,.08),0 24px 56px rgba(15,20,69,.16);display:flex;flex-direction:column;overflow:hidden}
+.sec{font-size:11.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#94a3b8}
+.mono{font-family:'IBM Plex Mono',monospace}
+.row:hover{background:#f6f7fb}
+.fold{display:grid;transition:grid-template-rows 180ms cubic-bezier(.2,.8,.2,1)}
+.fold>div{overflow:hidden;min-height:0}
+.chev{transition:transform 180ms cubic-bezier(.2,.8,.2,1)}
+.box{transition:background 100ms,box-shadow 100ms,color 100ms}
+@media (prefers-reduced-motion: reduce){.fold,.chev{transition:none}}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; font-family: Inter, system-ui, sans-serif; color: #0f172a; background: #f3f5f9; display: flex; flex-direction: column">
+  <div style="flex: 1; display: grid; grid-template-columns: repeat(4, 1fr); padding: 28px 24px; gap: 20px; align-items: start">
+    <sc-for list="{{pops}}" as="P" hint-placeholder-count="2">
+      <div style="display: flex; flex-direction: column; gap: 12px">
+        <span style="font-size: 15px; font-weight: 700; color: #0f172a">{{P.title}}</span>
+        <div class="pop">
+          <div style="display: flex; align-items: center; padding: 16px 18px 6px"><span style="flex: 1; font-size: 15px; font-weight: 600">Filters</span><button onClick="{{reset}}" style="border: 0; background: transparent; font-size: 13px; font-weight: 600; color: {{clearFg}}; height: 28px">Clear all</button></div>
+          <div style="padding: 8px 18px 14px; display: flex; flex-direction: column; gap: 10px">
+            <span class="sec">Status</span>
+            <div style="display: flex; flex-wrap: wrap; gap: 6px">
+              <sc-for list="{{status}}" as="c" hint-placeholder-count="5">
+                <button onClick="{{c.toggle}}" role="checkbox" aria-checked="{{c.on}}" class="box" style="border: 0; height: 30px; padding: 0 10px; border-radius: 8px; display: flex; align-items: center; gap: 7px; font-size: 12.5px; font-weight: {{c.w}}; background: {{c.bg}}; box-shadow: {{c.sh}}; color: #0f172a"><span aria-hidden="true" class="box" style="width: 13px; height: 13px; border-radius: 4px; box-shadow: {{c.boxSh}}; background: {{c.boxBg}}; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800">{{c.mark}}</span>{{c.name}}<span class="mono" style="font-size: 11px; color: #94a3b8">{{c.n}}</span></button>
+              </sc-for>
+            </div>
+          </div>
+          <div style="height: 1px; background: #eef1f6"></div>
+          <div style="padding: 14px 10px 10px; display: flex; flex-direction: column; gap: 4px">
+            <span class="sec" style="padding: 0 8px 6px">System and role</span>
+            <sc-for list="{{P.rows}}" as="t" hint-placeholder-count="3">
+              <div style="border-radius: 12px; background: {{t.bg}}; box-shadow: {{t.ring}}; transition: background 150ms">
+                <div class="row" style="display: flex; align-items: center; gap: 4px; padding: 0 6px 0 8px; height: 50px; border-radius: 12px">
+                  <button onClick="{{t.toggle}}" role="checkbox" aria-checked="{{t.aria}}" aria-label="All of {{t.code}}" style="flex: none; width: 32px; height: 32px; border: 0; background: transparent; display: flex; align-items: center; justify-content: center; padding: 0"><span aria-hidden="true" class="box" style="width: 17px; height: 17px; border-radius: 5px; box-shadow: {{t.boxSh}}; background: {{t.boxBg}}; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; line-height: 1">{{t.mark}}</span></button>
+                  <button onClick="{{t.expand}}" aria-expanded="{{t.openAria}}" style="flex: 1; min-width: 0; border: 0; background: transparent; height: 44px; display: flex; align-items: center; gap: 10px; padding: 0 4px; text-align: left">
+                    <span aria-hidden="true" style="flex: none; width: 28px; height: 28px; border-radius: 8px; background: {{t.tile}}; color: {{t.ink}}; display: flex; align-items: center; justify-content: center"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="{{t.icon}}"></path></svg></span>
+                    <span style="flex: 1; min-width: 0; font-size: 14px; font-weight: 600">{{t.code}} <span style="font-weight: 400; color: #64748b; font-size: 12.5px">{{t.name}}</span></span>
+                    <span style="flex: none; font-size: 11.5px; font-weight: 600; border-radius: 999px; padding: 2px 8px; color: {{t.pillFg}}; background: {{t.pillBg}}">{{t.pill}}</span>
+                    <svg class="chev" aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2.4" stroke-linecap="round" style="transform: rotate({{t.rot}})"><path d="M6 9l6 6 6-6"></path></svg>
+                  </button>
+                </div>
+                <div class="fold" style="grid-template-rows: {{t.rows}}">
+                  <div>
+                    <div style="padding: 0 12px 12px 48px; display: flex; flex-wrap: wrap; gap: 6px">
+                      <sc-for list="{{t.roles}}" as="r" hint-placeholder-count="4">
+                        <button onClick="{{r.toggle}}" role="checkbox" aria-checked="{{r.on}}" class="box" style="border: 0; height: 30px; padding: 0 10px; border-radius: {{P.radius}}; font-size: 12.5px; display: flex; align-items: center; gap: 6px; font-weight: {{r.w}}; background: {{r.bg}}; box-shadow: {{r.sh}}; color: {{r.fg}}">
+                          <sc-if value="{{r.tick}}" hint-placeholder-val="{{false}}"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"></path></svg></sc-if>
+                          <sc-if value="{{r.box}}" hint-placeholder-val="{{false}}"><span aria-hidden="true" style="width: 12px; height: 12px; border-radius: 4px; box-shadow: {{r.boxSh}}; background: {{r.boxBg}}; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 800">{{r.mark}}</span></sc-if>
+                          {{r.name}}<span class="mono" style="font-size: 10.5px; opacity: .6">{{r.n}}</span>
+                        </button>
+                      </sc-for>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="border-top: 1px solid #eef1f6; padding: 12px 16px; display: flex; align-items: center; gap: 10px; background: #fbfbfd">
+            <span style="flex: 1; font-size: 12.5px; color: #64748b">{{summary}}</span>
+            <button style="border: 0; height: 38px; padding: 0 16px; border-radius: 10px; background: #1a1f6e; color: #fff; font-size: 13px; font-weight: 600">Show {{match}} people</button>
+          </div>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+const IC = {
+  VRMS: 'M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z',
+  VMMS: 'M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2M15 18H9M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.62l-3.48-4.35A1 1 0 0 0 17.52 8H14M5 18a2 2 0 1 0 4 0a2 2 0 1 0-4 0M15 18a2 2 0 1 0 4 0a2 2 0 1 0-4 0',
+  BMS: 'M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zM9 16l2 2 4-4',
+};
+const SYS = [['VRMS', 'Repair', 61, [['Admin', 2], ['Service advisor', 9], ['Mechanic', 38], ['Inventory clerk', 12]]], ['VMMS', 'Maintenance', 48, [['Admin', 2], ['Fleet manager', 6], ['Mechanic', 22], ['Driver', 18]]], ['BMS', 'Bookings', 52, [['Admin', 1], ['Dispatcher', 7], ['Customer service', 8], ['Driver', 36]]]];
+const STATUS = [['attention', 'Needs attention', 3], ['locked', 'Locked', 1], ['pending', 'Pending', 2], ['active', 'Active', 143], ['inactive', 'Inactive', 4]];
+const box = (on, part) => ({ boxBg: on || part ? '#1a1f6e' : '#fff', boxSh: on || part ? 'none' : 'inset 0 0 0 1.5px #aab3c5', mark: on ? '✓' : part ? '–' : '' });
+const STYLES = {
+  navy: ['1 · Navy fill', '8px'],
+  tint: ['2 · Soft tint and tick', '8px'],
+  outline: ['3 · Outline and tick', '999px'],
+  check: ['4 · Checkbox chips', '8px'],
+};
+class Component extends DCLogic {
+  renderVals() {
+    const s = this.state || {};
+    const a = s.a || 'tint';
+    const b = s.b || 'check';
+    const sy = s.sy || { VRMS: true };
+    const ro = s.ro || { 'VRMS:Mechanic': true, 'VRMS:Service advisor': true };
+    const st = s.st || { attention: true };
+    const open = s.open !== undefined ? s.open : 'VRMS';
+    const set = (p) => this.setState(p);
+    const rolesOf = (code) => SYS.find((x) => x[0] === code)[3];
+    const picked = (code) => rolesOf(code).filter(([r]) => ro[`${code}:${r}`]);
+    // Every role ticked means the whole system: no “4 of 4”
+    const state = (code) => { const p = picked(code).length; return p && p < rolesOf(code).length ? 'some' : p || sy[code] ? 'all' : 'off'; };
+    const clearRoles = (code, base) => { const n = { ...base }; Object.keys(n).forEach((k) => k.startsWith(code + ':') && delete n[k]); return n; };
+    const toggleSys = (code) => () => { const cur = state(code); set({ sy: { ...sy, [code]: cur === 'off' }, ro: clearRoles(code, ro) }); };
+    const toggleRole = (code, r) => () => {
+      const key = `${code}:${r}`;
+      let nro = { ...ro, [key]: !ro[key] };
+      const n = rolesOf(code).filter(([x]) => nro[`${code}:${x}`]).length;
+      if (n === rolesOf(code).length) nro = clearRoles(code, nro);
+      set({ ro: nro, sy: { ...sy, [code]: n > 0 || sy[code] } });
+    };
+    const chip = (style, on) => {
+      if (style === 'navy') return { bg: on ? '#1a1f6e' : '#fff', fg: on ? '#fff' : '#334155', sh: on ? 'none' : 'inset 0 0 0 1px #dfe3ec', tick: false, box: false };
+      if (style === 'tint') return { bg: on ? '#e7eaf7' : '#f3f5f9', fg: on ? '#1a1f6e' : '#334155', sh: 'none', tick: on, box: false };
+      if (style === 'outline') return { bg: on ? '#f6f7fc' : '#fff', fg: on ? '#1a1f6e' : '#334155', sh: on ? 'inset 0 0 0 1.5px #1a1f6e' : 'inset 0 0 0 1px #dfe3ec', tick: on, box: false };
+      return { bg: on ? '#f3f4fb' : '#fff', fg: '#0f172a', sh: on ? 'inset 0 0 0 1.5px #1a1f6e' : 'inset 0 0 0 1px #dfe3ec', tick: false, box: true, ...box(on, false) };
+    };
+    const rowsFor = (style) => SYS.map(([code, name, n, roles]) => {
+      const cur = state(code);
+      const p = picked(code);
+      const isOpen = open === code;
+      return {
+        code, name, icon: IC[code], ...box(cur === 'all', cur === 'some'), aria: cur === 'some' ? 'mixed' : cur === 'all' ? 'true' : 'false', toggle: toggleSys(code),
+        pill: cur === 'some' ? (p.length === 1 ? p[0][0] : `${p.length} roles`) : cur === 'all' ? 'Everyone' : `${n}`, pillFg: cur === 'off' ? '#94a3b8' : '#1a1f6e', pillBg: cur === 'off' ? 'transparent' : '#eef0f8',
+        tile: cur === 'off' ? '#f1f3f8' : '#1a1f6e', ink: cur === 'off' ? '#475569' : '#e8b800',
+        bg: isOpen ? '#fff' : cur === 'off' ? 'transparent' : '#f6f7fc', ring: isOpen ? 'inset 0 0 0 1px #e2e8f0, 0 1px 2px rgba(15,20,69,.06)' : 'none',
+        openAria: isOpen ? 'true' : 'false', rot: isOpen ? '180deg' : '0deg', rows: isOpen ? '1fr' : '0fr', expand: () => set({ open: isOpen ? null : code }),
+        roles: roles.map(([r, rn]) => { const on = !!ro[`${code}:${r}`]; return { name: r, n: rn, on: on ? 'true' : 'false', toggle: toggleRole(code, r), w: on ? 600 : 500, ...chip(style, on) }; }),
+      };
+    });
+    const status = STATUS.map(([id, name, n]) => { const on = !!st[id]; return { name, n, on: on ? 'true' : 'false', toggle: () => set({ st: { ...st, [id]: !on } }), w: on ? 600 : 500, ...box(on, false), bg: on ? '#f3f4fb' : '#fff', sh: on ? 'inset 0 0 0 1.5px #1a1f6e' : 'inset 0 0 0 1px #dfe3ec' }; });
+    const stCount = STATUS.filter(([id]) => st[id]).length;
+    const sysCount = SYS.filter(([code]) => state(code) !== 'off').length;
+    const total = stCount + sysCount;
+    const match = SYS.reduce((sum, [code, , n]) => { const cur = state(code); return sum + (cur === 'all' ? n : cur === 'some' ? picked(code).reduce((x, [, rn]) => x + rn, 0) : 0); }, 0) || 149;
+    const mk = (cur, key) => Object.entries(STYLES).map(([k, [n]]) => { const on = k === cur; return { name: n, on: on ? 'true' : 'false', bg: on ? '#fff' : 'transparent', fg: on ? '#0f172a' : '#475569', sh: on ? '0 1px 2px rgba(15,20,69,.15)' : 'none', pick: () => set({ [key]: k }) }; });
+    return {
+      groups: [{ label: 'Left chips', opts: mk(a, 'a') }, { label: 'Right chips', opts: mk(b, 'b') }],
+      reset: () => set({ sy: {}, ro: {}, st: {}, open: null }), clearFg: total ? '#1a1f6e' : '#cbd2de',
+      status,
+      summary: total ? `${total} filter${total === 1 ? '' : 's'} on` : 'No filters',
+      match,
+      pops: ['navy', 'tint', 'outline', 'check'].map((k) => ({ title: STYLES[k][0], radius: STYLES[k][1], rows: rowsFor(k) })),
+    };
+  }
+}
+</script>
+</body>
+</html>

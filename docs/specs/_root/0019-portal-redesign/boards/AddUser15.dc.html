@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Add a user, round 15</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+button{font:inherit;cursor:pointer}
+button:focus-visible{outline:2px solid #1a1f6e;outline-offset:2px}
+.fld{height:44px;border-radius:10px;box-shadow:inset 0 0 0 1px #d6dbe6;background:#fff;display:flex;align-items:center;padding:0 12px;font-size:14px;box-sizing:border-box}
+.lab{font-size:13px;font-weight:600;color:#334155}
+.hint{font-size:12px;color:#64748b;line-height:1.45}
+.opt:hover{box-shadow:inset 0 0 0 1px #aab3c5}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes inU{from{transform:translateY(8px) scale(.98);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion: reduce){*{animation-duration:1ms!important}}
+</style>
+</helmet>
+<div style="width: 1440px; height: 1100px; font-family: Inter, system-ui, sans-serif; color: #0f172a; background: #f3f5f9; display: flex; flex-direction: column">
+  <div style="display: flex; flex-direction: column; gap: 10px; padding: 14px 24px; background: #fff; border-bottom: 1px solid #e2e8f0">
+    <sc-for list="{{groups}}" as="g" hint-placeholder-count="2">
+      <div style="display: flex; align-items: center; gap: 12px">
+        <span style="width: 90px; font-size: 12px; font-weight: 600; color: #64748b">{{g.label}}</span>
+        <div role="group" aria-label="{{g.label}}" style="display: flex; background: #f1f3f8; border-radius: 10px; padding: 3px; gap: 2px">
+          <sc-for list="{{g.opts}}" as="o" hint-placeholder-count="3">
+            <button aria-pressed="{{o.on}}" onClick="{{o.pick}}" style="border: 0; border-radius: 8px; height: 30px; padding: 0 12px; font-size: 12.5px; font-weight: 600; background: {{o.bg}}; color: {{o.fg}}; box-shadow: {{o.sh}}">{{o.name}}</button>
+          </sc-for>
+        </div>
+        <span style="font-size: 12.5px; color: #475569">{{g.note}}</span>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="flex: 1; position: relative; display: flex; min-height: 0; overflow: hidden">
+    <aside aria-hidden="true" style="flex: 0 0 72px; background: #0f1445"></aside>
+    <div aria-hidden="true" style="flex: 0 0 400px; background: #fff; border-right: 1px solid #e2e8f0; padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; gap: 12px">
+      <span style="font-size: 22px; font-weight: 700">Users</span>
+      <span style="height: 40px; border-radius: 10px; background: #f3f5f9"></span>
+      <sc-for list="{{ghost}}" as="g" hint-placeholder-count="8"><span style="display: flex; gap: 12px; align-items: center; padding: 8px 0; background: {{g.bg}}"><span style="width: 36px; height: 36px; border-radius: 999px; background: #eef0f8"></span><span style="flex: 1; display: flex; flex-direction: column; gap: 6px"><span style="height: 10px; width: {{g.w}}; border-radius: 4px; background: #e6e9f1"></span><span style="height: 8px; width: 70%; border-radius: 4px; background: #f1f3f8"></span></span></span></sc-for>
+    </div>
+    <div aria-hidden="true" style="flex: 1; padding: 32px; display: flex; flex-direction: column; gap: 14px"><span style="font-size: 24px; font-weight: 700">Dana Reyes</span><span style="height: 120px; border-radius: 14px; background: #fff"></span><span style="height: 220px; border-radius: 14px; background: #fff"></span></div>
+    <div style="position: absolute; inset: 0; background: rgba(15,20,69,.38)"></div>
+
+    <section role="dialog" aria-modal="true" aria-labelledby="t" style="position: absolute; top: 48px; left: 50%; margin-left: -320px; width: 640px; max-height: 880px; border-radius: 20px; background: #fff; display: flex; flex-direction: column; box-shadow: 0 24px 64px rgba(15,20,69,.32); animation: inU .18s cubic-bezier(.2,.8,.2,1); overflow: hidden">
+      <header style="flex: none; padding: 22px 24px 18px; display: flex; align-items: flex-start; gap: 14px">
+        <span aria-hidden="true" style="flex: none; width: 40px; height: 40px; border-radius: 12px; background: #eef0f8; color: #1a1f6e; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M10 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM3 21c0-4 3-6 7-6 1.4 0 2.7.3 3.8.8M19 14v6M16 17h6"></path></svg></span>
+        <div style="flex: 1"><h2 id="t" style="margin: 0; font-size: 20px; font-weight: 700; letter-spacing: -0.01em">{{title}}</h2><p style="margin: 4px 0 0; font-size: 13px; color: #64748b">{{sub}}</p></div>
+        <button aria-label="Close" style="width: 36px; height: 36px; border: 0; border-radius: 999px; background: transparent; font-size: 16px; color: #64748b">✕</button>
+      </header>
+
+      <div style="flex: 1; overflow: auto; padding: 4px 24px 22px; display: flex; flex-direction: column; gap: 18px">
+        <div style="display: flex; flex-direction: column; gap: 6px">
+          <span class="lab">Work email</span>
+          <span class="fld" style="box-shadow: {{emailRing}}">{{email}}<span style="flex: 1"></span>
+            <sc-if value="{{inChecking}}" hint-placeholder-val="{{false}}"><span style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: #64748b"><span aria-hidden="true" style="width: 12px; height: 12px; border-radius: 999px; box-shadow: inset 0 0 0 2px #dfe3ec; border-top: 2px solid #1a1f6e; box-sizing: border-box; animation: spin .8s linear infinite"></span>Checking</span></sc-if>
+            <sc-if value="{{inTypo}}" hint-placeholder-val="{{false}}"><span aria-hidden="true" style="width: 20px; height: 20px; border-radius: 999px; background: #fef3f2; color: #b42318; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700">!</span></sc-if>
+            <sc-if value="{{inExists}}" hint-placeholder-val="{{false}}"><span aria-label="Has an account" style="width: 20px; height: 20px; border-radius: 999px; background: #1a1f6e; color: #fff; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21c0-4 3.5-6 8-6s8 2 8 6"></path></svg></span></sc-if>
+            <sc-if value="{{inIcon}}" hint-placeholder-val="{{false}}"><span aria-label="Email is free" style="width: 20px; height: 20px; border-radius: 999px; background: #eef0f8; color: #1a1f6e; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"></path></svg></span></sc-if>
+          </span>
+          <sc-if value="{{typoLine}}" hint-placeholder-val="{{false}}"><span style="font-size: 12.5px; color: #b42318">Enter the whole email, like name@welinc.com.</span></sc-if>
+          <sc-if value="{{helpLine}}" hint-placeholder-val="{{false}}"><span style="display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: #475569"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1a1f6e" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"></path></svg>{{helpText}}</span></sc-if>
+          <sc-if value="{{previewCard}}" hint-placeholder-val="{{false}}">
+            <div style="margin-top: 4px; border-radius: 12px; box-shadow: inset 0 0 0 1px #e2e8f0; border-style: dashed; padding: 12px 14px; display: flex; align-items: center; gap: 12px; background-image: linear-gradient(#fff,#fff)">
+              <span aria-hidden="true" style="flex: none; width: 36px; height: 36px; border-radius: 999px; background: #eef0f8; color: #1a1f6e; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600">MC</span>
+              <span style="flex: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 14px; font-weight: 600">A new WeLinc account</span><span style="font-size: 12px; color: #64748b">Nobody uses this email yet. Fill in their name below.</span></span>
+              <span style="font-size: 11px; font-weight: 600; color: #1a1f6e; background: #eef0f8; border-radius: 6px; padding: 2px 7px">New</span>
+            </div>
+          </sc-if>
+          <sc-if value="{{exists}}" hint-placeholder-val="{{false}}">
+            <div style="margin-top: 4px; border-radius: 12px; background: #f3f4fb; padding: 12px 14px; display: flex; align-items: center; gap: 12px">
+              <span aria-hidden="true" style="flex: none; width: 36px; height: 36px; border-radius: 999px; background: #fff; color: #1a1f6e; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; box-shadow: 0 0 0 1px #e2e8f0">BD</span>
+              <span style="flex: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 14px; font-weight: 600">Bea Dizon already has an account</span><span style="font-size: 12px; color: #475569">{{existsLine}}</span></span>
+              <button style="border: 0; background: transparent; color: #1a1f6e; font-size: 13px; font-weight: 600">Open user</button>
+            </div>
+          </sc-if>
+        </div>
+
+        <sc-if value="{{showIdentity}}" hint-placeholder-val="{{true}}">
+          <div style="display: grid; grid-template-columns: 1.35fr 1fr; gap: 14px">
+            <div style="display: flex; flex-direction: column; gap: 6px">
+              <span class="lab">Full name</span>
+              <span class="fld">Ma. Cristina dela Cruz</span>
+              <span class="hint">One field, as it appears on their ID. welinc-auth keeps one name, so “Ma. Cristina” and “dela Cruz” stay whole.</span>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 6px">
+              <span class="lab">Contact number <span style="font-weight: 400; color: #94a3b8">optional</span></span>
+              <span class="fld"><span style="color: #64748b; padding-right: 10px; margin-right: 10px; box-shadow: 1px 0 0 #e2e8f0">+63</span>917 555 0142</span>
+            </div>
+          </div>
+        </sc-if>
+
+        <div style="height: 1px; background: #eef1f6"></div>
+
+        <sc-if value="{{pickSystem}}" hint-placeholder-val="{{true}}">
+          <div style="display: flex; flex-direction: column; gap: 8px">
+            <span class="lab">System</span>
+            <div role="radiogroup" aria-label="System" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px">
+              <sc-for list="{{systems}}" as="x" hint-placeholder-count="3">
+                <button role="radio" aria-checked="{{x.on}}" aria-disabled="{{x.dis}}" onClick="{{x.pick}}" class="opt" style="border: 0; border-radius: 12px; padding: 12px; display: flex; align-items: center; gap: 10px; text-align: left; background: {{x.bg}}; box-shadow: {{x.sh}}; opacity: {{x.op}}">
+                  <span aria-hidden="true" style="flex: none; width: 34px; height: 34px; border-radius: 9px; background: {{x.tile}}; color: {{x.ink}}; display: flex; align-items: center; justify-content: center"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="{{x.icon}}"></path></svg></span>
+                  <span style="display: flex; flex-direction: column; gap: 1px; min-width: 0"><span style="font-size: 14px; font-weight: 600">{{x.code}}</span><span style="font-size: 11.5px; color: #64748b">{{x.sub}}</span></span>
+                </button>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <span class="lab">{{roleLabel}}</span>
+          <div role="radiogroup" aria-label="Role" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px">
+            <sc-for list="{{roles}}" as="r" hint-placeholder-count="4">
+              <button role="radio" aria-checked="{{r.on}}" onClick="{{r.pick}}" class="opt" style="border: 0; border-radius: 12px; padding: 12px 14px; display: flex; align-items: flex-start; gap: 10px; text-align: left; background: {{r.bg}}; box-shadow: {{r.sh}}">
+                <span aria-hidden="true" style="flex: none; margin-top: 2px; width: 16px; height: 16px; border-radius: 999px; box-shadow: {{r.dot}}; background: #fff"></span>
+                <span style="display: flex; flex-direction: column; gap: 3px"><span style="font-size: 14px; font-weight: 600">{{r.name}}</span><span style="font-size: 12px; color: #64748b; line-height: 1.4">{{r.desc}}</span></span>
+              </button>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+
+      <div style="flex: none; margin: 0 24px; padding: 12px 14px; border-radius: 12px; background: #f6f7fb; display: flex; gap: 10px; align-items: flex-start">
+        <svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#1a1f6e" stroke-width="1.9" style="flex: none; margin-top: 1px"><path d="{{noteIcon}}"></path></svg>
+        <span style="font-size: 13px; color: #334155; line-height: 1.5">{{summary}}</span>
+      </div>
+
+      <footer style="flex: none; padding: 16px 24px 20px; display: flex; align-items: center; justify-content: flex-end; gap: 8px">
+        <button style="border: 0; height: 42px; padding: 0 16px; border-radius: 10px; background: transparent; font-size: 14px; font-weight: 600; color: #475569">Cancel</button>
+        <button style="border: 0; height: 42px; padding: 0 20px; border-radius: 10px; background: #1a1f6e; color: #fff; font-size: 14px; font-weight: 600">{{cta}}</button>
+      </footer>
+    </section>
+
+    <div style="position: absolute; left: 1100px; top: 48px; width: 300px; background: #fff; border-radius: 14px; box-shadow: 0 1px 2px rgba(15,20,69,.06), 0 0 0 1px rgba(15,20,69,.05), 0 12px 32px rgba(15,20,69,.18); padding: 16px 18px; display: flex; flex-direction: column; gap: 8px">
+      <span style="font-size: 14px; font-weight: 600">What changed</span>
+      <sc-for list="{{notes}}" as="n" hint-placeholder-count="6">
+        <div style="display: flex; gap: 10px; font-size: 13px; line-height: 1.5; color: #334155"><span aria-hidden="true" style="flex: none; width: 6px; height: 6px; margin-top: 7px; border-radius: 999px; background: {{n.dot}}"></span><span>{{n.t}}</span></div>
+      </sc-for>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1100}}'>
+const ICON = {
+  VRMS: 'M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z',
+  VMMS: 'M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2M15 18H9M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.62l-3.48-4.35A1 1 0 0 0 17.52 8H14M5 18a2 2 0 1 0 4 0a2 2 0 1 0-4 0M15 18a2 2 0 1 0 4 0a2 2 0 1 0-4 0',
+  BMS: 'M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zM9 16l2 2 4-4',
+};
+const SYS = {
+  VRMS: ['Vehicle repair', [['Admin', 'Manages users and permissions in VRMS.'], ['Service advisor', 'Opens repair orders and talks to customers.'], ['Mechanic', 'Sees and updates the jobs assigned to them.'], ['Inventory clerk', 'Manages parts and stock.']]],
+  VMMS: ['Maintenance', [['Admin', 'Manages users and permissions in VMMS.'], ['Fleet manager', 'Plans maintenance for the fleet.'], ['Mechanic', 'Works the maintenance jobs.'], ['Driver', 'Reports issues from the mobile app.']]],
+  BMS: ['Bookings', [['Admin', 'Manages users and permissions in BMS.'], ['Dispatcher', 'Assigns trips and drivers.'], ['Customer service', 'Handles bookings and calls.'], ['Driver', 'Uses the mobile app for trips.']]],
+};
+const EV_NOTES = {
+  quiet: 'Google Workspace and Okta: a free email gets no message at all; only a taken one speaks up. Calmest. My pick.',
+  line: 'A plain sentence under the field, in grey with a navy tick. Clear without looking like a success badge.',
+  icon: 'Just a small tick inside the field, explained by its label for screen readers. Tiny, but a tick alone can read as “valid”, not “free”.',
+  card: 'A dashed card that mirrors the “already has an account” card. Symmetric, but heavy for the common case.',
+};
+class Component extends DCLogic {
+  renderVals() {
+    const s = this.state || {};
+    const who = s.who || 'suite';
+    const st = s.st || 'new';
+    const exists = st === 'exists';
+    const set = (p) => this.setState(p);
+    const mk = (cur, list, key) => list.map(([k, n]) => {
+      const on = k === cur;
+      return { name: n, on: on ? 'true' : 'false', bg: on ? '#fff' : 'transparent', fg: on ? '#0f172a' : '#475569', sh: on ? '0 1px 2px rgba(15,20,69,.15)' : 'none', pick: () => set({ [key]: k }) };
+    });
+    const suite = who === 'suite';
+    const ev = 'icon';
+    const typo = st === 'typo';
+    const isNew = st === 'new';
+    const checking = st === 'checking';
+    // Bea already holds VMMS, so that card is taken when giving her access
+    const sys = suite ? (s.sys || (exists ? 'VRMS' : 'VRMS')) : 'VRMS';
+    const roleName = (s.role && s.role[sys]) || (sys === 'BMS' ? 'Driver' : 'Mechanic');
+    const systems = ['VRMS', 'VMMS', 'BMS'].map((code) => {
+      const taken = exists && code === 'VMMS';
+      const on = code === sys;
+      return { code, icon: ICON[code], sub: taken ? 'Already has it' : SYS[code][0], on: on ? 'true' : 'false', dis: taken ? 'true' : 'false', op: taken ? '.45' : '1', pick: () => !taken && set({ sys: code }), bg: on ? '#f3f4fb' : '#fff', sh: on ? 'inset 0 0 0 2px #1a1f6e' : 'inset 0 0 0 1px #dfe3ec', tile: on ? '#1a1f6e' : '#eef0f8', ink: on ? '#e8b800' : '#1a1f6e' };
+    });
+    const roles = SYS[sys][1].map(([name, desc]) => {
+      const on = name === roleName;
+      return { name, desc, on: on ? 'true' : 'false', pick: () => set({ role: { ...(s.role || {}), [sys]: name } }), bg: on ? '#f3f4fb' : '#fff', sh: on ? 'inset 0 0 0 2px #1a1f6e' : 'inset 0 0 0 1px #dfe3ec', dot: on ? 'inset 0 0 0 5px #1a1f6e' : 'inset 0 0 0 1.5px #aab3c5' };
+    });
+    const person = exists ? 'Bea Dizon' : 'Ma. Cristina';
+    return {
+      groups: [
+        { label: 'You are', opts: mk(who, [['suite', 'Suite admin'], ['vrms', 'VRMS admin']], 'who'), note: suite ? 'A suite admin picks the system first.' : 'A system admin has one system, so the picker is gone and the role says where.' },
+        { label: 'Email', opts: mk(st, [['typo', '1 · Not an email yet'], ['checking', '2 · Checking'], ['new', '3 · Free'], ['exists', '4 · Has an account']], 'st'), note: 'The icon in the field walks through these four, in order, as you type and pause.' },
+      ],
+      inChecking: checking, inIcon: isNew, inTypo: typo, inExists: exists, typoLine: typo,
+      helpLine: isNew && ev === 'line', helpText: 'No account uses this email yet. We will create one.',
+      previewCard: isNew && ev === 'card',
+      ghost: [60, 45, 70, 50, 65, 40, 55, 62].map((w, i) => ({ w: `${w}%`, bg: i === 2 ? '#f3f4fb' : 'transparent' })),
+      title: exists ? 'Give access' : 'Add a user',
+      sub: exists ? 'This email already has a WeLinc account.' : 'They get an email to set their password.',
+      email: exists ? 'bea.dizon@welinc.com' : typo ? 'cristina.delacruz@welinc' : checking ? 'cristina.delacruz@welinc.com' : 'cristina.delacruz@welinc.com',
+      exists, showIdentity: !exists,
+      existsLine: suite ? 'Mechanic in VMMS. Pick another system below to give her more access.' : 'She is in VMMS. Pick her VRMS role below.',
+      emailRing: typo ? 'inset 0 0 0 1.5px #b42318' : exists ? 'inset 0 0 0 1.5px #1a1f6e' : 'inset 0 0 0 1px #d6dbe6',
+      pickSystem: suite, systems, roles,
+      roleLabel: suite ? 'Role' : 'Role in VRMS',
+      noteIcon: exists ? 'M20 6 9 17l-5-5' : 'M3 6h18v12H3zM3 7l9 6 9-6',
+      summary: exists ? `${person} gets ${roleName} in ${sys} straight away. She signs in with her current password.` : `${person} gets ${roleName} in ${sys}. We email her a link to set a password; it works for 72 hours, and she shows as Pending until then.`,
+      cta: exists ? 'Give access' : 'Add and send invite',
+      notes: [
+        ['#1a1f6e', 'Round 15: the field’s own icon is the whole check. Red ! while it is not an email, a small spinner while welinc-auth looks it up, a navy tick when it is free, a person icon (and the card below) when it already has an account. No sentence when all is well.'],
+        ['#1a1f6e', 'Name: yes, only Full name. Every system and welinc-auth store one name.'],
+        ['#94a3b8', 'Round 14 note: only the email message changed. “New to WeLinc” in green read like a success badge. Pick one of the four “New email” styles; “While checking” shows the small wait while welinc-auth looks it up.'],
+        ['#067647', 'No Temporary switch. Temporary access is a suite admin tool with its own page and reason, so it stays there.'],
+        ['#067647', 'One system per add. Most adds are one system, and the server takes one today, so nothing new in welinc-auth. A second system is “Give access” from the user page.'],
+        ['#067647', 'Email first. A known email turns the dialog into “Give access”, hides the name fields, and greys the system they already have.'],
+        ['#067647', 'Roles are cards with a one line meaning, two per row, so a new admin knows what Service advisor means.'],
+        ['#067647', 'Systems carry the launcher icons (wrench, truck, calendar) in one navy, no colour per system.'],
+        ['#067647', 'The grey box says in one sentence what happens next, including the 72 hour link.'],
+      ].map(([dot, t]) => ({ dot, t })),
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>System switcher, round 16</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:inherit;text-decoration:none}
+button{font:inherit;cursor:pointer}
+button:focus-visible,a:focus-visible{outline:2px solid #1a1f6e;outline-offset:2px}
+.cd{transition:box-shadow .12s,background .12s}
+.cd:hover{box-shadow:inset 0 0 0 1px #aab3c5;background:#fafbfd}
+.hm:hover{background:#eef0f8}
+.mi:hover{background:#f3f5f9}
+.nv:hover{background:rgba(255,255,255,.08)}
+@keyframes popIn{from{transform:translateY(4px) scale(.98);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion: reduce){*{animation-duration:1ms!important}}
+</style>
+</helmet>
+<div style="width: 1440px; height: 960px; font-family: Inter, system-ui, sans-serif; color: #0f172a; background: #f3f5f9; display: flex; flex-direction: column">
+  <div style="display: flex; flex-direction: column; gap: 10px; padding: 14px 24px; background: #fff; border-bottom: 1px solid #e2e8f0">
+    <sc-for list="{{groups}}" as="g" hint-placeholder-count="3">
+      <div style="display: flex; align-items: center; gap: 12px">
+        <span style="width: 104px; font-size: 12px; font-weight: 600; color: #64748b">{{g.label}}</span>
+        <div role="group" aria-label="{{g.label}}" style="display: flex; background: #f1f3f8; border-radius: 10px; padding: 3px; gap: 2px">
+          <sc-for list="{{g.opts}}" as="o" hint-placeholder-count="4">
+            <button aria-pressed="{{o.on}}" onClick="{{o.pick}}" style="border: 0; border-radius: 8px; height: 30px; padding: 0 12px; font-size: 12.5px; font-weight: 600; background: {{o.bg}}; color: {{o.fg}}; box-shadow: {{o.sh}}">{{o.name}}</button>
+          </sc-for>
+        </div>
+        <span style="font-size: 12.5px; color: #475569">{{g.note}}</span>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="flex: 1; display: flex; min-height: 0">
+    <nav aria-label="Admin" style="flex: 0 0 256px; background: #0f1445; padding: 14px 12px; box-sizing: border-box; display: flex; flex-direction: column; gap: 4px; color: rgba(255,255,255,.75); font-size: 14px">
+      <sc-if value="{{backLink}}" hint-placeholder-val="{{false}}">
+        <a href="#" class="nv" style="display: flex; align-items: center; gap: 6px; height: 30px; padding: 0 8px; margin-bottom: 6px; border-radius: 8px; font-size: 12.5px; color: rgba(255,255,255,.7)"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"></path></svg>WeLinc home</a>
+      </sc-if>
+      <a href="#" title="{{logoTitle}}" style="display: flex; align-items: center; gap: 10px; color: #fff; font-weight: 700; font-size: 16px; padding: 4px 4px 16px"><span aria-hidden="true" style="width: 36px; height: 36px; border-radius: 9px; background: #e8b800; color: #0f1445; display: flex; align-items: center; justify-content: center; font-size: 15px; font-style: italic; font-weight: 800">WL</span><span style="display: flex; flex-direction: column"><span>{{areaName}}</span><span style="font-size: 12px; font-weight: 400; color: rgba(255,255,255,.6)">WeLinc</span></span></a>
+      <span style="height: 40px; display: flex; align-items: center; padding: 0 10px">Overview</span>
+      <span style="height: 40px; display: flex; align-items: center; padding: 0 10px; border-radius: 8px; background: rgba(255,255,255,.12); color: #fff; font-weight: 600">Users</span>
+      <span style="height: 40px; display: flex; align-items: center; padding: 0 10px">Administrators</span>
+      <span style="height: 40px; display: flex; align-items: center; padding: 0 10px">Permissions</span>
+      <span style="height: 40px; display: flex; align-items: center; padding: 0 10px">Temporary access</span>
+    </nav>
+    <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; position: relative">
+      <div style="height: 56px; flex: none; background: #fff; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; gap: 8px; padding: 0 24px">
+        <span style="font-size: 14px; color: #64748b">{{areaName}}</span><span aria-hidden="true" style="color: #94a3b8">›</span><span style="font-size: 14px; font-weight: 500">Users</span>
+        <span style="flex: 1"></span>
+        <sc-if value="{{showGrid}}" hint-placeholder-val="{{true}}">
+          <button onClick="{{togglePop}}" aria-label="Switch system" title="Switch system" aria-expanded="{{popOpen}}" style="width: 40px; height: 40px; border: 0; border-radius: 999px; background: {{gridBg}}; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="#475569"><circle cx="5" cy="5" r="2"></circle><circle cx="12" cy="5" r="2"></circle><circle cx="19" cy="5" r="2"></circle><circle cx="5" cy="12" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="19" cy="12" r="2"></circle><circle cx="5" cy="19" r="2"></circle><circle cx="12" cy="19" r="2"></circle><circle cx="19" cy="19" r="2"></circle></svg></button>
+        </sc-if>
+        <button onClick="{{toggleMenu}}" aria-label="Your account" aria-expanded="{{menuOpen}}" style="width: 40px; height: 40px; border: 0; border-radius: 999px; background: #eef0f8; color: #1a1f6e; font-size: 13px; font-weight: 600; box-shadow: {{avRing}}">{{ini}}</button>
+      </div>
+
+      <sc-if value="{{popShown}}" hint-placeholder-val="{{true}}">
+        <div role="menu" aria-label="Switch system" style="position: absolute; right: 72px; top: 52px; width: 352px; background: #fff; border-radius: 18px; box-shadow: 0 0 0 1px rgba(15,20,69,.08), 0 18px 44px rgba(15,20,69,.2); z-index: 9; animation: popIn .14s cubic-bezier(.2,.8,.2,1); display: flex; flex-direction: column">
+          <div style="display: flex; align-items: center; padding: 14px 14px 10px 16px">
+            <span style="flex: 1; font-size: 13px; font-weight: 600; color: #334155">Switch to</span>
+            <a href="#" class="hm" role="menuitem" style="display: flex; align-items: center; gap: 6px; height: 30px; padding: 0 11px; border-radius: 999px; font-size: 12.5px; font-weight: 600; color: #1a1f6e; box-shadow: inset 0 0 0 1px #dfe3ec"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 11l9-7 9 7v9H3z"></path></svg>Home</a>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 8px; padding: 0 12px 12px">
+            <sc-for list="{{cards}}" as="c" hint-placeholder-count="3">
+              <a href="#" class="cd" role="menuitem" aria-current="{{c.cur}}" style="border-radius: 14px; padding: 12px 14px; display: flex; align-items: center; gap: 12px; box-shadow: {{c.ring}}; background: {{c.bg}}">
+                <span aria-hidden="true" style="flex: none; width: 40px; height: 40px; border-radius: 11px; background: {{c.tile}}; color: {{c.ink}}; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="{{c.icon}}"></path></svg></span>
+                <span style="flex: 1; display: flex; flex-direction: column; gap: 1px; min-width: 0"><span style="font-size: 14px; font-weight: 600">{{c.title}}</span><span style="font-size: 12px; color: #64748b">{{c.name}}</span></span>
+                <span style="font-size: 11px; font-weight: 600; color: {{c.tagFg}}; background: {{c.tagBg}}; border-radius: 6px; padding: 3px 8px; white-space: nowrap">{{c.tag}}</span>
+              </a>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{menuShown}}" hint-placeholder-val="{{false}}">
+        <div role="menu" aria-label="Your account" style="position: absolute; right: 24px; top: 52px; width: 300px; background: #fff; border-radius: 16px; box-shadow: 0 0 0 1px rgba(15,20,69,.08), 0 18px 44px rgba(15,20,69,.2); padding: 6px; z-index: 9; animation: popIn .14s cubic-bezier(.2,.8,.2,1)">
+          <div style="padding: 12px; display: flex; align-items: center; gap: 12px"><span aria-hidden="true" style="width: 44px; height: 44px; border-radius: 999px; background: #eef0f8; color: #1a1f6e; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 600">{{ini}}</span><span style="display: flex; flex-direction: column"><span style="font-size: 15px; font-weight: 600">{{who}}</span><span style="font-size: 13px; color: #64748b">{{email}}</span></span></div>
+          <div style="height: 1px; background: #e8ebf2; margin: 2px 0"></div>
+          <sc-if value="{{homeInMenu}}" hint-placeholder-val="{{false}}"><a href="#" class="mi" role="menuitem" style="display: flex; align-items: center; gap: 10px; height: 40px; padding: 0 12px; border-radius: 8px; font-size: 14px"><svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="1.9"><path d="M3 11l9-7 9 7v9H3z"></path></svg>WeLinc home</a></sc-if>
+          <a href="#" class="mi" role="menuitem" style="display: flex; align-items: center; gap: 10px; height: 40px; padding: 0 12px; border-radius: 8px; font-size: 14px"><svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="1.9"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21c0-4 3.5-6 8-6s8 2 8 6"></path></svg>Your profile</a>
+          <div style="height: 1px; background: #e8ebf2; margin: 2px 0"></div>
+          <a href="#" class="mi" role="menuitem" style="display: flex; align-items: center; gap: 10px; height: 40px; padding: 0 12px; border-radius: 8px; font-size: 14px"><svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="1.9"><path d="M14 4h5v16h-5M10 8l-4 4 4 4M6 12h11"></path></svg>Sign out</a>
+        </div>
+      </sc-if>
+
+      <div style="flex: 1; padding: 28px 32px; display: flex; align-items: flex-end; gap: 20px">
+        <div style="width: 520px; background: #fff; border-radius: 14px; box-shadow: 0 1px 2px rgba(15,20,69,.06), 0 0 0 1px rgba(15,20,69,.05); padding: 18px 20px; display: flex; flex-direction: column; gap: 10px">
+          <span style="font-size: 15px; font-weight: 600">{{noteTitle}}</span>
+          <sc-for list="{{notes}}" as="n" hint-placeholder-count="4">
+            <div style="display: flex; gap: 10px; font-size: 13px; line-height: 1.55; color: #334155"><span aria-hidden="true" style="flex: none; width: 6px; height: 6px; margin-top: 7px; border-radius: 999px; background: {{n.dot}}"></span><span>{{n.t}}</span></div>
+          </sc-for>
+        </div>
+        <div style="width: 380px; background: #fff; border-radius: 14px; box-shadow: 0 1px 2px rgba(15,20,69,.06), 0 0 0 1px rgba(15,20,69,.05); padding: 18px 20px; display: flex; flex-direction: column; gap: 10px">
+          <span style="font-size: 15px; font-weight: 600">The name</span>
+          <span style="font-size: 13px; line-height: 1.55; color: #334155">{{nameNote}}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":960}}'>
+const IC = {
+  admin: 'M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6zM9 12l2 2 4-4',
+  VRMS: 'M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z',
+  VMMS: 'M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2M15 18H9M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.62l-3.48-4.35A1 1 0 0 0 17.52 8H14M5 18a2 2 0 1 0 4 0a2 2 0 1 0-4 0M15 18a2 2 0 1 0 4 0a2 2 0 1 0-4 0',
+  BMS: 'M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zM9 16l2 2 4-4',
+};
+const NAMES = { VRMS: 'Vehicle repair', VMMS: 'Vehicle maintenance', BMS: 'Bookings and dispatch' };
+const AREA = {
+  center: ['Admin center', 'Microsoft 365, Teams and Zoom call it this. Short, plain, and it says “where admins work” without naming one system. My pick.'],
+  suite: ['Suite management', 'Ties back to “suite admin”, but “management” suggests managing the systems themselves (vehicles, bookings), not people.'],
+  access: ['Access management', 'Exact for what is inside (users, permissions, temporary access, audit log; the IAM word), but the longest, and it wraps on smaller screens.'],
+  people: ['People and access', 'Friendly and descriptive; reads more like a section than a place you switch to.'],
+};
+const VIEWERS = {
+  dana: ['DR', 'Dana Reyes', 'dana.reyes@welinc.com', 'VRMS admin', [['VRMS', 'Admin'], ['BMS', 'Driver']]],
+  marco: ['MT', 'Marco Tan', 'marco.tan@welinc.com', 'VMMS admin', [['VMMS', 'Admin']]],
+  leonora: ['LC', 'Leonora Castillo', 'suite.admin@welinc.com', 'Suite admin', []],
+};
+const SOLO = {
+  logo: ['1 · Logo is home, no button', [['#067647', 'With only one place to be, a switcher is noise. The grid button is gone; the logo at the top of the sidebar already goes to WeLinc home (its tooltip says so), and Home also sits in the account menu. My pick.'], ['#1a1f6e', 'Click the LC avatar to see Home in the menu.']]],
+  menu: ['2 · Home only in the account menu', [['#067647', 'The top bar keeps just the avatar; Home lives in the account menu above Your profile. Clean, but one more click than the logo.']]],
+  back: ['3 · A back link in the sidebar', [['#067647', 'A small “‹ WeLinc home” above the logo, like a breadcrumb back to the portal. Very clear for someone who only ever comes here from home.'], ['#b54708', 'Adds a line to the sidebar for everyone with no systems.']]],
+  keep: ['4 · Keep the switcher anyway', [['#067647', 'The same grid button, with only the admin card (ticked) and the Home pill. Consistent with everyone else.'], ['#b54708', 'A menu with one choice that is the page you are on; this is the “Home pill just being there” you did not like.']]],
+};
+class Component extends DCLogic {
+  renderVals() {
+    const s = this.state || {};
+    const area = s.area || 'center';
+    const who = s.who || 'dana';
+    const solo = s.solo || 'logo';
+    const set = (p) => this.setState(p);
+    const mk = (cur, list, key) => list.map(([k, n]) => {
+      const on = k === cur;
+      return { name: n, on: on ? 'true' : 'false', bg: on ? '#fff' : 'transparent', fg: on ? '#0f172a' : '#475569', sh: on ? '0 1px 2px rgba(15,20,69,.15)' : 'none', pick: () => set({ [key]: k, pop: true, menu: false }) };
+    });
+    const [ini, name, email, adminRole, list] = VIEWERS[who];
+    const alone = list.length === 0;
+    const areaName = AREA[area][0];
+    const showGrid = !alone || solo === 'keep';
+    const pop = s.pop !== undefined ? s.pop : true;
+    const menu = !!s.menu;
+    const cards = [
+      { title: areaName, name: 'Users, permissions, records', icon: IC.admin, here: true, tag: 'You are here' },
+      ...list.map(([code, role]) => ({ title: code, name: NAMES[code], icon: IC[code], here: false, tag: role })),
+    ].map((c) => ({ ...c, cur: c.here ? 'page' : 'false', ring: c.here ? 'inset 0 0 0 1.5px #1a1f6e' : 'inset 0 0 0 1px #e8ebf2', bg: c.here ? '#f6f7fc' : '#fff', tile: c.here ? '#1a1f6e' : '#eef0f8', ink: c.here ? '#e8b800' : '#1a1f6e', tagFg: c.here ? '#fff' : '#1a1f6e', tagBg: c.here ? '#1a1f6e' : '#eef0f8' }));
+    const [soloTitle, soloNotes] = SOLO[solo];
+    const groups = [
+      { label: 'Admin area name', opts: mk(area, [['center', 'Admin center'], ['suite', 'Suite management'], ['access', 'Access management'], ['people', 'People and access']], 'area'), note: 'It changes the sidebar title, the breadcrumb and the card.' },
+      { label: 'Signed in as', opts: mk(who, [['dana', 'Dana · admin + 2 systems'], ['marco', 'Marco · admin + 1 system'], ['leonora', 'Leonora · admin only']], 'who'), note: alone ? 'Nowhere else to go: pick an idea below.' : 'The admin card is back, ticked, first.' },
+    ];
+    if (alone) groups.push({ label: 'Admin only', opts: mk(solo, [['logo', '1 · Logo is home'], ['menu', '2 · In the menu'], ['back', '3 · Back link'], ['keep', '4 · Keep switcher']], 'solo'), note: '' });
+    return {
+      groups, areaName, ini, who: name, email,
+      showGrid, popShown: showGrid && pop && !menu, popOpen: pop ? 'true' : 'false', gridBg: pop && !menu ? '#eef0f8' : 'transparent',
+      togglePop: () => set({ pop: !pop, menu: false }),
+      menuShown: menu, menuOpen: menu ? 'true' : 'false', toggleMenu: () => set({ menu: !menu }), avRing: menu ? '0 0 0 2px #1a1f6e' : 'none',
+      homeInMenu: alone && (solo === 'logo' || solo === 'menu'),
+      backLink: alone && solo === 'back',
+      logoTitle: 'WeLinc home',
+      cards,
+      noteTitle: alone ? soloTitle : 'Switcher with the admin card back',
+      notes: (alone ? soloNotes : [
+        ['#067647', 'The admin card is first and ticked (“You are here”) with the shield icon, so it reads as one of your places, not a header.'],
+        ['#067647', 'Each system card shows your role there. Wide cards, so one, two or three below it all look even.'],
+        ['#067647', `Marco (admin + 1 system) gets two cards: ${areaName} and VMMS. That is a real choice, so the switcher stays.`],
+        ['#1a1f6e', 'Only someone with no system at all (Leonora) has nothing to switch to. Switch “Signed in as”.'],
+      ]).map(([dot, t]) => ({ dot, t })),
+      nameNote: AREA[area][1],
+    };
+  }
+}
+</script>
+</body>
+</html>

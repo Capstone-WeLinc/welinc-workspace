@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Admin shell, round 20</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:inherit;text-decoration:none}
+button{font:inherit;cursor:pointer}
+button:focus-visible,a:focus-visible{outline:2px solid #e8b800;outline-offset:2px}
+.nv:hover{background:rgba(255,255,255,.08)}
+.cb:hover{background:rgba(255,255,255,.1);color:#fff}
+.cd{transition:box-shadow .12s,background .12s}
+.cd:hover{box-shadow:inset 0 0 0 1px #aab3c5;background:#fafbfd}
+.hm:hover{background:#eef0f8}
+@keyframes popIn{from{transform:translateY(4px) scale(.98);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion: reduce){*{animation-duration:1ms!important}}
+</style>
+</helmet>
+<div style="width: 1440px; height: 940px; font-family: Inter, system-ui, sans-serif; color: #0f172a; background: #f3f5f9; display: flex; flex-direction: column">
+  <div style="display: flex; flex-direction: column; gap: 10px; padding: 14px 24px; background: #fff; border-bottom: 1px solid #e2e8f0">
+    <sc-for list="{{groups}}" as="g" hint-placeholder-count="4">
+      <div style="display: flex; align-items: center; gap: 12px">
+        <span style="width: 110px; font-size: 12px; font-weight: 600; color: #64748b">{{g.label}}</span>
+        <div role="group" aria-label="{{g.label}}" style="display: flex; background: #f1f3f8; border-radius: 10px; padding: 3px; gap: 2px">
+          <sc-for list="{{g.opts}}" as="o" hint-placeholder-count="4">
+            <button aria-pressed="{{o.on}}" onClick="{{o.pick}}" style="border: 0; border-radius: 8px; height: 30px; padding: 0 12px; font-size: 12.5px; font-weight: 600; background: {{o.bg}}; color: {{o.fg}}; box-shadow: {{o.sh}}">{{o.name}}</button>
+          </sc-for>
+        </div>
+        <span style="font-size: 12.5px; color: #475569">{{g.note}}</span>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="flex: 1; display: flex; min-height: 0">
+    <nav aria-label="Suite management" style="flex: 0 0 {{navW}}; background: #0f1445; color: #fff; padding: 12px 10px 0; box-sizing: border-box; display: flex; flex-direction: column; gap: 2px">
+      <a href="#" aria-label="Home" title="Home" style="display: flex; align-items: center; gap: 10px; padding: 6px 4px 4px; justify-content: {{jc}}">
+        <span aria-hidden="true" style="flex: none; width: 36px; height: 36px; border-radius: 9px; background: #e8b800; color: #0f1445; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 15px; font-style: italic">WL</span>
+        <sc-if value="{{expanded}}" hint-placeholder-val="{{true}}"><span style="display: flex; flex-direction: column; min-width: 0"><span style="font-weight: 700; font-size: 16px; white-space: nowrap">Suite management</span><span style="font-size: 12px; color: {{roleFg}}; white-space: nowrap">{{roleLine}}</span></span></sc-if>
+      </a>
+      <div aria-hidden="true" style="height: 1px; background: rgba(255,255,255,.12); margin: 12px 2px 6px"></div>
+      <sc-for list="{{nav}}" as="it" hint-placeholder-count="7">
+        <a href="#" class="nv" title="{{it.name}}" aria-label="{{it.name}}" style="display: flex; align-items: center; gap: 12px; padding: 0 10px; height: 40px; border-radius: 8px; font-size: 14px; font-weight: {{it.w}}; color: {{it.fg}}; background: {{it.bg}}; justify-content: {{jc}}"><svg aria-hidden="true" style="flex: none" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="{{it.icon}}"></path></svg><sc-if value="{{expanded}}" hint-placeholder-val="{{true}}"><span style="white-space: nowrap">{{it.name}}</span></sc-if></a>
+      </sc-for>
+      <span style="flex: 1"></span>
+      <div style="margin: 6px -10px 0; padding: 10px 12px; border-top: 1px solid rgba(255,255,255,.1); background: rgba(0,0,0,.16); display: flex; align-items: center; gap: 10px; justify-content: {{footJc}}; min-height: 56px; box-sizing: border-box">
+        <sc-if value="{{expanded}}" hint-placeholder-val="{{true}}">
+          <sc-if value="{{f1}}" hint-placeholder-val="{{true}}"><span style="flex: 1; font-size: 13px; font-weight: 600; color: rgba(255,255,255,.8)">WeLinc Logistics</span></sc-if>
+          <sc-if value="{{f5}}" hint-placeholder-val="{{false}}"><span style="flex: 1; display: flex; align-items: center; gap: 10px"><span aria-hidden="true" style="width: 26px; height: 26px; border-radius: 7px; background: rgba(255,255,255,.1); color: #e8b800; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; font-style: italic">WL</span><span style="font-size: 13px; font-weight: 600; color: rgba(255,255,255,.85)">WeLinc Logistics</span></span></sc-if>
+          <sc-if value="{{f2}}" hint-placeholder-val="{{false}}"><span style="flex: 1; display: flex; align-items: center; gap: 10px"><span aria-hidden="true" style="width: 26px; height: 26px; border-radius: 7px; background: rgba(255,255,255,.1); color: #e8b800; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; font-style: italic">WL</span><span style="display: flex; flex-direction: column"><span style="font-size: 12.5px; font-weight: 600; color: rgba(255,255,255,.85)">WeLinc Logistics</span><span style="font-size: 11px; color: rgba(255,255,255,.5)">Fleet operations suite</span></span></span></sc-if>
+          <sc-if value="{{f3}}" hint-placeholder-val="{{false}}"><span style="flex: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 12.5px; font-weight: 600; color: rgba(255,255,255,.8)">WeLinc Logistics</span><span style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: rgba(255,255,255,.5)"><span aria-hidden="true" style="width: 6px; height: 6px; border-radius: 999px; background: #e8b800"></span>Staging</span></span></sc-if>
+          <sc-if value="{{f4}}" hint-placeholder-val="{{false}}"><span style="flex: 1; font-size: 11.5px; color: rgba(255,255,255,.45)">© 2026 WeLinc Logistics</span></sc-if>
+        </sc-if>
+        <button onClick="{{toggle}}" aria-label="{{label}}" title="{{tip}}" class="cb" style="flex: none; width: 30px; height: 30px; border: 0; border-radius: 8px; background: transparent; color: rgba(255,255,255,.65); display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="{{dbl}}"></path></svg></button>
+      </div>
+    </nav>
+
+    <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; position: relative">
+      <div style="height: 56px; flex: none; background: #fff; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; gap: 8px; padding: 0 24px">
+        <span style="font-size: 14px; color: #64748b">Suite management</span><span aria-hidden="true" style="color: #94a3b8">›</span><span style="font-size: 14px; font-weight: 500">Users</span>
+        <span style="flex: 1"></span>
+        <button onClick="{{togglePop}}" aria-label="Switch system" title="Switch system" aria-expanded="{{popOpen}}" style="width: 40px; height: 40px; border: 0; border-radius: 999px; background: {{gridBg}}; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="#475569"><circle cx="5" cy="5" r="2"></circle><circle cx="12" cy="5" r="2"></circle><circle cx="19" cy="5" r="2"></circle><circle cx="5" cy="12" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="19" cy="12" r="2"></circle><circle cx="5" cy="19" r="2"></circle><circle cx="12" cy="19" r="2"></circle><circle cx="19" cy="19" r="2"></circle></svg></button>
+        <span aria-hidden="true" style="width: 40px; height: 40px; border-radius: 999px; background: #eef0f8; color: #1a1f6e; font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center">DR</span>
+      </div>
+
+      <sc-if value="{{pop}}" hint-placeholder-val="{{true}}">
+        <div role="menu" aria-label="Switch system" style="position: absolute; right: 72px; top: 52px; width: 352px; background: #fff; border-radius: 18px; box-shadow: 0 0 0 1px rgba(15,20,69,.08), 0 18px 44px rgba(15,20,69,.2); z-index: 9; animation: popIn 140ms cubic-bezier(.2,.8,.2,1); display: flex; flex-direction: column">
+          <div style="display: flex; align-items: center; padding: 14px 14px 10px 16px">
+            <span style="flex: 1; font-size: 13px; font-weight: 600; color: #334155">Switch to</span>
+            <a href="#" class="hm" role="menuitem" style="display: flex; align-items: center; gap: 6px; height: 30px; padding: 0 11px 0 {{homePadL}}; border-radius: 999px; font-size: 12.5px; font-weight: 600; color: #1a1f6e; box-shadow: inset 0 0 0 1px #dfe3ec"><sc-if value="{{homeSvg}}" hint-placeholder-val="{{true}}"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="{{homeIcon}}"></path></svg></sc-if><sc-if value="{{homeMark}}" hint-placeholder-val="{{false}}"><span aria-hidden="true" style="width: 18px; height: 18px; border-radius: 5px; background: #e8b800; color: #0f1445; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 800; font-style: italic">WL</span></sc-if>Home<sc-if value="{{homeArrowR}}" hint-placeholder-val="{{false}}"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M7 17 17 7M9 7h8v8"></path></svg></sc-if></a>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 8px; padding: 0 12px 12px">
+            <sc-for list="{{cards}}" as="c" hint-placeholder-count="3">
+              <a href="#" class="cd" role="menuitem" aria-current="{{c.cur}}" style="border-radius: 14px; padding: 12px 14px; display: flex; align-items: center; gap: 12px; box-shadow: {{c.ring}}; background: {{c.bg}}">
+                <span aria-hidden="true" style="flex: none; width: 40px; height: 40px; border-radius: 11px; background: {{c.tile}}; color: {{c.ink}}; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="{{c.icon}}"></path></svg></span>
+                <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px"><span style="font-size: 14px; font-weight: 600; white-space: nowrap">{{c.title}}</span><span style="font-size: 12px; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{c.name}}</span></span>
+                <span style="font-size: 11px; font-weight: 600; color: {{c.tagFg}}; background: {{c.tagBg}}; border-radius: 6px; padding: 3px 8px; white-space: nowrap">{{c.tag}}</span>
+              </a>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":940}}'>
+const I = {
+  dash: 'M3 3h7v9H3zM14 3h7v5h-7zM14 12h7v9h-7zM3 16h7v5H3z',
+  users: 'M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM2 21c0-4 3-6 7-6s7 2 7 6M17 11a3 3 0 1 0 0-6M22 21c0-3-2-5-5-5.5',
+  shield: 'M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6zM9 12l2 2 4-4',
+  sliders: 'M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M14 4v4M8 10v4M16 16v4',
+  clock: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 7v5l3 2',
+  userx: 'M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM2 21c0-4 3-6 7-6 1.5 0 2.8.3 4 .8M17 15l5 5M22 15l-5 5',
+  log: 'M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01',
+  VRMS: 'M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z',
+  BMS: 'M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zM9 16l2 2 4-4',
+};
+const HOME = { home: ['Home', 'M3 11l9-7 9 7v9H3z', 'Plain and short. My pick; the page it opens is the one place that lists everything.'], all: ['All systems', 'M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z', 'Says what you will find there, but the cards right below are systems too, so it reads twice.'], portal: ['Portal', 'M4 5h16v14H4zM4 9h16', 'The word the team uses, but users never see “portal” anywhere else.'], start: ['Start', 'M5 12h14M13 6l6 6-6 6', 'Friendly; a bit vague for a work tool.'] };
+const FOOT = { 1: 'Just the company name and the collapse button. Quiet and always true.', 2: 'Logo mark, company name, and a short line of what the suite is. The most branded. My pick.', 3: 'Company name with the environment under it, so a demo on staging is never mistaken for live. On production that line hides.', 4: 'A small copyright line. The lightest, reads like a website footer.' };
+const ROLE = { suite: ['Suite admin', 'Every system'], vrms: ['VRMS admin', 'One system'] };
+class Component extends DCLogic {
+  renderVals() {
+    const s = this.state || {};
+    const foot = '5';
+    const hic = 'house';
+    const role = s.role || 'suite';
+    const sub = 'role';
+    const collapsed = !!s.c;
+    const pop = s.pop !== undefined ? s.pop : true;
+    const set = (p) => this.setState(p);
+    const mk = (cur, list, key) => list.map(([k, n]) => {
+      const on = k === cur;
+      return { name: n, on: on ? 'true' : 'false', bg: on ? '#fff' : 'transparent', fg: on ? '#0f172a' : '#475569', sh: on ? '0 1px 2px rgba(15,20,69,.15)' : 'none', pick: () => set({ [key]: k }) };
+    });
+    const label = collapsed ? 'Expand sidebar' : 'Collapse sidebar';
+    const [roleName, roleScope] = ROLE[role];
+    const subLines = { role: [roleName, 'rgba(255,255,255,.6)'], scope: [`${roleName} · ${roleScope}`, 'rgba(255,255,255,.6)'], gold: [roleName, '#e8b800'] };
+    const HI = { house: 'M3 11l9-7 9 7v9H3z', back: 'M15 6l-6 6 6 6', none: '' };
+    return {
+      groups: [
+        { label: 'Signed in as', opts: mk(role, [['suite', 'Suite admin'], ['vrms', 'VRMS admin']], 'role'), note: '' },
+      ],
+      roleLine: subLines[sub][0], roleFg: subLines[sub][1],
+      f1: foot === '1', f2: foot === '2', f3: foot === '3', f4: foot === '4', f5: foot === '5',
+      navW: collapsed ? '68px' : '256px', expanded: !collapsed, jc: collapsed ? 'center' : 'flex-start', footJc: collapsed ? 'center' : 'space-between',
+      toggle: () => set({ c: !collapsed }), label, tip: `${label}  [`, dbl: collapsed ? 'M6 7l5 5-5 5M13 7l5 5-5 5' : 'M18 7l-5 5 5 5M11 7l-5 5 5 5',
+      pop, popOpen: pop ? 'true' : 'false', gridBg: pop ? '#eef0f8' : 'transparent', togglePop: () => set({ pop: !pop }),
+      homeSvg: hic === 'house' || hic === 'back', homeIcon: HI[hic] || '', homeMark: hic === 'mark', homeArrowR: hic === 'out', homePadL: hic === 'mark' ? '5px' : hic === 'none' || hic === 'out' ? '12px' : '9px',
+      cards: [
+        { title: 'Suite management', name: 'Users and permissions', icon: I.shield, here: true, tag: 'You are here' },
+        { title: 'VRMS', name: 'Vehicle repair', icon: I.VRMS, tag: role === 'vrms' ? 'Admin' : 'Service advisor' },
+        { title: 'BMS', name: 'Bookings and dispatch', icon: I.BMS, tag: 'Driver' },
+      ].map((c) => ({ ...c, cur: c.here ? 'page' : 'false', ring: c.here ? 'inset 0 0 0 1.5px #1a1f6e' : 'inset 0 0 0 1px #e8ebf2', bg: c.here ? '#f6f7fc' : '#fff', tile: c.here ? '#1a1f6e' : '#eef0f8', ink: c.here ? '#e8b800' : '#1a1f6e', tagFg: c.here ? '#fff' : '#1a1f6e', tagBg: c.here ? '#1a1f6e' : '#eef0f8' })),
+      nav: [['Overview', I.dash], ['Users', I.users, true], ['Administrators', I.shield], ['Permissions', I.sliders], ['Temporary access', I.clock], ['Account deletions', I.userx], ['Audit log', I.log]].map(([name, icon, cur]) => ({ name, icon, w: cur ? 600 : 500, fg: cur ? '#fff' : 'rgba(255,255,255,.78)', bg: cur ? 'rgba(255,255,255,.12)' : 'transparent' })),
+
+    };
+  }
+}
+</script>
+</body>
+</html>
