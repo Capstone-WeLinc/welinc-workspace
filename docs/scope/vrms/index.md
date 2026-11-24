@@ -77,7 +77,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 58 | Per ticket checklist edits | Slice 1 | in-progress |
 | 63 | Chief dashboard rework with a Team section | Slice 1 | done |
 | 26 | Hosting, CI/CD & environments | Release | in-progress |
-| 27 | Error monitoring | Release | done |
+| 27 | Error monitoring | Release | in-progress |
 | 68 | API docs | Release | done |
 | 69 | Security checks | Release | in-progress |
 | 72 | Realistic demo data across the suite | Release | planned |
