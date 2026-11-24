@@ -11,8 +11,8 @@ The RTM summary reports 102 requirements. Its body contains 102 requirements acr
 - The BRD assigns account creation and role assignment to VMMS Admin. The suite architecture places account ownership in `welinc-auth`. VMMS scope covers consuming authenticated identities, VMMS roles, and session state; account CRUD remains in the shared auth and portal services.
 - BRD assumption A-03 describes VRMS and BMS reading VMMS-owned vehicle tables through foreign keys. The suite architecture prohibits cross-system database reads. VMMS remains the source of fleet data, and other systems consume it through documented APIs.
 - BRD assumption A-14 says VMMS may reference VRMS repair costs read-only. Keep repair-ticket and repair-cost ownership in VRMS; any integration must use its API and a spec.
-- RTM requirement FR-27.10 restricts the AI/Analytics page to Admin, while the BRD role descriptions include Operations in fleet dashboards and reports. Reconcile whether Operations may use analytics before changing UI or API access.
-- Explicit non-goals include GPS/telemetry, advanced mechanical-failure prediction, supplier/shop automation, vendor price estimation, payroll/HR, income or profit calculations, and repair-ticket management. VRMS `UNDER_REPAIR` status takes precedence over VMMS maintenance status.
+- **Resolved (2026-11-25):** Admin and Operations may access the VMMS AI/Analytics page and fleet analytics read endpoints, aligning FR-27.10 with the BRD role descriptions for Operations fleet dashboards and reports. Preserve the API's Admin/Operations fleet-role guard. Manual analytics sync remains Admin-only, and existing assigned-work-order policies remain unchanged. See [spec 0001](../../specs/vmms/0001-ai-analytics-admin-access/index.md).
+- Explicit non-goals include GPS/telemetry, advanced mechanical-failure prediction, supplier/shop automation, vendor price estimation, payroll/HR, income or profit calculations, and VRMS repair-ticket administration or duplicate repair storage. The VMMS-owned referral, status, and history integration is a scope extension; VRMS `UNDER_REPAIR` status takes precedence over VMMS maintenance status.
 
 | # | Feature | Phase | Status |
 |---:|---|---|---|
@@ -72,6 +72,8 @@ Requirements: BR-04 to BR-06; FR-04.* to FR-06.*; SC-03, SC-04.
   - FR-05.1: Single-vehicle and bulk master-odometer updates are implemented in backend and Operations web, with per-vehicle audit and schedule refresh in [spec 0004](../../specs/vmms/0004-bulk-odometer-updates/index.md); runtime acceptance pending. [Spec 0016](../../specs/vmms/0016-maintenance-canonicalization-and-bulk-odometer/index.md) adds a JSON bulk odometer API and wires the Vehicles bulk manual flow to it with partial-success results. Operations owns all writes to the vehicle master odometer through the dedicated Vehicles action, including readings originating from work orders. Generic vehicle edits, mechanic work-order submission, and schedule completion do not update the master; work-order readings remain evidence. Vehicle creation/import may establish the initial baseline. This user decision overrides the RTM's Mechanic/mobile actor; reconcile the RTM before acceptance.
   - FR-05.2: Implemented. Prisma and API DTO validation restrict status to `AVAILABLE`, `UNDER_MAINTENANCE`, or `UNDER_REPAIR`; no custom status is accepted.
   - FR-05.3: Implemented. VMMS uses `UPDATE ... status != UNDER_REPAIR`, so an existing or concurrently changed repair status cannot be overwritten.
+  - VMMS vehicle availability integration is documented in [spec 0024](../../specs/vmms/0024-vmms-repair-handoff-and-availability/index.md). VMMS remains the status writer; BMS event receipt and shared auth grants are proposed external contracts in [spec 0026](../../specs/vmms/0026-vmms-vrms-repair-referrals-and-bms-availability/index.md).
+  - Flow A VMMS slice: serve BMS fleet/availability reads and publish durable vehicle/garage master-data invalidations. VMMS implementation and BMS integration remain in progress under [spec 0024](../../specs/vmms/0024-vmms-repair-handoff-and-availability/index.md).
   - FR-06.1: Implemented for maintenance schedules. Outsourced providers are Operations-managed, active provider names are the only accepted outsourced value, and Admin has view-only access. Per [spec 0013](../../specs/vmms/0013-outsourced-provider-lifecycle/index.md), unreferenced providers can be renamed or deleted; referenced providers retain their name and may only be activated or deactivated.
   - FR-06.2: Gap. Account type is a fixed enum (`IN_HOUSE`/`OUTSOURCED`), not the BRD's configurable Online/Corporate classification, and no Operations-managed account-type catalog exists.
   - FR-06.3: Implemented. A vehicle's registered Garage assignment represents its branch; seeded Garage records include Marikina, Sta. Rosa and Pulilan. No separate vehicle-branch field is needed.
@@ -124,6 +126,8 @@ Support assigned work, checklist completion, parts and labor details, mechanic s
 Done when: assigned-work access, complete-checklist submission, approval and rejection, cost visibility by role, history, and next-service calculations meet their acceptance criteria.
 
 Requirements: BR-12 to BR-15; FR-12.* to FR-15.*; SC-08, SC-09, SC-20.
+
+- VMMS-to-VRMS repair referrals, referral outcomes, ticket status, and VRMS-owned repair-history reads are a scope extension in [spec 0024](../../specs/vmms/0024-vmms-repair-handoff-and-availability/index.md). The cross-system API proposal is pending review in [spec 0026](../../specs/vmms/0026-vmms-vrms-repair-referrals-and-bms-availability/index.md); VRMS and auth implementation are outside VMMS ownership.
 
 - [x] Reconcile the 14 Module 4 RTM rows with API workflow rules, admin views, and VMMS mobile screens.
 
@@ -243,7 +247,7 @@ Requirements: BR-27 and BR-28; FR-27.1 to FR-27.12 and FR-28.1 to FR-28.3; SC-16
 - [x] Reconcile the 15 Cross-Cutting RTM rows with the analytics service and VMMS flows in `welinc-mobile-vrms_vmms`.
 - [ ] Confirm the final integration and deployment evidence for the applicable success criteria.
 
-  Reconciliation evidence as of 2026-11-19:
+  Reconciliation evidence (code review 2026-11-19; access decision updated 2026-11-25):
   - FR-27.1: Implemented. The analytics sync extracts core PostgreSQL vehicle, schedule and checklist source records without changing operational rows.
   - FR-27.2: Implemented. The DuckDB sync prepares snapshot, status, trend, vehicle KPI, alert, summary and schedule tables.
   - FR-27.3: Implemented. Health, overview, vehicles, alerts, report, AI, work-order and legacy alias endpoints are exposed.
@@ -253,7 +257,7 @@ Requirements: BR-27 and BR-28; FR-27.1 to FR-27.12 and FR-28.1 to FR-28.3; SC-16
   - FR-27.7: Implemented. Forecast logic supplies 7/30/90-day information and AI overview/trend/anomaly context.
   - FR-27.8: Partial. Semantic maintenance search and embeddings exist in the service, but runtime embedding coverage/vector validation is not recorded.
   - FR-27.9: Implemented in code. Work-order advisory/recommendation routes provide contextual safety, tools/parts, execution and quality guidance with fallback behavior.
-  - FR-27.10: Partial. Analytics APIs enforce Admin/Operations fleet access and mobile roles are denied, but the web route lacks a route-local Admin-only guard before direct URL navigation.
+  - FR-27.10: Implemented in code; runtime role acceptance remains pending. Admin and Operations can use the web Analytics navigation and direct route, and fleet-read APIs enforce the Admin/Operations guard. Manual sync remains Admin-only; mobile roles cannot access fleet analytics.
   - FR-27.11: Implemented. Overview/report responses include generatedAt, source update time, data age and stale status metadata.
   - FR-27.12: Partial. Migration/validation code exists for data-mart tables and embeddings, but source/target runtime validation evidence is not recorded.
   - FR-28.1: Implemented. Mobile sync retrieves `/vehicles`, `/maintenance-schedules` and `/checklists` and stores records in SQLite.
@@ -263,5 +267,6 @@ Requirements: BR-27 and BR-28; FR-27.1 to FR-27.12 and FR-28.1 to FR-28.3; SC-16
   - Additional gaps:
   - Mobile staging currently contains the offline-sync continuation and revision guards, but no mobile test/build run confirms them.
   - Analytics HTTP authorization tests exist, but DuckDB/pgvector runtime migration, validation and source consistency are not executed.
+  - Proposed analytics runtime readiness, data-health visibility, and evidence-backed AI work is documented in draft [spec 0021](../../specs/vmms/0021-analytics-data-readiness-and-ai-evidence/index.md); it is not approved or authorized for implementation.
   - Deployment evidence for shared services, gateway routes, VMMS containers, web/mobile readiness and final environment configuration is not complete.
   - Cross-cutting reconciliation remains **in progress** until runtime integration and deployment evidence are recorded.
