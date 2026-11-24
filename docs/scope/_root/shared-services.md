@@ -465,7 +465,7 @@ spec [0019](../../specs/_root/0019-portal-redesign/index.md) · code in `welinc-
 - [ ] Build it: `/develop portal redesign`
   - [x] welinc-auth: `suiteAdmin`, the summary and email check routes, `contact` on create, the code email layout, contract 0001 Changes line (AC-6, AC-7, AC-23, AC-27)
   - [x] welinc-auth, same branch before its PR: the People list's `access` filter, the `ATTENTION` and `ACTIVE_GROUP` statuses, `GET /auth/admin/users/facets`, contract 0001 Changes line (AC-21a, AC-21b)
-  - [ ] Portal foundations, session toasts in the portal and web-vrms, the Suite management shell, filter popover and Add a user (AC-15, AC-17 to AC-26, AC-28)
+  - [x] Portal foundations, session toasts in the portal and web-vrms, the Suite management shell, filter popover and Add a user (AC-15, AC-17 to AC-26, AC-28)
   - [ ] Sign in, forgot password, Signed out and No access, then the static launcher with the screen choice fix (AC-1 to AC-5, AC-11, AC-13, AC-14, AC-16)
   - [ ] Motion (Arrival 2, the loop, Launch 3, reduced motion), then the sweep and board comparison, `design.md` and the spec 0016 amendment lines (AC-8 to AC-12, AC-29)
 - [ ] Verify it: `/check verify portal redesign`
