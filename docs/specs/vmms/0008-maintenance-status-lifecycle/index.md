@@ -1,6 +1,6 @@
 # 0008. Maintenance status lifecycle
 
-**Status**: Approved for implementation
+**Status**: Implementation complete; integrated runtime verification pending
 **Scope**: [Maintenance scheduling and alerts](../../../scope/vmms/index.md#3-maintenance-scheduling-and-alerts); [Work orders and maintenance history](../../../scope/vmms/index.md#4-work-orders-checklists-and-maintenance-history)
 
 Decision history: [rationale.md](rationale.md). Verification: [verify.md](verify.md).
@@ -41,7 +41,7 @@ review axis. `OVERDUE` may represent an in-progress work order; its
 | Chief review | `DONE` becomes `COMPLETED` on approval, or `IN_PROGRESS` on reject/repair; rejection requires remarks | Assigned chief mechanic |
 | Cancellation request | Request creation and rejection do not change schedule status; approval can set an eligible unstarted schedule to `CANCELLED` | Operations requests; Admin reviews |
 | Maintenance-log void | Approved void of a completed log sets it to `CANCELLED`; an Admin cancellation records a reason and closes the log | Operations requests; Admin reviews or cancels |
-| Recurrence | Approval of a completed recurring schedule creates a separate `PENDING` schedule; it does not reopen the completed schedule | System, in the approval transaction |
+| Recurrence | Approval of completed recurring work creates one separate successor using the initial cycle rules and the submitted service date/odometer; a cancelled occurrence creates no successor | System, in the approval transaction |
 | Deactivation | Soft-deletes the schedule; does not rewrite status or erase its history | Admin, subject to existing restrictions |
 
 Time-based schedules are not assigned `DUE` by an additional new timer in this
@@ -59,6 +59,11 @@ Any future change to that rule requires its own approved behavior change.
 4. Status, approval status, vehicle status, and soft deletion remain distinct.
 5. Existing routes, response fields, and persisted enum values remain
    compatible; no migration is required.
+6. Recurrence uses the service completion timestamp and odometer captured at
+   mechanic submission, not the later review timestamp or a newer master
+   reading. It preserves the cycle's trigger and interval rules.
+7. Recurrence creation is idempotent and transactional; cancellation of an
+   occurrence prevents a successor from being created from that occurrence.
 
 ## API, data, and security impact
 
@@ -69,6 +74,9 @@ Any future change to that rule requires its own approved behavior change.
   authorization, and compare-and-set conflict handling.
 - Do not allow a web/mobile client to assert derived due/overdue state as
   authoritative.
+- Store the mechanic's completion timestamp in the existing
+  `workOrderProgress` JSON and use the submitted service odometer already
+  persisted on the schedule. No new column or migration is required.
 
 ## Affected repositories
 
@@ -79,5 +87,5 @@ Any future change to that rule requires its own approved behavior change.
 
 ## Delivery status
 
-The lifecycle was traced against the current backend during design. Contract
-tests and final end-to-end verification remain to be completed.
+The focused recurrence unit tests pass. Seeded-flow and integrated runtime
+checks remain subject to the verification steps in [verify.md](verify.md).

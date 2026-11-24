@@ -64,17 +64,17 @@ Requirements: BR-04 to BR-06; FR-04.* to FR-06.*; SC-03, SC-04.
 
 - [x] Reconcile the 12 Module 2 RTM rows with the core API, web, and VMMS mobile flows.
 
-  Reconciliation evidence as of 2026-11-19:
+  Reconciliation evidence as of 2026-11-22:
   - FR-04.1: Implemented for required Plate Number, Make, Model, Garage Branch and Odometer Baseline; valid records start at `AVAILABLE`. The vehicle form and API also require year, engine type and truck size/category.
   - FR-04.2: Implemented. Plate numbers are unique in the database and imports and create/update paths return duplicate-plate errors.
   - FR-04.3: Implemented in the API. Vehicle updates run in a transaction and write previous/new values, actor identity and timestamp for changed fields.
   - FR-04.4: Implemented. Vehicle delete is a soft delete with `isActive=false`; active-vehicle API queries exclude archived records and the web/mobile read filtering prevents active dropdown use. The original BRD/RTM execution status remains `Not Executed`.
-  - FR-05.1: Single-vehicle and bulk master-odometer updates are implemented in backend and Operations web, with per-vehicle audit and schedule refresh in [spec 0004](../../specs/vmms/0004-bulk-odometer-updates/index.md); runtime acceptance pending. Operations owns all writes to the vehicle master odometer through the dedicated Vehicles action, including readings originating from work orders. Generic vehicle edits, mechanic work-order submission, and schedule completion do not update the master; work-order readings remain evidence. Vehicle creation/import may establish the initial baseline. This user decision overrides the RTM's Mechanic/mobile actor; reconcile the RTM before acceptance.
+  - FR-05.1: Single-vehicle and bulk master-odometer updates are implemented in backend and Operations web, with per-vehicle audit and schedule refresh in [spec 0004](../../specs/vmms/0004-bulk-odometer-updates/index.md); runtime acceptance pending. [Spec 0016](../../specs/vmms/0016-maintenance-canonicalization-and-bulk-odometer/index.md) adds a JSON bulk odometer API and wires the Vehicles bulk manual flow to it with partial-success results. Operations owns all writes to the vehicle master odometer through the dedicated Vehicles action, including readings originating from work orders. Generic vehicle edits, mechanic work-order submission, and schedule completion do not update the master; work-order readings remain evidence. Vehicle creation/import may establish the initial baseline. This user decision overrides the RTM's Mechanic/mobile actor; reconcile the RTM before acceptance.
   - FR-05.2: Implemented. Prisma and API DTO validation restrict status to `AVAILABLE`, `UNDER_MAINTENANCE`, or `UNDER_REPAIR`; no custom status is accepted.
   - FR-05.3: Implemented. VMMS uses `UPDATE ... status != UNDER_REPAIR`, so an existing or concurrently changed repair status cannot be overwritten.
-  - FR-06.1: Implemented for maintenance schedules. Outsourced providers are Operations-managed, active provider names are the only accepted outsourced value, and Admin has view-only access.
+  - FR-06.1: Implemented for maintenance schedules. Outsourced providers are Operations-managed, active provider names are the only accepted outsourced value, and Admin has view-only access. Per [spec 0013](../../specs/vmms/0013-outsourced-provider-lifecycle/index.md), unreferenced providers can be renamed or deleted; referenced providers retain their name and may only be activated or deactivated.
   - FR-06.2: Gap. Account type is a fixed enum (`IN_HOUSE`/`OUTSOURCED`), not the BRD's configurable Online/Corporate classification, and no Operations-managed account-type catalog exists.
-  - FR-06.3: Partial. Every vehicle requires an active registered garage. The implementation accepts arbitrary registered garage names, rather than enforcing only Marikina, Santa Rosa and Pulilan.
+  - FR-06.3: Implemented. A vehicle's registered Garage assignment represents its branch; seeded Garage records include Marikina, Sta. Rosa and Pulilan. No separate vehicle-branch field is needed.
   - FR-06.4: Implemented. The vehicle list has a default Garage Branch column, branch filter and ascending/descending branch sort.
   - FR-06.5: Implemented. `.xlsx` preview validates all rows, duplicate plates and active garage names, then saves valid rows and returns row-specific errors for invalid rows; the limit is 1,000 rows.
   - Mobile: implemented as an offline vehicle snapshot source, but the local vehicle model omits garage branch and web-only make/year/engine/truck-size fields.
@@ -92,35 +92,36 @@ Requirements: BR-07 to BR-11; FR-07.* to FR-11.*; SC-05 to SC-07, SC-18, SC-19, 
 
 - [x] Reconcile the 25 Module 3 RTM rows with the scheduler, notification flows, and web and mobile views.
 
-  Reconciliation evidence as of 2026-11-19:
-  - FR-07.1–07.3: Partial. The API models odometer, time and dual triggers and computes due date/odometer states. Existing eligible odometer schedule statuses now refresh transactionally when the master reading changes; analytics and mobile consume those persisted statuses through existing refresh/snapshot paths. Automatic schedule creation from live odometer/time thresholds and runtime/integration acceptance remain unverified; see [spec 0004](../../specs/vmms/0004-bulk-odometer-updates/index.md).
-  - FR-07.4: Implemented. Operations can create schedules for a specific truck with mechanic, checklist, trigger, start date, target date, account/provider and notes; the web provides create/edit flows.
-  - FR-07.5: Implemented. Schedule creation requires a target due date and validates a start date.
-  - FR-07.6: Implemented. Schedule start dates reject values before the Manila current date.
+  Reconciliation evidence as of 2026-11-22:
+  - FR-07.1–07.3: Partial. The API models odometer, time and dual triggers and computes due date/odometer states. Existing eligible odometer schedule statuses refresh transactionally when the master reading changes; analytics and mobile consume those persisted statuses through existing refresh/snapshot paths. Schedule creation remains Operations-managed: threshold crossings update existing schedule state and do not generate replacement schedules, as specified in [spec 0004](../../specs/vmms/0004-bulk-odometer-updates/index.md). Runtime/integration acceptance remains pending.
+  - Predictive maintenance: Implemented in backend and web code; Operations-facing due-window suggestions use recent odometer audit history. Initial schedule creation remains manual, and predictions do not create or modify work orders. Runtime/API verification remains pending in [spec 0012](../../specs/vmms/0012-predictive-maintenance-readiness/index.md).
+  - FR-07.4: Implemented. Operations can create schedules for a specific truck with mechanic, checklist, trigger, Due Date, account/provider and notes; the web provides create/edit flows.
+  - FR-07.5: Implemented. Due Date is the only user-entered schedule date; the internal start date is the Manila creation day on create and remains unchanged on edit.
+  - FR-07.6: Implemented. New schedules use the Manila current day internally; users cannot set a past start date, and edits preserve the stored start date.
   - FR-07.7: Implemented. Server and web paths block duplicate Pending schedules for the same truck and maintenance type.
   - FR-08.1: Implemented. Web has a monthly calendar using start/due dates and displays truck/type/status cells.
-  - FR-08.2: Partial. Web has list/calendar views, status/priority/vehicle/template/search/date filters and priority/date sorting; explicit garage-branch and maintenance-type sorting/filter labels need acceptance verification.
-  - FR-08.3–08.5: Partial. Overdue, Due and Pending states exist in web/mobile, and odometer buffer/time overdue evaluation exists. A single consistent Red/Orange/Green legend across every schedule view is not fully confirmed.
+  - FR-08.2: Partial. Web list/calendar views include status, priority, vehicle, Garage Branch, Maintenance Type, search and date filters, with sorting by date, priority, Garage Branch and Maintenance Type. Runtime acceptance remains pending.
+  - FR-08.3–08.5: Implemented in code. Web and VMMS mobile use Pending green, Due orange, Overdue red, In Progress blue, Done/awaiting review amber, and closed muted; schedule, work-order, dashboard, and notification surfaces include status guidance. Visual and integrated runtime acceptance remain pending.
   - FR-08.6: Implemented. Priority defaults to Medium and create/update/permissions tests cover Admin/Operations control.
-  - FR-08.7: Partial. Text search exists for vehicle/mechanic/filter data, but searchable dropdown behavior is not implemented consistently across station, parts, provider and mechanic fields.
+  - FR-08.7: Implemented in code. Web registered-option selectors are searchable without creating or activating records; Parts Used remains free text with prior-name suggestions on web and mobile. Keyboard, focus, empty-result, and inactive-option acceptance remain pending.
   - FR-09.1: Partial. In-app maintenance and general notifications plus a one-minute schedule evaluation cron exist. Semaphore SMS delivery is not confirmed in repository evidence.
   - FR-09.2: Implemented in code for +1 Chief Mechanic, +3 Admin/Operations and +7 critical escalation, with a daily Manila-time cron and deduplicated notifications.
   - FR-10.1: Implemented in the adjacent checklist module. Admin can create and duplicate checklist templates; copies persist independently.
   - FR-10.2: Implemented in API/mobile scope. Mechanics receive only assigned work; scope checks protect reassigned work.
   - FR-10.3: Implemented. Submission validation lists incomplete checklist items and blocks 100%-incomplete submissions.
-  - FR-10.4: Implemented. Only Chief Mechanic or the authorized review role completes approval, rejection returns work with remarks, and recurring next dates are created on approval.
-  - FR-11.1: Partial. Schedule edits and cancellation records exist, but the dedicated reschedule audit trail with original/new date, actor and one-second timestamp needs acceptance verification.
-  - FR-11.2: Not confirmed. No complete first/second In Progress extension and Admin-approval workflow was found.
+  - FR-10.4: Implemented in code. Chief Mechanic approval creates one recurring successor from the submitted service date/odometer and original cycle rules; cancelled occurrences do not continue the chain. Focused recurrence unit tests pass; seeded-flow and integrated runtime verification remain pending in [spec 0008](../../specs/vmms/0008-maintenance-status-lifecycle/index.md) and [spec 0012](../../specs/vmms/0012-predictive-maintenance-readiness/index.md).
+  - FR-11.1: Implemented in code. Date edits and approved extensions record prior/new dates, actor, source, and timestamp transactionally; integrated database acceptance remains pending.
+  - FR-11.2: Implemented in code. Assigned Mechanics can submit up to two eligible extension requests and Admin can approve/reject them with required review history. Focused service tests pass; the migration is not applied and runtime acceptance remains pending.
   - FR-11.3: Implemented. Operations must submit a reasoned cancellation; work cannot be cancelled after work starts, and the record is retained through Admin review.
   - FR-11.4: Implemented. Outsourced providers are resolved against active registered providers.
   - FR-11.5: Implemented for completed maintenance logs/history, with searchable per-truck web views and status/type/vehicle filtering.
-  - Runtime evidence: unit coverage exists for duplicate schedules, trigger rules, overdue escalation, cancellation and workflow, but no end-to-end RTM execution record is present. Feature status remains **in progress**.
+  - Runtime evidence: existing unit coverage covers duplicate schedules, trigger rules, overdue escalation, cancellation and workflow. New focused extension-service and mobile date/status-filter tests pass; backend build, mobile type/lint checks, and web build pass. [Spec 0008](../../specs/vmms/0008-maintenance-status-lifecycle/index.md) documents and tests the existing lifecycle boundaries; integrated browser/API verification remains pending. Spec 0016 also adds canonical `dueDate`/`dueOdometer` and additive `computedStatus` fields to key schedule API responses and aligns maintenance deep-links to supported search prefill. No end-to-end RTM, browser, or mobile-device acceptance is recorded. The migration remains unapplied; feature status remains **in progress**.
 
 ### 4. Work orders, checklists, and maintenance history
 
 Support assigned work, checklist completion, parts and labor details, mechanic submission, Chief Mechanic review, and searchable per-vehicle maintenance history.
 
-Done when: assigned-work access, complete-checklist submission, approval and rejection, cost visibility by role, history, and next-service calculations meet their acceptance criteria. On mobile, list content remains reachable through a single scroll area on short screens, and work-order detail remains scrollable around its fixed actions and keyboard.
+Done when: assigned-work access, complete-checklist submission, approval and rejection, cost visibility by role, history, and next-service calculations meet their acceptance criteria.
 
 Requirements: BR-12 to BR-15; FR-12.* to FR-15.*; SC-08, SC-09, SC-20.
 
@@ -138,12 +139,13 @@ Requirements: BR-12 to BR-15; FR-12.* to FR-15.*; SC-08, SC-09, SC-20.
   - FR-14.3: Implemented. Completed/Cancelled logs are closed, Operations can request an unlock, Admin approves it, and consumed unlock state re-locks after editing.
   - FR-14.4: Implemented in code. Maintenance-log edits record field, previous value, new value, actor and timestamp, and the edit service runs the controlled unlock flow.
   - FR-14.5: Implemented. A Manila-midnight cron marks eligible Pending, Due or In Progress work overdue and increments dashboard/report-derived overdue views.
+  - Append-only business audit: Spec 0010 adds database triggers for immutable audit tables, restrictive work-order/vehicle audit relations, feed categories, and web category filtering. Migration and runtime verification remain pending.
   - FR-15.1: Implemented. API `scheduleScope` limits Mechanics to `assignedMechanicId`; mobile loads and updates only locally synchronized assigned work.
   - FR-15.2: Implemented. Admin has the delete/cancel-log exception; Operations uses void/cancellation requests and cannot delete log records.
   - FR-15.3: Implemented. Web maintenance history has plate/log/work-order search and status/date filtering; vehicle-specific API/history views are also present.
   - Mobile scroll acceptance: the full work-order list, including search/filter controls and pagination, scrolls as one area; detail-step content scrolls beneath fixed step/actions, returns to the top when changing step/order, and adjusts for the keyboard. Device-level acceptance remains pending.
   - Mobile PDF export acceptance: the saved work-order PDF contains both Details and Execution content regardless of the currently selected step. Android saves to the user-granted folder (initially opening Downloads); iOS saves to the app's Documents folder exposed in Files. Device-level save acceptance remains pending.
-  - Runtime evidence: unit coverage exists for checklist submission, assignment, approval/rejection, closed-log locks, unlock/audit, cancellation and overdue daily evaluation. Browser/mobile/runtime acceptance remains unexecuted, so status stays **in progress**.
+  - Runtime evidence: unit coverage exists for checklist submission, assignment, approval/rejection, closed-log locks, unlock/audit, cancellation and overdue daily evaluation. Spec 0016 also preserves workflow states while exposing canonical schedule due/status fields and adds the JSON bulk odometer contract used by the Vehicles UI. Browser/mobile/runtime acceptance remains unexecuted, so status stays **in progress**.
 
 ## Cost and reporting
 
@@ -165,6 +167,7 @@ Requirements: BR-16 to BR-19; FR-16.* to FR-19.*; SC-10, SC-11, SC-22, SC-24 to 
   - FR-16.5: Implemented. Fuel submission rejects odometer readings below the truck baseline or latest non-voided fill-up.
   - FR-16.6: Implemented. The backend calculates `liters * pricePerLiter`; the web total is read-only and the API DTO does not accept a client total.
   - FR-16.7: Implemented. Web fuel values use the Philippine Peso symbol, and exported headers identify PHP costs.
+  - Spec 0009 backend catalog: implemented `GET /settings/catalog` and Admin-only catalog updates delegating to the existing fuel anomaly and maintenance costing domain services. Web UI and runtime acceptance remain pending.
   - FR-17.1: Implemented. Fuel history is ordered by entry date descending, then creation date descending.
   - FR-17.2: Implemented. Fuel entries are retained and voided with reason, actor and audit; voided entries are excluded from report totals and efficiency.
   - FR-17.3: Implemented. Web filtering supports vehicle, date and station and updates filtered fuel KPI cards.
@@ -193,6 +196,7 @@ Requirements: BR-20 to BR-22; FR-20.* to FR-22.*; SC-12, SC-13.
   - FR-20.3: Implemented. The dashboard exposes maintenance-cost KPIs and truck cost detail only, with no income, profit or revenue fields.
   - FR-21.1: Implemented. Selecting a truck shows completed work in the selected period with work-order number, type, mechanic, completion date and cost.
   - FR-21.2: Implemented. Admin configures a positive PHP threshold; totals above the threshold are visually flagged.
+  - Spec 0009 backend catalog: the existing maintenance-cost threshold remains the source of truth and is exposed/updated through the VMMS settings catalog API. Web UI and runtime acceptance remain pending.
   - FR-21.3: Implemented. The backend marks recurring-high-cost candidates when monthly totals exceed the threshold in the latest three consecutive Manila months.
   - FR-21.4: Implemented. The dashboard defaults to the current Manila month and supports custom and common period types, truck selection and cost detail updates.
   - FR-22.1: Implemented. API and web costing access is limited to Admin and Operations.
@@ -211,8 +215,8 @@ Requirements: BR-23 to BR-26; FR-23.* to FR-26.*; SC-14, SC-15.
 
 - [x] Reconcile the 11 Module 7 RTM rows with admin web, analytics API, generated reports, and export behavior.
 
-  Reconciliation evidence as of 2026-11-19:
-  - FR-23.1: Partial. The Fleet Health Dashboard renders vehicle, work-order, overdue, completed, cost and anomaly KPIs and refreshes every 30 seconds. The required <3-second load and real-time accuracy are not runtime-measured.
+  Reconciliation evidence as of 2026-11-19 (dashboard updated 2026-11-24, [spec 0015](../../specs/vmms/0015-fleet-dashboard-enhancement/index.md)):
+  - FR-23.1: Partial (enhanced). The fleet dashboard now adds URL-backed filters (All/Today Manila/This month Manila/Custom), separated current operational vs period-activity (recorded-date) metrics, attention queues (overdue/due/due soon/awaiting review/open fuel anomalies for Admin/Ops), status breakdown, garage workload, recent work orders, role-aware panels, and manual/30s/focus refresh with last-updated/error handling. Period completion/cost remain date-based approximations where schedule completion timestamps are unavailable. Required `<3s` load and real-time accuracy are not runtime-measured.
   - FR-23.2: Implemented in the maintenance reports view. Upcoming schedules are listed, sorted and filtered by urgency/date/vehicle/mechanic.
   - FR-23.3: Partial. Completed maintenance, maintenance/fuel cost summaries, downtime, fuel efficiency and flagged/recurring views are present. The full source-to-report suite and cross-report accuracy need runtime validation.
   - FR-24.1: Partial. Reports support time, truck, mechanic, status, date and search filtering; some report implementations include garage/type filters, but the exact common 3-second filter SLA is not measured.
@@ -224,7 +228,7 @@ Requirements: BR-23 to BR-26; FR-23.* to FR-26.*; SC-14, SC-15.
   - FR-26.4: Implemented. Reports and dashboard routes are management-facing; API report/cost routes restrict access to Admin/Operations.
   - FR-26.5: Partial. Fuel report exports call `recordFuelReportExport`; dashboard/report access and maintenance report export access are not confirmed in a general append-only audit trail.
   - Business audit logs: Admin-only access is specified in [VMMS spec 0002](../../specs/vmms/0002-business-audit-admin-only/index.md); enforce it in both the web route and backend role guard. The shared integration guide still needs alignment through its review process.
-  - Acceptance evidence: scheduled-report unit coverage and web/fuel export tests exist. Fleet-dashboard load timing, print output, full report-source accuracy and report audit coverage remain unexecuted. Feature status remains **in progress**.
+  - Acceptance evidence: scheduled-report unit coverage and web/fuel export tests exist; spec 0015 frontend dashboard slice implemented in `welinc-web-vmms` (pending integrated/manual verification and build/typecheck evidence in this session where applicable). Fleet-dashboard load timing, print output, full report-source accuracy, and report/dashboard audit coverage remain unexecuted. Feature status remains **in progress**.
 
 ## Cross-cutting
 

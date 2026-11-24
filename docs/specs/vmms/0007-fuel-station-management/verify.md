@@ -42,6 +42,19 @@ Steps derived from the acceptance criteria in [index.md](index.md).
 - [ ] Build and test `welinc-web-vmms`
 - [ ] Run focused station management and migration tests
 
+## Implementation evidence
+
+- Core API routes exist for active station selection, management listing,
+  creation, renaming, deactivation and reactivation.
+- The `fuel_fill_ups.station_name_snapshot` field and backfill migration exist.
+- New fill-ups store the station name snapshot, and fuel list/anomaly response
+  mapping prefers the snapshot for historical display.
+- The Fuel Management web page includes the Operations-only station
+  configuration dialog with active/inactive status, rename, confirmation for
+  deactivation and reactivation.
+- Runtime role checks, migration application/backfill, browser acceptance and
+  focused station tests remain pending.
+
 ## Acceptance-criteria coverage
 
 - AC-1 through AC-7 by the role, station list, mutation, snapshot, migration,

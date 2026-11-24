@@ -31,3 +31,14 @@ Steps derived from the acceptance criteria in [index.md](index.md).
 
 - AC-1 through AC-7 are covered by migration, database enforcement,
   authorization, erasure, lifecycle, and UI checks above.
+
+## Implementation evidence
+
+- Added a forward-only PostgreSQL trigger migration for the seven protected
+  immutable audit tables, with identity-erasure-only updates permitted.
+- Changed cascading audit foreign keys for work-order and vehicle history to
+  `RESTRICT` in Prisma and migration metadata.
+- Added stable `category` values to every unified business-audit record.
+- Added the Audit Logs category filter and category display in VMMS web.
+- Migration application, direct SQL mutation checks, erasure behavior,
+  browser filtering, and lifecycle runtime checks remain pending.
