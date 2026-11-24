@@ -1,6 +1,6 @@
 # 0009. Configurable settings catalog
 
-**Status**: Approved for implementation
+**Status**: Backend and web implementation complete; runtime verification pending
 **Scope**: [Fuel expenses and anomaly handling](../../../scope/vmms/index.md#5-fuel-expenses-and-anomaly-handling); [Maintenance costing](../../../scope/vmms/index.md#6-maintenance-costing)
 
 Decision history: [rationale.md](rationale.md). Verification: [verify.md](verify.md).
@@ -33,7 +33,7 @@ whether the actor may edit it. The initial keys are:
 
 ## Behavior and API
 
-- Add authenticated `GET /settings/catalog` for Admin and Operations. Return
+- Add authenticated, Admin-only `GET /settings/catalog`. Return
   only the two allowlisted entries and their effective values.
 - Add Admin-only `PATCH /settings/catalog/:key` with a typed value. Validate
   against the registry before delegating to the existing domain service.
@@ -44,13 +44,13 @@ whether the actor may edit it. The initial keys are:
   source of truth.
 - Unknown keys and malformed values return explicit validation errors and
   cause no persistence changes.
-- Add an Admin Settings web page backed by the catalog API; Operations may
-  view values but cannot edit them. Do not expose vehicle/category maintenance
+- Add an Admin-only Settings web page backed by the catalog API. Operations
+  and other web roles cannot access it or its API. Do not expose vehicle/category maintenance
   defaults on this page.
 
 ## Acceptance criteria
 
-1. Admin and Operations receive exactly the two catalog entries with the
+1. Admin receives exactly the two catalog entries with the
    configured/default values, metadata, constraints, and editable state.
 2. Admin can update each setting through the catalog; Operations and all other
    roles cannot mutate either value.
@@ -59,8 +59,8 @@ whether the actor may edit it. The initial keys are:
 4. Existing setting routes and consumers remain compatible.
 5. Unknown keys, invalid bounds/precision, malformed bodies, and unexpected
    properties are rejected without a partial update.
-6. The Admin Settings page displays both entries, validates inputs, and
-   reports save failures; Operations sees read-only values.
+6. The Admin-only Settings page displays both entries, validates inputs, and
+   reports save failures.
 7. Vehicle/category maintenance defaults and checklist templates remain
    independent and unchanged.
 

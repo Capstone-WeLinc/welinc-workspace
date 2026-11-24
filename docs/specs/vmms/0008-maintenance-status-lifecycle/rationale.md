@@ -34,6 +34,16 @@ into one central transition function.
 
 ## Smaller decisions
 
+- Keep recurrence serial: Operations creates the first schedule, and approval
+  of each completed recurring occurrence creates at most one `PENDING`
+  successor from the same cycle rules. Do not pre-create future occurrences.
+- Anchor the next interval to the mechanic's submitted service timestamp and
+  odometer, not the later Chief Mechanic review time or the vehicle's possibly
+  newer master reading. The service odometer is validated and persisted during
+  submission; the completion timestamp is stored in the existing progress JSON.
+- A cancelled occurrence has no successor. This naturally follows from
+  generating successors only on completed approval; `previousScheduleId`
+  keeps creation idempotent.
 - Keep `OVERDUE` as a schedule status and retain the prior execution phase in
   `workOrderProgress`; do not add an enum value.
 - Treat cancellation requests and maintenance-log voids as distinct from

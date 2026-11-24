@@ -39,5 +39,6 @@ Operations ownership and are already governed by their own workflow/spec.
 
 - Keep the legacy setting APIs working.
 - Use stable snake-case keys; do not use database model names as public keys.
-- Keep Operations read access, matching existing setting display behavior,
-  while retaining Admin-only writes.
+- Restrict both catalog reads and writes to Admin. Operations can use the
+  existing domain-specific setting views and endpoints where still authorized,
+  but has no Settings catalog access.

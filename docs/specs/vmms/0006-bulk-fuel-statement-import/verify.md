@@ -43,3 +43,14 @@ Steps derived from the acceptance criteria in [index.md](index.md).
 
 - AC-1 through AC-9 by the workbook, review, persistence, security, and
   compatibility checks above.
+
+## Implementation evidence
+
+- Core implementation exists for `.xlsx` preview, editable workbook review,
+  private import drafts, per-row partial save results, and draft ownership.
+- The backend provides Operations-only preview/save/draft routes and revalidates
+  active vehicles/stations, duplicates, odometer sequencing, and required fields.
+- The web provides worksheet station mapping, row review/editing, manual row
+  support, pagination, draft reopen/delete, and per-row saved/error states.
+- Workbook matrix, disposable database, browser, draft cross-user isolation,
+  audit/anomaly, and end-to-end compatibility checks remain pending.

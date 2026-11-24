@@ -1,6 +1,6 @@
 # 0010. Append-only business audit
 
-**Status**: Approved for implementation
+**Status**: Migration, API category, and web filter implemented; database/browser runtime verification pending
 **Scope**: [Work orders and maintenance history](../../../scope/vmms/index.md#4-work-orders-checklists-and-maintenance-history); [Reports and fleet dashboard](../../../scope/vmms/index.md#7-reports-and-fleet-dashboard)
 
 Decision history: [rationale.md](rationale.md). Verification: [verify.md](verify.md).
