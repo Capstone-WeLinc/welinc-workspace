@@ -44,6 +44,8 @@ _These are recommendations to keep the build orderly, not requirements. Skip any
 | S19 | Person page shows only the person's systems | Design | done |
 | S20 | Permissions page redesign | Design | in-progress |
 | S21 | Custom roles per system | Configuration | in-progress |
+| S22 | Portal redesign from the design rounds | Design | planned |
+| S23 | Profile page for the suite | Account | planned |
 
 ## Contract
 
@@ -450,6 +452,20 @@ spec [0018](../../specs/_root/0018-roles-and-custom-roles/index.md) (child [0002
 - [ ] Verify it: `/check verify custom roles`
 - [ ] Test it: `/test custom roles`
 - [ ] Document it: `/document custom roles`
+
+## Portal and profile (from the Nov 24 design rounds)
+
+### S22. Portal redesign from the design rounds · planned · needs a decision · Beta
+Build the portal screens you picked on Nov 24 (canvas "WeLinc design directions", Rounds 12 to 37): the launcher (navy band with the line drawing, the road and the livery trucks, Arrival 2 and the loop, system cards, the Suite management strip), sign-in A with the branch map, the four step forgot password, the Suite management shell (sidebar footer, account menu, system switcher), the filter popover, the one screen Add a user dialog, the steering wheel wait, the signed out and session ended toasts, the idle warning toast in place of the "Signed in until" pill, the 404 page, the reset code email, the ///L favicon and page titles.
+**Done when:** every screen above matches its board within the allowed differences (handoff 2026-11-24); the launcher fits one 1440×900 screen for every role and count rule on `R30Launcher`; a suite admin whose only role is temporary reaches Suite management (the `screenForAnswer` gap in `welinc-web-portal/src/lib/auth.ts`); the idle warning offers "Stay signed in" before the 30 min limit; motion respects reduced motion and the trucks are never live data.
+- Note (2026-11-24, replan): enrolled from the handoff's item 1. The picks are complete; `/architect` decides the motion library (the portal has only `tw-animate-css` today), the idle warning timing and wording, and how much of it ships before the mock defense. The boards on the canvas are the source (their generator scripts are gone); keep copies in the spec's `boards/`.
+- [ ] Design it (spec): `/architect portal redesign`
+
+### S23. Profile page for the suite · planned · needs a decision
+One profile page in the portal that every system links to, replacing the three separate ones (VRMS, VMMS and BMS web each have their own; VMMS and BMS upload pictures, VRMS does not). Direction A, settings page, as reworked on `Profile19`.
+**Done when:** a person edits their name, contact and picture, changes their password and sees their real sessions from the portal; email stays read only; welinc-auth offers cookie versions of `/auth/profile*` for the portal; pictures live in Blob Storage, not the container disk (`uploads/profiles/`, lost on a restart); each system's web app links to the portal page.
+- Note (2026-11-24, replan): enrolled from the handoff's item 3. Your notes on `Profile19` are still owed and feed the spec. Uploads and sessions sit in the shared services' GA default. The VMMS and BMS password change bug (no `confirmPassword`) and the mobile app's `email` in `PATCH /auth/profile` are theirs to fix (handoff item 4); this row doesn't change their code.
+- [ ] Design it (spec): `/architect profile page`
 
 ## Why this order
 
