@@ -73,6 +73,21 @@ Ordering motion last answers the moving deadline: every milestone before it leav
 - **A soft navy ring on the sign in split fields** (0016 AC-7's border only): the board shows it and sign in is a brand surface; working pages keep AC-7.
 - **"Your profile" hidden until S23** (link to a placeholder): a menu item that lands on a 404 looks broken in a demo.
 - **Code email layout for all four code emails** (reset only): they share helpers in `code-emails.ts`, and mixed looks read as a bug.
+- **One `access` list for systems and roles** (separate `systems` and `roles` params; a POST search body): each item is exactly one row or chip of the popover, so there is nothing for two params to disagree on, and a GET keeps the address shareable and skips the CSRF guard. `system` keeps meaning the scope, so the strip's `viewHref` links and spec 0017's rules don't move.
+- **A separate facets route** (facets on every list answer; no chip counts): the counts are needed only while the popover is open and change with a draft the list hasn't applied yet, so a list answer can't carry them, and putting them on every page would pay for them on each Load more.
+- **Each facet ignores its own filter** (every count under every filter): the usual faceted search rule; otherwise ticking one role drops every other role to 0 and the counts stop helping you choose.
+- **`ATTENTION` and `ACTIVE_GROUP` as status values defined by `groupWhere`** (the portal translating chips to today's six statuses): today's `ACTIVE` leaves out unverified emails and `PENDING_DELETION` ignores deactivation, so a translation would drift from the groups People shows. Reusing `groupWhere` keeps one rule, as the summary route already does.
+- **Any of within a facet, AND across facets** (all of across systems): what the board's "Show N people" sum implies and what every filter UI the team has used does; finding shared accounts stays with the person page's system chips.
+
+## Update (2026-11-25)
+
+The People filter API (AC-21 to AC-21b) was added once the auth milestone showed `GET /auth/admin/users` could only take one system and one role, while `Filter18` ticks several of each and counts every chip. Two lines were also corrected against the boards: AC-27's email logo is A (gold on the navy header, `R35LogoPlaces`; the built `scripts/email-logo.mjs` already draws A), and AC-18's collapsed footer shows only the expand button (`Shell20`).
+
+## Update (2026-11-25, during the build)
+
+Building AC-21b showed its query shape could not hold together with its own rule. It asked for one SQL count with a `FILTER` clause per status chip, and also for every count to use the list's `statusWhere` and `groupWhere`. Those helpers are Prisma where objects, and Prisma 7 cannot turn a where object into SQL, so the `FILTER` shape would mean writing the lock, setup and pending deletion rules a second time in raw SQL. That copy would drift the first time someone changes a rule in `people-page.ts`, and the counts would stop matching the list, which is the whole point of the facets. So the route runs parallel Prisma counts on the same helpers (about ten small indexed counts, the pattern `groupCounts` already uses for People's three groups). Two raw SQL queries stay the option for later, if People is measurably slow at a much larger head count.
+
+Two test lines were also wrong. One expected a duplicate `access` item to answer 400, while AC-21a says duplicates are normalized away; AC-21a is the contract (a shared link that repeats a pick should still load), so the test line now follows it. The same lines used `VMMS:DRIVER`, but Driver is a BMS role; they now use VMMS Mechanic and BMS Driver.
 
 ## Interview record (2026-11-24)
 
@@ -84,3 +99,5 @@ Ordering motion last answers the moving deadline: every milestone before it leav
 - Reduced motion: parked scene. Loop: pause when hidden. Arrival: only right after sign in. Launch: about 900 ms with navigation at once. Phones: short band, parked trucks.
 - Switcher: the held launcher answer. Email check: any admin, exact email only. Emails: all code emails, one layout. Wait: busy buttons and reloads, skeletons stay.
 - Tab titles: page first, "WeLinc" last. Sign in messages: endings as toasts, errors inline. 404: any unknown address.
+- People filter (2026-11-25): one `access` list; a facets route for the chip counts; the board's five status chips on the server's group rules; any of within a facet, AND across.
+- Facets query shape (2026-11-25, found during the build): parallel Prisma counts on the list's own where helpers, not two raw SQL queries; a duplicate `access` item is normalized, not refused (AC-21a wins over the old test line).
