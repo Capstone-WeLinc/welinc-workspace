@@ -16,7 +16,7 @@ _Steps derived from spec 0019 acceptance criteria. `/check verify` runs these; `
 - [ ] Tick Locked only and Show: groups with 0 people hide; with nothing matching, "No one matches these filters" shows with **Clear filters**, not Add user → AC-21
 - [ ] Reload with picks applied: the same picks and list come back from the address → AC-21
 - [ ] Open `/admin/people?status=LOCKED,BOGUS&access=VRMS:GONE,VMMS` as a VRMS only admin: the address is rewritten without the bad items before the list loads, and no 400 or 403 shows → AC-21
-- [ ] Open `/admin/people?system=VMMS` from a strip link: the popover shows only the VMMS row, and the facets call sends `system=VMMS` → AC-21
+- [ ] Open `/admin/people?system=VMMS` from a link: the popover shows only the VMMS row, and the facets call sends `system=VMMS` → AC-21
 - [ ] Type in the search without pausing and open Filter: the counts use the applied `q` in the address, not the half typed text → AC-21
 - [ ] Throttle the network: every count and Show's number show a dash while loading; a facets failure leaves the dashes with no toast and Show still applies → AC-21, AC-21b
 - [ ] With `access=VRMS` applied, Add user opens with VRMS preselected; with two systems applied, no system is preselected → AC-21
