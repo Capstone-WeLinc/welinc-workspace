@@ -1,4 +1,8 @@
-"""Pull the S27d Quiet map out of board R47Quiet (made by gen48.py from drawnmap.json) for the portal."""
+"""Pull the S27d Quiet map out of board R47Quiet (made by gen48.py from drawnmap.json) for the portal.
+
+Usage: extract_signin.py <R47Quiet.dc.html> <.../signin-map.svg> <.../mapStage.ts>; the map is written as
+signin-map-still.svg and signin-map-trucks.svg beside the path given.
+"""
 import re, sys, json
 board, out_svg, out_ts = sys.argv[1:4]
 s = open(board).read()
@@ -10,8 +14,36 @@ assert 'class="trf"' not in svg
 for i in sorted(set(re.findall(r'id="([^"]+)"', svg))):
     svg = svg.replace(f'id="{i}"', f'id="signin-{i}"').replace(f'#{i}"', f'#signin-{i}"').replace(f'url(#{i})', f'url(#signin-{i})')
 svg = svg.replace('<svg class="map" ', '<svg xmlns="http://www.w3.org/2000/svg" ').replace(' width="1240" height="1500"', ' width="100%" height="100%"').replace(' aria-hidden="true"', ' aria-hidden="true" focusable="false"')
-header = '<!-- The S27d Quiet sign in map (suite spec 0019, AC-13), taken from board R47Quiet, which gen48.py drew from docs/context/vrms/portal-redo-boards/gen/drawnmap.json. Map data (c) OpenStreetMap contributors, ODbL. -->\n'
-open(out_svg, 'w').write(header + svg + '\n')
+header = '<!-- The S27d Quiet sign in map (suite spec 0019, AC-13), {part}, taken from board R47Quiet, which gen48.py drew from docs/context/vrms/portal-redo-boards/gen/drawnmap.json. Map data (c) OpenStreetMap contributors, ODbL. -->\n'
+
+
+def top_children(svg):
+    """The <svg>'s opening tag, its direct children as strings, and its closing tag."""
+    open_end = svg.index('>') + 1
+    kids, depth, start = [], 0, None
+    for m in re.finditer(r'<(/?)([a-zA-Z]+)[^>]*?(/?)>', svg[open_end:-len('</svg>')]):
+        close, _, selfc = m.groups()
+        if not close and depth == 0:
+            start = m.start()
+        if close:
+            depth -= 1
+        elif not selfc:
+            depth += 1
+        if depth == 0:
+            kids.append(svg[open_end + start:open_end + m.end()])
+    return svg[:open_end], kids, '</svg>'
+
+
+# Two layers with the same viewBox, so they line up (spec 0019 sweep, the map's paint cost): the still
+# drawing, garages included, paints once; the twelve trucks move on a layer of their own.
+head, kids, tail = top_children(svg)
+assert ''.join(kids) == svg[len(head):-len(tail)]
+still = [k for k in kids if 'class="trk ' not in k]
+trucks = [k for k in kids if 'class="trk ' in k]
+assert len(trucks) == 12 and 'url(#' not in ''.join(trucks)
+base = out_svg[:-len('.svg')]
+open(base + '-still.svg', 'w').write(header.format(part='the still drawing') + head + ''.join(still) + tail + '\n')
+open(base + '-trucks.svg', 'w').write(header.format(part='the twelve trucks, drawn over the still drawing') + head + ''.join(trucks) + tail + '\n')
 labels = []
 for cls, style, text in re.findall(r'<span class="(t-[a-z]) [^"]*" style="([^"]+)">([^<]+)</span>', under):
     if cls not in ('t-g', 't-d'):
@@ -20,7 +52,7 @@ for cls, style, text in re.findall(r'<span class="(t-[a-z]) [^"]*" style="([^"]+
     tr = st.get('transform', '')
     side = 'start' if cls == 't-g' or 'translate(0' in tr else 'end' if '-100%' in tr else 'center'
     labels.append({'text': text, 'kind': 'garage' if cls == 't-g' else 'drop', 'x': int(st['left'][:-2]), 'y': int(st['top'][:-2]), 'size': float(st['font-size'][:-2]), 'side': side})
-ts = ['/*', '  Suite spec 0019, AC-13: the labels on the sign in map, placed on its 1440 by 900 stage as board', '  `R47Quiet` places them (the three garages and the drop points; no town, water or road names).', '  Generated with the map (`signin-map.svg`); positions are stage pixels.', '*/',
+ts = ['/*', '  Suite spec 0019, AC-13: the labels on the sign in map, placed on its 1440 by 900 stage as board', '  `R47Quiet` places them (the three garages and the drop points; no town, water or road names).', '  Generated with the map (`signin-map-still.svg`, `signin-map-trucks.svg`); positions are stage pixels.', '*/',
       "export type MapLabel = { text: string; kind: 'garage' | 'drop'; x: number; y: number; size: number; side: 'start' | 'end' | 'center' };", '',
       'export const MAP_LABELS: readonly MapLabel[] = [']
 for l in labels:
