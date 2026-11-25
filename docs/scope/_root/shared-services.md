@@ -467,7 +467,8 @@ spec [0019](../../specs/_root/0019-portal-redesign/index.md) · code in `welinc-
   - [x] welinc-auth: `suiteAdmin`, the summary and email check routes, `contact` on create, the code email layout, contract 0001 Changes line (AC-6, AC-7, AC-23, AC-27)
   - [x] welinc-auth, same branch before its PR: the People list's `access` filter, the `ATTENTION` and `ACTIVE_GROUP` statuses, `GET /auth/admin/users/facets`, contract 0001 Changes line (AC-21a, AC-21b)
   - [x] Portal foundations, session toasts in the portal and web-vrms, the Suite management shell, filter popover and Add a user (AC-15, AC-17 to AC-26, AC-28)
-  - [ ] Sign in, forgot password, Signed out and No access, then the static launcher with the screen choice fix (AC-1 to AC-5, AC-11, AC-13, AC-14, AC-16)
+  - [x] Sign in, forgot password, Signed out and No access, then the static launcher with the screen choice fix (AC-1 to AC-5, AC-11, AC-13, AC-14, AC-16)
+    - Local choices (2026-11-25): "Signed out" is the sign in form with the success toast, as `R36OutToast2` draws it (no separate screen); the forgot boards' old eyebrow gives way to AC-13's copy; the step 2 line keeps "If <email> has a WeLinc account" (spec 0009 AC-13); No access's Use another account signs out directly (no dialog, it names no systems); the footer drops the board's Help and Privacy (no such pages); the launcher logo is not a link (you are already Home); the parked trucks are the 10 ft van and the L300; the band is 400px on screens under 820px tall (the `short` variant) for the 1280×720 fit.
   - [ ] Motion (Arrival 2, the loop, Launch 3, reduced motion), then the sweep and board comparison, `design.md` and the spec 0016 amendment lines (AC-8 to AC-12, AC-29)
 - [ ] Verify it: `/check verify portal redesign`
 - [ ] Test it: `/test portal redesign`
