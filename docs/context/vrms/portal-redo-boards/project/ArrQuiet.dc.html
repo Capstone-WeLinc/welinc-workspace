@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Arrival, quiet rise</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=IBM+Plex+Mono:wght@500;600&amp;display=swap">
+<style>
+body{margin:0}
+.pg{width:1440px;height:900px;background:#f3f5f9;font-family:Inter,system-ui,sans-serif;position:relative;overflow:hidden;color:#0f172a}
+.band{position:relative;background:#0f1445;color:#fff;overflow:hidden}
+.top{position:relative;z-index:2;height:64px;width:1200px;margin:0 auto;display:flex;align-items:center}
+.lk{display:flex;align-items:center;gap:10px}.lk svg{height:20px;fill:#e8b800}.lk span{font-weight:800;font-style:italic;font-size:16px}
+.me{margin-left:auto;display:flex;align-items:center;gap:10px;height:44px;padding:0 8px;border-radius:12px;border:0;background:none;color:inherit;font:500 14px Inter,sans-serif;cursor:pointer}
+.av{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.12);box-shadow:inset 0 0 0 1px rgba(255,255,255,.2);display:grid;place-items:center;font-size:12px;font-weight:600}
+.gr{position:relative;z-index:2;width:1200px;margin:0 auto}
+.dt{margin:0;font-size:13px;font-weight:600;color:#e8b800}
+h1{margin:10px 0 0;font-size:48px;line-height:1;font-weight:800;letter-spacing:-.03em}
+.l{margin:12px 0 0;font-size:16px;color:rgba(255,255,255,.7)}
+.main{width:1200px;margin:24px auto 0}
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;list-style:none;margin:0;padding:0}
+.cards li{display:flex}
+.card{flex:1;display:flex;flex-direction:column;min-height:196px;background:#fff;border-radius:24px;box-shadow:0 1px 2px rgba(15,23,42,.05),0 6px 20px rgba(15,23,42,.06);padding:22px 24px 18px;text-decoration:none;color:inherit;box-sizing:border-box}
+.hd{display:flex;align-items:center;gap:14px}
+.tile{flex:none;width:48px;height:48px;border-radius:16px;background:#eef0f8;color:#1a1f6e;display:grid;place-items:center}
+.code{font-size:20px;font-weight:700}
+.chip{font-size:12px;font-weight:500;padding:3px 10px;border-radius:999px;background:#eef1f6;color:#475569;box-shadow:inset 0 0 0 1px #e2e8f0}
+.nm{margin-top:14px;font-size:14px;font-weight:500}
+.ds{margin-top:4px;font-size:13px;color:#5b6779}
+.ft{margin-top:auto;padding-top:12px;border-top:1px solid #eef1f6;display:flex;justify-content:space-between;align-items:center;font-size:14px;font-weight:600;color:#1a1f6e}
+.sc{position:absolute;right:0;bottom:0;width:760px;height:336px}
+.puff{animation:puff 2.4s ease-out infinite;transform-box:fill-box;transform-origin:center}
+.puff.b{animation-delay:.8s}.puff.c{animation-delay:1.6s}
+@keyframes puff{0%{opacity:0;transform:translate(0,0) scale(.4)}20%{opacity:.45}100%{opacity:0;transform:translate(-34px,-24px) scale(1.6)}}
+.glow{animation:glow 3.2s ease-in-out infinite}
+@keyframes glow{0%,100%{opacity:.14}50%{opacity:.08}}
+.sin{position:absolute;inset:0;display:grid;grid-template-columns:840px 600px}
+.sin .lf{position:relative;overflow:hidden;background:#0f1445;color:#fff}
+.sin .lk{position:absolute;left:64px;top:40px;display:flex;align-items:center;gap:10px}.sin .lk svg{height:20px;fill:#e8b800}.sin .lk span{font-weight:800;font-style:italic;font-size:16px}
+.sin .cp{position:absolute;left:64px;top:172px}
+.eb{margin:0;font-size:14px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#e8b800}
+.hh{margin:14px 0 0;font-size:72px;line-height:1;font-weight:800;letter-spacing:-.035em}
+.hh em{font-style:normal;color:#e8b800}
+.ln{margin:22px 0 0;font-size:18px;line-height:1.55;color:rgba(255,255,255,.72);max-width:420px}
+.wm{position:absolute;right:-60px;bottom:-40px;height:360px;fill:rgba(255,255,255,.04)}
+.sin .rt{background:#fff;display:flex;align-items:center;justify-content:center}
+.fm{width:384px;display:flex;flex-direction:column;gap:26px;margin:0}
+.fm h2{margin:0;font-size:28px;font-weight:800;letter-spacing:-.02em;color:#0f172a}
+.sub{margin:8px 0 0;font-size:15px;color:#475569}
+.fs{display:flex;flex-direction:column;gap:18px}
+.fm label{display:block;font-size:14px;font-weight:600;margin-bottom:6px;color:#0f172a}
+.row{display:flex;justify-content:space-between;align-items:flex-start}
+.row a{font-size:14px;font-weight:600;color:#1a1f6e}
+.in{box-sizing:border-box;width:100%;height:46px;border:1px solid #64748b;border-radius:12px;padding:0 14px;font:15px Inter,sans-serif;color:#0f172a;background:#fff}
+.in::placeholder{color:#5b6779}
+.btn{height:48px;border:0;border-radius:12px;background:#0f1445;color:#fff;font:700 16px Inter,sans-serif;display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer}
+.hint{margin:0;font-size:14px;line-height:1.5;color:#5b6779}
+.pg{--k:1}
+.pg.k3{--k:3}
+.stage{position:absolute;inset:0}
+.lau{position:absolute;inset:0}
+.band{height:400px}
+.gr{padding-top:56px}
+.ctl{position:absolute;z-index:50;right:24px;bottom:24px;display:flex;gap:6px;padding:6px;border-radius:16px;background:rgba(255,255,255,.94);box-shadow:0 1px 2px rgba(15,23,42,.08),0 8px 24px rgba(15,23,42,.14)}
+.ctl button{display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 16px;border:0;border-radius:12px;background:none;color:#1a1f6e;font:600 14px Inter,sans-serif;cursor:pointer}
+.ctl button:hover{background:#eef0f8}
+.ctl .tg.on{background:#0f1445;color:#fff}
+@keyframes rise{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes fadeOut{from{opacity:1}to{opacity:0}}
+@media (prefers-reduced-motion:reduce){.stage *,.stage{animation-duration:1ms!important;animation-delay:0s!important}}
+
+.sin{z-index:5;animation:fadeOut calc(0.25s*var(--k)) ease calc(0.3s*var(--k)) both}
+.lau{animation:quiet calc(0.4s*var(--k)) cubic-bezier(.2,.8,.2,1) calc(0.5s*var(--k)) both}
+@keyframes quiet{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+</style>
+</helmet>
+<div class="pg {{speed}}"><sc-if value="{{on}}" hint-placeholder-val="{{ true }}"><div class="stage"><div class="lau"><div class="band"><svg class="sc" viewBox="0 0 760 336" aria-hidden="true">
+<defs><symbol id="van" viewBox="-8 -2 138 56">
+<rect x="0" y="0" width="92" height="38" rx="2.5" fill="#f7f8fb" stroke="#c9d0de"/>
+<path d="M0.5 25 C28 19 60 31 91.5 15 V22 C60 34 28 24 0.5 30 Z" fill="#f29a1f"/>
+<path d="M0.5 30 C28 24 60 34 91.5 22 V36 a2 2 0 0 1 -2 2 H2.5 a2 2 0 0 1 -2 -2 Z" fill="#1f5cc4"/>
+<g transform="translate(6 6) scale(0.0541)" fill="#e8b800"><polygon points="82,0 144,0 66,183 4,183"/><polygon points="177,0 240,0 162,183 100,183"/><polygon points="265,0 328,0 268,140 328,140 328,183 187,183"/></g>
+<text x="26" y="15" font-size="11" font-weight="800" font-style="italic" fill="#0f1445" font-family="Inter,sans-serif">WeLinc</text>
+<path d="M95 10h16l13 13v15H95z" fill="#eef1f6" stroke="#c3cad8"/>
+<path d="M99 14h10l8 8h-18z" fill="#14205a"/>
+<rect x="95" y="30" width="29" height="3" fill="#c3cad8"/>
+<rect x="86" y="36" width="38" height="5" fill="#2a2f45"/>
+<rect x="-4" y="27" width="4" height="13" rx="1" fill="#8d96ab"/>
+<circle cx="16" cy="44" r="7" fill="#11131f"/><circle cx="16" cy="44" r="3" fill="#aab2c5"/>
+<circle cx="34" cy="44" r="7" fill="#11131f"/><circle cx="34" cy="44" r="3" fill="#aab2c5"/>
+<circle cx="110" cy="44" r="7" fill="#11131f"/><circle cx="110" cy="44" r="3" fill="#aab2c5"/>
+<rect x="124" y="24" width="4" height="6" rx="1" fill="#f29a1f"/>
+</symbol><linearGradient id="spill" x1="0" x2="1"><stop offset="0" stop-color="#e8b800" stop-opacity=".12"/><stop offset="1" stop-color="#e8b800" stop-opacity="0"/></linearGradient></defs>
+<rect x="60" y="58" width="250" height="236" fill="#141a55"/>
+<rect x="48" y="46" width="274" height="16" fill="#1a2263"/>
+<rect x="84" y="110" width="202" height="184" fill="#060828"/><rect x="84" y="110" width="202" height="70" fill="#232a78"/><g stroke="#141a55" stroke-width="2"><path d="M84 122h202M84 134h202M84 146h202M84 158h202M84 170h202"/></g><rect x="84" y="176" width="202" height="5" fill="#3b43a3"/><rect class="glow" x="84" y="181" width="202" height="113" fill="#e8b800" opacity=".14"/>
+<path d="M286 294 L620 294 L286 200 Z" fill="url(#spill)"/>
+<rect x="0" y="294" width="760" height="42" fill="#0a0d36"/>
+<g fill="#cbd2ea" opacity=".3"><rect x="330" y="314" width="56" height="4" rx="2"/><rect x="450" y="314" width="56" height="4" rx="2"/><rect x="570" y="314" width="56" height="4" rx="2"/><rect x="690" y="314" width="56" height="4" rx="2"/></g>
+<ellipse class="shadow" cx="510" cy="296" rx="200" ry="6" fill="#000" opacity=".35"/>
+<use href="#van" x="290" y="135" width="414" height="168"/><g fill="#cbd2ea"><circle class="puff" cx="302" cy="262" r="6"/><circle class="puff b" cx="302" cy="262" r="6"/><circle class="puff c" cx="302" cy="262" r="6"/></g>
+</svg><div class="top"><div class="lk"><svg viewBox="0 0 330 185" aria-hidden="true"><polygon points="82,0 144,0 66,183 4,183"/><polygon points="177,0 240,0 162,183 100,183"/><polygon points="265,0 328,0 268,140 328,140 328,183 187,183"/></svg><span>WeLinc Logistics</span></div><button class="me" type="button" aria-label="Account menu for Corazon Villareal"><span class="av">CV</span>Corazon Villareal<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" opacity=".7" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></div><div class="gr"><p class="dt">Wednesday, November 25</p><h1>Good morning,<br>Corazon</h1><p class="l">Pick where you want to work today.</p></div></div><main class="main"><ul class="cards"><li><a class="card" href="#"><span class="hd"><span class="tile"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M9 16l2 2 4-4"/></svg></span><span class="code">BMS</span><span class="chip">Operations</span></span><span class="nm">Booking Management System</span><span class="ds">Bookings, trips and drivers</span><span class="ft">Open BMS <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a></li><li><a class="card" href="#"><span class="hd"><span class="tile"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg></span><span class="code">VMMS</span><span class="chip">Operations</span></span><span class="nm">Vehicle Maintenance Management System</span><span class="ds">Maintenance schedules and fleet upkeep</span><span class="ft">Open VMMS <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a></li><li><a class="card" href="#"><span class="hd"><span class="tile"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></span><span class="code">VRMS</span><span class="chip">Chief Mechanic</span></span><span class="nm">Vehicle Repair Management System</span><span class="ds">Repair tickets, mechanics and workshop work</span><span class="ft">Open VRMS <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a></li></ul></main></div><div class="sin"><div class="lf"><div class="lk"><svg viewBox="0 0 330 185" aria-hidden="true"><polygon points="82,0 144,0 66,183 4,183"/><polygon points="177,0 240,0 162,183 100,183"/><polygon points="265,0 328,0 268,140 328,140 328,183 187,183"/></svg><span>WeLinc Logistics</span></div><div class="cp"><p class="eb">WeLinc Logistics</p><h2 class="hh"><em>Operations</em><br>Workspace</h2><p class="ln">Book trips, plan upkeep and run repairs from one account.</p></div><svg class="wm" viewBox="0 0 330 185" aria-hidden="true"><polygon points="82,0 144,0 66,183 4,183"/><polygon points="177,0 240,0 162,183 100,183"/><polygon points="265,0 328,0 268,140 328,140 328,183 187,183"/></svg></div><div class="rt"><form class="fm"><div><h2>Sign in</h2><p class="sub">Use your WeLinc work email.</p></div><div class="fs"><div><label for="e">Work email</label><input id="e" class="in" placeholder="you@welinc.com"></div><div><div class="row"><label for="p">Password</label><a href="#">Forgot password?</a></div><input id="p" type="password" class="in" placeholder="Enter password"></div><button type="button" class="btn">Sign in <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div><p class="hint">No account yet? Ask your admin to add you. You'll get an email to set your password.</p></form></div></div></div></sc-if><div class="ctl"><button type="button" onClick="{{replay}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>Replay</button><button type="button" class="{{slowCls}}" aria-pressed="{{slowPressed}}" onClick="{{toggleSlow}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M10 2h4"/></svg>Slow</button></div></div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+constructor(props) {
+super(props);
+this.state = { on: true, slow: false };
+}
+componentWillUnmount() { clearTimeout(this.t); }
+restart() {
+clearTimeout(this.t);
+this.setState({ on: false });
+this.t = setTimeout(() => this.setState({ on: true }), 60);
+}
+renderVals() {
+const slow = this.state.slow;
+return {
+on: this.state.on,
+speed: slow ? 'k3' : 'k1',
+slowCls: slow ? 'tg on' : 'tg',
+slowPressed: slow ? 'true' : 'false',
+replay: () => this.restart(),
+toggleSlow: () => { this.setState({ slow: !slow }); this.restart(); },
+};
+}
+}
+</script>
+</body>
+</html>

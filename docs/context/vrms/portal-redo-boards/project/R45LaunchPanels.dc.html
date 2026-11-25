@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Launcher, three panels, the one you point at opens up</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=IBM+Plex+Mono:wght@500;600&amp;display=swap">
+<style>
+body{margin:0}
+*{box-sizing:border-box}
+.pg{width:1440px;height:900px;font-family:Inter,system-ui,sans-serif;position:relative;overflow:hidden;color:#fff;background:#0a0d33}
+a{color:inherit;text-decoration:none}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+.lk{display:flex;align-items:center;gap:10px;color:#fff}.lk svg{height:20px;fill:#e8b800}.lk span{font-weight:800;font-style:italic;font-size:16px}
+
+.pg{background:#f3f5f9;color:#0f172a}
+.wrap{width:1200px;margin:0 auto;position:relative}
+.top{height:64px;display:flex;align-items:center}
+.me{margin-left:auto;display:flex;align-items:center;gap:10px;height:44px;padding:0 8px;border-radius:12px;border:0;background:none;color:#fff;font:500 14px Inter,sans-serif}
+.av{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.12);box-shadow:inset 0 0 0 1px rgba(255,255,255,.22);display:grid;place-items:center;font-size:12px;font-weight:600}
+.dt{margin:0;font-size:13px;font-weight:600;color:#e8b800}
+.hi{margin:8px 0 0;font-size:44px;line-height:1.05;font-weight:800;letter-spacing:-.03em;color:#fff}
+.l{margin:10px 0 0;font-size:16px;color:rgba(255,255,255,.7)}
+.acct{display:flex;align-items:center;gap:28px;font-size:13px;color:#5b6779;border-top:1px solid #e2e8f0;padding-top:16px}
+.acct b{font-weight:600;color:#0f172a}
+.acct a{margin-left:auto;font-weight:600;color:#1a1f6e;text-decoration:underline;text-underline-offset:3px;text-decoration-color:#c7cde0}
+.acct .sep{width:1px;height:14px;background:#d5dbe6}
+
+/* app previews: each system's real first screen, drawn small */
+.pv{display:grid;grid-template-columns:40px 1fr;width:100%;height:100%;background:#f6f7fb;border-radius:12px;overflow:hidden;box-shadow:inset 0 0 0 1px #e2e8f0;font-size:9px;color:#0f172a;text-align:left}
+.pv .sb{background:#0f1445;padding:10px 8px;display:flex;flex-direction:column;gap:7px}
+.pv .sb i{display:block;height:6px;border-radius:3px;background:rgba(255,255,255,.18)}
+.pv .sb i.on{background:rgba(255,255,255,.55)}
+.pv .sb b{display:block;width:16px;height:9px;margin-bottom:6px;background:#e8b800;clip-path:polygon(25% 0,45% 0,20% 100%,0 100%)}
+.pv .ct{padding:10px 12px;min-width:0}
+.pv .t{font-size:11px;font-weight:700;display:flex;justify-content:space-between;align-items:baseline}
+.pv .t span{font-weight:500;color:#5b6779;font-size:9px}
+.pv .r{display:grid;align-items:center;gap:8px;padding:6px 0;border-top:1px solid #e6e9f1;white-space:nowrap}
+.pv .kp{display:flex;gap:10px;margin:7px 0 4px;color:#5b6779;white-space:nowrap}.pv .kp b{font-family:'IBM Plex Mono',monospace;color:#0f172a}.pv .kp .od b{color:#8a5a00}
+.pv .r{row-gap:4px}
+.pv .m{font-family:"IBM Plex Mono",monospace;font-weight:600;color:#1a1f6e}
+.pv .g{color:#5b6779;overflow:hidden;text-overflow:ellipsis}
+.pv .s{justify-self:end;font-weight:600;color:#334155}
+.pv .pb{height:5px;border-radius:3px;background:#e6e9f1;overflow:hidden}.pv .pb i{display:block;height:100%;background:#1a1f6e}
+.pv .od{color:#8a5a00}
+.pv .kb{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-top:6px}
+.pv .kc{background:#eceff6;border-radius:7px;padding:6px}
+.pv .kc>span{display:block;font-weight:600;color:#5b6779;margin-bottom:5px}
+.pv .tk{background:#fff;border-radius:5px;padding:5px 6px;margin-top:4px;box-shadow:0 1px 1px rgba(15,23,42,.06);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pv .tk em{display:block;font-style:normal;font-family:"IBM Plex Mono",monospace;color:#5b6779;font-size:8px;margin-top:2px}
+
+.hdr{background:#0f1445}
+.head{display:flex;align-items:flex-end;justify-content:space-between;padding:30px 0 22px}
+.head .dt{color:#1a1f6e}
+.head .hi{color:#0f1445;font-size:40px}
+.head p.r{margin:0;font-size:14px;color:#5b6779;text-align:right;line-height:1.6}.head p.r b{color:#0f172a}
+.pans{display:flex;gap:16px;height:628px}
+.pan{flex:1;display:flex;flex-direction:column;border-radius:24px;background:#fff;box-shadow:0 1px 2px rgba(15,23,42,.05),0 8px 24px rgba(15,23,42,.06);overflow:hidden;transition:flex .4s cubic-bezier(.2,.8,.2,1);position:relative}
+.pan.open{flex:2.5;background:#0f1445;color:#fff}
+.pan .sh{display:block;margin:14px 14px 0;height:330px}
+.pan.open .sh{height:380px}
+.pan.open .pv{zoom:1.5;height:253px}
+.pan .tx{padding:22px 26px;display:flex;flex-direction:column;flex:1}
+.pan .k{font:600 12px "IBM Plex Mono",monospace;letter-spacing:.08em;color:#5b6779}
+.pan.open .k{color:#e8b800}
+.pan .nm{margin-top:8px;font-size:20px;font-weight:800;letter-spacing:-.02em;line-height:1.2}
+.pan.open .nm{font-size:28px}
+.pan .ds{margin-top:8px;font-size:14px;color:#5b6779}
+.pan.open .ds{color:rgba(255,255,255,.7)}
+.pan .rl{margin-top:auto;font-size:13px;color:#5b6779}.pan .rl b{color:#0f172a}
+.pan.open .rl{color:rgba(255,255,255,.7)}.pan.open .rl b{color:#fff}
+.pan.open .row{display:flex;gap:28px;margin-top:16px}
+.pan.open .row span{font-size:14px;color:rgba(255,255,255,.82);border-top:1px solid rgba(255,255,255,.16);padding-top:10px;flex:1}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</helmet>
+<div class="pg"><div class="hdr"><div class="wrap"><div class="top"><div class="lk"><svg viewBox="0 0 330 185" aria-hidden="true"><polygon points="82,0 144,0 66,183 4,183"/><polygon points="177,0 240,0 162,183 100,183"/><polygon points="265,0 328,0 268,140 328,140 328,183 187,183"/></svg><span>WeLinc Logistics</span></div><button class="me" type="button" aria-label="Account menu for Corazon Villareal"><span class="av">CV</span>Corazon Villareal<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" opacity=".7" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></div></div></div><div class="wrap">
+<div class="head"><div><p class="dt">Wednesday, November 25</p><h1 class="hi">Good morning, Corazon</h1></div><p class="r">Last sign in <b>yesterday, 5:42 PM</b><br><b>2</b> devices signed in</p></div>
+<div class="pans"><a class="pan" href="#"><span class="sh"><span class="pv"><span class="sb"><b></b><i class="on"></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i></span><span class="ct"><span class="t">Today's trips<span>Wed, Nov 25</span></span><span class="kp"><span><b>8</b> trips</span><span><b>2</b> on the road</span><span><b>1</b> loading</span></span><span class="r" style="grid-template-columns:34px 1fr auto"><span class="m">08:00</span><span class="g">Lipat bahay, Marikina to Antipolo</span><span class="s">On the road</span></span><span class="r" style="grid-template-columns:34px 1fr auto"><span class="m">09:30</span><span class="g">Office pull out, Pasig to Makati</span><span class="s">Loading</span></span><span class="r" style="grid-template-columns:34px 1fr auto"><span class="m">11:00</span><span class="g">Condo move, Mandaluyong to BGC</span><span class="s">On the road</span></span><span class="r" style="grid-template-columns:34px 1fr auto"><span class="m">13:00</span><span class="g">Corporate delivery, Taguig to Sta. Rosa</span><span class="s">Booked</span></span><span class="r" style="grid-template-columns:34px 1fr auto"><span class="m">14:00</span><span class="g">Furniture drop, Cainta to San Juan</span><span class="s">Booked</span></span><span class="r" style="grid-template-columns:34px 1fr auto"><span class="m">15:30</span><span class="g">Lipat bahay, Cainta to Quezon City</span><span class="s">Booked</span></span><span class="r" style="grid-template-columns:34px 1fr auto"><span class="m">17:00</span><span class="g">Office pull out, Ortigas to Pasay</span><span class="s">Booked</span></span><span class="r" style="grid-template-columns:34px 1fr auto"><span class="m">18:30</span><span class="g">Warehouse run, Pulilan to Malolos</span><span class="s">Booked</span></span></span></span></span><span class="tx"><span class="k">BOOKINGS</span><span class="nm">Booking Management System</span><span class="ds">Bookings, trips and job orders</span><span class="rl">Your role <b>Operations</b></span></span></a><a class="pan" href="#"><span class="sh"><span class="pv"><span class="sb"><b></b><i class=""></i><i class="on"></i><i class=""></i><i class=""></i><i class=""></i></span><span class="ct"><span class="t">Due this week<span>14 trucks</span></span><span class="kp"><span><b>4</b> due</span><span class="od"><b>1</b> late</span><span><b>9</b> on schedule</span></span><span class="r" style="grid-template-columns:50px 1fr auto"><span class="m">CAK 9043</span><span class="g">10,000 km service</span><span class="s">Nov 27</span><span class="pb" style="grid-column:1/-1"><i style="width:82%"></i></span></span><span class="r" style="grid-template-columns:50px 1fr auto"><span class="m">DAK 2917</span><span class="g">Oil and filter</span><span class="s od">2 days late</span><span class="pb" style="grid-column:1/-1"><i style="width:100%"></i></span></span><span class="r" style="grid-template-columns:50px 1fr auto"><span class="m">DCR 5096</span><span class="g">Tire rotation</span><span class="s">Dec 3</span><span class="pb" style="grid-column:1/-1"><i style="width:46%"></i></span></span><span class="r" style="grid-template-columns:50px 1fr auto"><span class="m">NBK 4410</span><span class="g">Brake check</span><span class="s">Dec 9</span><span class="pb" style="grid-column:1/-1"><i style="width:20%"></i></span></span><span class="r" style="grid-template-columns:50px 1fr auto"><span class="m">NAB 7782</span><span class="g">Aircon cleaning</span><span class="s">Dec 11</span><span class="pb" style="grid-column:1/-1"><i style="width:15%"></i></span></span><span class="r" style="grid-template-columns:50px 1fr auto"><span class="m">CBE 3315</span><span class="g">20,000 km service</span><span class="s">Dec 14</span><span class="pb" style="grid-column:1/-1"><i style="width:10%"></i></span></span><span class="r" style="grid-template-columns:50px 1fr auto"><span class="m">DAG 6021</span><span class="g">Battery check</span><span class="s">Dec 18</span><span class="pb" style="grid-column:1/-1"><i style="width:6%"></i></span></span><span class="r" style="grid-template-columns:50px 1fr auto"><span class="m">NCF 1189</span><span class="g">Wheel alignment</span><span class="s">Dec 20</span><span class="pb" style="grid-column:1/-1"><i style="width:4%"></i></span></span></span></span></span><span class="tx"><span class="k">MAINTENANCE</span><span class="nm">Vehicle Maintenance Management System</span><span class="ds">Planned and preventive maintenance</span><span class="rl">Your role <b>Operations</b></span></span></a><a class="pan open" href="#"><span class="sh"><span class="pv"><span class="sb"><b></b><i class=""></i><i class=""></i><i class="on"></i><i class=""></i><i class=""></i></span><span class="ct"><span class="t">Repair tickets<span>Marikina</span></span><span class="kp"><span><b>6</b> open</span><span><b>3</b> mechanics in</span><span><b>1</b> waiting on parts</span></span><span class="kb"><span class="kc"><span>Open 3</span><span class="tk">Brake hose cracked<em>DAK 2917</em></span><span class="tk">Aircon not cooling<em>CAK 9043</em></span><span class="tk">Tail light out<em>NAB 7782</em></span><span class="tk">Door seal torn<em>CBE 3315</em></span></span><span class="kc"><span>In progress 2</span><span class="tk">Brake pads worn<em>DCR 5096</em></span><span class="tk">Tail lift slow<em>NBK 4410</em></span><span class="tk">Wiper motor<em>DAG 6021</em></span></span><span class="kc"><span>Ready 1</span><span class="tk">Clutch slipping<em>NBK 4410</em></span><span class="tk">Fan belt squeal<em>NCF 1189</em></span></span></span></span></span></span><span class="tx"><span class="k">REPAIRS</span><span class="nm">Vehicle Repair Management System</span><span class="ds">Repair tickets, mechanics and parts</span><span class="row"><span>Open and track repair tickets</span><span>Assign mechanics to the work</span><span>Record the parts used</span></span><span class="rl">Your role <b>Chief Mechanic</b></span></span></a></div></div></div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

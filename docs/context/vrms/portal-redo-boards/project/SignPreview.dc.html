@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sign in, product preview</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=IBM+Plex+Mono:wght@500;600&amp;display=swap">
+<style>
+body{margin:0}
+.pg{width:1440px;height:900px;display:grid;grid-template-columns:840px 600px;font-family:Inter,system-ui,sans-serif;color:#0f172a;overflow:hidden}
+.rt{background:#fff;display:flex;align-items:center;justify-content:center}
+.fm{width:384px;display:flex;flex-direction:column;gap:26px;margin:0}
+.fm h2{margin:0;font-size:28px;font-weight:800;letter-spacing:-.02em}
+.sub{margin:8px 0 0;font-size:15px;color:#475569}
+.fs{display:flex;flex-direction:column;gap:18px}
+.fm label{display:block;font-size:14px;font-weight:600;margin-bottom:6px}
+.row{display:flex;justify-content:space-between;align-items:flex-start}
+.row a{font-size:14px;font-weight:600;color:#1a1f6e}
+.in{box-sizing:border-box;width:100%;height:46px;border:1px solid #64748b;border-radius:12px;padding:0 14px;font:15px Inter,sans-serif;color:#0f172a;background:#fff}
+.in::placeholder{color:#5b6779}
+.btn{height:48px;border:0;border-radius:12px;background:#0f1445;color:#fff;font:700 16px Inter,sans-serif;display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer}
+.hint{margin:0;font-size:14px;line-height:1.5;color:#5b6779}
+.lf{position:relative;overflow:hidden;background:#0f1445;color:#fff}
+.lk{position:absolute;left:64px;top:40px;display:flex;align-items:center;gap:10px}.lk svg{height:20px;fill:#e8b800}.lk span{font-weight:800;font-style:italic;font-size:16px}
+.cp{position:absolute;left:64px;top:140px}
+h1{margin:0;font-size:64px;line-height:1;font-weight:800;letter-spacing:-.035em}
+h1 em{font-style:normal;color:#e8b800}
+.ln{margin:18px 0 0;font-size:18px;line-height:1.55;color:rgba(255,255,255,.72);max-width:440px}
+.shot{position:absolute;left:150px;top:470px;width:860px;height:540px;border-radius:18px;background:#f3f5f9;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.45),0 0 0 1px rgba(255,255,255,.14);transform:perspective(1800px) rotateX(14deg) rotateY(-14deg) rotateZ(3deg);transform-origin:0 0}
+.band{height:150px;background:#1a1f6e;padding:16px 26px;box-sizing:border-box;color:#fff}
+.band .top{display:flex;align-items:center;gap:8px}.band .top svg{height:11px;fill:#e8b800}.band .top span{font:800 italic 10px Inter;}
+.band .dt{margin:22px 0 0;font-size:9px;font-weight:600;color:#e8b800}
+.band h4{margin:5px 0 0;font-size:26px;font-weight:800;letter-spacing:-.03em}
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;padding:18px 26px}
+.cd{background:#fff;border-radius:14px;height:122px;box-shadow:0 1px 2px rgba(15,23,42,.06),0 4px 14px rgba(15,23,42,.06);padding:14px;box-sizing:border-box;color:#0f172a}
+.cd .ic{width:28px;height:28px;border-radius:9px;background:#eef0f8}
+.cd b{display:block;margin-top:10px;font-size:15px}
+.cd i{display:block;margin-top:4px;height:6px;width:80%;border-radius:3px;background:#e6e9f2}
+.cd i+i{width:55%}
+.strip{margin:0 26px;height:52px;border-radius:14px;background:#0f1445}
+</style>
+</helmet>
+<div class="pg">
+<div class="lf">
+<div class="lk"><svg viewBox="0 0 330 185" aria-hidden="true"><polygon points="82,0 144,0 66,183 4,183"/><polygon points="177,0 240,0 162,183 100,183"/><polygon points="265,0 328,0 268,140 328,140 328,183 187,183"/></svg><span>WeLinc Logistics</span></div>
+<div class="cp"><h1>From booking<br>to the <em>repair bay.</em></h1><p class="ln">The WeLinc operations workspace for every truck on the road.</p></div>
+<div class="shot" aria-hidden="true">
+<div class="band"><div class="top"><svg viewBox="0 0 330 185"><polygon points="82,0 144,0 66,183 4,183"/><polygon points="177,0 240,0 162,183 100,183"/><polygon points="265,0 328,0 268,140 328,140 328,183 187,183"/></svg><span>WeLinc Logistics</span></div><p class="dt">Wednesday, November 25</p><h4>Good morning</h4></div>
+<div class="cards"><div class="cd"><span class="ic" style="display:block"></span><b>BMS</b><i></i><i></i></div><div class="cd"><span class="ic" style="display:block"></span><b>VMMS</b><i></i><i></i></div><div class="cd"><span class="ic" style="display:block"></span><b>VRMS</b><i></i><i></i></div></div>
+<div class="strip"></div>
+</div>
+</div>
+<div class="rt"><form class="fm">
+<div><h2>Sign in</h2><p class="sub">Use your WeLinc work email.</p></div>
+<div class="fs">
+<div><label for="e">Work email</label><input id="e" class="in" placeholder="you@welinc.com"></div>
+<div><div class="row"><label for="p">Password</label><a href="#">Forgot password?</a></div><input id="p" type="password" class="in" placeholder="Enter password"></div>
+<button type="button" class="btn">Sign in <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+</div>
+<p class="hint">No account yet? Ask your admin to add you. You'll get an email to set your password.</p>
+</form></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
