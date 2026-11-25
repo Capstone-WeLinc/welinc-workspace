@@ -9,6 +9,10 @@ Every board in this round is on the Design canvas **"WeLinc portal redo: sign in
 - **Launcher** (Corazon Villareal, three systems): L1 `LauScenes` (slim header, a line drawing on each card), L2 `LauLivery` (white band, navy line drawing), L3 `LauPhoto`, L4 `LauRows`, L5 `LauVan`, L6 `LauLineup` (L300, closed van and wing van parked in three bays), L7 `LauRoute` (one trip out and back on a map), L8 `LauWhite` (no band, gold hairline).
 - **Admin launcher** (Victor Ramos, VRMS Admin; tile names from `SuiteEntry.tsx`, counts are sample values): M1 `AdmStrip` (Suite management as a row under the VRMS card), M2 `AdmColumn` (beside it, same height), M3 `AdmSide` (a right column overlapping the band), M4 `AdmBand` (the counts sit in the band).
 
+## Launches 1 to 4, copied from the codesamtm canvas (Nov 26)
+
+From "WeLinc design directions" (https://claude.ai/artifact/VFhLSMNhfpAFD4D4c2VQzp, page Round 23, plus Round 29's dock): `L28MGate` (Launch 1 boom gate), `L28MDock` and `R29LaunchDock` (Launch 2 dock door; Round 29's truck pulls away), `L28MRoute` (Launch 3 route bar, built as `R31LaunchRoute`), `L28MLoad` (Launch 4 loading). **Picked: random among Launches 2, 3 and 4**, one per click, never the same twice in a row (Launch 2 as `R29LaunchDock`). Launch 1 (the boom gate) is out.
+
 ## Round 69 (Nov 26): three to a row, Suite management reworked
 
 **Your calls after Round 68:** **three to a row.** No "N to review" count on Suite management, a new icon for it, the tile reads "Suite management" in full, and the uppercase name label a little bigger.
