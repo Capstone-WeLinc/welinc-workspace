@@ -36,6 +36,13 @@ _Steps derived from spec 0019 acceptance criteria. `/check verify` runs these; `
 - [ ] Give access from a person's Access tab: the email is fixed, the system preselected, the systems they hold greyed → AC-22
 - [ ] The summary box says the setup code works for one hour → AC-22
 
+*Sign in depth (open `/login` signed out, 1440×900)*
+- [ ] Compare with `boards/R75Shade4.dc.html`: the faint glow and dark edges on the map, the glass panel with its light top and left edges, inset fields, the gold mark tile, "Sta. Rosa" left of its pin and not cut by the panel → AC-13, AC-29
+- [ ] Put the sign in beside the launcher: the same navy, no visibly bluer cast → AC-13
+- [ ] Turn on reduce transparency (macOS Accessibility, Display) and reload: the panel is near solid, edges and shadow kept → AC-13
+- [ ] At 375 px: the same look with a lighter blur; the panel text passes 4.5:1 (axe, and a manual check over the brightest map line) → AC-13
+- [ ] The copy reads exactly as AC-13 ("Enter your credentials to access the workspace", Email, "© OpenStreetMap" linked) → AC-13
+
 ## Commands
 - [ ] `cd welinc-web-portal && npm run lint && npm run build:local` → both pass → AC-29
 - [ ] `cd welinc-web-portal && npx vitest run --maxWorkers=2` → all pass (an unlimited run on the Intel Mac can time out under load) → AC-29

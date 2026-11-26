@@ -9,6 +9,60 @@ Every board in this round is on the Design canvas **"WeLinc portal redo: sign in
 - **Launcher** (Corazon Villareal, three systems): L1 `LauScenes` (slim header, a line drawing on each card), L2 `LauLivery` (white band, navy line drawing), L3 `LauPhoto`, L4 `LauRows`, L5 `LauVan`, L6 `LauLineup` (L300, closed van and wing van parked in three bays), L7 `LauRoute` (one trip out and back on a map), L8 `LauWhite` (no band, gold hairline).
 - **Admin launcher** (Victor Ramos, VRMS Admin; tile names from `SuiteEntry.tsx`, counts are sample values): M1 `AdmStrip` (Suite management as a row under the VRMS card), M2 `AdmColumn` (beside it, same height), M3 `AdmSide` (a right column overlapping the band), M4 `AdmBand` (the counts sit in the band).
 
+## Round 75 (Nov 26): A in navier shades
+
+You found A bluer than the built sign in. Its blue comes from three things: the radial glow (`#26358c` in place of the flat `#0f1445`), the base map lines at 64% (they are periwinkle), and the glass's `saturate(1.35)`, which boosts the blue behind the form. Same canvas, page **"Round 75: A in navier shades"** (it opens there). Every board keeps A's glass, gold tile, inset fields and "Sta. Rosa" left of its pin; only the glow, the map opacity and the saturate change. All screenshotted.
+
+- `R75Built` as built (flat `#0f1445`, map 42%), `R75Lit` A as picked (the bluest).
+- S1 `R75Shade1`: glow `#202d80` to `#18216a`, map 58%, saturate 1.1.
+- S2 `R75Shade2`: glow `#1b2774` to `#151d60`, map 52%, saturate 1.1.
+- S3 `R75Shade3`: glow `#172066` to `#121954`, map 47%, saturate 1.0.
+- S4 `R75Shade4`: glow `#131a56` to `#10164b`, map 42% as built, saturate 1.0 (the launcher navy, only the dark edges left).
+- Generator: `python3 -I gen/gen75.py gen/r70-snap.json <out>` (`shade(c1, c2, sat, map)`).
+- **Picked (Nov 26): S4 (`R75Shade4`).** It replaces Round 73's pick for the colour; A's glass, fields, gold tile and label stay. Values in suite spec 0019 AC-13; the board is copied into the spec's `boards/`.
+
+## Round 73 (Nov 26): A, glass turned down
+
+You meant A was too glassy, not that glass was wrong (Rounds 71 and 72 took the glass out, which missed). Same canvas, page **"Round 73: A, glass turned down"** (it opens there). Each board is A with every glass value scaled together: the top tint (7.5% to 3% white), the navy base (40%), the blur (16px), the saturation (1.35), the top and left edge lines (17% and 10% white) and the shadow (35%). All screenshotted.
+
+- `R73Glass` A as published (100%), `R73Glass75` (75%), `R73Glass55` (55%), `R73Glass40` (40%), `R73Glass25` (25%).
+- Generator: `python3 -I gen/gen73.py gen/r70-snap.json <out>` (`glass(k)` scales A's glass by `k`).
+- `R74Glass70` (same page): A at 70% with the navy base at 36%. Picked, then dropped the same day.
+- **Picked (Nov 26): A as published, 100% (`R70Lit`, the same as `R73Glass`).** Its values, for the build: `#glass` background `linear-gradient(180deg, rgba(255,255,255,.075), rgba(255,255,255,.03) 60%), rgba(8,11,42,.40)`, `backdrop-filter: blur(16px) saturate(1.35)`, edges `inset 1px 0 0 rgba(255,255,255,.17), inset 0 1px 0 rgba(255,255,255,.10)`, shadow `-24px 0 60px rgba(3,5,22,.35)`. Also: the base map group at 64% (not 42%), the radial glow (`#26358c` to `#19236f` to `#0f1445`) and dark edges on the map, the mark in its 41px gold tile (no italic), the fields at `rgba(3,5,24,.62)` with an inner shadow, and "Sta. Rosa" left of its pin. Generator `gen/gen70.py`.
+
+## Round 72 (Nov 26): A, translucent and not darker
+
+You kept **A** and asked for panels that don't make it darker, more translucent. Round 71's options all darkened the form side. Same canvas, page **"Round 72: A, translucent and not darker"** (it opens there). What made A glassy was the shine (the light top tint) and the bright top and left edges, so none of these have them. Every board keeps A's lit map, gold tile, inset fields, "Sta. Rosa" left of its pin and "Tanay" under its pin. All screenshotted.
+
+- `R72Glass`: A as published, for comparison.
+- A5 `R72Veil`: the map's own navy at 45%, no blur, no edges.
+- A6 `R72Haze`: the map's navy at 35% with a 2px soften, no edges.
+- A7 `R72Tint`: a lighter blue at 30% (a touch lighter than the map) with a 3px soften.
+- A8 `R72Mist`: a thin white mist (4.5%), no navy added, a 1.5px soften, one very faint edge.
+- Generator: `python3 -I gen/gen72.py gen/r70-snap.json <out>` (built from `gen71.py`).
+
+## Round 71 (Nov 26): A with less glass
+
+You picked **A** from Round 70 but found it too glassy. Same canvas, page **"Round 71: A with less glass"** (it opens there). Every board keeps A's lit map, gold tile, inset fields and the moved "Sta. Rosa" label; only the panel changes. All screenshotted.
+
+- `R71Glass`: A as published, for comparison.
+- A1 `R71Matte`: nearly solid (86%), no blur, one faint edge line.
+- A2 `R71Smoke`: a darker tint (70%) with a 5px blur, no shine and no edge lines.
+- A3 `R71Solid`: a solid deep panel, no line, a soft shadow falls onto the map.
+- A4 `R71Fade`: no edge at all; the map dissolves into the deep side over 160px ("Tanay" moved under its pin so it stays clear of the form).
+- Generator: `python3 -I gen/gen71.py gen/r70-snap.json <out>` (built from `gen70.py`'s pieces).
+
+## Round 70 (Nov 26): sign in depth
+
+You found the built sign in "one shade throughout" and plain next to the original (the truck photo with a floating card). The round keeps everything picked (S27d Quiet map, copy, form) and changes only layers and light. It's on the launcher canvas (https://claude.ai/artifact/MCG63z1xfNtVSRmYz6pxRp), page **"Round 70: sign in depth"**, which the canvas now opens on. Every board was screenshotted before publishing.
+
+- `R70Built`: the reference, the sign in as built on `feat/portal-redesign`.
+- A `R70Lit` (recommended): a bluer lit network with darker edges (the base map group at 64% instead of 42%; the gold runs untouched), real glass (a light top tint, 16px blur, bright top and left edges), inset fields, the mark in its gold tile, and the "Sta. Rosa" label moved left of its pin so the panel edge doesn't cut it.
+- B `R70Frost`: the same lit map with clear glass (2.5px blur), so the network carries on under the form, and a gold top edge. The trucks drive under the glass, which costs paint (the sweep took them out from under it).
+- C `R70Card`: the original's floating card and gold truck tile, on the whole lit map.
+- D `R70TwoTone`: no glass; a lit map beside a solid deep panel with a soft shadow edge, lighter fields, a short gold line under "Sign in".
+- Generator: `python3 -I gen/gen70.py gen/r70-snap.json <out>`. `r70-snap.json` is the built page (`/login` at 1440×900), its CSS and markup captured with Playwright; each board is that snapshot plus one block of CSS.
+
 ## Launches 1 to 4, copied from the codesamtm canvas (Nov 26)
 
 From "WeLinc design directions" (https://claude.ai/artifact/VFhLSMNhfpAFD4D4c2VQzp, page Round 23, plus Round 29's dock): `L28MGate` (Launch 1 boom gate), `L28MDock` and `R29LaunchDock` (Launch 2 dock door; Round 29's truck pulls away), `L28MRoute` (Launch 3 route bar, built as `R31LaunchRoute`), `L28MLoad` (Launch 4 loading). **Picked: random among Launches 2, 3 and 4**, one per click, never the same twice in a row (Launch 2 as `R29LaunchDock`). Launch 1 (the boom gate) is out.
