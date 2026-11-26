@@ -11,7 +11,8 @@ Local stack: sign in on the portal (`http://localhost:8000`) as `vrms.admin@weli
 - [ ] Turn on Still → everything stops on its telling frame: hazards and beacon lit, the flickering lamp on, the camera aimed down at the gate, the drawer out, the pass on the reader, the bay dimmed but visible; no puffs, steam, sparks or contact arcs → AC-17
 - [ ] Same with the system's reduced motion setting on and Still off → the same frames → AC-17
 - [ ] Inspect any scene → `<svg aria-hidden="true" focusable="false" data-scene="…">`; no scene shows a real name, plate, ticket number or role → AC-18
-- [ ] Run `npm run build:local` in web-vrms and search `dist/` for `ScenesSection` → not there → AC-20
+- [ ] Run `npm run build:local` in web-vrms and search `dist/` for `Error scenes` → not there; with `VITE_DEV_UI=true` it is in its own `DevUiPage` chunk → AC-20
+- [ ] On staging, open `/dev/ui` signed out (sent to sign in), then signed in (the kit with the Error scenes section) → AC-20
 
 ### Panels inside the shell (web-vrms)
 - [ ] Open `/repairs/<a real uuid that doesn't exist>` (for example `00000000-0000-4000-8000-000000000000`) → sidebar and top bar stay; a white 720px card with "Repair ticket not found", the board's line, Back to repairs; the bay or the drawer → AC-3, AC-9
