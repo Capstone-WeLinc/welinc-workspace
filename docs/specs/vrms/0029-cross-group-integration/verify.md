@@ -12,7 +12,7 @@ _Steps derived from spec 0029 acceptance criteria. `/check verify` runs these; `
 - [ ] `docker exec welinc_vrms_backend npx prisma migrate status` says up to date, and `\d referrals`, `\d deliveries` show the tables; `repair_tickets.driver_id` is nullable with its foreign key still `ON DELETE RESTRICT` → AC-1, AC-6, AC-13, AC-21
 - [ ] `curl -i http://localhost:3000/vrms/integrations/anything` answers with `Cache-Control: no-store`, also on a 401 or 403 once a route exists → AC-24
 - [ ] With `SUITE_GATEWAY_INTERNAL_URL` unset, backend-vrms refuses to start with "SUITE_GATEWAY_INTERNAL_URL: is required" → AC-21
-- [ ] Settings, Integration shows "Keep retrying a message for" (24 hours, 1 to 168), "Keep sent messages for" (90 days, 7 to 365) and "Full truck and garage check every" (60 minutes, 15 to 1440) → AC-3, AC-21, AC-23
+- [ ] Settings, Thresholds, in its Integration section, shows "Keep retrying a message for" (24 hours, 1 to 168), "Keep sent messages for" (90 days, 7 to 365) and "Full truck and garage check every" (60 minutes, 15 to 1440) → AC-3, AC-21, AC-23
 
 ### Worker, live (VMMS stopped locally, so the gateway answers 502)
 - [ ] Insert a `REPAIR_EVENT` delivery for a real ticket: within 15 s it is `PENDING` with `attempts` 1, `last_status_code` 502, `last_error` `UPSTREAM_UNAVAILABLE`, next attempt 30 s after the last → AC-21
@@ -205,3 +205,29 @@ _On staging, after backend-vrms #91, web-vrms #93 and welinc-auth #81 deployed, 
 - [ ] Open a ticket of an archived Capstone 1 truck (for example NEB 7306) → readable, with the "Truck removed in VMMS" banner → AC-1
 - [ ] Change a truck's plate in VMMS staging → VRMS shows the new plate after the next hourly reconcile, with a history row by VMMS → AC-3
 - [ ] Portal, Roles, VRMS → "Answer other systems" on for Admin only → AC-26
+
+## Milestone 4: flow 3, BMS repair impact (child 0003)
+
+### Commands
+- [ ] In welinc-backend-vrms and welinc-web-vrms: lint, build, `npm run openapi:check`, jest and vitest pass → AC-24
+- [ ] `GET /vrms/settings/changes?keys=fleet.reconcileMinutes,integration.retryWindowHours` answers 200 (camelCase keys are valid); the Thresholds page's Recent changes loads with no console error → AC-3, AC-21
+- [ ] `POST /vrms/integrations/bms/expedite-requests` with a `bms` token for `repair.expedite.write`: 202 `WAITING`; the same `requestId` with another body answers 409 `REQUEST_ID_REUSED`; a truck with no open ticket answers 404 `NO_OPEN_REPAIR`; a `vmms` token answers 403 `FORBIDDEN`; all with `Cache-Control: no-store` → AC-18, AC-24 (needs a `bms` service token)
+- [ ] `GET /vrms/integrations/bms/vehicles/<vmmsVehicleId>/active-repair` answers the open ticket's number, status, reason, issues resolved of total, expected return date and opened time; a truck with none answers `{ repair: null }`; no costs, notes or people → AC-20 (needs a `bms` token)
+
+### Repair updates to BMS (outbox)
+- [ ] Create a ticket, move its status, change `dueAt` (with a reason), close and cancel: each queues one `REPAIR_UPDATE` to BMS in the same transaction, with the ticket number, status, issue categories, `dueAt` and a per ticket `eventVersion` → AC-17
+- [ ] A dismissed `REPAIR_UPDATE` queues a fresh one carrying the ticket's current state → AC-22
+
+### Expedite requests (as `vrms.admin@`)
+- [ ] A ticket with a waiting request shows a banner listing each request (JO number, reason); the Admin dashboard shows "Expedite requests (n)" → AC-18
+- [ ] Accept opens a dialog with priority one step up (capped at Critical) and an optional new due date; saving changes the ticket with the reason "Expedite JO-…", writes the audit row, queues `EXPEDITE_ANSWER`, and a `REPAIR_UPDATE` when the date changed → AC-19
+- [ ] Decline needs 5 to 500 characters and queues the answer; closing or cancelling a ticket declines its waiting requests with "Repair finished" or "Repair cancelled" → AC-19
+- [ ] A request received from BMS writes an audit row with actor role `SYSTEM` and actor name `BMS` → AC-25
+- [ ] A Chief Mechanic (no `integration.respond`) gets 403 on accept and decline and sees no buttons → AC-11
+
+### Upcoming trips
+- [ ] On the new ticket form, picking a truck shows "Upcoming trips in BMS"; the ticket detail page shows an "Upcoming trips" card, "From BMS, the next 14 days" → AC-16
+- [ ] With BMS stopped, both say "BMS can't be reached" and saving still works → AC-16
+
+## Known edge: a truck VMMS lists whose VRMS row is soft deleted
+- [ ] A VRMS truck with `deleted_at` set that `fleet:link` links to VMMS never shows in the truck picker (`listVehicles` hides `deletedAt`), so a referral for it cannot open a ticket. Expected: the link or sync clears `deletedAt` for a truck VMMS lists → AC-1, AC-5, AC-8 (found by `/check verify` 2026-11-27; `PXW 382` locally)
