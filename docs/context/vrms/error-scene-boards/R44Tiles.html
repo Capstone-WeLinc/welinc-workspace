@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Round 44 · Seven new error tiles</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:light}
+body{margin:0;background:#f3f5f9;font-family:Inter,system-ui,sans-serif;color:#0f172a}
+.wrap{max-width:1180px;margin:0 auto;padding:40px 32px 64px}
+header h1{margin:0;font-size:24px;font-weight:700;letter-spacing:-.01em}
+header p{margin:6px 0 0;font-size:14.5px;line-height:1.55;color:#475569;max-width:760px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(540px,1fr));gap:28px;margin-top:28px}
+.subj h2{margin:0 0 10px;font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#5b6779}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.card{background:#fff;border-radius:14px;box-shadow:0 1px 2px rgba(15,20,69,.06),0 0 0 1px rgba(15,20,69,.07)}
+.card .hd{padding:14px 18px 2px;display:flex;justify-content:space-between;align-items:baseline}
+.card .hd h3{margin:0;font-size:14.5px;font-weight:700}
+.card .hd span{font-size:12px;font-weight:600;color:#5b6779}
+.body{display:flex;flex-direction:column;align-items:center;text-align:center;padding:10px 18px 20px}
+.body p.t{margin:12px 0 0;font-size:14.5px;font-weight:600}
+.body p.m{margin:4px 0 0;font-size:13px;color:#5b6779}
+.btn{margin-top:12px;height:36px;padding:0 14px;border-radius:10px;font:inherit;font-size:13.5px;font-weight:600;border:0;background:#fff;color:#0f172a;box-shadow:inset 0 0 0 1px #cbd2ea}
+svg{display:block}
+.slow{animation:slow 2.4s ease-in-out infinite}@keyframes slow{50%{opacity:.25}}
+@media (prefers-reduced-motion: reduce){*{animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<h1>Round 44 · Seven new error tiles</h1>
+<p>Two takes for each subject, in the line art of the five tiles you picked in Round 39 (devices, history, tickets, trucks, parts). Navy line, white fills, dashed grey for what didn't load, one amber accent, and one slow pulse on the missing part. Pick A or B per subject.</p>
+</header>
+<div class="grid">
+
+<!-- activity -->
+<section class="subj"><h2>Activity</h2><div class="pair">
+<div class="card"><div class="hd"><h3>Recent activity</h3><span>A · Timeline</span></div><div class="body">
+<svg width="120" height="88" viewBox="0 0 120 88" aria-hidden="true"><rect width="120" height="88" rx="14" fill="#eef0f8"/>
+<path d="M36 22 V62" stroke="#cbd2ea" stroke-width="2.2"/>
+<circle cx="36" cy="22" r="5" fill="#1a1f6e"/><circle cx="36" cy="40" r="5" fill="#1a1f6e"/>
+<circle class="slow" cx="36" cy="62" r="6" fill="#fff" stroke="#e8b800" stroke-width="2.2" stroke-dasharray="3 2.4"/>
+<rect x="48" y="15" width="48" height="14" rx="3" fill="#fff" stroke="#1a1f6e" stroke-width="2.2"/><path d="M54 22 h26" stroke="#aab2c5" stroke-width="2" stroke-linecap="round"/>
+<rect x="48" y="33" width="48" height="14" rx="3" fill="#fff" stroke="#1a1f6e" stroke-width="2.2"/><path d="M54 40 h20" stroke="#aab2c5" stroke-width="2" stroke-linecap="round"/>
+<path d="M50 62 h40" stroke="#cbd2ea" stroke-width="2.4" stroke-dasharray="3 3" stroke-linecap="round"/>
+</svg><p class="t">We couldn't load the activity</p><p class="m">Check your connection, then try again.</p><button class="btn">Try again</button></div></div>
+<div class="card"><div class="hd"><h3>Recent activity</h3><span>B · Clipboard</span></div><div class="body">
+<svg width="120" height="88" viewBox="0 0 120 88" aria-hidden="true"><rect width="120" height="88" rx="14" fill="#eef0f8"/>
+<rect x="32" y="16" width="56" height="62" rx="5" fill="#fff" stroke="#1a1f6e" stroke-width="2.2"/>
+<rect x="47" y="10" width="26" height="11" rx="3" fill="#e8b800" stroke="#1a1f6e" stroke-width="2.2"/>
+<path d="M40 33 l3 3 l6 -6 M40 45 l3 3 l6 -6" stroke="#1a1f6e" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M55 33 h24 M55 45 h18" stroke="#aab2c5" stroke-width="2" stroke-linecap="round"/>
+<path d="M40 58 h38" stroke="#cbd2ea" stroke-width="2.4" stroke-dasharray="3 3" stroke-linecap="round"/>
+<path class="slow" d="M40 68 h28" stroke="#cbd2ea" stroke-width="2.4" stroke-dasharray="3 3" stroke-linecap="round"/>
+</svg><p class="t">We couldn't load the activity</p><p class="m">Check your connection, then try again.</p><button class="btn">Try again</button></div></div>
+</div></section>
+
+<!-- charts -->
+<section class="subj"><h2>Charts</h2><div class="pair">
+<div class="card"><div class="hd"><h3>Repairs by week</h3><span>A · Bars</span></div><div class="body">
+<svg width="120" height="88" viewBox="0 0 120 88" aria-hidden="true"><rect width="120" height="88" rx="14" fill="#eef0f8"/>
+<rect x="34" y="50" width="13" height="20" rx="2" fill="#e8b800" stroke="#1a1f6e" stroke-width="2.2"/>
+<rect x="55" y="32" width="13" height="38" rx="2" fill="none" stroke="#cbd2ea" stroke-width="2.2" stroke-dasharray="3 3"/>
+<rect class="slow" x="76" y="42" width="13" height="28" rx="2" fill="none" stroke="#cbd2ea" stroke-width="2.2" stroke-dasharray="3 3"/>
+<path d="M26 18 V70 H96" stroke="#1a1f6e" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+</svg><p class="t">We couldn't load this chart</p><p class="m">Check your connection, then try again.</p><button class="btn">Try again</button></div></div>
+<div class="card"><div class="hd"><h3>Repairs by week</h3><span>B · Broken line</span></div><div class="body">
+<svg width="120" height="88" viewBox="0 0 120 88" aria-hidden="true"><rect width="120" height="88" rx="14" fill="#eef0f8"/>
+<rect x="20" y="16" width="80" height="56" rx="4" fill="#fff" stroke="#1a1f6e" stroke-width="2.2"/>
+<path d="M28 32 h64 M28 48 h64" stroke="#e3e7f2" stroke-width="1.6"/>
+<path d="M28 62 L40 50 L50 54 L60 40" stroke="#1a1f6e" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="60" cy="40" r="3.2" fill="#e8b800" stroke="#1a1f6e" stroke-width="1.6"/>
+<path d="M70 36 L80 42 L92 28" stroke="#cbd2ea" stroke-width="2.4" fill="none" stroke-dasharray="3 3" stroke-linecap="round"/>
+<path class="slow" d="M62 30 l5 10" stroke="#c0392b" stroke-width="2.4" stroke-linecap="round"/>
+</svg><p class="t">We couldn't load this chart</p><p class="m">Check your connection, then try again.</p><button class="btn">Try again</button></div></div>
+</div></section>
+
+<!-- settings -->
+<section class="subj"><h2>Settings</h2><div class="pair">
+<div class="card"><div class="hd"><h3>Thresholds</h3><span>A · Gears</span></div><div class="body">
+<svg width="120" height="88" viewBox="0 0 120 88" aria-hidden="true"><rect width="120" height="88" rx="14" fill="#eef0f8"/>
+<circle cx="48" cy="42" r="17" fill="none" stroke="#1a1f6e" stroke-width="6" stroke-dasharray="6.68 6.68"/>
+<circle cx="48" cy="42" r="14" fill="#fff" stroke="#1a1f6e" stroke-width="2.2"/>
+<circle cx="48" cy="42" r="5" fill="#e8b800" stroke="#1a1f6e" stroke-width="2.2"/>
+<circle class="slow" cx="80" cy="58" r="12" fill="#fff" stroke="#cbd2ea" stroke-width="2.2" stroke-dasharray="3 3"/>
+<circle cx="80" cy="58" r="3.5" fill="none" stroke="#cbd2ea" stroke-width="2"/>
+</svg><p class="t">We couldn't load these settings</p><p class="m">Check your connection, then try again.</p><button class="btn">Try again</button></div></div>
+<div class="card"><div class="hd"><h3>Thresholds</h3><span>B · Sliders</span></div><div class="body">
+<svg width="120" height="88" viewBox="0 0 120 88" aria-hidden="true"><rect width="120" height="88" rx="14" fill="#eef0f8"/>
+<rect x="22" y="18" width="76" height="52" rx="5" fill="#fff" stroke="#1a1f6e" stroke-width="2.2"/>
+<path d="M32 31 h56 M32 44 h56 M32 57 h56" stroke="#cbd2ea" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M32 31 h16 M32 44 h36" stroke="#1a1f6e" stroke-width="2.4" stroke-linecap="round"/>
+<rect x="45" y="26" width="8" height="10" rx="2" fill="#1a1f6e"/>
+<rect x="65" y="39" width="8" height="10" rx="2" fill="#1a1f6e"/>
+<circle class="slow" cx="58" cy="57" r="5" fill="#fff" stroke="#e8b800" stroke-width="2.2" stroke-dasharray="3 2.4"/>
+</svg><p class="t">We couldn't load these settings</p><p class="m">Check your connection, then try again.</p><button class="btn">Try again</button></div></div>
+</div></section>
+
+<!-- people -->
+<section class="subj"><h2>People</h2><div class="pair">
+<div class="card"><div class="hd"><h3>Team</h3><span>A · ID badges</span></div><div class="body">
+<svg width="120" height="88" viewBox="0 0 120 88" aria-hidden="true"><rect width="120" height="88" rx="14" fill="#eef0f8"/>
+<rect x="24" y="18" width="32" height="50" rx="4" fill="#fff" stroke="#1a1f6e" stroke-width="2.2"/>
+<rect x="24" y="18" width="32" height="8" rx="4" fill="#e8b800" stroke="#1a1f6e" stroke-width="2.2"/>
+<circle cx="40" cy="38" r="6" fill="#fff" stroke="#1a1f6e" stroke-width="2.2"/>
+<path d="M30 55 c2 -8 18 -8 20 0" stroke="#1a1f6e" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+<path d="M33 61 h14" stroke="#aab2c5" stroke-width="2" stroke-linecap="round"/>
+<rect x="64" y="18" width="32" height="50" rx="4" fill="#fff" stroke="#1a1f6e" stroke-width="2.2"/>
+<rect x="64" y="18" width="32" height="8" rx="4" fill="#e8b800" stroke="#1a1f6e" stroke-width="2.2"/>
+<g class="slow"><circle cx="80" cy="38" r="6" fill="none" stroke="#cbd2ea" stroke-width="2.2" stroke-dasharray="3 2.6"/>
+<path d="M70 55 c2 -8 18 -8 20 0" stroke="#cbd2ea" stroke-width="2.2" fill="none" stroke-dasharray="3 3" stroke-linecap="round"/></g>
+<path d="M73 61 h14" stroke="#cbd2ea" stroke-width="2" stroke-dasharray="3 3" stroke-linecap="round"/>
+</svg><p class="t">We couldn't load the people</p><p class="m">Check your connection, then try again.</p><button class="btn">Try again</button></div></div>
+<div class="card"><div class="hd"><h3>Team</h3><span>B · Crew</span></div><div class="body">
+<svg width="120" height="88" viewBox="0 0 120 88" aria-hidden="true"><rect width="120" height="88" rx="14" fill="#eef0f8"/>
+<g transform="translate(0 -5)"><circle cx="36" cy="46" r="7" fill="#fff" stroke="#1a1f6e" stroke-width="2.2"/>
+<path d="M27 42 a9 9 0 0 1 18 0 h3 v3 h-24 v-3z" fill="#e8b800" stroke="#1a1f6e" stroke-width="2" stroke-linejoin="round"/>
+<path d="M25 66 c2 -11 20 -11 22 0 v8" stroke="#1a1f6e" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+<circle cx="60" cy="42" r="7" fill="#fff" stroke="#1a1f6e" stroke-width="2.2"/>
+<path d="M51 38 a9 9 0 0 1 18 0 h3 v3 h-24 v-3z" fill="#e8b800" stroke="#1a1f6e" stroke-width="2" stroke-linejoin="round"/>
+<path d="M49 62 c2 -11 20 -11 22 0 v8" stroke="#1a1f6e" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+<g class="slow"><circle cx="84" cy="46" r="7" fill="none" stroke="#cbd2ea" stroke-width="2.2" stroke-dasharray="3 2.6"/>
+<path d="M75 42 a9 9 0 0 1 18 0" fill="none" stroke="#cbd2ea" stroke-width="2" stroke-dasharray="3 2.6"/>
+<path d="M73 66 c2 -11 20 -11 22 0 v8" stroke="#cbd2ea" stroke-width="2.2" fill="none" stroke-dasharray="3 3" stroke-linecap="round"/></g>
+</g>
+</svg><p class="t">We couldn't load the people</p><p class="m">Check your connection, then try again.</p><button class="btn">Try again</button></div></div>
+</div></section>
+
+<!-- knowledge -->
+<section class="subj"><h2>Knowledge</h2><div class="pair">
+<div class="card"><div class="hd"><h3>Knowledge base</h3><span>A · Manual</span></div><div class="body">
+<svg width="120" height="88" viewBox="0 0 120 88" aria-hidden="true"><rect width="120" height="88" rx="14" fill="#eef0f8"/>
+<path d="M44 16 h38 a3 3 0 0 1 3 3 v52 a3 3 0 0 1 -3 3 h-38z" fill="#fff" stroke="#1a1f6e" stroke-width="2.2"/>
+<rect x="35" y="14" width="11" height="62" rx="3" fill="#1a1f6e"/>
+<rect x="53" y="24" width="24" height="11" rx="2" fill="#e8b800" stroke="#1a1f6e" stroke-width="2"/>
+<path d="M53 46 h24 M53 55 h18" stroke="#cbd2ea" stroke-width="2.4" stroke-dasharray="3 3" stroke-linecap="round"/>
+<path class="slow" d="M53 64 h22" stroke="#cbd2ea" stroke-width="2.4" stroke-dasharray="3 3" stroke-linecap="round"/>
+</svg><p class="t">We couldn't load the knowledge base</p><p class="m">Check your connection, then try again.</p><button class="btn">Try again</button></div></div>
+<div class="card"><div class="hd"><h3>Knowledge base</h3><span>B · Magnifier</span></div><div class="body">
+<svg width="120" height="88" viewBox="0 0 120 88" aria-hidden="true"><rect width="120" height="88" rx="14" fill="#eef0f8"/>
+<rect x="24" y="14" width="50" height="62" rx="3" fill="#fff" stroke="#1a1f6e" stroke-width="2.2"/>
+<path d="M32 26 h30 M32 34 h22" stroke="#aab2c5" stroke-width="2" stroke-linecap="round"/>
+<path d="M32 46 h20 M32 54 h16 M32 62 h24" stroke="#cbd2ea" stroke-width="2.4" stroke-dasharray="3 3" stroke-linecap="round"/>
+<path d="M83 61 l11 11" stroke="#1a1f6e" stroke-width="4.5" stroke-linecap="round"/>
+<circle cx="74" cy="52" r="13" fill="#fff" stroke="#1a1f6e" stroke-width="2.4"/>
+<circle cx="74" cy="52" r="9" fill="none" stroke="#e8b800" stroke-width="1.6" opacity=".7"/>
+<path class="slow" d="M68 52 h12" stroke="#cbd2ea" stroke-width="2.4" stroke-dasharray="3 3" stroke-linecap="round"/>
+</svg><p class="t">We couldn't load the knowledge base</p><p class="m">Check your connection, then try again.</p><button class="btn">Try again</button></div></div>
+</div></section>
+
+<!-- roles -->
+<section class="subj" style="grid-column:1/-1"><h2>Roles · new takes</h2><div class="pair" style="grid-template-columns:repeat(3,1fr)">
+<div class="card"><div class="hd"><h3>Roles</h3><span>C · Duty board</span></div><div class="body">
+<svg width="120" height="88" viewBox="0 0 120 88" aria-hidden="true"><rect width="120" height="88" rx="14" fill="#eef0f8"/>
+<rect x="18" y="14" width="84" height="60" rx="4" fill="#fff" stroke="#1a1f6e" stroke-width="2.2"/>
+<circle cx="36" cy="24" r="2.2" fill="#1a1f6e"/><circle cx="60" cy="24" r="2.2" fill="#1a1f6e"/><circle cx="84" cy="24" r="2.2" fill="#1a1f6e"/>
+<path d="M36 24 V31 M60 24 V31" stroke="#1a1f6e" stroke-width="1.8"/>
+<rect x="28" y="31" width="16" height="24" rx="3" fill="#e8b800" stroke="#1a1f6e" stroke-width="2.2"/><path d="M32 46 h8" stroke="#1a1f6e" stroke-width="2" stroke-linecap="round"/>
+<rect x="52" y="31" width="16" height="24" rx="3" fill="#fff" stroke="#1a1f6e" stroke-width="2.2"/><path d="M56 46 h8" stroke="#aab2c5" stroke-width="2" stroke-linecap="round"/>
+<rect class="slow" x="76" y="31" width="16" height="24" rx="3" fill="none" stroke="#cbd2ea" stroke-width="2.2" stroke-dasharray="3 3"/>
+<path d="M28 65 h64" stroke="#e3e7f2" stroke-width="1.6"/>
+</svg><p class="t">We couldn't load the roles</p><p class="m">Check your connection, then try again.</p><button class="btn">Try again</button></div></div>
+<div class="card"><div class="hd"><h3>Roles</h3><span>D · Hi vis vest</span></div><div class="body">
+<svg width="120" height="88" viewBox="0 0 120 88" aria-hidden="true"><rect width="120" height="88" rx="14" fill="#eef0f8"/>
+<path d="M45 14 H52 L60 28 L68 14 H75 L90 24 L84 40 L80 37 V76 H40 V37 L36 40 L30 24 Z" fill="#e8b800" stroke="#1a1f6e" stroke-width="2.2" stroke-linejoin="round"/>
+<path d="M60 28 V76" stroke="#1a1f6e" stroke-width="1.6"/>
+<path d="M41 58 h38 M41 66 h38" stroke="#fff" stroke-width="3.2"/>
+<rect class="slow" x="65" y="40" width="12" height="9" rx="1.5" fill="#fff" stroke="#1a1f6e" stroke-width="1.8" stroke-dasharray="2.5 2"/>
+</svg><p class="t">We couldn't load the roles</p><p class="m">Check your connection, then try again.</p><button class="btn">Try again</button></div></div>
+<div class="card"><div class="hd"><h3>Roles</h3><span>E · Key cabinet</span></div><div class="body">
+<svg width="120" height="88" viewBox="0 0 120 88" aria-hidden="true"><rect width="120" height="88" rx="14" fill="#eef0f8"/>
+<rect x="26" y="12" width="68" height="66" rx="4" fill="#fff" stroke="#1a1f6e" stroke-width="2.2"/>
+<circle cx="42" cy="24" r="2" fill="#1a1f6e"/><circle cx="42" cy="31" r="4" fill="#fff" stroke="#1a1f6e" stroke-width="2"/><path d="M42 35 v9 M42 40 h3" stroke="#1a1f6e" stroke-width="2" stroke-linecap="round"/>
+<circle cx="60" cy="24" r="2" fill="#1a1f6e"/><circle cx="60" cy="31" r="4" fill="#e8b800" stroke="#1a1f6e" stroke-width="2"/><path d="M60 35 v9 M60 40 h3" stroke="#1a1f6e" stroke-width="2" stroke-linecap="round"/>
+<circle cx="78" cy="24" r="2" fill="#1a1f6e"/><circle cx="78" cy="31" r="4" fill="#fff" stroke="#1a1f6e" stroke-width="2"/><path d="M78 35 v9 M78 40 h3" stroke="#1a1f6e" stroke-width="2" stroke-linecap="round"/>
+<circle cx="42" cy="48" r="2" fill="#1a1f6e"/><circle cx="42" cy="55" r="4" fill="#fff" stroke="#1a1f6e" stroke-width="2"/><path d="M42 59 v9 M42 64 h3" stroke="#1a1f6e" stroke-width="2" stroke-linecap="round"/>
+<circle cx="60" cy="48" r="2" fill="#1a1f6e"/><circle cx="60" cy="55" r="4" fill="#fff" stroke="#1a1f6e" stroke-width="2"/><path d="M60 59 v9 M60 64 h3" stroke="#1a1f6e" stroke-width="2" stroke-linecap="round"/>
+<circle cx="78" cy="48" r="2" fill="#1a1f6e"/>
+<g class="slow"><circle cx="78" cy="55" r="4" fill="none" stroke="#cbd2ea" stroke-width="2" stroke-dasharray="2.5 2"/><path d="M78 59 v9 M78 64 h3" stroke="#cbd2ea" stroke-width="2" stroke-dasharray="2.5 2" stroke-linecap="round"/></g>
+</svg><p class="t">We couldn't load the roles</p><p class="m">Check your connection, then try again.</p><button class="btn">Try again</button></div></div>
+</div></section>
+
+<!-- list -->
+<section class="subj"><h2>List</h2><div class="pair">
+<div class="card"><div class="hd"><h3>Vehicles</h3><span>A · Table</span></div><div class="body">
+<svg width="120" height="88" viewBox="0 0 120 88" aria-hidden="true"><rect width="120" height="88" rx="14" fill="#eef0f8"/>
+<rect x="20" y="16" width="80" height="56" rx="4" fill="#fff" stroke="#1a1f6e" stroke-width="2.2"/>
+<path d="M20 20 a4 4 0 0 1 4 -4 h72 a4 4 0 0 1 4 4 v8 h-80z" fill="#1a1f6e"/>
+<path d="M22 41 h76 M22 56 h76" stroke="#e3e7f2" stroke-width="1.6"/>
+<path d="M28 35 h18 M54 35 h30" stroke="#aab2c5" stroke-width="2" stroke-linecap="round"/>
+<path d="M28 49 h18 M54 49 h24" stroke="#cbd2ea" stroke-width="2.4" stroke-dasharray="3 3" stroke-linecap="round"/>
+<path class="slow" d="M28 64 h18 M54 64 h30" stroke="#cbd2ea" stroke-width="2.4" stroke-dasharray="3 3" stroke-linecap="round"/>
+</svg><p class="t">We couldn't load the list</p><p class="m">Check your connection, then try again.</p><button class="btn">Try again</button></div></div>
+<div class="card"><div class="hd"><h3>Vehicles</h3><span>B · Rows and refresh</span></div><div class="body">
+<svg width="120" height="88" viewBox="0 0 120 88" aria-hidden="true"><rect width="120" height="88" rx="14" fill="#eef0f8"/>
+<rect x="20" y="16" width="60" height="15" rx="3" fill="#fff" stroke="#1a1f6e" stroke-width="2.2"/>
+<circle cx="28" cy="23.5" r="3" fill="#e8b800"/><path d="M36 23.5 h36" stroke="#aab2c5" stroke-width="2" stroke-linecap="round"/>
+<rect x="20" y="37" width="60" height="15" rx="3" fill="#fff" stroke="#1a1f6e" stroke-width="2.2"/>
+<path d="M28 44.5 h40" stroke="#cbd2ea" stroke-width="2.4" stroke-dasharray="3 3" stroke-linecap="round"/>
+<rect x="20" y="58" width="60" height="15" rx="3" fill="#fff" stroke="#cbd2ea" stroke-width="2.2" stroke-dasharray="3 3"/>
+<path d="M104 38 a10 10 0 1 1 -3.5 -7.6" stroke="#1a1f6e" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+<path d="M101 25 v6 h-6" stroke="#1a1f6e" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<path class="slow" d="M89 50 l10 -10" stroke="#c0392b" stroke-width="2.4" stroke-linecap="round"/>
+</svg><p class="t">We couldn't load the list</p><p class="m">Check your connection, then try again.</p><button class="btn">Try again</button></div></div>
+</div></section>
+
+</div>
+</div>
+</body>
+</html>

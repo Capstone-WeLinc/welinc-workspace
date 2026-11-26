@@ -1,7 +1,7 @@
 # 0028. Error scenes: a drawn road and depot scene for every error state
 
 **Date**: 2026-11-26
-**Status**: Proposed
+**Status**: In Progress
 **Scope row**: [73](../../../scope/vrms/ui-refresh.md#73-error-scenes--in-progress) (`docs/scope/vrms/ui-refresh.md`)
 **Repos**: `welinc-web-vrms` (every scene), `welinc-web-portal` (the same scene kit, its crash screens, failed loads and small errors), the workspace (`scripts/check-scenes.mjs` and a CI job)
 **Design source**: the picked boards in [`docs/context/vrms/error-scene-boards/`](../../../context/vrms/error-scene-boards/README.md) (canvas rounds 38 to 43), the portal's `R34NotFound` in [`docs/specs/_root/0019-portal-redesign/boards/`](../../_root/0019-portal-redesign/boards/), and the new tile board from task 1. Rules from suite `design.md` and `docs/context/vrms/design.md` hold where the boards are silent.
@@ -175,15 +175,15 @@ The `tickets`, `parts`, `settings`, `knowledge` and `roles` tiles have no web-vr
 
 Facade, as the UI refresh phase sets it: the screens first, on the errors the app already raises. No backend slice exists. web-vrms is built whole before the portal copies the kit in, and the CI job lands last, so the daily check never fails while the portal catches up. One branch and pull request per repo (`feat/error-scenes`), into `development`; the workspace changes on their own branch into `main`.
 
-1. **Tile board round** (workspace): draw the seven new tile subjects, two takes each, in the `R39SmallMatched` style; render and screenshot, fix, then show you; on your pick, copy the board into `docs/context/vrms/error-scene-boards/` with a README row, satisfies **AC-19**
-2. **web-vrms kit foundation**: `src/styles/scenes.css` (the portal's `--scene-*` and `--livery-*` values, `scene-blink`, and the motion utilities the boards use, each with reduced motion and `data-motion` stops), imported from `index.css`; `ScenePanel`, `SceneBand`, `useScenePick`, `LiveryTruck.tsx` copied from the portal; the `/dev/ui` Scenes section with the Still switch, satisfies **AC-1**, **AC-3**, **AC-4**, **AC-16**, **AC-17**, **AC-18**, **AC-20**
-3. **web-vrms panel scenes**: `CrashScene`, `LoadScene`, `NotFoundBayScene`, `NotFoundDrawerScene`, `ClosedScene`, `GateScene`, drawn from their boards; wire `CrashScreen` page, `ErrorState kind="page"` and its page call sites (dropping their card wrappers), the not found, 403, `ForbiddenPage` and `ModuleOffPage` screens, satisfies **AC-5**, **AC-7**, **AC-9**, **AC-10**, **AC-11**
-4. **web-vrms band scenes**: `PoleScene`, `ReaderScene`, `LanyardScene`, `RoadScene` (from the portal), `GateScene wide`; wire `CrashScreen` full, `PermissionsGate` (both states, Sign out added to the error), `RequireAuth` unavailable, `NotFoundPage`, satisfies **AC-4**, **AC-6**, **AC-12**, **AC-13**, **AC-14**, **AC-15**
-5. **web-vrms tiles**: `ErrorTile` with all 12 subjects, `ErrorState kind="tile"`, `DataTable`'s two props, and every tile call site, satisfies **AC-8**
-6. **web-vrms tests and checks**: the scenarios above; `npm run lint`, `npm run typecheck`, `npm run build:local`; report the main bundle's gzip size change (over 25 KB comes back to you through this spec before the pull request); check that AC-23's untouched states still look as before, satisfies **AC-1** to **AC-20**, **AC-23**
-7. **Portal move**: kit copied in from web-vrms (`LiveryTruck.tsx` moved into it, `RoadScene` from `NotFound.tsx`), its scene tokens and `scene-blink` moved into `scenes.css`, imports updated; check sign in, launcher, launches and 404 look the same, satisfies **AC-1**, **AC-21**
-8. **Portal scenes**: `CrashScreen` panel and band, `LauncherError`, `AdminPage`, `ViewError`'s `kind` and `subject` with every call site; tests; lint and `build:local`, satisfies **AC-22**, **AC-23**
-9. **Workspace check**: `scripts/check-scenes.mjs`, `scripts/test/check-scenes.test.mjs`, and the `scenes` job in `.github/workflows/ci.yml`; run it locally against both repos' `development` once both pull requests are merged, satisfies **AC-2**
+1. [x] **Tile board round** (workspace): draw the seven new tile subjects, two takes each, in the `R39SmallMatched` style; render and screenshot, fix, then show you; on your pick, copy the board into `docs/context/vrms/error-scene-boards/` with a README row, satisfies **AC-19**
+2. [x] **web-vrms kit foundation**: `src/styles/scenes.css` (the portal's `--scene-*` and `--livery-*` values, `scene-blink`, and the motion utilities the boards use, each with reduced motion and `data-motion` stops), imported from `index.css`; `ScenePanel`, `SceneBand`, `useScenePick`, `LiveryTruck.tsx` copied from the portal; the `/dev/ui` Scenes section with the Still switch, satisfies **AC-1**, **AC-3**, **AC-4**, **AC-16**, **AC-17**, **AC-18**, **AC-20**
+3. [x] **web-vrms panel scenes**: `CrashScene`, `LoadScene`, `NotFoundBayScene`, `NotFoundDrawerScene`, `ClosedScene`, `GateScene`, drawn from their boards; wire `CrashScreen` page, `ErrorState kind="page"` and its page call sites (dropping their card wrappers), the not found, 403, `ForbiddenPage` and `ModuleOffPage` screens, satisfies **AC-5**, **AC-7**, **AC-9**, **AC-10**, **AC-11**
+4. [x] **web-vrms band scenes**: `PoleScene`, `ReaderScene`, `LanyardScene`, `RoadScene` (from the portal), `GateScene wide`; wire `CrashScreen` full, `PermissionsGate` (both states, Sign out added to the error), `RequireAuth` unavailable, `NotFoundPage`, satisfies **AC-4**, **AC-6**, **AC-12**, **AC-13**, **AC-14**, **AC-15**
+5. [x] **web-vrms tiles**: `ErrorTile` with all 12 subjects, `ErrorState kind="tile"`, `DataTable`'s two props, and every tile call site, satisfies **AC-8**
+6. [x] **web-vrms tests and checks**: the scenarios above; `npm run lint`, `npm run typecheck`, `npm run build:local`; report the main bundle's gzip size change (over 25 KB comes back to you through this spec before the pull request); check that AC-23's untouched states still look as before, satisfies **AC-1** to **AC-20**, **AC-23**
+7. [x] **Portal move**: kit copied in from web-vrms (`LiveryTruck.tsx` moved into it, `RoadScene` from `NotFound.tsx`), its scene tokens and `scene-blink` moved into `scenes.css`, imports updated; check sign in, launcher, launches and 404 look the same, satisfies **AC-1**, **AC-21**
+8. [x] **Portal scenes**: `CrashScreen` panel and band, `LauncherError`, `AdminPage`, `ViewError`'s `kind` and `subject` with every call site; tests; lint and `build:local`, satisfies **AC-22**, **AC-23**
+9. [x] **Workspace check**: `scripts/check-scenes.mjs`, `scripts/test/check-scenes.test.mjs`, and the `scenes` job in `.github/workflows/ci.yml`; run it locally against both repos' `development` once both pull requests are merged, satisfies **AC-2**
 
 ## Consequences
 

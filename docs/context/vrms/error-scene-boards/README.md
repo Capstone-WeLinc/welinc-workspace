@@ -12,6 +12,7 @@ Copies of the picked boards from the "WeLinc design directions" canvas (pages "R
 | Full page crash (the shell itself) | `R43FullPole.dc.html` | Depot in a blackout, snapped line sparks; one lamp flickers, two nearly out, one dark |
 | Permissions didn't load (`PermissionsGate`) | `R43PermSwitch.dc.html` | Random pick on each visit: blank pass tapped on the card reader, or the lanyard rack with your pass blank |
 | Small errors in cards and dialogs | `R39SmallMatched.dc.html` | Light line-art tile matching what failed |
+| Small errors, seven more subjects (Round 44, picked 2026-11-26) | `R44Tiles.html` | Picked takes: activity A (timeline), charts B (broken line), settings B (sliders), people A (ID badges), knowledge B (magnifier), roles C (duty board), list A (table). The other takes stay on the board, not picked. A plain HTML page, no canvas runtime needed |
 
 The 404 and "No VRMS access" reuse the portal's Round 34 scenes, kept in `docs/specs/_root/0019-portal-redesign/boards/` (`R34NotFound`, `R34NoAccess`).
 

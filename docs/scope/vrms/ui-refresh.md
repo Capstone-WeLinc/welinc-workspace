@@ -201,12 +201,12 @@ Give every error state in web-vrms its own drawn road and depot scene in place o
 - Note (2026-11-26, `/architect`): decided: identical copies of the scene kit (`src/components/brand/scenes/` plus `src/styles/scenes.css`) in both apps, checked byte for byte by `scripts/check-scenes.mjs` in workspace CI (daily, not a required check); a 720 px panel inside the shell and the wide band for full page errors; `ErrorState` and the portal's `ViewError` pick page or tile by what the failure replaces. Beyond the inventory: "Can't reach the sign in service" reuses the reader and lanyard pair, "No VRMS access" gets the gate drawn wide, the ticket 403 the gate panel, the knowledge base's not found the drawer. Seven new tile subjects get a board round first. The portal slice (crash, launcher and Admin load, `ViewError`) lands last, before the defense.
 spec [0028](../../specs/vrms/0028-error-scenes/index.md) · code in `welinc-web-vrms/src/components/brand/scenes/`, `welinc-web-portal/src/components/brand/scenes/`, `scripts/check-scenes.mjs`
 - [x] Design it (spec): `/architect error scenes`
-- [ ] Build it: `/develop error scenes`
-  - [ ] Tile board round: seven new subjects, two takes each, you pick (AC-19)
-  - [ ] web-vrms kit, panels and bands: `scenes.css`, `ScenePanel`, `SceneBand`, every page and full page scene, the `/dev/ui` gallery (AC-1, AC-3 to AC-7, AC-9 to AC-18, AC-20)
-  - [ ] web-vrms tiles, call sites and tests (AC-8, AC-23)
-  - [ ] Portal: move its scene parts into the kit, then its crash, launcher, Admin and `ViewError` scenes (AC-21, AC-22)
-  - [ ] Workspace drift check and its CI job (AC-2)
+- [x] Build it: `/develop error scenes`
+  - [x] Tile board round: seven new subjects, two takes each, you pick (AC-19); picked 2026-11-26 in `R44Tiles.html` (roles redrawn, the duty board picked)
+  - [x] web-vrms kit, panels and bands: `scenes.css`, `ScenePanel`, `SceneBand`, every page and full page scene, the `/dev/ui` gallery (AC-1, AC-3 to AC-7, AC-9 to AC-18, AC-20)
+  - [x] web-vrms tiles, call sites and tests (AC-8, AC-23)
+  - [x] Portal: move its scene parts into the kit, then its crash, launcher, Admin and `ViewError` scenes (AC-21, AC-22)
+  - [x] Workspace drift check and its CI job (AC-2)
 - [ ] Verify it: `/check verify error scenes`
 - [ ] Test it: `/test error scenes`
 - [ ] Polish it (optional, ask first): `emil-design-eng` (looping motion, reduced motion) · `web-design-guidelines`
