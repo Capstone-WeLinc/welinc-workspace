@@ -102,3 +102,52 @@ _Steps derived from spec 0029 acceptance criteria. `/check verify` runs these; `
 - AC-4: the migration, removed routes, ticket create and close, and Settings, Vehicles
 - AC-5: the ticket create steps and the picker
 - AC-35: the UI flag steps and the reconcile reactivation
+
+## Milestone 3: rest of flows 1 and 2 (tasks 8 and 9)
+
+### Commands
+- [ ] In welinc-backend-vrms: `npm run lint`, `npm run build`, `npm run openapi:check`, `npx jest` all pass → AC-24
+- [ ] `audit_logs.repair_ticket_id` is nullable after `prisma migrate deploy` (`20261127180000_audit_without_ticket`) → AC-10, AC-22
+- [ ] In welinc-web-vrms: `npm run lint`, `npm run typecheck`, `npm run build:local`, `npx vitest run` all pass
+
+### Referral decisions (as `vrms.admin@`, Repairs, Referrals tab)
+- [ ] A waiting referral for a truck with an open ticket shows "Add to REP-…", "Open REP-…" and "Reject"; one with no open ticket shows "Open a ticket" and "Reject" → AC-9
+- [ ] "Add to REP-…" lists one line per finding, text "label: note" prefilled, system empty and required; saving adds the issues as `[System] text`, sets the referral `ADDED_TO_TICKET`, and writes `REFERRAL_ADDED` then one `ISSUE_ADDED` per line, 1 ms apart → AC-9
+- [ ] The same Add, with the ticket changed in another tab first, answers 409 `STALE` in the dialog and changes nothing → AC-9
+- [ ] Add queues `LINKS_UPDATED` with the new schedule and referral ids; a second referral for a schedule already on the ticket queues `STATUS_UPDATED` instead (ask 5) → AC-13
+- [ ] "Reject" needs 5 to 500 characters; saving sets `REJECTED`, writes `REFERRAL_REJECTED` with no ticket, and queues a `REFERRAL_REJECTED` delivery with `{ eventId, referralId, eventType: 'REJECTED', reason, occurredAt }` → AC-10
+- [ ] Two Admins deciding one referral at once: the second gets 409 `REFERRAL_ALREADY_DECIDED` → AC-8, AC-10
+- [ ] A Chief Mechanic (no `integration.respond`) gets 403 on add and reject, and sees no Referrals tab → AC-11
+
+### Repair events (one per change, ticket row locked)
+- [ ] Start work, Send for verification, Return to mechanic, Close, Cancel, and the mechanic add (M1) and last remove (M2) each queue one `REPAIR_EVENT` in the same transaction: `STATUS_UPDATED`, `COMPLETED` on Close, `CANCELLED` on Cancel → AC-13
+- [ ] A stale status move queues nothing → AC-13
+- [ ] The rows for one ticket go out in `seq` order: a later row waits while an earlier one is retrying (seen live: `LINKS_UPDATED` behind the failing `OPENED`) → AC-13, AC-21
+
+### Reads VMMS calls (needs a `vmms` service token, minted by VMMS or on staging)
+- [ ] `GET /vrms/integrations/vmms/repairs/<id>` answers `{ repairTicketId, repairTicketNumber, status, outsideShopName }`; `PENDING_APPROVAL` reads `OUTSOURCED` with the shop; an unknown id answers 404 `REPAIR_NOT_FOUND`; `Cache-Control: no-store` → AC-14, AC-24
+- [ ] `GET /vrms/integrations/vmms/vehicles/<vmmsVehicleId>/repair-history?limit=50` lists the truck's tickets newest first, never cancelled ones, with issue lines "System: text", parts "description xN" and no prices, distinct mechanic names, the provider and `totalRepairCost` as a string; `nextCursor` pages on; an unknown truck answers 200 with no items → AC-15
+- [ ] A `bms` token on either read answers 403 `FORBIDDEN`; a person's token answers 403 `WRONG_TOKEN_USE` → AC-24
+
+### Outside shop
+- [ ] `GET /vrms/config/outside-shops` answers VMMS's list; with VMMS's route missing (404, ask 6) it answers the four stub shops; with VMMS stopped after one good read it answers the kept list with `stale: true`; with none kept, 503 `VMMS_UNAVAILABLE` → AC-36
+- [ ] An Outsourced or Pending approval ticket with no shop shows "Pick the outside shop"; picking one shows "At <shop>" in the header, writes `TICKET_EDITED` (field `outsideShop`) and queues `STATUS_UPDATED` carrying `outsideShopName` → AC-36
+- [ ] Picking again answers 409 `SHOP_ALREADY_SET`; on an open ticket not outsourced, 409 `NOT_OUTSOURCED` → AC-36
+- [ ] Code check until feature 37: `applyStatusMove` refuses M9 without `vmmsProviderId` (unit test) → AC-36
+
+### Deliveries (Audit logs, Deliveries tab)
+- [ ] An `audit.view` holder sees the tab; failed rows list first; the tab shows the failed count; filters by status, system and message → AC-22
+- [ ] A `PENDING` row with 3 or more attempts shows the warning and its last status code → AC-22
+- [ ] The side panel shows the payload, the attempt times and the last error; Retry on a failed row sets it `PENDING` with attempts 0 and a fresh window, and the worker sends it within 15 s; Dismiss needs a reason, sets `DISMISSED`, and lets the ticket's later rows go → AC-21, AC-22
+- [ ] Retry and Dismiss write `DELIVERY_RETRIED` and `DELIVERY_DISMISSED`, with the ticket when the row has one; on a row that isn't failed they answer 409 `NOT_FAILED` → AC-22, AC-25
+- [ ] The Activity tab reads a rejection as "sent back VMMS referral WO-…" and a dismissed rejection message as "dismissed a failed message for a VMMS referral" → AC-25
+- [ ] Without `integration.respond`, the panel has no Retry or Dismiss → AC-11, AC-22
+
+### Retention (value source: `integration.deliveryRetentionDays`, not a constant)
+- [ ] Set the setting to 7, run `DeliveryRetentionJob.run()`: `SENT` and `DISMISSED` rows older than 7 days go; `PENDING` and `FAILED` rows of any age stay → AC-23
+
+### Local test data from this run
+- Two referrals were inserted by hand: `WO-20261127-000101` (CAK 9043, added to REP-20261126-7J6W) and `WO-20261127-000102` (NRE 471, rejected, its message marked `FAILED` by hand and then dismissed). Their deliveries and audit rows stay; the referral rows can be deleted with `DELETE FROM referrals WHERE work_order_number IN ('WO-20261127-000101','WO-20261127-000102')` once the deliveries pointing at them are gone or set aside.
+
+## Acceptance criteria coverage (milestone 3)
+- AC-8: concurrent decisions · AC-9: Add steps · AC-10: Reject steps · AC-11: permission steps · AC-13: repair event steps · AC-14, AC-15: the two reads · AC-21: per ticket order, Retry · AC-22: Deliveries steps · AC-23: retention · AC-24: token and `no-store` steps · AC-25: audit rows for decisions and deliveries (system actor rows come with flow 3) · AC-36: outside shop steps (M9 itself with feature 37)
