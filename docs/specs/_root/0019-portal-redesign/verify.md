@@ -73,7 +73,7 @@ _Run locally on `feat/portal-redesign`. Seed accounts in `docs/integration/seed-
 - [x] Sign out from the account menu: a confirm dialog, then the sign in with the "You signed out." toast → AC-19
 - [x] Forgot password: step 1 email, step 2 "works for 10 minutes" with resend after about 60 s, step 3 the four password rules, Confirm new password and "Passwords match" / "Passwords don't match yet" (step 4 not submitted, so no seed password changed) → AC-14
 - [x] At 1440, 900 and 375 px the sign in glass blurs 16, 8 and 8 px → AC-13
-- [ ] Focus on a sign in field: AC-14 says a navy border and soft navy ring, never gold. Built: a white border and soft white ring on the dark glass (never gold). Decide the wording with `/architect` → AC-13, AC-14
+- [x] Focus on a sign in field: a white border and soft white ring on the dark glass, never gold (AC-14 wording changed from navy to white on 2026-11-26, your call) → AC-13, AC-14
 - [ ] The launch scenes 2, 3 and 4 (random on each launch), the A3 arrival, and the launcher for a suite admin with no systems (straight to `/admin/people`) → AC-5, AC-8, AC-10
 - [ ] Sign in and launcher against `R75Shade4` and the Round 69 boards, side by side → AC-1, AC-13, AC-29
 - [ ] Reduce transparency (macOS) and the 4.5:1 contrast check at 375 px with axe → AC-13
