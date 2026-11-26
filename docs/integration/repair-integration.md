@@ -4,8 +4,9 @@ Repairs across the three systems: VMMS refers trucks for repair, VRMS runs the r
 
 ## VMMS checklist
 
-Your flows 1 and 2 already work as built, and nothing below blocks testing. These make them sturdier.
+Your referral sender already works with VRMS (checked on local stacks on 2026-11-27). One fix blocks the rest of flows 1 and 2; the others make them sturdier.
 
+- [ ] **Fix the advisory locks in your two VRMS receivers (blocks every repair event).** `vrms-repair-events.service.ts` (around line 101) and the referral event receiver (around line 377) run `SELECT pg_advisory_xact_lock(...)` through `$queryRaw`. That function returns `void`, which Prisma 7's Postgres adapter can't read, so every call answers 500 (`UnsupportedNativeDataType`). Use `$executeRaw` for those lines. VRMS keeps each event and retries it for 24 hours, so nothing is lost while you fix it.
 - [ ] **Send referrals from your every minute job only**, not inside the Chief Mechanic's request (`maintenance-schedules.service.ts` awaits `deliverOne`, so the tap waits up to 5 s on VRMS).
 - [ ] **Check a maintenance schedule's state only when it is first linked**, not on every event. Today, if a work order changes after its referral, every later event for that ticket answers 409.
 - [ ] **Refuse to deactivate a truck that has an open VRMS repair**, and name the ticket. Otherwise every later event for it answers 404.

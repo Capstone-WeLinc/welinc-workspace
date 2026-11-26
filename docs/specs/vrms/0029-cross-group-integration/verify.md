@@ -30,3 +30,35 @@ _Steps derived from spec 0029 acceptance criteria. `/check verify` runs these; `
 - AC-21: the worker steps and the env check
 - AC-24: the no-store step and the guard step
 - AC-26: the catalog, registry and token steps (staging's `seed:clients` and `catalog:sync` are milestone 5)
+
+## Milestone 2, part 1: fleet link and the referral thread (tasks 4 and 6)
+
+### Commands
+- [ ] `npm run fleet:link` (in the backend container) prints the plan and changes nothing; a second run after `--confirm` plans "link N, archive 0, add 0" → AC-1
+- [ ] Two VRMS trucks whose plates differ only in case stop the run with "STOP: 2 VRMS rows match VMMS …" and exit 1, nothing changed → AC-1
+- [ ] After `--confirm`, archived trucks have `is_active` false and a null VMMS id, their tickets still open, and each has one `vehicle_changes` row by `VMMS` → AC-1
+- [ ] `fleet:link --confirm` with `SENTRY_ENVIRONMENT=production` refuses → AC-1
+
+### Referral intake (routes VMMS calls)
+- [ ] VMMS's sender delivers a queued referral: VMMS marks it `SENT`, VRMS stores it `WAITING` with empty notes as null and the empty checklist id kept → AC-6
+- [ ] The same body again answers 202 `duplicate: true` and writes no row; a changed body answers 409 `REFERRAL_ID_REUSED` → AC-6
+- [ ] An `Idempotency-Key` that differs from `referralId` answers 400 `IDEMPOTENCY_KEY_MISMATCH` → AC-6
+- [ ] A `vmmsVehicleId` VMMS doesn't have answers 422 `VEHICLE_NOT_FOUND`; with VMMS stopped, an unknown truck answers 503 `VMMS_UNAVAILABLE` → AC-6
+- [ ] No token answers 401 with `Cache-Control: no-store`; a `bms` token answers 403 `FORBIDDEN`; a person's token answers 403 `WRONG_TOKEN_USE` → AC-24
+
+### UI
+- [ ] As `vrms.admin@`, Repair tickets shows Tickets and Referrals with the waiting count; `/repairs?view=referrals` lists the referral (plate chip, WO, findings, received) → AC-7
+- [ ] As `vrms.chief@` (no `integration.respond`), there is no Referrals switch, and `GET /vrms/referrals` answers 403 → AC-11
+- [ ] The dashboard shows "Referrals waiting" linking to the tab → AC-7
+- [ ] A row opens the side sheet with the findings, remarks, odometer and WO, and "Open a ticket" → AC-7
+- [ ] "Open a ticket" fills the truck, its garage, the odometer and one issue per finding; the driver is optional; saving creates the ticket and the referral turns "Ticket opened" → AC-8
+- [ ] The new ticket shows "From VMMS WO-…" in its header and in the list, Driver "None (from VMMS)", and the Activity line "opened … from a VMMS referral" → AC-12
+- [ ] Two Admins opening a ticket from one referral: the second gets 409 `REFERRAL_ALREADY_DECIDED` → AC-8
+- [ ] A truck with an open ticket shows "Open REP-…" in the sheet instead of "Open a ticket" (Add to ticket comes with milestone 3) → AC-9
+
+### Events to VMMS
+- [ ] Creating a ticket queues one `REPAIR_EVENT` (`OPENED`, `OPEN`); creating it Assigned queues `OPENED` then `STATUS_UPDATED` (`ASSIGNED`) → AC-13
+- [ ] Once VMMS fixes its advisory locks, the `OPENED` event is accepted, VMMS shows the truck Under Repair and the ticket on its work order, and the ticket's `vmms_event_version` is 1 → AC-13 (blocked: VMMS answers 500 today)
+
+### Staging order (from this run)
+- [ ] Deploy backend-vrms with the new key before running welinc-auth's `catalog:sync`, or clear `permission_sync_state.etag` once after; otherwise VRMS never pulls the `integration.respond` cells → AC-26
