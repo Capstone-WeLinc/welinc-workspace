@@ -1,4 +1,4 @@
-# Verify: cross group integration · spec 0029 · updated 2026-11-27
+# Verify: cross group integration · spec 0029 · updated 2026-11-28
 _Steps derived from spec 0029 acceptance criteria. `/check verify` runs these; `/test` locks the durable ones. Milestone 1 (shared setup and plumbing) below; later milestones append their own sections._
 
 ## Milestone 1: shared setup and plumbing
@@ -151,3 +151,41 @@ _Steps derived from spec 0029 acceptance criteria. `/check verify` runs these; `
 
 ## Acceptance criteria coverage (milestone 3)
 - AC-8: concurrent decisions · AC-9: Add steps · AC-10: Reject steps · AC-11: permission steps · AC-13: repair event steps · AC-14, AC-15: the two reads · AC-21: per ticket order, Retry · AC-22: Deliveries steps · AC-23: retention · AC-24: token and `no-store` steps · AC-25: audit rows for decisions and deliveries (system actor rows come with flow 3) · AC-36: outside shop steps (M9 itself with feature 37)
+
+## Milestone 4: flow 3 against a BMS stub (task 10)
+
+Start the stand in for BMS first (the BMS stack must be stopped, it uses the same name): `docker run -d --rm --name vrms-bms-stub --network welinc-network --network-alias bms-gateway -v "$PWD/welinc-backend-vrms/scripts:/stub:ro" node:24-alpine node /stub/bms-stub.mjs`. Its log (`docker logs vrms-bms-stub`) shows every call and body. Once BMS ships its routes, run the same steps against BMS's `development` instead.
+
+### UI / manual
+- [ ] As `vrms.admin@`, open New repair and pick a linked truck → "Upcoming trips in BMS" lists the stub's three trips under the truck, the JO and booking numbers in mono, "Confirmed" or "Pending" on the right → AC-16
+- [ ] Stop the stub, pick another truck → "BMS can't be reached." with Retry; the form still saves. Start the stub, press Retry → the trips appear → AC-16
+- [ ] Open an open ticket on a linked truck → an "Upcoming trips" card sits under Details ("From BMS, the next 14 days"); a closed ticket has no card; the 3 s refresh never calls the schedule again (Network tab) → AC-16
+- [ ] Create a ticket on a linked truck, then move it once → two `REPAIR_UPDATE` rows on the Deliveries tab, "Repair opened" then "Status changed to …", sent with `eventVersion` 1 then 2 (stub log), and `repair_tickets.bms_event_version` ends at 2 → AC-17
+- [ ] A ticket with a waiting expedite request shows the banner ("BMS asks to speed up this repair"), each JO with its reason, "needed by" date and received time; a Mechanic sees the banner with no buttons → AC-18, AC-11
+- [ ] Accept on a High ticket → the dialog starts at Critical; set a new expected return and save → priority Critical, the due date moved, Activity shows "accepted a BMS expedite request", "Priority: High → Critical" and "Due: … → …" (note "Expedite JO-…"), and the stub receives the repair update (changeReason "Expedite JO-…", the new `expectedReturnAt`) before the `ACCEPTED` answer → AC-19, AC-17
+- [ ] Accept again without touching the date → no `dueAt` row and no repair update, only the answer → AC-19
+- [ ] Decline with a reason under 5 characters → the button stays disabled; with a real reason → the stub receives `DECLINED` with that reason → AC-19
+- [ ] Two Admins answer the same request → the second sees "JO-… was already answered." and the page reloads → AC-19
+- [ ] Close (or cancel) a ticket with two waiting requests → both become Declined ("Repair finished" or "Repair cancelled"), Activity names VRMS as the actor, and the stub gets the closing update, then the two answers → AC-19, AC-25
+- [ ] The Admin dashboard shows "Expedite requests" (Needs you) while any wait, and the list under it links to each ticket; the tile jumps to the list → AC-18
+- [ ] On the Deliveries tab, fail a `REPAIR_UPDATE` (stop the stub until it fails, or mark it by hand), then Dismiss it → a fresh update with "Resent after a failed delivery" is queued with the ticket's current state → AC-22
+
+### Commands
+- [ ] `POST {gateway}/vrms/integrations/bms/expedite-requests` with a `bms` service token (scope `repair.expedite.write`) for a truck with an open ticket → 202 `{ requestId, status: 'WAITING', repairTicketNumber, duplicate: false }` and an `EXPEDITE_REQUESTED` row with actor BMS; the same body again → `duplicate: true`; a changed body → 409 `REQUEST_ID_REUSED`; a truck with no open ticket → 404 `NO_OPEN_REPAIR` → AC-18, AC-25
+- [ ] The same route with a `vmms` token or a person's token → 403 → AC-24
+- [ ] `GET {gateway}/vrms/integrations/bms/vehicles/<vmmsVehicleId>/active-repair` with a `bms` token → the ticket number, status and label, reason (category names only), issues resolved of total, `expectedReturnAt` and `openedAt`, nothing else; a truck with no open ticket → `{ "repair": null }`; `Cache-Control: no-store` → AC-20, AC-24
+- [ ] `npx jest src/modules/integrations/bms src/modules/vrms/expedite-decisions.service.spec.ts src/modules/vrms/apply-status-move.spec.ts` in welinc-backend-vrms → all pass → AC-16 to AC-20
+
+### Value sourcing (child 0003)
+- [ ] `reason`: a ticket with Brakes and Electrical issues (Electrical twice) sends "Brakes, Electrical" in category order; a ticket with no categorized issue sends "Not yet diagnosed"
+- [ ] `expectedReturnAt`: equals `dueAt` while open, null once Closed or Cancelled, null when no due date
+- [ ] `repairStatus` and `repairStatusLabel`: VRMS's own value and label, Pending approval included (not mapped to Outsourced as for VMMS)
+- [ ] `eventVersion`: one above `bms_event_version`, independent of `vmms_event_version`
+- [ ] `serviceDate` on the trips card: a trip on `2026-12-01` shows "Tue, Dec 1" in every browser time zone (it is a calendar day, never shifted)
+- [ ] The accept dialog's date: 5:00 PM entered in Manila is stored and sent as 09:00Z
+
+### Local test data from this run
+- Three expedite requests were inserted by hand: `JO-2026-0142` (accepted, REP-20261114-KO7E is now Critical with a due date of Nov 30, 5:00 PM), `JO-2026-0157` (declined) and `JO-2026-0161` (still waiting on REP-20261126-7J6W). One `EXPEDITE_REQUESTED` audit row says "Inserted for the local live check".
+
+## Acceptance criteria coverage (milestone 4)
+- AC-16: trips steps (form, card, BMS down) · AC-17: update steps and value sourcing · AC-18: banner, intake and dashboard steps · AC-19: accept, decline, race and auto decline steps · AC-20: active repair command · AC-22: dismiss resend · AC-24: token and `no-store` · AC-25: BMS and VRMS as named actors
