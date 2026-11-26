@@ -1,7 +1,7 @@
 # 0028. Error scenes: a drawn road and depot scene for every error state
 
 **Date**: 2026-11-26
-**Status**: In Progress
+**Status**: Accepted
 **Scope row**: [73](../../../scope/vrms/ui-refresh.md#73-error-scenes--in-progress) (`docs/scope/vrms/ui-refresh.md`)
 **Repos**: `welinc-web-vrms` (every scene), `welinc-web-portal` (the same scene kit, its crash screens, failed loads and small errors), the workspace (`scripts/check-scenes.mjs` and a CI job)
 **Design source**: the picked boards in [`docs/context/vrms/error-scene-boards/`](../../../context/vrms/error-scene-boards/README.md) (canvas rounds 38 to 43), the portal's `R34NotFound` in [`docs/specs/_root/0019-portal-redesign/boards/`](../../_root/0019-portal-redesign/boards/), and the new tile board from task 1. Rules from suite `design.md` and `docs/context/vrms/design.md` hold where the boards are silent.
