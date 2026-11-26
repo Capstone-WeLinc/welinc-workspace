@@ -19,7 +19,7 @@ Rationale: reasoning and options are in [rationale.md](rationale.md).
 | [0004-deliveries.md](0004-deliveries.md) | The plumbing: the `Delivery` outbox, the worker and its retry rule, inbound duplicate handling, the Deliveries tab | Every message is retried, never lost, and visible |
 | [0005-next-slice.md](0005-next-slice.md) | Slice 2: flows 4 to 7 (retire a truck, repeat repair alert, fuel anomaly referral, odometer readings) and the register request for a truck VMMS doesn't have | Spec all seven flows, build 1 to 3 first |
 
-Flows 1 to 3 are slice 1 and the integration defense. Slice 2 starts once VMMS agrees to its asks (below). Feature 42 (due dates) gets its own spec next, bound by the due date rule in child 0003.
+Flows 1 to 3 are slice 1 and the main thread of the integration defense. VMMS was asked for flows 4 to 7 at the same time (2026-11-26), so its side is built in parallel, and VRMS builds slice 2 right after slice 1. The register request is asked later. Feature 42 (due dates) gets its own spec next, bound by the due date rule in child 0003.
 
 ## Requirements
 
@@ -196,7 +196,7 @@ Tracer Bullet: the first thread runs one referral end to end (VMMS → VRMS → 
 11. `docs/integration/repair-integration.md` with the asks, the OpenAPI replies for every integration route, and links from `docs/integration/README.md`. Satisfies **AC-27**, **AC-24**
 12. Staging: `seed:clients` and `catalog:sync` in auth, `fleet:link --confirm` as a one off job, then turn on the reconcile job. Check flows 1 and 2 against VMMS staging, and flow 3 once BMS ships. Satisfies **AC-1**, **AC-26**
 
-**Slice 2**: the tasks are in [0005](0005-next-slice.md), after VMMS agrees to its asks.
+**Slice 2**: the tasks are in [0005](0005-next-slice.md), built after slice 1 (VMMS builds its side in parallel).
 
 ## Consequences
 
@@ -222,7 +222,7 @@ Tracer Bullet: the first thread runs one referral end to end (VMMS → VRMS → 
 ## Follow-up
 
 - [ ] Run `/architect` for feature 42 (due dates) next. It must write `dueAt` only through child 0003's `setDueAt` so BMS hears every change.
-- [ ] Send VMMS the slice 1 asks and BMS the asks list as soon as the doc (AC-27) exists. Slice 2 starts when VMMS agrees.
+- [ ] Send VMMS and BMS the link to `docs/integration/repair-integration.md` (written 2026-11-26 as checklists, flows 4 to 7 included). Ask the register request later.
 - [ ] Mark spec 0020 updated: no toggle, no `DISABLED`, status copied from VMMS (AC-4).
 - [ ] Feature 47 (realistic reseed): VRMS's seed must stop creating trucks and garages and run `fleet:link` and the sync after VMMS's seed. Design it with this in mind.
 - [ ] Feature 28 (notifications): turn the referral and expedite dashboard cards into bell notifications once it exists.

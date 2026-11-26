@@ -1,6 +1,6 @@
 # 0005. Slice 2: flows 4 to 7 and the register request
 
-Child of [0029](index.md). Built after slice 1, once VMMS agrees to the asks below. VMMS has no code for any of these yet.
+Child of [0029](index.md). Flows 4 to 7 were asked of VMMS on 2026-11-26 (in `docs/integration/repair-integration.md`), so VMMS builds its side while VRMS builds slice 1. VRMS builds them after slice 1. The register request is not asked yet. VMMS has no code for any of these yet.
 
 ## Summary
 
@@ -50,7 +50,7 @@ All of them reuse slice 1's plumbing (child 0004), so each is a payload, a route
 2. Build the retirement request receiver and the decision sender. Approving is deactivating the truck (`isActive`), since VMMS has no Retired status.
 3. Build the repeat repair receiver, and add its alerts to the existing repeated failures list (today it counts maintenance jobs only).
 4. Add "Refer for repair" on the fuel anomaly screen for the VMMS Admin and Chief Mechanic, sending the referral above.
-5. Build the register request receiver, and show waiting requests in the truck list for Operations to complete.
+5. Later, not asked yet: build the register request receiver, and show waiting requests in the truck list for Operations to complete.
 
 ## Build plan (slice 2)
 

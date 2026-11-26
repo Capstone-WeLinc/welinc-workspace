@@ -153,7 +153,7 @@ One spec for everything VRMS shares with VMMS and BMS, written after the meeting
   - [ ] Rest of flows 1 and 2: add to ticket, reject, every event, status and history reads, the outside shop picker, the Deliveries tab and retention (AC-9, AC-10, AC-13 to AC-15, AC-22, AC-23, AC-25, AC-36)
   - [ ] Flow 3 against a BMS stub: repair updates, `setDueAt`, expedite, the trips card, the active repair read (AC-16 to AC-20)
   - [ ] Contract doc, OpenAPI and staging: `repair-integration.md`, the asks sent, `fleet:link` and the sync on staging (AC-27, AC-1, AC-26)
-- [ ] Build slice 2 (spec 0029 child 0005, after VMMS agrees): flows 4 to 7 and the register request (AC-28 to AC-34)
+- [ ] Build slice 2 (spec 0029 child 0005, right after slice 1; VMMS was asked 2026-11-26 and builds its side in parallel): flows 7, 6, 5, 4 (AC-28 to AC-31, AC-33, AC-34); the register request (AC-32) is asked later
 - [ ] Verify it: `/check verify cross group integration`
 - [ ] Test it: `/test cross group integration`
 - [ ] Document it: `/document cross group integration`

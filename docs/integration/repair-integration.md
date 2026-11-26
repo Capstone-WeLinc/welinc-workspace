@@ -18,12 +18,18 @@ Your flows 1 and 2 already work as built, and nothing below blocks testing. Thes
 - [ ] **Your own fixes toward BMS:** stop retrying a 400 forever in the availability sender (it blocks that truck's later events), and check `client_id === 'bms'` on the fleet routes.
 - [ ] **Test flow 1 with us** once VRMS's first milestone is in (see [When you can test](#when-you-can-test)).
 
-**Later (flows 4 to 7, spec 0029 [child 0005](../specs/vrms/0029-cross-group-integration/0005-next-slice.md)), not yet:**
-- odometer readings on `OPENED` and `COMPLETED`
-- retirement request and decision
-- repeat repair alert
-- "Refer for repair" from a fuel anomaly
-- register request
+**Flows 4 to 7** (build these alongside, smallest first; shapes in [Flows 4 to 7](#flows-4-to-7-vmms-and-vrms)):
+
+- [ ] **Flow 7, odometer:** accept `serviceOdometerReading` on `OPENED` (the reading when the repair starts). Treat the one on `COMPLETED` as a pending reading for Operations to confirm, as your odometer rule already works.
+- [ ] **Flow 6, fuel anomaly:** add "Refer for repair" on the fuel anomaly screen for the Admin and Chief Mechanic. It sends a referral (route 1) with `source: 'FUEL_ANOMALY'`, `fuelTransactionId`, the anomaly as the finding, and no `maintenanceScheduleId`.
+- [ ] **Flow 5, repeat repair:** receive route 15 and add each alert to your repeated failures list beside the maintenance ones.
+- [ ] **Flow 4, retire a truck:**
+  - receive route 14 and show Operations the request with its ticket and reason
+  - approving deactivates the truck (`isActive` false) and closes your record of that repair, since VRMS sends no `COMPLETED` for it
+  - declining needs a reason
+  - send the decision on route 16
+
+**Later, not yet:** a register request, for VRMS to ask you to add a truck you don't have.
 
 ## BMS checklist
 
@@ -44,6 +50,7 @@ Nothing for repairs is built in BMS yet. All of it is new.
 - [ ] **Referral intake, the Referrals tab, and repair events back to VMMS** (routes 1, 2, 3). VMMS can test flow 1 from here.
 - [ ] **Status and history reads, the outside shop picker, the fleet copy** (routes 4 to 8).
 - [ ] **Flow 3:** trips card, repair updates, expedite requests and answers, the active repair read (routes 9 to 13), first against a stub, then against BMS.
+- [ ] **Flows 7, 6, 5, 4**, in that order: the opening and closing odometer, fuel anomaly referrals, the "Repeat repair" mark, "Close as beyond repair" (routes 14 to 16).
 - [ ] **On staging**: grants applied, fleet linked, all flows checked.
 
 ## When you can test
@@ -97,6 +104,8 @@ A failed message gets a Retry button for an Admin, and Retry restarts the 24 hou
 | `vmms` | `BMS` | `fleet.availability.write`, `fleet.change.write` |
 | `bms` | `VRMS` | `repair.status.read`, `repair.expedite.write` |
 
+Flows 4 and 5 add `vrms` on `VMMS`: `vehicle.retire.write` and `repair.repeat.write`; and `vmms` on `VRMS`: `retirement.decision.write`.
+
 ## Routes
 
 | # | Caller → served by | Route | Scope | Built |
@@ -114,6 +123,9 @@ A failed message gets a Retry button for an Admin, and Retry restarts the 24 hou
 | 11 | BMS → VRMS | `POST /vrms/integrations/bms/expedite-requests` | `repair.expedite.write` | no |
 | 12 | VRMS → BMS | `POST /bms/integrations/vrms/expedite-answers` | `repair.update.write` | no |
 | 13 | BMS → VRMS | `GET /vrms/integrations/bms/vehicles/:vmmsVehicleId/active-repair` | `repair.status.read` | no |
+| 14 | VRMS → VMMS | `POST /vmms/integrations/vrms/retirement-requests` | `vehicle.retire.write` | no |
+| 15 | VRMS → VMMS | `POST /vmms/integrations/vrms/repeat-repairs` | `repair.repeat.write` | no |
+| 16 | VMMS → VRMS | `POST /vrms/integrations/vmms/retirement-decisions` | `retirement.decision.write` | no |
 
 ## Flows 1 and 2: VMMS and VRMS
 
@@ -202,6 +214,44 @@ Every VRMS ticket is sent, not only referral ones. A ticket a person opened has 
 - **Route 6:** VRMS answers 202 and reads the record fresh (route 7). It never uses the message's fields.
 - **Hourly:** VRMS reads the full lists to catch anything missed.
 - **Route 8:** feeds the outside shop picker when an Admin outsources a ticket.
+
+## Flows 4 to 7: VMMS and VRMS
+
+**Flow 7, odometer.**
+- **On `OPENED`:** route 2 adds `serviceOdometerReading` (int), the reading when the repair starts. VRMS starts it from your last reading and refuses a lower one.
+- **On `COMPLETED`:** it carries the closing reading, which VRMS asks for at verification.
+
+**Flow 6, fuel anomaly.** Route 1 takes two more fields:
+
+```ts
+{
+  source?: 'INSPECTION' | 'FUEL_ANOMALY'; // default INSPECTION
+  fuelTransactionId?: string;             // uuid, required with FUEL_ANOMALY
+  maintenanceScheduleId?: string;         // required with INSPECTION, left out with FUEL_ANOMALY
+}
+```
+
+The anomaly goes in `findings` (one item, the anomaly as `label`, the details as `note`). You hear back as for any referral: route 2 lists it in `acceptedReferralIds`, with no schedule id, or route 3 rejects it.
+
+**Flow 5, repeat repair (route 15).** When a ticket closes and an issue category has hit the set count on that truck within the set window (VRMS settings, default 3 within 90 days), VRMS sends this once per category per window:
+
+```ts
+{ eventId: string; vmmsVehicleId: string; category: string; repairTicketNumbers: string[]; windowDays: number; count: number; occurredAt: string }
+```
+
+**Flow 4, retire a truck (routes 14 and 16).** A VRMS Admin closes a ticket "Beyond repair" with a reason.
+- **The request:** VRMS sends route 14 instead of `COMPLETED`, so the truck stays Under Repair.
+
+```ts
+// route 14, VRMS → VMMS
+{ eventId: string; requestId: string; vmmsVehicleId: string; repairTicketId: string; repairTicketNumber: string; reason: string; occurredAt: string }
+// route 16, VMMS → VRMS
+{ eventId: string; requestId: string; decision: 'APPROVED' | 'DECLINED'; reason?: string /* required when declined */; occurredAt: string }
+```
+
+- **Approved:** you deactivate the truck and close your record of that repair. VRMS sends nothing more for it.
+- **Declined:** VRMS opens a new ticket on the truck, linked to the old one, and sends its `OPENED` first, then `COMPLETED` for the old one. That way the truck never shows without an open repair.
+- **Route 16 answers:** 202, with the usual duplicate rule on `eventId`.
 
 ## Flow 3: BMS and VRMS (BMS Flow C)
 
