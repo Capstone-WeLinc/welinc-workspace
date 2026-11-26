@@ -163,6 +163,7 @@ Start the stand in for BMS first (the BMS stack must be stopped, it uses the sam
 - [ ] Create a ticket on a linked truck, then move it once → two `REPAIR_UPDATE` rows on the Deliveries tab, "Repair opened" then "Status changed to …", sent with `eventVersion` 1 then 2 (stub log), and `repair_tickets.bms_event_version` ends at 2 → AC-17
 - [ ] A ticket with a waiting expedite request shows the banner ("BMS asks to speed up this repair"), each JO with its reason, "needed by" date and received time; a Mechanic sees the banner with no buttons → AC-18, AC-11
 - [ ] Accept on a High ticket → the dialog starts at Critical; set a new expected return and save → priority Critical, the due date moved, Activity shows "accepted a BMS expedite request", "Priority: High → Critical" and "Due: … → …" (note "Expedite JO-…"), and the stub receives the repair update (changeReason "Expedite JO-…", the new `expectedReturnAt`) before the `ACCEPTED` answer → AC-19, AC-17
+- [ ] Add a VMMS referral with a new system (for example Brakes) to an open ticket → the stub receives a repair update with changeReason "Issues added from VMMS WO-…" and the new category in `reason` → AC-17
 - [ ] Accept again without touching the date → no `dueAt` row and no repair update, only the answer → AC-19
 - [ ] Decline with a reason under 5 characters → the button stays disabled; with a real reason → the stub receives `DECLINED` with that reason → AC-19
 - [ ] Two Admins answer the same request → the second sees "JO-… was already answered." and the page reloads → AC-19
