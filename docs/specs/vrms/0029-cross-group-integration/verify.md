@@ -190,3 +190,18 @@ Start the stand in for BMS first (the BMS stack must be stopped, it uses the sam
 
 ## Acceptance criteria coverage (milestone 4)
 - AC-16: trips steps (form, card, BMS down) · AC-17: update steps and value sourcing · AC-18: banner, intake and dashboard steps · AC-19: accept, decline, race and auto decline steps · AC-20: active repair command · AC-22: dismiss resend · AC-24: token and `no-store` · AC-25: BMS and VRMS as named actors
+
+## Milestone 5: contract doc, OpenAPI and staging (added 2026-11-27)
+_On staging, after backend-vrms #91, web-vrms #93 and welinc-auth #81 deployed, `seed:clients` ran, and `fleet:link --confirm` ran._
+
+### Commands
+- [ ] `curl -s -o /dev/null -w "%{http_code}" -X POST https://staging-api.welinc.app/vrms/integrations/vmms/repair-referrals` → `401` → AC-24
+- [ ] Open `https://staging-api.welinc.app/vrms/docs`, *Integrations: VMMS* and *Integrations: BMS* → six routes, each listing 401 (`TOKEN_EXPIRED`, `WRONG_AUDIENCE`), 403 (`WRONG_TOKEN_USE`, `FORBIDDEN`) and 503 (`AUTH_UNAVAILABLE`) beside its own codes → AC-24
+- [ ] With a `bms` token, an expedite request with `neededBy: "2026-02-30"` → 400, and nothing stored → AC-18
+- [ ] Read `docs/integration/repair-integration.md` against `/vrms/docs` route by route → the same codes, limits and bodies → AC-27
+
+### UI / manual
+- [ ] As `vrms.admin@` on staging, Settings, Vehicles → the 6 VMMS trucks marked "Managed in VMMS", no toggle or type edit → AC-1
+- [ ] Open a ticket of an archived Capstone 1 truck (for example NEB 7306) → readable, with the "Truck removed in VMMS" banner → AC-1
+- [ ] Change a truck's plate in VMMS staging → VRMS shows the new plate after the next hourly reconcile, with a history row by VMMS → AC-3
+- [ ] Portal, Roles, VRMS → "Answer other systems" on for Admin only → AC-26
