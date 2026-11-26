@@ -193,7 +193,7 @@ spec [0027](../../specs/vrms/0027-navigation-redesign/index.md) · code in `weli
 - [ ] Verify it: `/check verify navigation redesign`
 - [ ] Test it: `/test navigation redesign`
 
-### 73. Error scenes · in-progress
+### 73. Error scenes · done
 Give every error state in web-vrms its own drawn road and depot scene in place of the small icon, and reuse the scenes in the portal. The crash copy from spec 0025 (AC-7, AC-7a) stays; only the picture changes.
 **Done when:** each picked scene ships in web-vrms (crash inside the app, page didn't load, record not found, no access, module turned off, full page crash, permissions didn't load, small errors in cards and dialogs), a crash inside the shell keeps the sidebar and top bar with a 720 px scene panel, motion loops and respects reduced motion, and the portal's copies can't drift from web-vrms's without a check failing.
 - Note (2026-11-25, replan): enrolled from the 2026-11-25 handoff's item 2. Every scene is picked (canvas rounds 38 to 43); the picked boards, the rules from your notes and the inventory are in [`docs/context/vrms/error-scene-boards/`](../../context/vrms/error-scene-boards/README.md), so the build needs neither the canvas nor the codesamtm account. The 404 and "No VRMS access" reuse the portal's Round 34 barrier and gate scenes; the offline banner stays a banner.
@@ -207,6 +207,7 @@ spec [0028](../../specs/vrms/0028-error-scenes/index.md) · code in `welinc-web-
   - [x] web-vrms tiles, call sites and tests (AC-8, AC-23)
   - [x] Portal: move its scene parts into the kit, then its crash, launcher, Admin and `ViewError` scenes (AC-21, AC-22)
   - [x] Workspace drift check and its CI job (AC-2)
-- [ ] Verify it: `/check verify error scenes`
+- [x] Verify it: `/check verify error scenes`
+  - Note (2026-11-26, your call): marked done with these `verify.md` steps not run, left unticked there: a mechanic on someone else's ticket (AC-10), the staff crash view (AC-5), a portal view crash (AC-22), staging `/dev/ui`, the system reduced motion setting, the before and after looks (AC-21, AC-23) and the portal `Portal.test.tsx` title test that fails only in a full run. Verify found and fixed one bug: a shell crash showed the router's default page (web-vrms PR 91).
 - [ ] Test it: `/test error scenes`
 - [ ] Polish it (optional, ask first): `emil-design-eng` (looping motion, reduced motion) · `web-design-guidelines`

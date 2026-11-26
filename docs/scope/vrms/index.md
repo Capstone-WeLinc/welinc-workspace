@@ -62,7 +62,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 64 | Audit log page redesign | UI refresh | planned |
 | 65 | Ticket detail redesign | UI refresh | in-progress |
 | 70 | Navigation redesign | UI refresh | in-progress |
-| 73 | Error scenes | UI refresh | in-progress |
+| 73 | Error scenes | UI refresh | done |
 | 16 | Ticket status lifecycle | Slice 1 | done |
 | 17 | Chief Mechanic role | Slice 1 | done |
 | 18 | New repair ticket & assignment | Slice 1 | done |
