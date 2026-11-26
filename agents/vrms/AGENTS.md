@@ -36,6 +36,7 @@ sh scripts/setup.sh vrms   # first time setup: clones, .env files, keys, package
 node scripts/check-system.mjs vrms   # suite spec 0014 checker: live login checks plus the leftovers scan (exit 0 passes)
 node scripts/check-contract-routes.mjs <openapi.json>   # VRMS spec 0026: welinc-auth's docs against contract 0001 section 16 (exit 0 passes)
 node scripts/check-design-tokens.mjs   # suite spec 0016 AC-2: design.md's color tokens match both apps' src/index.css (exit 0 passes)
+node scripts/check-scenes.mjs welinc-web-vrms welinc-web-portal   # VRMS spec 0028 AC-2: both apps hold the same scene kit byte for byte (exit 0 passes; CI runs it daily)
 bash agents/vrms/overnight/start.sh [features] [--until HH:MM] [--plan] [--watch]   # unattended run: a fresh session per item, local commits only, morning report (agents/vrms/overnight/README.md)
 
 # Gateway checks (needs Docker and openssl; starts and removes its own containers)
