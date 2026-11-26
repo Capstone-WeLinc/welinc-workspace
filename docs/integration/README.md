@@ -10,6 +10,7 @@ How VMMS and BMS work with the shared services (auth, portal, gateway). Setting 
 | [web-login.md](web-login.md) | The sign in flow your backend and web app copy from VRMS |
 | [account-screens.md](account-screens.md) | Profile, activity, the portal admin section, account deletion |
 | [fleet-api.md](fleet-api.md) | The trucks API: VMMS serves it, BMS reads it |
+| [repair-integration.md](repair-integration.md) | Repairs across systems: VMMS referrals into VRMS, repair status back to VMMS, repair impact and expedite requests with BMS, the retry rule, and the asks |
 | [error-monitoring.md](error-monitoring.md) | Optional: reporting your crashes and errors to Sentry, with the gateway tunnel for web apps |
 | [security-checks.md](security-checks.md) | The weekly ZAP scan of your web app, the security headers to copy, secret scanning |
 

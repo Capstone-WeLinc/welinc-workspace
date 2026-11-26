@@ -47,7 +47,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 52 | Configurable settings & modules | Foundation | done |
 | 55 | Integration kickoff prep | Integration | done |
 | 60 | Portal system picker for shared accounts | Integration | dropped |
-| 56 | Cross group integration contract | Integration | planned |
+| 56 | Cross group integration contract | Integration | in-progress |
 | 61 | Suite admin model | Integration | dropped |
 | 8 | App shell & role badge | UI refresh | done |
 | 9 | Login & profile pages | UI refresh | done |

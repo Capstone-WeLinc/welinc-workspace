@@ -123,7 +123,7 @@ People with roles in more than one system (for example a mechanic in both VRMS a
 - Note (2026-11-07, replan): moved to the suite epic and reshaped as [S4. App initiated login and launcher](../_root/shared-services.md#s4-app-initiated-login-and-launcher--done): the app sends people to the portal and gets them back by a one time code, and the portal shows a launcher only when opened directly. Kept here for history.
 - [ ] Polish it (optional, ask first): `web-design-guidelines` · `break-ui` (one, two and three systems, long names)
 
-### 56. Cross group integration contract · planned · needs a decision · GA
+### 56. Cross group integration contract · in-progress · GA
 One spec for everything VRMS shares with VMMS and BMS, written after the meeting: roles in the shared auth, gateway routes, vehicle status, the notification service, the one mobile app, who owns the copied Booking and maintenance models, and the environment, CI and dependency update standards.
 **Done when:** the spec records each shared contract, all three systems run together on staging behind one login, and every scope note that says feature 56 may change it is resolved.
 - Note (2026-10-29): spec 0010 dropped the copied `Booking`, `MaintenanceSchedule`, `ChecklistTemplate` and `ChecklistItem` models from VRMS. Bring them back only if the meeting decides VRMS owns them. Vehicle status now also has `DISABLED`, which VMMS shares.
@@ -145,7 +145,18 @@ One spec for everything VRMS shares with VMMS and BMS, written after the meeting
 - Note (2026-11-23, replan): VMMS is live on staging too since 2026-11-22 (`check-system.mjs vmms` and `bms` both pass), so all three systems run together behind one login, half of this feature's **Done when**. Nothing else blocks the design: this is the next step, with feature 42 designed alongside.
 - Note (2026-11-23, from spec 0027): decide how VRMS opens a repair for a truck VMMS doesn't have yet (for example a quick register by plate on the new ticket form, linked to or sent to VMMS through the fleet API). VRMS's sidebar has no Fleet section until this is settled.
 - Note (2026-11-25, replan): VMMS merged its half of flows 1 and 2 on the workspace `main` (specs `vmms/0023` to `vmms/0026`), so bring them to the design. Built in VMMS: a receiver for VRMS repair events, `POST /vmms/integrations/vrms/repair-events` (service token `aud: VMMS`, `client_id: vrms`, scope `fleet.repair-status.write`; ticket opened, completed, cancelled, with the linked maintenance schedule ids and an odometer). Proposed, for VRMS to accept or change: `POST /vrms/integrations/vmms/repair-referrals` (`aud: VRMS`, `client_id: vmms`, scope `repair.referral.write`, `referralId` as the idempotency key, failed checklist findings and Chief Mechanic remarks, no attachments or costs), outcomes back to VMMS (accept links the ticket, reject returns the job to its mechanic with the reason, cancel leaves it open, complete sends it to the Chief Mechanic's final check), and an on demand repair history read that VMMS never stores. Both need a grant in welinc-auth's client registry. Order (your call, 2026-11-25): after S22 and feature 73.
-- [ ] Design it (spec): `/architect cross group integration`
+- Note (2026-11-26, `/architect`): spec [0029](../../specs/vrms/0029-cross-group-integration/index.md). Outbox plus service token calls; VRMS's trucks and garages become a copy of VMMS's (change messages plus an hourly read; `fleet:link` archives unmatched rows); referrals on a Repairs tab; BMS Flow C with a live trips read and expedite requests; one permission, `integration.respond`. Slice 1 is flows 1 to 3; slice 2 (flows 4 to 7 and the register request) waits on VMMS's asks. Eight asks for VMMS and five for BMS are in the spec, to send once `docs/integration/repair-integration.md` exists. Cross checked on another model; its fixes applied.
+- [x] Design it (spec): `/architect cross group integration`
+- [ ] Build it: `/develop cross group integration`
+  - [ ] Shared setup and plumbing: welinc-auth grants and `integration.respond`, migration 1, the integration guard, the outbox worker (AC-11, AC-21, AC-24, AC-26)
+  - [ ] Thread and fleet copy: `fleet:link`, one referral end to end into VMMS, then the change receiver, reconcile, read only vehicles and the removed truck flag (AC-1 to AC-8, AC-12, AC-13, AC-35)
+  - [ ] Rest of flows 1 and 2: add to ticket, reject, every event, status and history reads, the outside shop picker, the Deliveries tab and retention (AC-9, AC-10, AC-13 to AC-15, AC-22, AC-23, AC-25, AC-36)
+  - [ ] Flow 3 against a BMS stub: repair updates, `setDueAt`, expedite, the trips card, the active repair read (AC-16 to AC-20)
+  - [ ] Contract doc, OpenAPI and staging: `repair-integration.md`, the asks sent, `fleet:link` and the sync on staging (AC-27, AC-1, AC-26)
+- [ ] Build slice 2 (spec 0029 child 0005, after VMMS agrees): flows 4 to 7 and the register request (AC-28 to AC-34)
+- [ ] Verify it: `/check verify cross group integration`
+- [ ] Test it: `/test cross group integration`
+- [ ] Document it: `/document cross group integration`
 
 ### 61. Suite admin model · dropped · replaced by suite S10
 A safe way to have "someone who can do everything" across VRMS, VMMS and BMS, the way industry does it, instead of one superadmin role that skips every check (which your Capstone 1 panel called insecure).
