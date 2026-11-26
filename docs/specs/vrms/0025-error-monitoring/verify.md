@@ -66,13 +66,13 @@ Proven live: gateway tunnel (164 of 164 checks; on staging OPTIONS 204, GET 405,
 _Locally, with `VITE_SENTRY_TEST_ROUTES=true` in each app's `.env.development.local` (never the committed `.env.development`). Seed logins in `docs/integration/seed-accounts.md`._
 
 ### UI / manual
-- [ ] web-vrms, signed in as `vrms.admin@welinc.com`, `VITE_SENTRY_DSN` blank: open `/debug/sentry?x=1`, press Crash this page → sidebar and top bar stay; the line reads "Try reloading. Copy the details below into your bug report."; the details box shows `Error: …`, `Page: /debug/sentry` (no `?x=1`), `Time: YYYY-MM-DD HH:mm:ss (…Z)`, `App: web-vrms local`, and no `Code:` line → AC-7a
-- [ ] Press Copy details and paste into a text field → exactly the box text; the button reads "Copied" for about 2 seconds, then "Copy details" again → AC-7a
+- [x] web-vrms, signed in as `vrms.admin@welinc.com`, `VITE_SENTRY_DSN` blank: open `/debug/sentry?x=1`, press Crash this page → sidebar and top bar stay; the line reads "Try reloading. Copy the details below into your bug report."; the details box shows `Error: …`, `Page: /debug/sentry` (no `?x=1`), `Time: YYYY-MM-DD HH:mm:ss (…Z)`, `App: web-vrms local`, and no `Code:` line → AC-7a
+- [x] Press Copy details and paste into a text field → exactly the box text; the button reads "Copied" for about 2 seconds, then "Copy details" again → AC-7a
 - [ ] Set `VITE_SENTRY_DSN` in `.env.development.local`, crash again as the admin → a `Code:` line joins the box and matches the first 8 characters of the event id in `vrms-web`; no separate Reference line → AC-7a
 - [ ] Open web-vrms through the LAN address over http (for example `http://<your LAN IP>:8001`, a page that isn't secure, so there is no clipboard API), crash as the admin, press Copy details → the button reads "Select and copy the text above" and the box text can still be selected → AC-7a
-- [ ] Portal, signed in as a suite admin, at `/debug/sentry` → the same admin version with `App: web-portal local` and Back to apps; Copy details works as above → AC-7a
+- [x] Portal, signed in as a suite admin, at `/debug/sentry` → the same admin version with `App: web-portal local` and Back to apps; Copy details works as above → AC-7a
 - [ ] Staff version without a code: in the portal's permission matrix give a non admin VRMS role `settings.manage` for the test, sign in as that person in web-vrms with the DSN blank, crash `/debug/sentry` → "Try reloading. If it keeps happening, tell your admin what you were doing.", no code line, no details box; then with the DSN set → "…send this code to your admin." and the Reference code. Take the permission back after → AC-7
-- [ ] One accessibility snapshot of the admin version (`browser_snapshot`) → the `alert` holds only the title and the line; the details box (`Crash details`) and the buttons sit outside it → AC-7a
+- [x] One accessibility snapshot of the admin version (`browser_snapshot`) → the `alert` holds only the title and the line; the details box (`Crash details`) and the buttons sit outside it → AC-7a
 - [ ] Sign out of web-vrms as the admin and sign in as a mechanic in the same tab, then crash any page (staff with `settings.manage` from the step above) → staff version, never the admin one → AC-7a
 
 ### Commands
