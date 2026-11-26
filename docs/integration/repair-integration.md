@@ -1,11 +1,12 @@
 # Repair integration (VRMS with VMMS and BMS)
 
-Repairs across the three systems: VMMS refers trucks for repair, VRMS runs the repair, and BMS plans bookings around it. Your checklist is first. The exact routes and payloads are in the [reference](#reference) below. Full design: VRMS spec [0029](../specs/vrms/0029-cross-group-integration/index.md).
+Repairs across the three systems: VMMS refers trucks for repair, VRMS runs the repair, and BMS plans bookings around it. Your checklist is first. The exact routes and payloads are in the [reference](#reference) below. Full design: VRMS spec [0029](../specs/vrms/0029-cross-group-integration/index.md). Every route VRMS serves, with each answer and error code, is in VRMS's API docs: `http://localhost:3000/vrms/docs` (or `https://staging-api.welinc.app/vrms/docs`), under *Integrations: VMMS* and *Integrations: BMS*.
 
 ## VMMS checklist
 
-Your flows 1 and 2 already work as built, and nothing below blocks testing. These make them sturdier.
+Your referral sender already works with VRMS (checked on local stacks on 2026-11-27). One fix blocks the rest of flows 1 and 2; the others make them sturdier.
 
+- [ ] **Fix the advisory locks in your two VRMS receivers (blocks every repair event).** `vrms-repair-events.service.ts` (around line 101) and the referral event receiver (around line 377) run `SELECT pg_advisory_xact_lock(...)` through `$queryRaw`. That function returns `void`, which Prisma 7's Postgres adapter can't read, so every call answers 500 (`UnsupportedNativeDataType`). Use `$executeRaw` for those lines. VRMS keeps each event and retries it for 24 hours, so nothing is lost while you fix it.
 - [ ] **Send referrals from your every minute job only**, not inside the Chief Mechanic's request (`maintenance-schedules.service.ts` awaits `deliverOne`, so the tap waits up to 5 s on VRMS).
 - [ ] **Check a maintenance schedule's state only when it is first linked**, not on every event. Today, if a work order changes after its referral, every later event for that ticket answers 409.
 - [ ] **Refuse to deactivate a truck that has an open VRMS repair**, and name the ticket. Otherwise every later event for it answers 404.
@@ -16,7 +17,7 @@ Your flows 1 and 2 already work as built, and nothing below blocks testing. Thes
 - [ ] **Let `LINKS_UPDATED` add only referrals**, without a new schedule. Until then VRMS sends `STATUS_UPDATED` for that case.
 - [ ] **Mobile:** allow "For Repair" when any checklist item fails (today it needs more failed than passed).
 - [ ] **Your own fixes toward BMS:** stop retrying a 400 forever in the availability sender (it blocks that truck's later events), and check `client_id === 'bms'` on the fleet routes.
-- [ ] **Test flow 1 with us** once VRMS's first milestone is in (see [When you can test](#when-you-can-test)).
+- [ ] **Test flows 1 and 2 with us.** VRMS's side is built (see [When you can test](#when-you-can-test)); your receiver fix above comes first.
 
 **Flows 4 to 7** (build these alongside, smallest first; shapes in [Flows 4 to 7](#flows-4-to-7-vmms-and-vrms)):
 
@@ -33,7 +34,7 @@ Your flows 1 and 2 already work as built, and nothing below blocks testing. Thes
 
 ## BMS checklist
 
-Nothing for repairs is built in BMS yet. All of it is new.
+Nothing for repairs is built in BMS yet. All of it is new. VRMS's side is built and was checked against a stand in for your routes, so your shapes below are the ones VRMS already sends and reads.
 
 - [ ] **Route your gateway:** add `/bms/integrations/vrms/*` and `/bms/integrations/vmms/*` to `bms-gateway/src/routes.ts`.
 - [ ] **Serve the truck's upcoming trips** ([route 9](#route-9-upcoming-trips-bms-serves)) behind `schedule.read` for client `vrms`.
@@ -46,10 +47,10 @@ Nothing for repairs is built in BMS yet. All of it is new.
 
 ## VRMS checklist (ours, so you know when to test)
 
-- [ ] **welinc-auth grants** for all three clients ([table](#auth-grants)). Your token requests are refused until this lands.
-- [ ] **Referral intake, the Referrals tab, and repair events back to VMMS** (routes 1, 2, 3). VMMS can test flow 1 from here.
-- [ ] **Status and history reads, the outside shop picker, the fleet copy** (routes 4 to 8).
-- [ ] **Flow 3:** trips card, repair updates, expedite requests and answers, the active repair read (routes 9 to 13), first against a stub, then against BMS.
+- [x] **welinc-auth grants** for all three clients ([table](#auth-grants)). Your token requests are refused until this is on staging.
+- [x] **Referral intake, the Referrals tab, and repair events back to VMMS** (routes 1, 2, 3). VMMS can test flow 1 from here.
+- [x] **Status and history reads, the outside shop picker, the fleet copy** (routes 4 to 8). Until route 8 exists, VRMS shows four stand in shops.
+- [x] **Flow 3:** trips card, repair updates, expedite requests and answers, the active repair read (routes 9 to 13), against a stand in for BMS. Checked against BMS once your routes land.
 - [ ] **Flows 7, 6, 5, 4**, in that order: the opening and closing odometer, fuel anomaly referrals, the "Repeat repair" mark, "Close as beyond repair" (routes 14 to 16).
 - [ ] **On staging**: grants applied, fleet linked, all flows checked.
 
@@ -79,7 +80,7 @@ Nothing for repairs is built in BMS yet. All of it is new.
 
 - **Tokens:** a service token from `POST /auth/token` (`client_credentials`, the target system as `audience`, the scope). The copied `service-token-client.ts` does it.
 - **Gateway:** call through the suite gateway's internal address, `SUITE_GATEWAY_INTERNAL_URL`.
-- **Receivers check:** `aud` is their own system, the scope, and the caller's `client_id` (403 `FORBIDDEN` otherwise). Every answer carries `Cache-Control: no-store`.
+- **Receivers check:** the token is a service token (403 `WRONG_TOKEN_USE` for a person's), `aud` is their own system (401 `WRONG_AUDIENCE`), and the scope and the caller's `client_id` match (403 `FORBIDDEN`). An expired token is 401 `TOKEN_EXPIRED`; when the receiver can't reach welinc-auth's keys it answers 503 `AUTH_UNAVAILABLE`. Every answer carries `Cache-Control: no-store`.
 - **Duplicates:** every message has an id (`eventId`, `referralId`, `requestId`). The same id with the same body answers success again with `duplicate: true`. The same id with a different body answers 409.
 - **Full state:** events carry the full current state plus an `eventVersion` per ticket. Times are UTC ISO 8601 ending in `Z`.
 
@@ -90,7 +91,7 @@ Nothing for repairs is built in BMS yet. All of it is new.
 | any 2xx | done |
 | 401, 403, 408, 429, 5xx, network error, timeout (5 s) | retry after 30 s, doubling up to 1 hour |
 | any other 4xx | failed at once; keep the code and show it to an Admin |
-| still failing 24 hours after the first try | failed |
+| still failing 24 hours after the first try | failed (VRMS marks it on the first failed answer after that) |
 
 A failed message gets a Retry button for an Admin, and Retry restarts the 24 hours. Messages for one repair ticket go in order: a later one waits while an earlier one is failed.
 
@@ -110,19 +111,19 @@ Flows 4 and 5 add `vrms` on `VMMS`: `vehicle.retire.write` and `repair.repeat.wr
 
 | # | Caller → served by | Route | Scope | Built |
 |---|---|---|---|---|
-| 1 | VMMS → VRMS | `POST /vrms/integrations/vmms/repair-referrals` | `repair.referral.write` | VMMS sender yes, VRMS no |
-| 2 | VRMS → VMMS | `POST /vmms/integrations/vrms/repair-events` | `fleet.repair-status.write` | VMMS yes, VRMS sender no |
-| 3 | VRMS → VMMS | `POST /vmms/integrations/vrms/referral-events` | `repair.referral-status.write` | VMMS yes, VRMS sender no |
-| 4 | VMMS → VRMS | `GET /vrms/integrations/vmms/repairs/:repairTicketId` | `repair.status.read` | VMMS client yes, VRMS no |
-| 5 | VMMS → VRMS | `GET /vrms/integrations/vmms/vehicles/:vmmsVehicleId/repair-history` | `repair.history.read` | VMMS client yes, VRMS no |
-| 6 | VMMS → VRMS | `POST /vrms/integrations/vmms/fleet-changes` | `fleet.change.write` | no |
-| 7 | VRMS → VMMS | `GET /vmms/fleet/vehicles`, `/vehicles/:id`, `/garages` | `fleet.read` | VMMS yes |
-| 8 | VRMS → VMMS | `GET /vmms/fleet/outsourced-providers` | `fleet.read` | no |
-| 9 | VRMS → BMS | `GET /bms/integrations/vrms/vehicles/:vmmsVehicleId/schedule` | `schedule.read` | no |
-| 10 | VRMS → BMS | `POST /bms/integrations/vrms/repair-updates` | `repair.update.write` | no |
-| 11 | BMS → VRMS | `POST /vrms/integrations/bms/expedite-requests` | `repair.expedite.write` | no |
-| 12 | VRMS → BMS | `POST /bms/integrations/vrms/expedite-answers` | `repair.update.write` | no |
-| 13 | BMS → VRMS | `GET /vrms/integrations/bms/vehicles/:vmmsVehicleId/active-repair` | `repair.status.read` | no |
+| 1 | VMMS → VRMS | `POST /vrms/integrations/vmms/repair-referrals` | `repair.referral.write` | both |
+| 2 | VRMS → VMMS | `POST /vmms/integrations/vrms/repair-events` | `fleet.repair-status.write` | both (VMMS answers 500, see your checklist) |
+| 3 | VRMS → VMMS | `POST /vmms/integrations/vrms/referral-events` | `repair.referral-status.write` | both (VMMS answers 500, same fix) |
+| 4 | VMMS → VRMS | `GET /vrms/integrations/vmms/repairs/:repairTicketId` | `repair.status.read` | both |
+| 5 | VMMS → VRMS | `GET /vrms/integrations/vmms/vehicles/:vmmsVehicleId/repair-history` | `repair.history.read` | both |
+| 6 | VMMS → VRMS | `POST /vrms/integrations/vmms/fleet-changes` | `fleet.change.write` | VRMS yes, VMMS sender no |
+| 7 | VRMS → VMMS | `GET /vmms/fleet/vehicles`, `/vehicles/:id`, `/garages` | `fleet.read` | both |
+| 8 | VRMS → VMMS | `GET /vmms/fleet/outsourced-providers` | `fleet.read` | VRMS reader yes, VMMS no |
+| 9 | VRMS → BMS | `GET /bms/integrations/vrms/vehicles/:vmmsVehicleId/schedule` | `schedule.read` | VRMS reader yes, BMS no |
+| 10 | VRMS → BMS | `POST /bms/integrations/vrms/repair-updates` | `repair.update.write` | VRMS sender yes, BMS no |
+| 11 | BMS → VRMS | `POST /vrms/integrations/bms/expedite-requests` | `repair.expedite.write` | VRMS yes, BMS sender no |
+| 12 | VRMS → BMS | `POST /bms/integrations/vrms/expedite-answers` | `repair.update.write` | VRMS sender yes, BMS no |
+| 13 | BMS → VRMS | `GET /vrms/integrations/bms/vehicles/:vmmsVehicleId/active-repair` | `repair.status.read` | VRMS yes, BMS client no |
 | 14 | VRMS → VMMS | `POST /vmms/integrations/vrms/retirement-requests` | `vehicle.retire.write` | no |
 | 15 | VRMS → VMMS | `POST /vmms/integrations/vrms/repeat-repairs` | `repair.repeat.write` | no |
 | 16 | VMMS → VRMS | `POST /vrms/integrations/vmms/retirement-decisions` | `retirement.decision.write` | no |
@@ -142,7 +143,7 @@ Header `Idempotency-Key: <referralId>`.
   vehiclePlate: string;
   maintenanceScheduleId: string;
   workOrderNumber: string;       // WO-…
-  odometerReading: number;
+  odometerReading: number;       // whole number, 0 or more
   findings: { checklistItemId: string; label: string; note: string | null }[]; // failed items, 1 to 100
   chiefMechanicRemarks: string | null;
 }
@@ -154,9 +155,11 @@ Header `Idempotency-Key: <referralId>`.
 | 202 `{ …, duplicate: true }` | the same referral again |
 | 409 `REFERRAL_ID_REUSED` | the same id with a different body |
 | 422 `VEHICLE_NOT_FOUND` | VMMS itself doesn't have the truck |
-| 400 | a bad id, odometer or findings count, or `Idempotency-Key` not equal to `referralId` |
+| 400 `IDEMPOTENCY_KEY_MISMATCH` | `Idempotency-Key` not equal to `referralId` |
+| 400 | a bad id, odometer or findings count |
+| 503 `VMMS_UNAVAILABLE` | VRMS doesn't know the truck yet and couldn't read it from you within 3 s; retry |
 
-Long text is trimmed, never refused.
+Long text is cut, never refused: the plate at 20 characters, the work order number at 40, a finding's label at 200 and note at 2,000, the remarks at 4,000.
 
 ### Route 2: repair events (VRMS sends, VMMS receives, as built)
 
@@ -171,7 +174,7 @@ Long text is trimmed, never refused.
   vmmsVehicleId: string;
   maintenanceScheduleIds: string[]; // all linked so far, only grows
   acceptedReferralIds: string[];    // all accepted so far, only grows
-  outsideShopName?: string;         // only with OUTSOURCED, an active VMMS shop
+  outsideShopName?: string;         // only with OUTSOURCED, the shop the Admin picked from your list (route 8)
   occurredAt: string;
 }
 ```
@@ -194,8 +197,8 @@ Every VRMS ticket is sent, not only referral ones. A ticket a person opened has 
 
 ### Routes 4 and 5: VMMS reads
 
-- **Route 4** answers `{ repairTicketId, repairTicketNumber, status, outsideShopName }`, with the status as in route 2. An unknown id answers 404 `REPAIR_NOT_FOUND`.
-- **Route 5**, `?limit=1..100` (default 50) `&cursor=<opaque>`, answers `{ items, nextCursor }`, newest first: closed tickets plus the open one, never cancelled ones.
+- **Route 4** answers `{ repairTicketId, repairTicketNumber, status, outsideShopName }`, with the status as in route 2 and the shop only while `OUTSOURCED` (else null). An unknown id answers 404 `REPAIR_NOT_FOUND`.
+- **Route 5**, `?limit=1..100` (default 50) `&cursor=<opaque>`, answers `{ items, nextCursor }`, newest first: closed tickets plus the open one, never cancelled ones. A truck VRMS has no tickets for answers no items, not 404. A cursor VRMS didn't make answers 400 `INVALID_CURSOR`; `nextCursor` is null on the last page.
 
 ```ts
 {
@@ -211,9 +214,9 @@ Every VRMS ticket is sent, not only referral ones. A ticket a person opened has 
 
 ### Routes 6 to 8: VRMS's fleet copy
 
-- **Route 6:** VRMS answers 202 and reads the record fresh (route 7). It never uses the message's fields.
-- **Hourly:** VRMS reads the full lists to catch anything missed.
-- **Route 8:** feeds the outside shop picker when an Admin outsources a ticket.
+- **Route 6:** the same body you send BMS, `{ eventId, entityType: 'VEHICLE' | 'GARAGE', entityId, changeType, occurredAt }`. VRMS answers 202 `{ accepted: true }` at once, then reads the record fresh (route 7). It never uses the message's other fields.
+- **Hourly:** VRMS reads the full lists to catch anything missed (`fleet.reconcileMinutes`, a VRMS setting). It skips a run when your list comes back empty or would archive more than 20% of the trucks, and reports it instead.
+- **Route 8:** feeds the outside shop picker when an Admin outsources a ticket. VRMS keeps the last good list for 24 hours. Until you serve it, a 404 there makes VRMS show four stand in shops.
 
 ## Flows 4 to 7: VMMS and VRMS
 
@@ -259,7 +262,7 @@ VRMS sends BMS an update on every ticket change (route 10). BMS can read the cur
 
 ### Route 9: upcoming trips (BMS serves)
 
-`GET …/schedule?days=14` (1 to 31):
+`GET …/schedule?days=14` (accept 1 to 31; VRMS always asks for 14):
 
 ```ts
 { items: {
@@ -281,26 +284,31 @@ The items are `DispatchAssignment` rows for that `vehicleId` in `PENDING` or `CO
   eventVersion: number;            // per ticket; keep the highest, ignore lower
   vmmsVehicleId: string; vehiclePlate: string;
   repairTicketId: string; repairTicketNumber: string;
-  repairStatus: string; repairStatusLabel: string;  // VRMS's own, "On hold"
+  repairStatus: string; repairStatusLabel: string;  // VRMS's own status (all nine, not route 2's mapping) and its label, "On hold"
   reason: string;                  // issue categories, "Brakes, Electrical", or "Not yet diagnosed"
   expectedReturnAt: string | null; // null when unknown and once closed or cancelled
-  changeReason: string;            // "Repair opened", "Status changed to On hold", "Expedite JO-…", "Repair finished"
+  changeReason: string;            // "Repair opened", "Status changed to On hold", "Expedite JO-…", "Issues added from VMMS WO-…",
+                                   // "Repair finished", "Repair cancelled", "Resent after a failed delivery"
   occurredAt: string;
 }
 ```
 
-It's sent on open, every status change, every expected date change, close and cancel. It holds no costs, notes or people.
+It's sent on open, every status change, every expected date change, a referral that adds issues, close and cancel. When a VRMS Admin dismisses a failed update, VRMS sends a fresh one with the ticket's current state. It holds no costs, notes or people.
 
 ### Route 11: expedite request (BMS sends, VRMS serves)
 
-`{ requestId, vmmsVehicleId, jobOrderNumber, reason /* 5 to 1000 */, neededBy? /* YYYY-MM-DD */ }`
+Header `Idempotency-Key: <requestId>`.
+
+`{ requestId, vmmsVehicleId, jobOrderNumber /* 1 to 40 */, reason /* 5 to 1000, trimmed */, neededBy? /* YYYY-MM-DD, a real date */ }`
 
 | VRMS answers | When |
 |---|---|
-| 202 `{ requestId, status: 'WAITING', repairTicketNumber }` | stored on the truck's open ticket |
-| 202 with `duplicate: true` | the same request again |
+| 202 `{ requestId, status: 'WAITING', repairTicketNumber, duplicate: false }` | stored on the truck's open ticket |
+| 202 `{ …, duplicate: true }` | the same request again; `status` is where it stands now (`WAITING`, `ACCEPTED` or `DECLINED`) |
 | 404 `NO_OPEN_REPAIR` | no open repair; don't retry |
 | 409 `REQUEST_ID_REUSED` | the same id with a different body |
+| 400 `IDEMPOTENCY_KEY_MISMATCH` | `Idempotency-Key` not equal to `requestId` |
+| 400 | a bad id, length or date |
 
 ### Route 12: expedite answer (VRMS sends, BMS receives)
 
@@ -319,7 +327,7 @@ An accepted answer with a new date is followed by a route 10 update with that da
 
 ### Route 13: active repair (VRMS serves)
 
-`{ repair: null }` when there's no open repair, otherwise:
+`{ repair: null }` when there's no open repair (or VRMS doesn't know the truck), otherwise:
 
 ```ts
 { repair: {

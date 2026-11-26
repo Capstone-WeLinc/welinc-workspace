@@ -1,7 +1,7 @@
 # 0029. Cross group integration: repair handoff with VMMS, repair impact with BMS
 
 **Date**: 2026-11-26
-**Status**: Proposed
+**Status**: In Progress
 
 ## Summary
 
