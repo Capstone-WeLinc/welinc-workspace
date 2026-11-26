@@ -62,3 +62,43 @@ _Steps derived from spec 0029 acceptance criteria. `/check verify` runs these; `
 
 ### Staging order (from this run)
 - [ ] Deploy backend-vrms with the new key before running welinc-auth's `catalog:sync`, or clear `permission_sync_state.etag` once after; otherwise VRMS never pulls the `integration.respond` cells → AC-26
+
+## Milestone 2, part 2: fleet copy kept current, read only trucks (task 7)
+
+### Commands
+- [ ] `docker exec welinc_vrms_backend npx prisma migrate status` is up to date, and `select enum_range(null::"VehicleStatus")` answers `{AVAILABLE,UNDER_REPAIR,UNDER_MAINTENANCE}` with no row left on `DISABLED` → AC-4
+- [ ] `curl -i -X POST http://localhost:3000/vrms/integrations/vmms/fleet-changes` with no token answers 401 with `Cache-Control: no-store`; a person's token answers 403 `WRONG_TOKEN_USE`; a `bms` service token answers 403 `FORBIDDEN` → AC-24
+- [ ] `POST /vrms/vehicles/:id/status` and `PATCH /vrms/vehicles/:id` answer 404 (the routes are gone), and `/vrms/docs` lists neither → AC-4
+
+### Change messages (once VMMS sends to VRMS, ask 4)
+- [ ] VMMS renames a plate: the receiver answers 202 `{ accepted: true }` at once, and within a minute Settings, Vehicles shows the new plate, with a History row "Plate ... by VMMS" → AC-2
+- [ ] VMMS deletes a truck: the next message deactivates it (`is_active` false, never deleted) and its History says "In VMMS: In the fleet → Removed in VMMS" → AC-2
+- [ ] A message for a truck while VMMS is stopped: still 202, the backend logs "left for the reconcile", nothing changes → AC-2
+
+### Reconcile (value source: `fleet.reconcileMinutes`, not a constant)
+- [ ] After a backend restart the log shows "Fleet reconcile: N trucks and M garages read, 0 deactivated" within a minute, then not again until the setting's minutes pass; set it to 15 in Settings, Integration and see the next run 15 minutes later → AC-3
+- [ ] Set a linked truck `is_active` false in VRMS's database: the next reconcile sets it back and writes a History row by VMMS → AC-3, AC-35
+- [ ] With two of six linked trucks missing from VMMS's list (more than 20%), the run deactivates nothing and reports "Deactivated nothing: 2 of 6 active trucks..." to Sentry under `fleet-reconcile`; with one missing, that one is deactivated → AC-3
+- [ ] VMMS answers an empty truck list: nothing is deactivated, garages still apply, and the failure is reported → AC-3
+- [ ] A VMMS plate that clashes with another local row's plate: the plate is skipped, the other fields apply, and Sentry gets "Fleet sync skipped: truck ..." → AC-3
+- [ ] On a database where `fleet:link` has never linked a truck, the job runs nothing → AC-1, AC-3
+
+### Ticket create
+- [ ] Create a ticket for a linked truck VMMS shows Under maintenance: it saves (no lock), and the truck keeps VMMS's status (no "Under repair" written by VRMS, no new History row) → AC-4, AC-5
+- [ ] Stop VMMS and create a ticket: it saves and a warning toast says "VMMS can't be reached, using the last copy"; the reply carries `fleetStale: true` → AC-5
+- [ ] A truck VMMS no longer has (404 on the fresh read) answers 422 `VEHICLE_NOT_IN_VMMS` and writes nothing → AC-5
+- [ ] The truck picker lists only active linked trucks; a search with no match says "Not in VMMS yet. Ask VMMS Operations to add it." → AC-5
+- [ ] Close or cancel a ticket: the truck's status and odometer stay as VMMS has them, and no History row is written → AC-4
+
+### UI
+- [ ] Settings, Vehicles says "Managed in VMMS. To add or change a truck, ask VMMS Operations. Last update from VMMS …", shows Truck (plate chip, make and model without the make twice), Size, Garage, Status, Open ticket, chips All, Available, Under repair, Under maintenance, and only History (plus Open REP-…) in the row menu → AC-4
+- [ ] The History dialog words sync rows: Plate, Garage, Capacity in kg, Size, Status with no "Ticket removed", and "In VMMS" → AC-3, AC-4
+- [ ] With a linked truck inactive, its open ticket shows "Truck removed in VMMS" as a chip in the list and a warning banner on the detail page; the Admin dashboard shows "Trucks removed in VMMS (n)" linking to `/repairs?removed=1`, where the "Truck removed in VMMS only" switch is on → AC-35
+- [ ] The flag clears on the next sync once VMMS lists the truck again, and the card disappears at 0 → AC-35
+
+## Acceptance criteria coverage (milestone 2, part 2)
+- AC-2: the change message steps (blocked until VMMS adds VRMS as a recipient)
+- AC-3: the reconcile steps and the History wording
+- AC-4: the migration, removed routes, ticket create and close, and Settings, Vehicles
+- AC-5: the ticket create steps and the picker
+- AC-35: the UI flag steps and the reconcile reactivation
