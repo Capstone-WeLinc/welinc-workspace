@@ -192,3 +192,11 @@ spec [0027](../../specs/vrms/0027-navigation-redesign/index.md) · code in `weli
   - [ ] Portal Admin frame, `pendingDeletionRequests`, the launcher's `open`, then the sweep and board comparison (AC-12 to AC-15)
 - [ ] Verify it: `/check verify navigation redesign`
 - [ ] Test it: `/test navigation redesign`
+
+### 73. Error scenes · planned · needs a decision
+Give every error state in web-vrms its own drawn road and depot scene in place of the small icon, and reuse the scenes in the portal. The crash copy from spec 0025 (AC-7, AC-7a) stays; only the picture changes.
+**Done when:** each picked scene ships in web-vrms (crash inside the app, page didn't load, record not found, no access, module turned off, full page crash, permissions didn't load, small errors in cards and dialogs), a crash inside the shell keeps the sidebar and top bar with a 720 px scene panel, motion loops and respects reduced motion, and the portal's copies can't drift from web-vrms's without a check failing.
+- Note (2026-11-25, replan): enrolled from the 2026-11-25 handoff's item 2. Every scene is picked (canvas rounds 38 to 43); the picked boards, the rules from your notes and the inventory are in [`docs/context/vrms/error-scene-boards/`](../../context/vrms/error-scene-boards/README.md), so the build needs neither the canvas nor the codesamtm account. The 404 and "No VRMS access" reuse the portal's Round 34 barrier and gate scenes; the offline banner stays a banner.
+- Note (2026-11-25, your call): one VRMS row and one spec; the portal reuse is a note here and on S22, not a suite row. For `/architect`: how the two apps share the scene components (recommended in the handoff: copies under `src/components/brand/scenes/` plus a checker like `check-design-tokens.mjs`; a shared package is too much setup this close to the deadline), and the start points on the portal's `feat/portal-redesign` (`LiveryTruck.tsx`, `NotFound.tsx`, the `--scene-*` and `--livery-*` tokens, `scene-blink`). Order: after S22, before feature 56.
+- [ ] Design it (spec): `/architect error scenes`
+- [ ] Polish it (optional, ask first): `emil-design-eng` (looping motion, reduced motion) · `web-design-guidelines`

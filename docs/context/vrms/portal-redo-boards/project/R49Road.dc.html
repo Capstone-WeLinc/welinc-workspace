@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>A · Road band, a module column per system</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=IBM+Plex+Mono:wght@500;600&amp;display=swap">
+<style>
+body{margin:0}
+*{box-sizing:border-box}
+.pg{width:1440px;min-height:900px;font-family:Inter,system-ui,sans-serif;position:relative;overflow:hidden;color:#0f172a;background:#f3f5f9}
+a{color:inherit;text-decoration:none}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+.w{width:1200px;margin:0 auto;position:relative}
+.top{position:relative;z-index:3;height:64px;display:flex;align-items:center}
+.lk{display:flex;align-items:center;gap:10px}.lk svg{height:20px;fill:#e8b800}.lk span{font-weight:800;font-style:italic;font-size:16px}
+.me{margin-left:auto;display:flex;align-items:center;gap:10px;height:44px;padding:0 8px;border-radius:12px;border:0;background:none;color:inherit;font:500 14px Inter,sans-serif;cursor:pointer}
+.av{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.12);box-shadow:inset 0 0 0 1px rgba(255,255,255,.2);display:grid;place-items:center;font-size:12px;font-weight:600}
+.lt .av{background:#e6e9f2;box-shadow:none;color:#0f1445}
+.band{position:relative;background:#0f1445;color:#fff;overflow:hidden}
+.dt{margin:0;font:600 13px "IBM Plex Mono",monospace;letter-spacing:.04em;color:#e8b800}
+.band{height:356px}
+.gr{padding-top:30px}
+h1{margin:10px 0 0;font-size:52px;line-height:1;font-weight:800;letter-spacing:-.03em}
+.l{margin:12px 0 0;font-size:16px;color:rgba(255,255,255,.68)}
+.road{position:absolute;left:0;right:0;bottom:0;height:84px;background:#0a0d33;box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+.road i{position:absolute;left:0;right:0;top:44px;height:3px;background:repeating-linear-gradient(90deg,rgba(203,210,234,.32) 0 44px,transparent 44px 104px)}
+.road b{position:absolute;left:0;right:0;top:0;height:6px;background:#141a55}
+.veh{position:absolute;bottom:14px;left:0;animation:drive 30s linear infinite}
+.veh.v1{width:190px;animation-delay:-5s}.veh.v2{width:128px;bottom:13px;animation-delay:-19s}
+@keyframes drive{from{transform:translateX(-240px)}to{transform:translateX(1700px)}}
+.main{margin-top:28px}
+.cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}
+.card{background:#fff;border-radius:20px;box-shadow:0 1px 2px rgba(15,23,42,.05),0 8px 24px rgba(15,23,42,.06);padding:22px 12px 12px}
+.hd{padding:0 12px;display:flex;align-items:baseline;gap:10px}
+.code{font-size:24px;font-weight:800;letter-spacing:-.01em;color:#0f1445}
+.role{margin-left:auto;font-size:13px;font-weight:500;color:#5b6779}
+.nm{padding:0 12px;margin-top:4px;font-size:13px;color:#5b6779}
+.ls{list-style:none;margin:16px 0 0;padding:8px 0 0;border-top:1px solid #eef1f6}
+.m{display:flex;align-items:center;gap:12px;height:46px;padding:0 12px;border-radius:12px;font-size:15px;font-weight:500}
+.m svg{color:#3a4486;flex:none}.m .chr{margin-left:auto;opacity:0;transition:opacity .15s,transform .15s;color:#0f1445}
+.m:hover{background:#f3f5f9}.m:hover .chr{opacity:1;transform:translateX(2px)}@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</helmet>
+<div class="pg"><div class="band"><div class="w"><div class="top"><div class="lk"><svg viewBox="0 0 330 185" aria-hidden="true"><polygon points="82,0 144,0 66,183 4,183"/><polygon points="177,0 240,0 162,183 100,183"/><polygon points="265,0 328,0 268,140 328,140 328,183 187,183"/></svg><span>WeLinc Logistics</span></div><button class="me" type="button" aria-label="Account menu, Corazon Villareal"><span class="av">CV</span>Corazon Villareal<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" opacity=".7" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></div><div class="gr"><p class="dt">Wednesday, November 25</p><h1>Good morning, Corazon</h1><p class="l">Pick a module to start. Each system opens where you choose.</p></div></div><div class="road"><b></b><i></i><svg class="veh v1" viewBox="-8 -2 138 56"><defs><symbol id="van" viewBox="-8 -2 138 56">
+<rect x="0" y="0" width="92" height="38" rx="2.5" fill="#f7f8fb" stroke="#c9d0de"/>
+<path d="M0.5 25 C28 19 60 31 91.5 15 V22 C60 34 28 24 0.5 30 Z" fill="#f29a1f"/>
+<path d="M0.5 30 C28 24 60 34 91.5 22 V36 a2 2 0 0 1 -2 2 H2.5 a2 2 0 0 1 -2 -2 Z" fill="#1f5cc4"/>
+<g transform="translate(6 6) scale(0.0541)" fill="#e8b800"><polygon points="82,0 144,0 66,183 4,183"/><polygon points="177,0 240,0 162,183 100,183"/><polygon points="265,0 328,0 268,140 328,140 328,183 187,183"/></g>
+<text x="26" y="15" font-size="11" font-weight="800" font-style="italic" fill="#0f1445" font-family="Inter,sans-serif">WeLinc</text>
+<path d="M95 10h16l13 13v15H95z" fill="#eef1f6" stroke="#c3cad8"/>
+<path d="M99 14h10l8 8h-18z" fill="#14205a"/>
+<rect x="95" y="30" width="29" height="3" fill="#c3cad8"/>
+<rect x="86" y="36" width="38" height="5" fill="#2a2f45"/>
+<rect x="-4" y="27" width="4" height="13" rx="1" fill="#8d96ab"/>
+<circle cx="16" cy="44" r="7" fill="#11131f"/><circle cx="16" cy="44" r="3" fill="#aab2c5"/>
+<circle cx="34" cy="44" r="7" fill="#11131f"/><circle cx="34" cy="44" r="3" fill="#aab2c5"/>
+<circle cx="110" cy="44" r="7" fill="#11131f"/><circle cx="110" cy="44" r="3" fill="#aab2c5"/>
+<rect x="124" y="24" width="4" height="6" rx="1" fill="#f29a1f"/>
+</symbol></defs><use href="#van"/></svg><svg class="veh v2" viewBox="-6 -2 96 50"><defs><symbol id="l300" viewBox="-6 -2 96 50">
+<path d="M0 4a4 4 0 0 1 4-4h52l20 17a4 4 0 0 1 1.5 3V34a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2z" fill="#f7f8fb" stroke="#c9d0de"/>
+<path d="M58 4l15 13H58z" fill="#14205a"/>
+<rect x="45" y="4" width="11" height="12" rx="1.5" fill="#14205a"/>
+<path d="M0.5 21H77v5H0.5z" fill="#f29a1f"/>
+<path d="M0.5 26H77v8a2 2 0 0 1-2 2H2a1.5 1.5 0 0 1-1.5-1.5z" fill="#1f5cc4"/>
+<g transform="translate(4 7) scale(0.035)" fill="#e8b800"><polygon points="82,0 144,0 66,183 4,183"/><polygon points="177,0 240,0 162,183 100,183"/><polygon points="265,0 328,0 268,140 328,140 328,183 187,183"/></g>
+<text x="16.5" y="13.5" font-size="7.5" font-weight="800" font-style="italic" fill="#0f1445" font-family="Inter,sans-serif">WeLinc</text>
+<rect x="74" y="29" width="7" height="6" rx="1" fill="#2a2f45"/>
+<rect x="75" y="20" width="3" height="5" rx="1" fill="#f29a1f"/>
+<circle cx="16" cy="38" r="7" fill="#11131f"/><circle cx="16" cy="38" r="3" fill="#aab2c5"/>
+<circle cx="62" cy="38" r="7" fill="#11131f"/><circle cx="62" cy="38" r="3" fill="#aab2c5"/>
+</symbol></defs><use href="#l300"/></svg></div></div><main class="w main"><div class="cols"><section class="card"><div class="hd"><span class="code">BMS</span><span class="role">Operations</span></div><div class="nm">Booking Management System</div><ul class="ls"><li><a class="m" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>Dashboard<svg class="chr" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></a></li><li><a class="m" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 14h2M14 14h2M8 18h2"/></svg>Scheduling<svg class="chr" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></a></li><li><a class="m" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4M12 16h4M8 11h.01M8 16h.01"/></svg>Job order<svg class="chr" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></a></li><li><a class="m" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m16 11 2 2 4-4"/></svg>Vehicle and team availability<svg class="chr" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></a></li></ul></section><section class="card"><div class="hd"><span class="code">VMMS</span><span class="role">Operations</span></div><div class="nm">Vehicle Maintenance Management System</div><ul class="ls"><li><a class="m" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>Dashboard<svg class="chr" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></a></li><li><a class="m" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg>Fleet vehicles<svg class="chr" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></a></li><li><a class="m" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 14h2M14 14h2M8 18h2"/></svg>Scheduling<svg class="chr" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></a></li><li><a class="m" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>Work orders<svg class="chr" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></a></li><li><a class="m" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4M12 16h4M8 11h.01M8 16h.01"/></svg>Service logs<svg class="chr" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></a></li><li><a class="m" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 22h12M4 9h10M14 22V4a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v18"/><path d="M14 13h2a2 2 0 0 1 2 2v2a2 2 0 0 0 4 0V9.83a2 2 0 0 0-.59-1.42L18 5"/></svg>Fuel management<svg class="chr" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></a></li></ul></section><section class="card"><div class="hd"><span class="code">VRMS</span><span class="role">Chief Mechanic</span></div><div class="nm">Vehicle Repair Management System</div><ul class="ls"><li><a class="m" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>Dashboard<svg class="chr" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></a></li><li><a class="m" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>Repair tickets<svg class="chr" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></a></li><li><a class="m" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8v8"/></svg>New repair<svg class="chr" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></a></li><li><a class="m" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>Repair history<svg class="chr" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></a></li><li><a class="m" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="M18 17V9M13 17V5M8 17v-3"/></svg>Analytics<svg class="chr" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></a></li><li><a class="m" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>Knowledge base<svg class="chr" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></a></li></ul></section></div></main></div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

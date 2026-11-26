@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>S3 · Suite admin on the key cabinet (pairs with C)</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=IBM+Plex+Mono:wght@500;600&amp;display=swap">
+<style>
+body{margin:0}
+*{box-sizing:border-box}
+.pg{width:1440px;min-height:900px;font-family:Inter,system-ui,sans-serif;position:relative;overflow:hidden;color:#0f172a;background:#f3f5f9}
+a{color:inherit;text-decoration:none}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+.w{width:1200px;margin:0 auto;position:relative}
+.top{position:relative;z-index:3;height:64px;display:flex;align-items:center}
+.lk{display:flex;align-items:center;gap:10px}.lk svg{height:20px;fill:#e8b800}.lk span{font-weight:800;font-style:italic;font-size:16px}
+.me{margin-left:auto;display:flex;align-items:center;gap:10px;height:44px;padding:0 8px;border-radius:12px;border:0;background:none;color:inherit;font:500 14px Inter,sans-serif;cursor:pointer}
+.av{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.12);box-shadow:inset 0 0 0 1px rgba(255,255,255,.2);display:grid;place-items:center;font-size:12px;font-weight:600}
+.lt .av{background:#e6e9f2;box-shadow:none;color:#0f1445}
+.band{position:relative;background:#0f1445;color:#fff;overflow:hidden}
+.dt{margin:0;font:600 13px "IBM Plex Mono",monospace;letter-spacing:.04em;color:#e8b800}
+.band{height:214px}
+.gr{padding-top:26px}
+h1{margin:10px 0 0;font-size:44px;line-height:1;font-weight:800;letter-spacing:-.03em}
+.cab{margin-top:-34px;position:relative;z-index:2;border-radius:22px;padding:26px 28px 10px;
+background:radial-gradient(circle at 11px 11px,rgba(15,20,69,.13) 2.2px,transparent 2.6px) 0 0/22px 22px,linear-gradient(#e7ebf2,#dde2eb);
+box-shadow:0 1px 0 rgba(255,255,255,.8) inset,0 0 0 1px #cfd5e1,0 18px 40px rgba(15,23,42,.12)}
+.row{display:flex;align-items:flex-start;gap:24px;padding-bottom:22px}
+.plate{flex:none;width:196px;margin-top:22px;border-radius:12px;padding:14px 16px;background:linear-gradient(#141a55,#0f1445);color:#fff;box-shadow:0 2px 0 #070a2e,0 6px 14px rgba(15,20,69,.25)}
+.plate b{display:block;font-size:26px;font-weight:800;letter-spacing:-.02em}
+.plate span{display:block;margin-top:2px;font-size:13px;color:rgba(255,255,255,.7)}
+.plate i{display:block;margin-top:8px;font:500 11px "IBM Plex Mono",monospace;color:#e8b800;font-style:normal}
+.rail{position:relative;flex:1;display:flex;gap:12px;padding-top:6px}
+.rail:before{content:"";position:absolute;left:-6px;right:-6px;top:0;height:8px;border-radius:4px;background:linear-gradient(#b8c0cf,#98a1b3);box-shadow:0 2px 3px rgba(15,23,42,.18)}
+.key{position:relative;width:140px;display:flex;flex-direction:column;align-items:center;transform-origin:50% 0;transition:transform .45s cubic-bezier(.3,1.6,.5,1)}
+.key:hover{transform:rotate(-7deg)}
+.key .hook{width:4px;height:12px;background:#8a93a6;border-radius:2px}
+.key .ring{width:22px;height:22px;margin-top:-4px;border-radius:50%;border:3px solid #9aa3b5}
+.key .tag{margin-top:-6px;width:140px;height:96px;border-radius:14px 14px 18px 18px;padding:18px 14px 10px;display:flex;flex-direction:column;position:relative;box-shadow:0 1px 0 rgba(255,255,255,.4) inset,0 6px 12px rgba(15,23,42,.16)}
+.key .tag:before{content:"";position:absolute;left:62px;top:6px;width:16px;height:6px;border-radius:3px;background:rgba(0,0,0,.22)}
+.key .tag span{font-size:14px;font-weight:700;line-height:1.2}
+.key .tag em{margin-top:auto;font:500 11px "IBM Plex Mono",monospace;font-style:normal;opacity:.65;display:flex;align-items:center;gap:6px}
+.s0 .tag{background:#e8b800;color:#0f1445}
+.s1 .tag{background:#fff;color:#0f1445}
+.s2 .tag{background:#1a2263;color:#fff}@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</helmet>
+<div class="pg"><div class="band"><div class="w"><div class="top"><div class="lk"><svg viewBox="0 0 330 185" aria-hidden="true"><polygon points="82,0 144,0 66,183 4,183"/><polygon points="177,0 240,0 162,183 100,183"/><polygon points="265,0 328,0 268,140 328,140 328,183 187,183"/></svg><span>WeLinc Logistics</span></div><button class="me" type="button" aria-label="Account menu, Leonora Castillo"><span class="av">LC</span>Leonora Castillo<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" opacity=".7" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></div><div class="gr"><p class="dt">Wednesday, November 25</p><h1>Good morning, Leonora</h1></div></div></div><main class="w"><div class="cab"><div class="row"><div class="plate"><b>Overview</b><span>and Activity</span><i>2 modules</i></div><div class="rail"><a class="key s0" href="#"><span class="hook"></span><span class="ring"></span><span class="tag"><span>Overview</span><em><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>SUITE-01</em></span></a><a class="key s0" href="#"><span class="hook"></span><span class="ring"></span><span class="tag"><span>Activity</span><em><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>SUITE-02</em></span></a></div></div><div class="row"><div class="plate"><b>Accounts</b><span>People and admins</span><i>3 modules</i></div><div class="rail"><a class="key s1" href="#"><span class="hook"></span><span class="ring"></span><span class="tag"><span>People</span><em><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>5 need a look</em></span></a><a class="key s1" href="#"><span class="hook"></span><span class="ring"></span><span class="tag"><span>Deletion requests</span><em><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m17 8 5 5M22 8l-5 5"/></svg>2 waiting</em></span></a><a class="key s1" href="#"><span class="hook"></span><span class="ring"></span><span class="tag"><span>Suite admins</span><em><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>1 of 3</em></span></a></div></div><div class="row"><div class="plate"><b>Access</b><span>Roles and passes</span><i>2 modules</i></div><div class="rail"><a class="key s2" href="#"><span class="hook"></span><span class="ring"></span><span class="tag"><span>Roles</span><em><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="8" cy="12" r="2"/><path d="M14 10h4M14 14h4"/></svg>SUITE-01</em></span></a><a class="key s2" href="#"><span class="hook"></span><span class="ring"></span><span class="tag"><span>Temporary access</span><em><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6M15.5 7.5l3 3L22 7l-3-3"/></svg>4 active</em></span></a></div></div></div></main></div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

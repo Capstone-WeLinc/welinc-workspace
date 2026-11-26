@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Suite management icon: S1 people, S2 ID badge, S3 key, S4 controls, S5 team tree</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=IBM+Plex+Mono:wght@500;600&amp;display=swap">
+<style>
+body{margin:0}
+*{box-sizing:border-box}
+.pg{width:1440px;min-height:900px;font-family:Inter,system-ui,sans-serif;position:relative;overflow:hidden;color:#0f172a;background:#f3f5f9}
+a{color:inherit;text-decoration:none}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+.w{width:1200px;margin:0 auto;position:relative}
+.top{position:relative;z-index:3;height:64px;display:flex;align-items:center}
+.lk{display:flex;align-items:center;gap:10px}.lk svg{height:20px;fill:#e8b800}.lk span{font-weight:800;font-style:italic;font-size:16px}
+.me{margin-left:auto;display:flex;align-items:center;gap:10px;height:44px;padding:0 8px;border-radius:12px;border:0;background:none;color:inherit;font:500 14px Inter,sans-serif;cursor:pointer}
+.av{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.12);box-shadow:inset 0 0 0 1px rgba(255,255,255,.2);display:grid;place-items:center;font-size:12px;font-weight:600}
+.lt .av{background:#e6e9f2;box-shadow:none;color:#0f1445}
+.band{position:relative;background:#0f1445;color:#fff;overflow:hidden}
+.dt{margin:0;font:600 13px "IBM Plex Mono",monospace;letter-spacing:.04em;color:#e8b800}
+.pg{background:#f3f5f9;height:900px}
+.w{width:1200px;margin:0 auto;position:relative}
+.row{height:64px;display:flex;align-items:center;gap:16px}
+.lk{display:flex;align-items:center;gap:10px;white-space:nowrap}.lk svg{height:20px;fill:#e8b800}.lk b{font-weight:800;font-style:italic;font-size:16px}
+.lk em{font-style:normal;font-size:14px;font-weight:500;color:rgba(255,255,255,.62);padding-left:12px;margin-left:2px;border-left:1px solid rgba(255,255,255,.18)}
+.sp{flex:1}
+.hb{width:40px;height:40px;border-radius:12px;border:0;background:none;color:rgba(255,255,255,.7);display:grid;place-items:center;cursor:pointer}
+.hb:hover{background:rgba(255,255,255,.08);color:#fff}
+.me{display:flex;align-items:center;gap:10px;height:44px;padding:0 10px 0 6px;border-radius:12px;border:0;background:none;color:#fff;font:500 14px Inter,sans-serif;cursor:pointer}
+.me:hover{background:rgba(255,255,255,.08)}
+.av{width:32px;height:32px;border-radius:50%;background:#e8b800;color:#0f1445;display:grid;place-items:center;font-size:12px;font-weight:700}
+.nd{font:600 12px "IBM Plex Mono",monospace;letter-spacing:.05em;color:rgba(255,255,255,.55);white-space:nowrap}
+.hd{display:flex;align-items:baseline;gap:12px;margin:0 0 16px}
+.hd h2{margin:0;font-size:15px;font-weight:700;letter-spacing:-.005em;color:#0f172a}
+.hd span{font:600 12px "IBM Plex Mono",monospace;color:#7a8597}
+.hd p{margin:0 0 0 auto;font-size:13px;color:#7a8597}
+.foot{position:absolute;left:0;right:0;bottom:22px;font-size:13px;color:#7a8597}
+.foot .w{display:flex;gap:24px}.foot .w span:first-child{margin-right:auto}
+/* G1 tiles */
+.tiles{display:grid;grid-template-columns:repeat(4,282px);gap:24px}
+.tl{position:relative;height:272px;padding:22px 22px 20px;border-radius:20px;background:#fff;display:flex;flex-direction:column;
+box-shadow:0 0 0 1px #e3e7ef,0 1px 2px rgba(15,23,42,.04);transition:transform .2s cubic-bezier(.2,.8,.2,1),box-shadow .2s}
+.tl:hover{transform:translateY(-3px);box-shadow:0 0 0 1px #d5dbe7,0 14px 30px rgba(15,23,42,.10)}
+.tl:focus-visible{outline:3px solid #e8b800;outline-offset:3px}
+.tl .ai{flex:none}
+.tl b{margin-top:18px;font-size:26px;line-height:1;font-weight:800;letter-spacing:-.03em;color:#0f1445}
+.tl .nm{margin-top:8px;font-size:14px;font-weight:600;line-height:1.35;color:#0f172a}
+.tl .ln{margin-top:4px;font-size:13px;line-height:1.45;color:#5b6779}
+.tl .rl{margin-top:auto;padding-top:12px;font-size:13px;color:#5b6779}.tl .rl strong{color:#0f172a;font-weight:600}
+.ghost{height:272px;border-radius:20px;border:1.5px dashed #cfd5e1;padding:22px;display:flex;flex-direction:column;justify-content:flex-end;color:#7a8597;font-size:13px;line-height:1.5}
+.ghost strong{color:#3c4759;font-weight:600;font-size:14px}
+.ct{color:#7a5f00;font-weight:600}
+.gl{grid-row:1;margin:0 0 -8px;font:600 11px "IBM Plex Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:#7a8597}
+.lay>a{grid-row:2}
+.lay:not(:has(.gl))>a{grid-row:auto}
+.lay a{transition:transform .2s cubic-bezier(.2,.8,.2,1),box-shadow .2s}
+.lay a:hover{transform:translateY(-3px)}
+.lay a:focus-visible{outline:3px solid #e8b800;outline-offset:3px}.tp{position:relative;background:radial-gradient(720px 260px at 82% 0%,#1d2678 0%,rgba(29,38,120,0) 70%),#0f1445;color:#fff;overflow:hidden}
+.tp:after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:linear-gradient(90deg,rgba(232,184,0,0),rgba(232,184,0,.35) 50%,rgba(232,184,0,0))}
+.tp .mk{position:absolute;right:calc(50% - 720px);top:-60px;height:280px;fill:rgba(255,255,255,.05);z-index:0}
+.tp .row{position:relative;z-index:3}
+.tp .av{background:#fff;color:#0f1445;box-shadow:0 0 0 3px rgba(255,255,255,.14)}
+.tp .lk em{color:rgba(255,255,255,.6)}.tp{height:88px}.tp .row{height:88px}.tp .mk{top:-110px;height:300px}.below{padding-top:36px}.lay{display:grid;grid-template-columns:repeat(4,282px);gap:24px}
+.t1{height:256px;padding:22px;border-radius:20px;background:#fff;display:flex;flex-direction:column;box-shadow:0 0 0 1px #e3e7ef}
+.t1:hover{box-shadow:0 0 0 1px #d5dbe7,0 14px 30px rgba(15,23,42,.10)}
+.t1 b{margin-top:18px;font-size:26px;line-height:1;font-weight:800;letter-spacing:-.03em;color:#0f1445}
+.t1 .nm{margin-top:8px;font-size:14px;font-weight:600;line-height:1.35}
+.t1 .ln{margin-top:4px;font-size:13px;line-height:1.45;color:#5b6779}
+.t1 .rl{margin-top:auto;font-size:13px;font-weight:600;color:#0f172a}.t1{position:relative}
+.t1 kbd{position:absolute;top:20px;right:20px;min-width:26px;height:26px;padding:0 7px;border-radius:7px;display:grid;place-items:center;
+font:600 12px "IBM Plex Mono",monospace;color:#5b6779;background:#f3f5f9;box-shadow:inset 0 0 0 1px #dfe3ec,inset 0 -2px 0 #dfe3ec}.co{position:absolute;left:calc(50% - 600px);bottom:20px;font-size:13px;color:#5b6779;z-index:2}.co b{color:#0f172a;font-weight:700}
+.ft{position:absolute;left:0;right:0;bottom:0;height:140px;overflow:hidden;pointer-events:none}
+@media (prefers-reduced-motion:reduce){.ft *,.ft *:before,.ft *:after,.ft:before,.ft:after{animation:none!important}}.ft{height:440px}
+.ft .hl{position:absolute;left:0;right:0;bottom:56px;height:1px;background:#e1e5ee;z-index:2}
+.ft .est{position:absolute;right:calc(50% - 600px);bottom:22px;font:600 11px "IBM Plex Mono",monospace;letter-spacing:.1em;color:#7a8597}
+.ft .bx{position:absolute;bottom:57px;z-index:1}.ft .bx{right:calc(50% - 600px);height:200px}.ft .bx *{stroke:rgba(15,20,69,.12)}.ft .bx .b{fill:none}.ft .bx .tp{fill:rgba(232,184,0,.16);stroke:rgba(232,184,0,.3)}.t1{height:212px}.t1 .ln{display:none}.t1 .nm{margin-top:10px;font:600 10px "IBM Plex Mono",monospace;letter-spacing:.01em;text-transform:uppercase;color:#5b6779;white-space:nowrap}.lay{grid-template-columns:repeat(3,384px)}.li{width:52px;height:52px;display:flex;align-items:center;color:#0f1445}.t1 .nm{font-size:11.5px!important;letter-spacing:.02em!important}.t1 .rl .ct{color:#5b6779;font-weight:500}.opts{display:grid;grid-template-columns:repeat(3,384px);gap:24px 24px}.opts .t1{display:flex}@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</helmet>
+<div class="pg"><header class="tp"><svg class="mk" viewBox="0 0 330 185" aria-hidden="true"><polygon points="82,0 144,0 66,183 4,183"/><polygon points="177,0 240,0 162,183 100,183"/><polygon points="265,0 328,0 268,140 328,140 328,183 187,183"/></svg><div class="w"><div class="row"><div class="lk"><svg viewBox="0 0 330 185" aria-hidden="true"><polygon points="82,0 144,0 66,183 4,183"/><polygon points="177,0 240,0 162,183 100,183"/><polygon points="265,0 328,0 268,140 328,140 328,183 187,183"/></svg><b>WeLinc Logistics</b><em>Operations Workspace</em></div><span class="sp"></span><button class="hb" type="button" aria-label="Help"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01"/></svg></button><button class="me" type="button"><span class="av" aria-hidden="true">FR</span>Felicidad Roxas<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" opacity=".7" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></div></div></header><div class="w below"><div class="hd"><h2>Suite management: pick an icon</h2></div><div class="opts"><div class="cell"><p class="gl" style="margin:0 0 8px">S1 · People</p><a class="t1" href="#" data-key="3"><kbd aria-hidden="true">3</kbd><svg class="ai" width="52" height="52" viewBox="0 0 64 64" aria-hidden="true"><circle cx="43" cy="21" r="7.5" fill="#e8b800"/><path d="M31 52v-2.5a12 12 0 0 1 24 0V52z" fill="#e8b800"/><circle cx="25" cy="24" r="9" fill="#0f1445"/><path d="M9 55v-3.5a16 16 0 0 1 32 0V55z" fill="#0f1445"/></svg><b>Suite management</b><span class="nm">People, roles and access</span><span class="ln">People, roles and access for VMMS and VRMS</span><span class="rl"><span class="ct">For VMMS and VRMS</span></span></a></div><div class="cell"><p class="gl" style="margin:0 0 8px">S2 · ID badge</p><a class="t1" href="#" data-key="3"><kbd aria-hidden="true">3</kbd><svg class="ai" width="52" height="52" viewBox="0 0 64 64" aria-hidden="true"><rect x="13" y="11" width="38" height="46" rx="6" fill="#0f1445"/><rect x="26" y="6" width="12" height="9" rx="2.5" fill="#e8b800"/><circle cx="32" cy="29" r="7" fill="#e8b800"/><path d="M22 43h20M25 49h14" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg><b>Suite management</b><span class="nm">People, roles and access</span><span class="ln">People, roles and access for VMMS and VRMS</span><span class="rl"><span class="ct">For VMMS and VRMS</span></span></a></div><div class="cell"><p class="gl" style="margin:0 0 8px">S3 · Key</p><a class="t1" href="#" data-key="3"><kbd aria-hidden="true">3</kbd><svg class="ai" width="52" height="52" viewBox="0 0 64 64" aria-hidden="true"><circle cx="21" cy="32" r="13" fill="#0f1445"/><circle cx="21" cy="32" r="5" fill="#e8b800"/><rect x="31" y="28" width="27" height="8" rx="2" fill="#0f1445"/><rect x="48" y="35" width="6" height="9" rx="1.5" fill="#0f1445"/><rect x="39" y="35" width="5" height="6" rx="1.5" fill="#0f1445"/></svg><b>Suite management</b><span class="nm">People, roles and access</span><span class="ln">People, roles and access for VMMS and VRMS</span><span class="rl"><span class="ct">For VMMS and VRMS</span></span></a></div><div class="cell"><p class="gl" style="margin:0 0 8px">S4 · Controls</p><a class="t1" href="#" data-key="3"><kbd aria-hidden="true">3</kbd><svg class="ai" width="52" height="52" viewBox="0 0 64 64" aria-hidden="true"><path d="M10 18h44M10 32h44M10 46h44" stroke="#0f1445" stroke-width="5" stroke-linecap="round"/><circle cx="24" cy="18" r="6.5" fill="#e8b800"/><circle cx="42" cy="32" r="6.5" fill="#0f1445"/><circle cx="42" cy="32" r="2.5" fill="#fff"/><circle cx="28" cy="46" r="6.5" fill="#0f1445"/><circle cx="28" cy="46" r="2.5" fill="#fff"/></svg><b>Suite management</b><span class="nm">People, roles and access</span><span class="ln">People, roles and access for VMMS and VRMS</span><span class="rl"><span class="ct">For VMMS and VRMS</span></span></a></div><div class="cell"><p class="gl" style="margin:0 0 8px">S5 · Team tree</p><a class="t1" href="#" data-key="3"><kbd aria-hidden="true">3</kbd><svg class="ai" width="52" height="52" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 20v8M14 28h36M14 28v8M32 28v8M50 28v8" stroke="#0f1445" stroke-width="3" fill="none" stroke-linecap="round"/><rect x="23" y="7" width="18" height="14" rx="3.5" fill="#0f1445"/><rect x="5" y="36" width="18" height="14" rx="3.5" fill="#0f1445"/><rect x="23" y="36" width="18" height="14" rx="3.5" fill="#e8b800"/><rect x="41" y="36" width="18" height="14" rx="3.5" fill="#0f1445"/></svg><b>Suite management</b><span class="nm">People, roles and access</span><span class="ln">People, roles and access for VMMS and VRMS</span><span class="rl"><span class="ct">For VMMS and VRMS</span></span></a></div></div></div><div class="ft" aria-hidden="true"><svg class="bx" viewBox="-2 48 488 332" fill="none" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><rect class="b" x="0" y="250" width="170" height="128" rx="3"/><rect class="tp" x="68.0" y="250" width="34.0" height="48.6"/><path d="M0 258H170"/><rect class="b" x="176" y="250" width="170" height="128" rx="3"/><rect class="tp" x="244.0" y="250" width="34.0" height="48.6"/><path d="M176 258H346"/><rect class="b" x="352" y="274" width="130" height="104" rx="3"/><rect class="tp" x="404.0" y="274" width="26.0" height="39.5"/><path d="M352 282H482"/><rect class="b" x="70" y="136" width="150" height="112" rx="3"/><rect class="tp" x="130.0" y="136" width="30.0" height="42.6"/><path d="M70 144H220"/><rect class="b" x="226" y="150" width="136" height="98" rx="3"/><rect class="tp" x="280.4" y="150" width="27.2" height="37.2"/><path d="M226 158H362"/><rect class="b" x="140" y="50" width="120" height="84" rx="3"/><rect class="tp" x="188.0" y="50" width="24.0" height="31.9"/><path d="M140 58H260"/></svg><div class="hl"></div><span class="est">EST. 2018</span></div><span class="co"><b>WeLinc Logistics</b></span></div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

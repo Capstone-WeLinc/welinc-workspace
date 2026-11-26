@@ -10,7 +10,7 @@ Setup for the live steps: put the `vrms-backend` DSN in `welinc-backend-vrms/.en
 - [ ] Same call as a mechanic (no `settings.manage`) → 403; with `SENTRY_TEST_ROUTES` blank → 404, also for a signed out caller → AC-16
 - [ ] Stop welinc-auth and make a signed in call that misses the cache → 503 `AUTH_UNAVAILABLE`, and one issue arrives (the 5xx `HttpException` path) → AC-1
 - [ ] A validation 400, a 401 and a 403 create no issue; a failing `/vrms/health` 503 creates none → AC-2
-- [ ] Open `/debug/sentry` as the admin, press Crash this page → the sidebar and top bar stay, the crash screen shows Reload, Back to dashboard and an 8 character reference that matches the start of the Sentry event id; one issue in `vrms-web` with `system: vrms-web` and `role: ADMIN` → AC-3, AC-7, AC-16
+- [ ] Open `/debug/sentry` as the admin, press Crash this page → the sidebar and top bar stay, the crash screen shows Reload, Back to dashboard and an 8 character reference that matches the start of the Sentry event id (since 2026-11-25 an admin sees it as the `Code:` line in the details box instead, AC-7a); one issue in `vrms-web` with `system: vrms-web` and `role: ADMIN` → AC-3, AC-7, AC-16
 - [ ] Click another menu item after the crash → the page loads normally → AC-7
 - [ ] `/debug/sentry` as a mechanic → sent to the dashboard; in a build without the flag the address is Page not found → AC-16
 - [ ] With `VITE_SENTRY_DSN` blank, crash the page again → crash screen without a reference code, nothing sent → AC-7, AC-14
@@ -61,3 +61,23 @@ Result: **passed, with 5 behaviors blocked by design** (accepted by the lead). S
 - The AC-11 and AC-12 emails: the monitor and rule exist and fired, but arrival wasn't read.
 
 Proven live: gateway tunnel (164 of 164 checks; on staging OPTIONS 204, GET 405, foreign DSN 403 `TUNNEL_REJECTED`), test routes 404 on staging, `.map` files 404 on both web sites, cron monitor `ok`, uptime monitor `ok`, the new issue rule fired at 01:00 UTC, five Azure alerts to `ag-welinc-staging`, no email, name or IP in two real events.
+
+## Crash screen by standing · task 13 · added 2026-11-25
+_Locally, with `VITE_SENTRY_TEST_ROUTES=true` in each app's `.env.development.local` (never the committed `.env.development`). Seed logins in `docs/integration/seed-accounts.md`._
+
+### UI / manual
+- [x] web-vrms, signed in as `vrms.admin@welinc.com`, `VITE_SENTRY_DSN` blank: open `/debug/sentry?x=1`, press Crash this page → sidebar and top bar stay; the line reads "Try reloading. Copy the details below into your bug report."; the details box shows `Error: …`, `Page: /debug/sentry` (no `?x=1`), `Time: YYYY-MM-DD HH:mm:ss (…Z)`, `App: web-vrms local`, and no `Code:` line → AC-7a
+- [x] Press Copy details and paste into a text field → exactly the box text; the button reads "Copied" for about 2 seconds, then "Copy details" again → AC-7a
+- [ ] Set `VITE_SENTRY_DSN` in `.env.development.local`, crash again as the admin → a `Code:` line joins the box and matches the first 8 characters of the event id in `vrms-web`; no separate Reference line → AC-7a
+- [ ] Open web-vrms through the LAN address over http (for example `http://<your LAN IP>:8001`, a page that isn't secure, so there is no clipboard API), crash as the admin, press Copy details → the button reads "Select and copy the text above" and the box text can still be selected → AC-7a
+- [x] Portal, signed in as a suite admin, at `/debug/sentry` → the same admin version with `App: web-portal local` and Back to apps; Copy details works as above → AC-7a
+- [ ] Staff version without a code: in the portal's permission matrix give a non admin VRMS role `settings.manage` for the test, sign in as that person in web-vrms with the DSN blank, crash `/debug/sentry` → "Try reloading. If it keeps happening, tell your admin what you were doing.", no code line, no details box; then with the DSN set → "…send this code to your admin." and the Reference code. Take the permission back after → AC-7
+- [x] One accessibility snapshot of the admin version (`browser_snapshot`) → the `alert` holds only the title and the line; the details box (`Crash details`) and the buttons sit outside it → AC-7a
+- [ ] Sign out of web-vrms as the admin and sign in as a mechanic in the same tab, then crash any page (staff with `settings.manage` from the step above) → staff version, never the admin one → AC-7a
+
+### Commands
+- [x] `npm test` in welinc-web-vrms (599 passing) and welinc-web-portal (366 passing) → `crashDetails`, `copyText`, the three `CrashScreen` versions, the Code line joining, the copy labels and the standing flag pass → AC-7, AC-7a
+
+### Acceptance-criteria coverage
+- AC-7 staff steps with and without a code, unit tests · AC-7a admin steps in both apps, the copy and fallback steps, the accessibility snapshot, the sign out step, unit tests (system admin standing and demotion in the portal are unit tests only)
+

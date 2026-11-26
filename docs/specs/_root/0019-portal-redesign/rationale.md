@@ -73,6 +73,21 @@ Ordering motion last answers the moving deadline: every milestone before it leav
 - **A soft navy ring on the sign in split fields** (0016 AC-7's border only): the board shows it and sign in is a brand surface; working pages keep AC-7.
 - **"Your profile" hidden until S23** (link to a placeholder): a menu item that lands on a 404 looks broken in a demo.
 - **Code email layout for all four code emails** (reset only): they share helpers in `code-emails.ts`, and mixed looks read as a bug.
+- **One `access` list for systems and roles** (separate `systems` and `roles` params; a POST search body): each item is exactly one row or chip of the popover, so there is nothing for two params to disagree on, and a GET keeps the address shareable and skips the CSRF guard. `system` keeps meaning the scope, so the strip's `viewHref` links and spec 0017's rules don't move.
+- **A separate facets route** (facets on every list answer; no chip counts): the counts are needed only while the popover is open and change with a draft the list hasn't applied yet, so a list answer can't carry them, and putting them on every page would pay for them on each Load more.
+- **Each facet ignores its own filter** (every count under every filter): the usual faceted search rule; otherwise ticking one role drops every other role to 0 and the counts stop helping you choose.
+- **`ATTENTION` and `ACTIVE_GROUP` as status values defined by `groupWhere`** (the portal translating chips to today's six statuses): today's `ACTIVE` leaves out unverified emails and `PENDING_DELETION` ignores deactivation, so a translation would drift from the groups People shows. Reusing `groupWhere` keeps one rule, as the summary route already does.
+- **Any of within a facet, AND across facets** (all of across systems): what the board's "Show N people" sum implies and what every filter UI the team has used does; finding shared accounts stays with the person page's system chips.
+
+## Update (2026-11-25)
+
+The People filter API (AC-21 to AC-21b) was added once the auth milestone showed `GET /auth/admin/users` could only take one system and one role, while `Filter18` ticks several of each and counts every chip. Two lines were also corrected against the boards: AC-27's email logo is A (gold on the navy header, `R35LogoPlaces`; the built `scripts/email-logo.mjs` already draws A), and AC-18's collapsed footer shows only the expand button (`Shell20`).
+
+## Update (2026-11-25, during the build)
+
+Building AC-21b showed its query shape could not hold together with its own rule. It asked for one SQL count with a `FILTER` clause per status chip, and also for every count to use the list's `statusWhere` and `groupWhere`. Those helpers are Prisma where objects, and Prisma 7 cannot turn a where object into SQL, so the `FILTER` shape would mean writing the lock, setup and pending deletion rules a second time in raw SQL. That copy would drift the first time someone changes a rule in `people-page.ts`, and the counts would stop matching the list, which is the whole point of the facets. So the route runs parallel Prisma counts on the same helpers (about ten small indexed counts, the pattern `groupCounts` already uses for People's three groups). Two raw SQL queries stay the option for later, if People is measurably slow at a much larger head count.
+
+Two test lines were also wrong. One expected a duplicate `access` item to answer 400, while AC-21a says duplicates are normalized away; AC-21a is the contract (a shared link that repeats a pick should still load), so the test line now follows it. The same lines used `VMMS:DRIVER`, but Driver is a BMS role; they now use VMMS Mechanic and BMS Driver.
 
 ## Interview record (2026-11-24)
 
@@ -81,6 +96,32 @@ Ordering motion last answers the moving deadline: every milestone before it leav
 - Strip counts: new counts only route, no step up; "Users need a look" is People's Needs attention group.
 - Idle warning: 2 minutes, a toast in the portal and web-vrms, "Still there?" wording, the 12 hour end as the same toast without an action.
 - Screen fix: `suiteAdmin` in the launcher answer.
-- Reduced motion: parked scene. Loop: pause when hidden. Arrival: only right after sign in. Launch: about 900 ms with navigation at once. Phones: short band, parked trucks.
+- Reduced motion: parked scene. Loop: pause when hidden. Arrival: only right after sign in. Launch: about 900 ms with navigation at once (replaced 2026-11-26: a 1.2 s hold, see *Update 2026-11-26*). Phones: short band, parked trucks.
 - Switcher: the held launcher answer. Email check: any admin, exact email only. Emails: all code emails, one layout. Wait: busy buttons and reloads, skeletons stay.
 - Tab titles: page first, "WeLinc" last. Sign in messages: endings as toasts, errors inline. 404: any unknown address.
+- People filter (2026-11-25): one `access` list; a facets route for the chip counts; the board's five status chips on the server's group rules; any of within a facet, AND across.
+- Facets query shape (2026-11-25, found during the build): parallel Prisma counts on the list's own where helpers, not two raw SQL queries; a duplicate `access` item is normalized, not refused (AC-21a wins over the old test line).
+
+## Update 2026-11-26
+
+The launcher, the launch and the sign in went through more design rounds after this spec was written (launcher Rounds 49 to 69, sign in Round 47; history in `docs/context/vrms/portal-redo-boards/README.md`). This update brings the spec in line. The calls, with the reason for each:
+
+- **The launcher is calm.** No greeting, no moving vehicles or road, no map, no counts. You found the road "too distracting", and counts on the Suite management tile repeated what People shows one click later. Tiles (L1, N3 text, three to a row, P5 number keys) read like the module launchers people already know.
+- **A suite admin with no system role skips the launcher.** A suite admin can never hold a system role (spec 0013 AC-33), so the launcher only ever showed them one tile. Products with one destination per account (Google Admin, Okta, Microsoft Entra) send that account straight there. Rejected: filling the launcher with Suite management's areas (it breaks the rule that only systems and one Suite tile are clickable, and it repeats the sidebar), and keeping the one tile (a wasted click on every sign in).
+- **`GET /auth/admin/summary` is removed, not kept unused.** Its only reader was the count on the strip, which is gone. It was the one admin route that skips the sign in code, so keeping it with no caller adds attack surface and maintenance for nothing. It was never merged, so removing it costs only the branch work.
+- **CSS in place of the Motion library.** Option 3 below was rejected when the launcher had a truck loop and a braking hand off between Arrival 2 and the loop, which needed a library's springs and shared timing. Those are gone. What is left (the A3 tile slide, three launch scenes of at most 900 ms, the sign in trucks on SVG paths) is plain keyframes, the same way Admin already does motion. This drops a 32.5 kB lazy chunk and a dependency, and reduced motion becomes one media query. The cost is throwing away the built Motion milestone.
+- **The launch is random among Launches 2, 3 and 4, never the same twice in a row.** Your call over one launch per system. The last scene id sits in `sessionStorage` because the page unloads after every launch, so memory alone cannot remember it; it holds a digit, nothing about the person or session, so spec 0003 AC-36 still holds. Launch 1 (the boom gate) is out.
+- **The sign in is S27d Quiet** (Round 47) in place of `R37SignIn`: the drawn map under the whole page with the form on navy glass. The map is traced from OpenStreetMap, so the page carries the ODbL credit. The code step and forgot password on it are still to draw; AC-14 keeps Round 31's steps until then.
+- **No help button**, although the boards draw a "?": there is no help page behind it, the same reason Privacy and Terms were left out.
+- **The launch holds the click for 1.2 s** (your call, later on 2026-11-26, found during the build). The first build kept the old rule (never `preventDefault`, a 900 ms cap), but staging answered in 0.2 to 0.3 s, so the system's page replaced the launcher before the scene's key moment. A 2 s hold was tried and felt slow; 1.2 s plays every scene in full. A prefetch of the system's page was tried and dropped, since the systems serve their page uncached and it saved nothing. Chrome's prerendering (Speculation Rules) was looked at and left out: it works only in Chromium browsers and each system would have to opt in. Holding a navigation for an animation is usually avoided, which is why it is short, skipped for new tab clicks, and only 200 ms under reduced motion. web-vrms paints navy with "Opening VRMS…" until it draws, so the cover's navy carries into the system without a white flash (measured live: VRMS opens at about 1.24 s).
+- **The phone layout is designed during `/develop`**, not drawn first (your call), and recorded in AC-4 then.
+
+## Update 2026-11-26 (sign in depth)
+
+You found the built sign in "one shade throughout" and plain next to the original truck photo with its floating card. Rounds 70 to 75 (launcher canvas, history in `docs/context/vrms/portal-redo-boards/README.md`) changed only layers and light, never the map, copy or form.
+
+- **Lit map and real glass (Round 70 A), picked over clear glass, a floating card and two tones.** The glass separates the form from the map without a hard card, and the inset fields read as fields on dark.
+- **The glass stays at full strength (Round 73).** Rounds 71 and 72 took the glass out and lost the depth; scaling every glass value down together made it look flat again. You kept A at 100%.
+- **The colour is the launcher navy, not A's blue (Round 75, S4).** A's blue came from three things: the glow (`#26358c`), the map lines at 64% and the glass's `saturate(1.35)`. S4 keeps only a faint glow (`#131a56`) and the dark edges, the map at the built 42% and no saturate, so the sign in, launcher band and VRMS share one navy. Rejected: S1 to S3 (still bluer than the band) and A as picked.
+- **Recommended, not asked (override in the spec if wrong):** a solid panel (`rgba(8,11,42,.88)`) where blur is unsupported or reduce transparency is on, because text on a 40% tint over map lines can drop below 4.5:1 without the blur; an 8px blur below 1024 px, where the panel covers most of the map and a 16px blur costs more on low end phones; and a new build step 14 in place of reopening step 13, so the history stays honest.
+- **AC-13's copy now matches the build.** Your Nov 26 calls during the build ("Email", the "Enter your credentials" line, the "Centralized platform" copy, "© OpenStreetMap") were in the scope row but not in AC-13.

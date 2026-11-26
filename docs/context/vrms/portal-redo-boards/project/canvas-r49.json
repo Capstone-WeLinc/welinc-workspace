@@ -1,0 +1,2521 @@
+{
+ "v": 3,
+ "createdOnFiles": {
+  "v": 1,
+  "at": "2026-11-25T06:44:21Z"
+ },
+ "title": "WeLinc launcher: system pickers (Rounds 49 to 57)",
+ "launch": {
+  "view": "canvas",
+  "page": "r69"
+ },
+ "pages": [
+  {
+   "id": "r69",
+   "name": "Round 69: 3 to a row, Suite management reworked"
+  },
+  {
+   "id": "r68",
+   "name": "Round 68: N3 per person (picked: 3 to a row)"
+  },
+  {
+   "id": "r67",
+   "name": "Round 67: fewer rows, VMMS on one line (picked: N3)"
+  },
+  {
+   "id": "r66",
+   "name": "Round 66: A3, and new system descriptions"
+  },
+  {
+   "id": "r65",
+   "name": "Round 65 (launch screens not the ones meant; A3 + A4 out, A3 picked)"
+  },
+  {
+   "id": "r64arr",
+   "name": "Round 64: arrival options (A3 + A4 tried on Round 65)"
+  },
+  {
+   "id": "saved",
+   "name": "Saved: launch and arrival boards (Rounds 31 to 44)"
+  },
+  {
+   "id": "r63box",
+   "name": "Round 63: K3 made to fit (picked: K3a)"
+  },
+  {
+   "id": "r63icon",
+   "name": "Round 63: the system icons (picked: J1, I1 as it is)"
+  },
+  {
+   "id": "r62art",
+   "name": "Round 62: the bottom of the page (picked: K3)"
+  },
+  {
+   "id": "r61line",
+   "name": "Round 61: the bottom line (picked: E1g)"
+  },
+  {
+   "id": "r60foot",
+   "name": "Round 60 (out: animation; E1's line kept, still)"
+  },
+  {
+   "id": "r59page",
+   "name": "Round 59: the page itself (picked: P5)"
+  },
+  {
+   "id": "r59band",
+   "name": "Round 59 (out): the band, new ideas"
+  },
+  {
+   "id": "r59foot",
+   "name": "Round 59 (out): footers, not the name"
+  },
+  {
+   "id": "r58top",
+   "name": "Round 58 (out: only the mark moved)"
+  },
+  {
+   "id": "r58foot",
+   "name": "Round 58 (out: the company name as the footer)"
+  },
+  {
+   "id": "r57top",
+   "name": "Round 57: the band (picked: Q1)"
+  },
+  {
+   "id": "r57bot",
+   "name": "Round 57: footer designs (out: D2 to D6; see Round 58)"
+  },
+  {
+   "id": "r56top",
+   "name": "Round 56 (out: text in place of the greeting)"
+  },
+  {
+   "id": "r55top",
+   "name": "Round 55: the whole top area"
+  },
+  {
+   "id": "r54bot",
+   "name": "Round 54: bottom designs (old top; see Round 57)"
+  },
+  {
+   "id": "r54sep",
+   "name": "Round 54 (out): navbar and band separation"
+  },
+  {
+   "id": "r53lay",
+   "name": "Round 53: layouts (picked: L1)"
+  },
+  {
+   "id": "r53bot",
+   "name": "Round 53: the bottom"
+  },
+  {
+   "id": "r53mark",
+   "name": "Round 53: N3b variations (picked: M1)"
+  },
+  {
+   "id": "r52icon",
+   "name": "Round 52: the icon spot"
+  },
+  {
+   "id": "r52grid",
+   "name": "Round 52: G1 or G2, and the bottom"
+  },
+  {
+   "id": "r52nav",
+   "name": "Round 52: navbar, N1 or N3 family"
+  },
+  {
+   "id": "r51grid",
+   "name": "Round 51 (out: icons on navy squares, G3 to G5)"
+  },
+  {
+   "id": "r51nav",
+   "name": "Round 51 (out: the road and vans, N4)"
+  },
+  {
+   "id": "r50launcher",
+   "name": "Round 50: launcher, BMS VMMS VRMS only"
+  },
+  {
+   "id": "r50suite",
+   "name": "Round 50: where Suite management goes"
+  },
+  {
+   "id": "r49launcher",
+   "name": "Round 49 (out: pages inside systems)"
+  },
+  {
+   "id": "r49suite",
+   "name": "Round 49 (out): Suite management"
+  }
+ ],
+ "boards": {
+  "Main.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "A · Road band, a module column per system · out",
+   "page": "r49launcher"
+  },
+  "R49Tabs.dc.html": {
+   "x": 1520,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "B · Tabs: the van drives to the system you pick (click BMS, VMMS, VRMS) · out",
+   "page": "r49launcher",
+   "is_interactive": true
+  },
+  "R49Keys.dc.html": {
+   "x": 3040,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "C · Key cabinet: every module is a key tag on its system's rail (tags swing on hover) · out",
+   "page": "r49launcher"
+  },
+  "R49Depot.dc.html": {
+   "x": 0,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "D · Isometric depot: point at a system, its part of the depot lights up · out",
+   "page": "r49launcher",
+   "is_interactive": true
+  },
+  "R49Search.dc.html": {
+   "x": 1520,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "E · Search first: \"Where to?\" finds any module in any system (shown typing \"sch\") · out",
+   "page": "r49launcher"
+  },
+  "R49Menu.dc.html": {
+   "x": 3040,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "F · Menu bar: each system drops its modules down (VMMS open); moving day hero, the tail lift working · out",
+   "page": "r49launcher"
+  },
+  "R49Ledger.dc.html": {
+   "x": 0,
+   "y": 2040,
+   "w": 1440,
+   "h": 900,
+   "title": "G · Ledger: a light page, big type links, the L300 runs along the gold line · out",
+   "page": "r49launcher"
+  },
+  "R49Fleet.dc.html": {
+   "x": 1520,
+   "y": 2040,
+   "w": 1440,
+   "h": 900,
+   "title": "H · The fleet head on, headlights on; a wide row per system · out",
+   "page": "r49launcher"
+  },
+  "R49Pins.dc.html": {
+   "x": 3040,
+   "y": 2040,
+   "w": 1440,
+   "h": 900,
+   "title": "I · Pinned first: your own shortcuts across systems, then every module · out",
+   "page": "r49launcher"
+  },
+  "R49Drawers.dc.html": {
+   "x": 0,
+   "y": 3060,
+   "w": 1440,
+   "h": 900,
+   "title": "J · Drawers: one system open at a time (click a row); the road from above · out",
+   "page": "r49launcher",
+   "is_interactive": true
+  },
+  "R49AdmColumn.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "M1 · Suite management as a navy third column beside the systems · out",
+   "page": "r49suite"
+  },
+  "R49AdmStrip.dc.html": {
+   "x": 1520,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "M2 · Suite management as one strip across the top, the systems below · out",
+   "page": "r49suite"
+  },
+  "R49AdmMenu.dc.html": {
+   "x": 3040,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "M3 · Suite management in the top bar, a menu with the count on the button (shown open) · out",
+   "page": "r49suite"
+  },
+  "R49AdmTabs.dc.html": {
+   "x": 0,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "M4 · Suite management as a third tab (pairs with B; click the tabs) · out",
+   "page": "r49suite",
+   "is_interactive": true
+  },
+  "R49AdmFirst.dc.html": {
+   "x": 1520,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "M5 · What needs you first: the two counts lead, the rest of Suite management as links · out",
+   "page": "r49suite"
+  },
+  "R49SuiteHome.dc.html": {
+   "x": 0,
+   "y": 2400,
+   "w": 1440,
+   "h": 900,
+   "title": "S1 · Suite admin, no systems: Overview leads, then Accounts, Access and Audit · out",
+   "page": "r49suite"
+  },
+  "R49SuiteLedger.dc.html": {
+   "x": 1520,
+   "y": 2400,
+   "w": 1440,
+   "h": 900,
+   "title": "S2 · Suite admin as a ledger (pairs with G) · out",
+   "page": "r49suite"
+  },
+  "R49SuiteKeys.dc.html": {
+   "x": 3040,
+   "y": 2400,
+   "w": 1440,
+   "h": 900,
+   "title": "S3 · Suite admin on the key cabinet (pairs with C) · out",
+   "page": "r49suite"
+  },
+  "R50Road.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "1 · Road band, three system cards",
+   "page": "r50launcher"
+  },
+  "R50Stage.dc.html": {
+   "x": 1520,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "2 · Stage: the names are the buttons; point at one and the van drives under it · out",
+   "page": "r50launcher",
+   "is_interactive": true
+  },
+  "R50Keys.dc.html": {
+   "x": 3040,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "3 · Key board: one key per system, it swings when you point at it · out",
+   "page": "r50launcher",
+   "is_interactive": true
+  },
+  "R50Depot.dc.html": {
+   "x": 0,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "4 · Isometric depot: each system is a part of it; pointing at a card lights its part",
+   "page": "r50launcher",
+   "is_interactive": true
+  },
+  "R50Ledger.dc.html": {
+   "x": 1520,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "5 · Ledger: a light page, the systems as huge rows of type · out",
+   "page": "r50launcher"
+  },
+  "R50Hero.dc.html": {
+   "x": 3040,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "6 · Moving day hero (the tail lift working), three cards across it",
+   "page": "r50launcher"
+  },
+  "R50Fleet.dc.html": {
+   "x": 0,
+   "y": 2040,
+   "w": 1440,
+   "h": 900,
+   "title": "7 · The fleet head on, headlights on; three wide system bars · out",
+   "page": "r50launcher"
+  },
+  "R50Bays.dc.html": {
+   "x": 1520,
+   "y": 2040,
+   "w": 1440,
+   "h": 900,
+   "title": "8 · Bays: three tall numbered panels; pointing at one drops the hazard stripe · out",
+   "page": "r50launcher",
+   "is_interactive": true
+  },
+  "R50SuiteBar.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "P1 · Elsewhere: a button in the top bar",
+   "page": "r50suite"
+  },
+  "R50SuiteAccount.dc.html": {
+   "x": 1520,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "P2 · Elsewhere: in the account menu (shown open)",
+   "page": "r50suite"
+  },
+  "R50SuiteLine.dc.html": {
+   "x": 3040,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "P3 · Elsewhere: one quiet line under the systems",
+   "page": "r50suite"
+  },
+  "R50SuiteGreeting.dc.html": {
+   "x": 0,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "P4 · Elsewhere: a link in the greeting line",
+   "page": "r50suite"
+  },
+  "R50SuiteCard.dc.html": {
+   "x": 0,
+   "y": 2400,
+   "w": 1440,
+   "h": 900,
+   "title": "P5 · A choice of its own beside her systems, in navy",
+   "page": "r50suite"
+  },
+  "R50FourRoad.dc.html": {
+   "x": 1520,
+   "y": 2400,
+   "w": 1440,
+   "h": 900,
+   "title": "P6 · Fullest case (sample: Admin in all three): the fourth card",
+   "page": "r50suite"
+  },
+  "R50FourKeys.dc.html": {
+   "x": 3040,
+   "y": 2400,
+   "w": 1440,
+   "h": 900,
+   "title": "P7 · Fullest case on the key board: the fourth key",
+   "page": "r50suite"
+  },
+  "R51G1Tiles.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "G1 · Tiles from the top left, four to a row like a launchpad",
+   "page": "r51grid"
+  },
+  "R51G2Cards.dc.html": {
+   "x": 1520,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "G2 · App launcher cards: icon on the left, name and role beside it",
+   "page": "r51grid"
+  },
+  "R51G3Icons.dc.html": {
+   "x": 3040,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "G3 · Big app icons in one panel, each system its own colour",
+   "page": "r51grid"
+  },
+  "R51G4Scenes.dc.html": {
+   "x": 0,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "G4 · Module cards with a drawn scene: wing van, L300, van on the lift",
+   "page": "r51grid"
+  },
+  "R51G5Admin.dc.html": {
+   "x": 1520,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "G5 · Admin (Felicidad Roxas): BMS greyed, Suite management in the fourth slot",
+   "page": "r51grid"
+  },
+  "R51N1Rail.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "N1 · Road rail: a 64px bar over a thin road, the greeting on the page",
+   "page": "r51nav"
+  },
+  "R51N3Depot.dc.html": {
+   "x": 1520,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "N3 · Depot skyline: the three garages, a van leaves each in turn",
+   "page": "r51nav"
+  },
+  "R51N4Float.dc.html": {
+   "x": 3040,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "N4 · Floating bar inside the page, the L300 along its foot",
+   "page": "r51nav"
+  },
+  "R52IconPlain.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 580,
+   "title": "I1 · The drawn mark alone, no square behind it",
+   "page": "r52icon"
+  },
+  "R52IconFrame.dc.html": {
+   "x": 1520,
+   "y": 0,
+   "w": 1440,
+   "h": 580,
+   "title": "I2 · The drawn mark in a thin outlined frame",
+   "page": "r52icon"
+  },
+  "R52IconDisc.dc.html": {
+   "x": 3040,
+   "y": 0,
+   "w": 1440,
+   "h": 580,
+   "title": "I3 · The drawn mark on a soft gold disc",
+   "page": "r52icon"
+  },
+  "R52IconVehicle.dc.html": {
+   "x": 0,
+   "y": 700,
+   "w": 1440,
+   "h": 580,
+   "title": "I4 · A line drawn vehicle per system, gold detail",
+   "page": "r52icon"
+  },
+  "R52IconLine.dc.html": {
+   "x": 1520,
+   "y": 700,
+   "w": 1440,
+   "h": 580,
+   "title": "I5 · Standard line icons (calendar, truck, wrench, shield)",
+   "page": "r52icon"
+  },
+  "R52IconNone.dc.html": {
+   "x": 3040,
+   "y": 700,
+   "w": 1440,
+   "h": 580,
+   "title": "I6 · No icon: a short gold rule, the code is the mark",
+   "page": "r52icon"
+  },
+  "R52G1Panel.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "G1 + B1 · Tiles; a help and account panel at the bottom",
+   "page": "r52grid"
+  },
+  "R52G2Panel.dc.html": {
+   "x": 1520,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "G2 + B1 · Cards; a help and account panel at the bottom",
+   "page": "r52grid"
+  },
+  "R52G1Admin.dc.html": {
+   "x": 3040,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "G1 admin · Felicidad: her two systems, then Suite management",
+   "page": "r52grid"
+  },
+  "R52G1Outline.dc.html": {
+   "x": 0,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "G1 + B2 · Tiles; the three garages as a faint still outline",
+   "page": "r52grid"
+  },
+  "R52G2Outline.dc.html": {
+   "x": 1520,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "G2 + B2 · Cards; the three garages as a faint still outline",
+   "page": "r52grid"
+  },
+  "R52G2Admin.dc.html": {
+   "x": 3040,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "G2 admin · Felicidad: her two systems, then Suite management",
+   "page": "r52grid"
+  },
+  "R52NavPlain.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "N1a · Slim bar, the greeting on the page",
+   "page": "r52nav"
+  },
+  "R52NavEdge.dc.html": {
+   "x": 1520,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "N1b · Slim bar, gold bottom edge, the date in the bar",
+   "page": "r52nav"
+  },
+  "R52NavInBar.dc.html": {
+   "x": 3040,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "N1c · The greeting in the bar; the page starts with the systems",
+   "page": "r52nav"
+  },
+  "R52NavBand.dc.html": {
+   "x": 0,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "N3a · Navy band holding the greeting, nothing else",
+   "page": "r52nav"
+  },
+  "R52NavMark.dc.html": {
+   "x": 1520,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "N3b · Navy band, the WeLinc mark oversized and faint",
+   "page": "r52nav"
+  },
+  "R52NavGarages.dc.html": {
+   "x": 3040,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "N3c · Navy band, the three garages as a still outline",
+   "page": "r52nav"
+  },
+  "R53L1.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "L1 · Classic tile; the role alone at the bottom, no label (I1) · picked",
+   "page": "r53lay"
+  },
+  "R53L2.dc.html": {
+   "x": 1520,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "L2 · Head row: icon and code together, the role small at the top right (I1)",
+   "page": "r53lay"
+  },
+  "R53L3.dc.html": {
+   "x": 3040,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "L3 · Taller tile, the role in its own footer under a hairline (I2)",
+   "page": "r53lay"
+  },
+  "R53L4.dc.html": {
+   "x": 0,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "L4 · Small tiles, five to a row, a size smaller (I1)",
+   "page": "r53lay"
+  },
+  "R53L5.dc.html": {
+   "x": 1520,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "L5 · Wide tiles, two to a row, the icon large on the left (I2)",
+   "page": "r53lay"
+  },
+  "R53L6.dc.html": {
+   "x": 3040,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "L6 · Joined: one panel split by hairlines, no gaps or shadows (I1)",
+   "page": "r53lay"
+  },
+  "R53L1Admin.dc.html": {
+   "x": 0,
+   "y": 2040,
+   "w": 1440,
+   "h": 900,
+   "title": "L1 admin · Felicidad: Suite management is a white tile like the rest, after her systems (I2)",
+   "page": "r53lay"
+  },
+  "R53L2Admin.dc.html": {
+   "x": 1520,
+   "y": 2040,
+   "w": 1440,
+   "h": 900,
+   "title": "L2 admin · Felicidad, Suite management white (I1)",
+   "page": "r53lay"
+  },
+  "R53L6Admin.dc.html": {
+   "x": 3040,
+   "y": 2040,
+   "w": 1440,
+   "h": 900,
+   "title": "L6 admin · Felicidad, Suite management white (I1)",
+   "page": "r53lay"
+  },
+  "R53B1.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "B1 · Help and account panel, pinned to the bottom (from Round 52)",
+   "page": "r53bot"
+  },
+  "R53B3.dc.html": {
+   "x": 1520,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "B3 · Help and account as three cards right under the systems",
+   "page": "r53bot"
+  },
+  "R53B4.dc.html": {
+   "x": 3040,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "B4 · A navy footer that mirrors the band, the mark faint in it",
+   "page": "r53bot"
+  },
+  "R53B5.dc.html": {
+   "x": 0,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "B5 · The WeLinc mark, huge and faint, in the bottom right",
+   "page": "r53bot"
+  },
+  "R53B6.dc.html": {
+   "x": 1520,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "B6 · A dotted floor with a gold lane line, fading up from the bottom",
+   "page": "r53bot"
+  },
+  "R53B7.dc.html": {
+   "x": 3040,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "B7 · Our garages: Marikina, Sta. Rosa and Pulilan by town",
+   "page": "r53bot"
+  },
+  "R53M1.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "M1 · The mark oversized and faint, cropped on the right (Round 52 N3b) · picked",
+   "page": "r53mark"
+  },
+  "R53M2.dc.html": {
+   "x": 1520,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "M2 · The mark huge and very faint behind the greeting",
+   "page": "r53mark"
+  },
+  "R53M3.dc.html": {
+   "x": 3040,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "M3 · The mark drawn as a thin gold outline on the right",
+   "page": "r53mark"
+  },
+  "R53M4.dc.html": {
+   "x": 0,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "M4 · A taller band, the mark in faint gold sinking off the bottom right",
+   "page": "r53mark"
+  },
+  "R53M5.dc.html": {
+   "x": 1520,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "M5 · The mark's slant as faint stripes on the right, a small gold mark",
+   "page": "r53mark"
+  },
+  "R53M6.dc.html": {
+   "x": 3040,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "M6 · The band cut on the mark's slant with a gold edge, the mark in gold",
+   "page": "r53mark"
+  },
+  "R54D1.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "D1 · The name as huge type, cropped by the bottom edge",
+   "page": "r54bot"
+  },
+  "R54D2.dc.html": {
+   "x": 1520,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "D2 · A navy strip with the mark's slant repeated across it",
+   "page": "r54bot"
+  },
+  "R54D3.dc.html": {
+   "x": 3040,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "D3 · A navy band mirroring the top: the faint mark, now on the left",
+   "page": "r54bot"
+  },
+  "R54D4.dc.html": {
+   "x": 0,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "D4 · A company seal like a dispatch stamp, bottom right",
+   "page": "r54bot"
+  },
+  "R54D5.dc.html": {
+   "x": 1520,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "D5 · A small ornament: the gold mark between two hairlines, the line under it",
+   "page": "r54bot"
+  },
+  "R54D6.dc.html": {
+   "x": 3040,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "D6 · Livery band: the three gold slashes at the right end of a navy strip",
+   "page": "r54bot"
+  },
+  "R54T1.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "T1 · No separation (M1 as picked)",
+   "page": "r54sep"
+  },
+  "R54T2.dc.html": {
+   "x": 1520,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "T2 · A hairline under the navbar, across the full width",
+   "page": "r54sep"
+  },
+  "R54T3.dc.html": {
+   "x": 3040,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "T3 · The navbar a shade deeper than the band",
+   "page": "r54sep"
+  },
+  "R54T4.dc.html": {
+   "x": 0,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "T4 · Deeper navbar with a gold line under it",
+   "page": "r54sep"
+  },
+  "R54T5.dc.html": {
+   "x": 1520,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "T5 · The navbar as frosted glass, the mark blurred behind it",
+   "page": "r54sep"
+  },
+  "R54T6.dc.html": {
+   "x": 3040,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "T6 · The navbar lifted: a soft shadow falls onto the band",
+   "page": "r54sep"
+  },
+  "R55H1.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "H1 · One band: logo, greeting and account in a single 128px row",
+   "page": "r55top"
+  },
+  "R55H2.dc.html": {
+   "x": 1520,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "H2 · A white navbar over the navy band",
+   "page": "r55top"
+  },
+  "R55H3.dc.html": {
+   "x": 3040,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "H3 · Dispatch clock: the greeting left, the time and date large on the right",
+   "page": "r55top"
+  },
+  "R55H4.dc.html": {
+   "x": 0,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "H4 · Editorial: a taller band, the greeting very large on its bottom edge",
+   "page": "r55top"
+  },
+  "R55H5.dc.html": {
+   "x": 1520,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "H5 · Brand first: the band carries the WeLinc name, the greeting under it",
+   "page": "r55top"
+  },
+  "R55H6.dc.html": {
+   "x": 3040,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "H6 · Personal: the initials large beside the greeting",
+   "page": "r55top"
+  },
+  "R56P1.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "P1 · \"Your systems\" moves into the band; 148px",
+   "page": "r56top"
+  },
+  "R56P2.dc.html": {
+   "x": 1520,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "P2 · One taller row: a larger lockup and the account; 104px",
+   "page": "r56top"
+  },
+  "R56P3.dc.html": {
+   "x": 3040,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "P3 · \"Operations Workspace\" as the title, the date beside it; 152px",
+   "page": "r56top"
+  },
+  "R56P4.dc.html": {
+   "x": 0,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "P4 · The bar and one quiet line (the date, 3 systems); 118px",
+   "page": "r56top"
+  },
+  "R56P5.dc.html": {
+   "x": 1520,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "P5 · As P1, larger, the mark warmer behind it; 164px",
+   "page": "r56top"
+  },
+  "R57Q1.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "Q1 · 88px: one row, the bar is the whole band",
+   "page": "r57top"
+  },
+  "R57Q2.dc.html": {
+   "x": 1520,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "Q2 · 112px: one taller row, a larger lockup",
+   "page": "r57top"
+  },
+  "R57Q3.dc.html": {
+   "x": 3040,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "Q3 · 128px: the bar at the top, the mark fills the space under it",
+   "page": "r57top"
+  },
+  "R57Q4.dc.html": {
+   "x": 0,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "Q4 · 140px: the bar at the top, the mark larger and warmer",
+   "page": "r57top"
+  },
+  "R57Q5.dc.html": {
+   "x": 1520,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "Q5 · 128px: the mark crisp and small in gold on the right, no large mark",
+   "page": "r57top"
+  },
+  "R57D1.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "D1 · The name as huge faint type, cropped by the bottom edge",
+   "page": "r57bot"
+  },
+  "R57D2.dc.html": {
+   "x": 1520,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "D2 · A navy strip with the mark's slant repeated across it",
+   "page": "r57bot"
+  },
+  "R57D3.dc.html": {
+   "x": 3040,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "D3 · A navy band mirroring the top, the faint mark on the left",
+   "page": "r57bot"
+  },
+  "R57D4.dc.html": {
+   "x": 0,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "D4 · A company seal like a dispatch stamp, bottom right",
+   "page": "r57bot"
+  },
+  "R57D5.dc.html": {
+   "x": 1520,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "D5 · The gold mark between two hairlines, the line under it",
+   "page": "r57bot"
+  },
+  "R57D6.dc.html": {
+   "x": 3040,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "D6 · A navy strip with the three gold slashes at its right end",
+   "page": "r57bot"
+  },
+  "R58Q1.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "Q1 · as picked: 88px, the faint mark on the right",
+   "page": "r58top"
+  },
+  "R58Q1a.dc.html": {
+   "x": 1520,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "Q1a · The mark much larger, its slashes sweep across the right half",
+   "page": "r58top"
+  },
+  "R58Q1b.dc.html": {
+   "x": 3040,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "Q1b · The mark bleeds off the window's right edge, the light follows it",
+   "page": "r58top"
+  },
+  "R58Q1c.dc.html": {
+   "x": 0,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "Q1c · No large mark: its slant as faint stripes fading in from the right",
+   "page": "r58top"
+  },
+  "R58Q1d.dc.html": {
+   "x": 1520,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "Q1d · A solid gold livery line along the bottom instead of the fade",
+   "page": "r58top"
+  },
+  "R58Q1e.dc.html": {
+   "x": 3040,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "Q1e · Deeper on the left, lighter under the mark; the mark in faint gold",
+   "page": "r58top"
+  },
+  "R58Q1f.dc.html": {
+   "x": 0,
+   "y": 2040,
+   "w": 1440,
+   "h": 900,
+   "title": "Q1f · Help and profile joined in one soft pill",
+   "page": "r58top"
+  },
+  "R58F1.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "F1 · D1 under Q1: the name huge and faint, cropped, a hairline above",
+   "page": "r58foot"
+  },
+  "R58F2.dc.html": {
+   "x": 1520,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "F2 · The name as a thin navy outline, cropped by the bottom edge",
+   "page": "r58foot"
+  },
+  "R58F3.dc.html": {
+   "x": 3040,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "F3 · No rule: the name rises out of the page, fading upward",
+   "page": "r58foot"
+  },
+  "R58F4.dc.html": {
+   "x": 0,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "F4 · The whole lockup at scale: the mark and \"WeLinc\", faint, cropped",
+   "page": "r58foot"
+  },
+  "R58F5.dc.html": {
+   "x": 1520,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "F5 · The name parked on a gold lane line, like a bay marking",
+   "page": "r58foot"
+  },
+  "R58F6.dc.html": {
+   "x": 3040,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "F6 · Letterpress: the name pressed into the page, light from above",
+   "page": "r58foot"
+  },
+  "R58F7.dc.html": {
+   "x": 0,
+   "y": 2040,
+   "w": 1440,
+   "h": 900,
+   "title": "F7 · \"2018\" in huge faint figures on the right, the line on the left",
+   "page": "r58foot"
+  },
+  "R58F8.dc.html": {
+   "x": 1520,
+   "y": 2040,
+   "w": 1440,
+   "h": 900,
+   "title": "F8 · Two tone: \"WeLinc\" faint navy, \"Logistics\" faint gold",
+   "page": "r58foot"
+  },
+  "R59P1.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "P1 · Three systems share the full width, no empty fourth slot",
+   "page": "r59page"
+  },
+  "R59P2.dc.html": {
+   "x": 1520,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "P2 · The tiles sit in the middle of the page, not stuck under the band",
+   "page": "r59page"
+  },
+  "R59P3.dc.html": {
+   "x": 3040,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "P3 · The empty slot explains itself: a dashed \"Missing a system?\" tile",
+   "page": "r59page"
+  },
+  "R59P4.dc.html": {
+   "x": 0,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "P4 · The tiles parked in bays: gold bay lines and a stop line on the page floor",
+   "page": "r59page"
+  },
+  "R59P5.dc.html": {
+   "x": 1520,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "P5 · Keyboard first: each tile carries its number key (1, 2, 3)",
+   "page": "r59page"
+  },
+  "R59A1.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "A1 · Container siding: the band ribbed like a container wall, lit from the right",
+   "page": "r59band"
+  },
+  "R59A2.dc.html": {
+   "x": 1520,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "A2 · Depot skyline: our depot as a faint line drawing on the band's bottom edge",
+   "page": "r59band"
+  },
+  "R59A3.dc.html": {
+   "x": 3040,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "A3 · Dispatch board: a fine ruled grid, like the planning board in dispatch",
+   "page": "r59band"
+  },
+  "R59A4.dc.html": {
+   "x": 0,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "A4 · The band gets a job: a status pill for the three systems",
+   "page": "r59band"
+  },
+  "R59A5.dc.html": {
+   "x": 1520,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "A5 · Livery pinstripes: gold and white, kicking up on the mark's slant at the right",
+   "page": "r59band"
+  },
+  "R59F1.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "F1 · The fleet parked along the floor: L300, closed van, wing van in their livery",
+   "page": "r59foot"
+  },
+  "R59F2.dc.html": {
+   "x": 1520,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "F2 · The depot at the end of the page, a navy line drawing",
+   "page": "r59foot"
+  },
+  "R59F3.dc.html": {
+   "x": 3040,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "F3 · Our branches: Marikina, Sta. Rosa and Pulilan with their towns",
+   "page": "r59foot"
+  },
+  "R59F4.dc.html": {
+   "x": 0,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "F4 · Your account: when you last signed in, and \"Not you?\"",
+   "page": "r59foot"
+  },
+  "R59F5.dc.html": {
+   "x": 1520,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "F5 · Help where people get stuck: a missing system, how the suite works",
+   "page": "r59foot"
+  },
+  "R59F6.dc.html": {
+   "x": 3040,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "F6 · Loading bay floor: the tile columns carry on as painted bay lines",
+   "page": "r59foot"
+  },
+  "R60E1.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "E1 · Moves: a gold glint runs along a hairline once every 9 s",
+   "page": "r60foot"
+  },
+  "R60E2.dc.html": {
+   "x": 1520,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "E2 · Moves: bay lights, a slow wave brightens a row of small gold lamps",
+   "page": "r60foot"
+  },
+  "R60E3.dc.html": {
+   "x": 3040,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "E3 · Moves: the mark's slashes drift right like a slow belt (8 px/s)",
+   "page": "r60foot"
+  },
+  "R60E4.dc.html": {
+   "x": 0,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "E4 · Moves: today as a quiet line, gold up to now, a soft pulse at the time",
+   "page": "r60foot"
+  },
+  "R60E5.dc.html": {
+   "x": 1520,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "E5 · Still: the band's gold fade echoed at the bottom, the line centred",
+   "page": "r60foot"
+  },
+  "R60E6.dc.html": {
+   "x": 3040,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "E6 · Still: a quiet floor a shade deeper, a small gold mark by the line",
+   "page": "r60foot"
+  },
+  "R61E1.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "E1 · The line as it is: a hairline across the full width (the fallback)",
+   "page": "r61line"
+  },
+  "R61E1a.dc.html": {
+   "x": 1520,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "E1a · The line only as wide as the content, lined up with the tiles",
+   "page": "r61line"
+  },
+  "R61E1b.dc.html": {
+   "x": 3040,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "E1b · The line fades out at both ends",
+   "page": "r61line"
+  },
+  "R61E1c.dc.html": {
+   "x": 0,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "E1c · A short gold start: the line begins with 48px of gold over the company line",
+   "page": "r61line"
+  },
+  "R61E1d.dc.html": {
+   "x": 1520,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "E1d · A pinstripe pair: the grey line with a thin gold one 3px under it",
+   "page": "r61line"
+  },
+  "R61E1e.dc.html": {
+   "x": 3040,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "E1e · A lane marking: the line dashed, long dashes like paint on a depot floor",
+   "page": "r61line"
+  },
+  "R61E1f.dc.html": {
+   "x": 0,
+   "y": 2040,
+   "w": 1440,
+   "h": 900,
+   "title": "E1f · The small gold mark leads the line, at the left edge of the content",
+   "page": "r61line"
+  },
+  "R61E1g.dc.html": {
+   "x": 1520,
+   "y": 2040,
+   "w": 1440,
+   "h": 900,
+   "title": "E1g · Split: the company line on the left, \"EST. 2018\" small on the right, under the line",
+   "page": "r61line"
+  },
+  "R62K1.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "K1 · Halftone: a navy dot screen rising from the floor, strongest at the bottom right",
+   "page": "r62art"
+  },
+  "R62K2.dc.html": {
+   "x": 1520,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "K2 · The depot floor in perspective: a faint grid running back from the line",
+   "page": "r62art"
+  },
+  "R62K3.dc.html": {
+   "x": 3040,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "K3 · Moving boxes stacked at the bottom right, taped and labelled (lipat bahay)",
+   "page": "r62art"
+  },
+  "R62K4.dc.html": {
+   "x": 0,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "K4 · A blueprint of the 14 ft closed van on grid paper, bottom right",
+   "page": "r62art"
+  },
+  "R62K5.dc.html": {
+   "x": 1520,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "K5 · WeLinc packing tape laid across the floor: the mark and \"this side up\"",
+   "page": "r62art"
+  },
+  "R62K6.dc.html": {
+   "x": 3040,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "K6 · Tyre tracks: two faint tread trails sweeping across the floor",
+   "page": "r62art"
+  },
+  "R63K3.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "K3 · As picked, with E1g under it (reference)",
+   "page": "r63box"
+  },
+  "R63K3a.dc.html": {
+   "x": 1520,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "K3a · Quieter: smaller, no labels, lighter ink, on the content edge",
+   "page": "r63box"
+  },
+  "R63K3b.dc.html": {
+   "x": 3040,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "K3b · In the empty slot: a stack as wide as the fourth tile column",
+   "page": "r63box"
+  },
+  "R63K3c.dc.html": {
+   "x": 0,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "K3c · White cartons in the tiles' own style: white, the tile hairline, gold tape",
+   "page": "r63box"
+  },
+  "R63K3d.dc.html": {
+   "x": 1520,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "K3d · A low row: cartons just unloaded along the floor",
+   "page": "r63box"
+  },
+  "R63J1.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "J1 · I1 as it is: the drawn marks, filled navy with gold",
+   "page": "r63icon"
+  },
+  "R63J2.dc.html": {
+   "x": 1520,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "J2 · I2 as it is: the drawn marks in a thin frame",
+   "page": "r63icon"
+  },
+  "R63J3.dc.html": {
+   "x": 3040,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "J3 · I1 as outlines: the same subjects in a 2.8 line, closer to the boxes",
+   "page": "r63icon"
+  },
+  "R63J4.dc.html": {
+   "x": 0,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "J4 · I1 in navy only: gold left for the keys, the boxes and the band",
+   "page": "r63icon"
+  },
+  "R63J5.dc.html": {
+   "x": 1520,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "J5 · New subjects, line: the booking clipboard, the service calendar, the repair toolbox",
+   "page": "r63icon"
+  },
+  "R63J6.dc.html": {
+   "x": 3040,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "J6 · New subjects, filled: the same three, solid navy with gold like I1",
+   "page": "r63icon"
+  },
+  "R63J7.dc.html": {
+   "x": 0,
+   "y": 2040,
+   "w": 1440,
+   "h": 900,
+   "title": "J7 · I1 evened out: the ticket and the gauge brought up to the wrench's visual size",
+   "page": "r63icon"
+  },
+  "R64A1.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "A1 · Quiet: the sign in fades, the launcher rises 12px into place (about 0.9 s)",
+   "page": "r64arr",
+   "is_interactive": true
+  },
+  "R64A2.dc.html": {
+   "x": 1520,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "A2 · Roller door: the sign in rolls up like a depot shutter and stops as the band; the tiles rise under it",
+   "page": "r64arr",
+   "is_interactive": true
+  },
+  "R64A3.dc.html": {
+   "x": 3040,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "A3 · Deal: the sign in fades, the tiles slide in from the left one by one, then their keys show",
+   "page": "r64arr",
+   "is_interactive": true
+  },
+  "R64A4.dc.html": {
+   "x": 0,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "A4 · Boxes last: a quiet arrival, then the cartons drop into their stack one by one and settle",
+   "page": "r64arr",
+   "is_interactive": true
+  },
+  "R64A5.dc.html": {
+   "x": 1520,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "A5 · Focus: the sign in steps back and blurs, the launcher comes forward",
+   "page": "r64arr",
+   "is_interactive": true
+  },
+  "R64A6.dc.html": {
+   "x": 3040,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "A6 · No arrival: a plain cut to the launcher (what reduced motion gets anyway)",
+   "page": "r64arr",
+   "is_interactive": true
+  },
+  "R31LaunchRoute.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "Launch 3 (picked, Round 31; built): the route bar, the truck starts right of the garage",
+   "page": "saved",
+   "is_interactive": true
+  },
+  "R31ArrTruck.dc.html": {
+   "x": 1520,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "Arrival 2 (Round 31): the truck drops off each card",
+   "page": "saved",
+   "is_interactive": true
+  },
+  "R34Sequence.dc.html": {
+   "x": 3040,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "Sign in to launcher (Round 34 sequence)",
+   "page": "saved",
+   "is_interactive": true
+  },
+  "ArrQuiet.dc.html": {
+   "x": 0,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "Round 44 · Arrival, quiet rise",
+   "page": "saved",
+   "is_interactive": true
+  },
+  "ArrSweep.dc.html": {
+   "x": 1520,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "Round 44 · Arrival, the navy side sweeps into the band",
+   "page": "saved",
+   "is_interactive": true
+  },
+  "ArrHandoff.dc.html": {
+   "x": 3040,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "Round 44 · Arrival, the sign in page rolls up like a shutter",
+   "page": "saved",
+   "is_interactive": true
+  },
+  "ArrPark.dc.html": {
+   "x": 0,
+   "y": 2040,
+   "w": 1440,
+   "h": 900,
+   "title": "Round 44 · Arrival, the van pulls out of the garage",
+   "page": "saved",
+   "is_interactive": true
+  },
+  "ArrDeal.dc.html": {
+   "x": 1520,
+   "y": 2040,
+   "w": 1440,
+   "h": 900,
+   "title": "Round 44 · Arrival, cards dispatched down from the band",
+   "page": "saved",
+   "is_interactive": true
+  },
+  "ArrFocus.dc.html": {
+   "x": 3040,
+   "y": 2040,
+   "w": 1440,
+   "h": 900,
+   "title": "Round 44 · Arrival, sign in steps back and the launcher comes forward",
+   "page": "saved",
+   "is_interactive": true
+  },
+  "R65A34.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "A3 + A4 · The tiles deal in, their keys show, then the cartons drop into their stack",
+   "page": "r65",
+   "is_interactive": true
+  },
+  "R65L1.dc.html": {
+   "x": 1520,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "Launch 1 · Boom gate: the boom lifts at the depot gate and the van rolls through (redrawn)",
+   "page": "r65",
+   "is_interactive": true
+  },
+  "R65L2.dc.html": {
+   "x": 3040,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "Launch 2 · Dock door: the shutter rolls up on the system's mark, the wing van pulls away (redrawn)",
+   "page": "r65",
+   "is_interactive": true
+  },
+  "R65L3.dc.html": {
+   "x": 0,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "Launch 3 · As built: the route draws from the garage and the van runs it to the pin",
+   "page": "r65",
+   "is_interactive": true
+  },
+  "R65L4.dc.html": {
+   "x": 1520,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "Launch 4 · Loading: cartons slide into the van, the doors close (redrawn)",
+   "page": "r65",
+   "is_interactive": true
+  },
+  "R65L5.dc.html": {
+   "x": 3040,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "Launch 5 · New, no vehicle: the cartons stack up like a progress meter",
+   "page": "r65",
+   "is_interactive": true
+  },
+  "R66A3.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "A3 · The tiles deal in one by one, each number key arriving with its own tile",
+   "page": "r66",
+   "is_interactive": true
+  },
+  "R66D1.dc.html": {
+   "x": 1520,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "D1 · What you do there: a short verb line each",
+   "page": "r66"
+  },
+  "R66D2.dc.html": {
+   "x": 3040,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "D2 · From start to finish: where the work begins and ends",
+   "page": "r66"
+  },
+  "R66D3.dc.html": {
+   "x": 0,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "D3 · The work as things: what the system keeps",
+   "page": "r66"
+  },
+  "R66D4.dc.html": {
+   "x": 1520,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "D4 · Short: two or three words",
+   "page": "r66"
+  },
+  "R67N1.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "N1 · Three across: the full name on one line, no description",
+   "page": "r67"
+  },
+  "R67N2.dc.html": {
+   "x": 1520,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "N2 · Three across: the full name on one line, then a short line (\"Planned maintenance\")",
+   "page": "r67"
+  },
+  "R67N3.dc.html": {
+   "x": 0,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "N3 · Four across kept: the full name as a small one line label, no description",
+   "page": "r67"
+  },
+  "R67N4.dc.html": {
+   "x": 1520,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "N4 · Four across kept: the code and a short line; the full name in the tooltip",
+   "page": "r67"
+  },
+  "R68Victor3.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "Victor Ramos (one system, its admin) · 3 to a row",
+   "page": "r68"
+  },
+  "R68Victor4.dc.html": {
+   "x": 1520,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "Victor Ramos (one system, its admin) · 4 to a row",
+   "page": "r68"
+  },
+  "R68Danilo3.dc.html": {
+   "x": 0,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "Danilo Reyes (two systems) · 3 to a row",
+   "page": "r68"
+  },
+  "R68Danilo4.dc.html": {
+   "x": 1520,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "Danilo Reyes (two systems) · 4 to a row",
+   "page": "r68"
+  },
+  "R68Corazon3.dc.html": {
+   "x": 0,
+   "y": 2040,
+   "w": 1440,
+   "h": 900,
+   "title": "Corazon Villareal (three systems) · 3 to a row",
+   "page": "r68"
+  },
+  "R68Corazon4.dc.html": {
+   "x": 1520,
+   "y": 2040,
+   "w": 1440,
+   "h": 900,
+   "title": "Corazon Villareal (three systems) · 4 to a row",
+   "page": "r68"
+  },
+  "R68Felicidad3.dc.html": {
+   "x": 0,
+   "y": 3060,
+   "w": 1440,
+   "h": 900,
+   "title": "Felicidad Roxas (admin of two systems) · 3 to a row",
+   "page": "r68"
+  },
+  "R68Felicidad4.dc.html": {
+   "x": 1520,
+   "y": 3060,
+   "w": 1440,
+   "h": 900,
+   "title": "Felicidad Roxas (admin of two systems) · 4 to a row",
+   "page": "r68"
+  },
+  "R68Armando3.dc.html": {
+   "x": 0,
+   "y": 4080,
+   "w": 1440,
+   "h": 900,
+   "title": "Armando Cruz (three systems, admin of one) · 3 to a row",
+   "page": "r68"
+  },
+  "R68Armando4.dc.html": {
+   "x": 1520,
+   "y": 4080,
+   "w": 1440,
+   "h": 900,
+   "title": "Armando Cruz (three systems, admin of one) · 4 to a row",
+   "page": "r68"
+  },
+  "R68Leonora3.dc.html": {
+   "x": 0,
+   "y": 5100,
+   "w": 1440,
+   "h": 900,
+   "title": "Leonora Castillo (suite admin, no systems) · 3 to a row",
+   "page": "r68"
+  },
+  "R68Leonora4.dc.html": {
+   "x": 1520,
+   "y": 5100,
+   "w": 1440,
+   "h": 900,
+   "title": "Leonora Castillo (suite admin, no systems) · 4 to a row",
+   "page": "r68"
+  },
+  "R69SuiteIcons.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "Suite management icon: S1 people, S2 ID badge, S3 key, S4 controls, S5 team tree",
+   "page": "r69"
+  },
+  "R69Victor.dc.html": {
+   "x": 1520,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "Victor Ramos (one system, its admin) · 3 to a row",
+   "page": "r69"
+  },
+  "R69Danilo.dc.html": {
+   "x": 3040,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "Danilo Reyes (two systems) · 3 to a row",
+   "page": "r69"
+  },
+  "R69Corazon.dc.html": {
+   "x": 0,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "Corazon Villareal (three systems) · 3 to a row",
+   "page": "r69"
+  },
+  "R69Felicidad.dc.html": {
+   "x": 1520,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "Felicidad Roxas (admin of two systems) · 3 to a row",
+   "page": "r69"
+  },
+  "R69Armando.dc.html": {
+   "x": 3040,
+   "y": 1020,
+   "w": 1440,
+   "h": 900,
+   "title": "Armando Cruz (three systems, admin of one) · 3 to a row",
+   "page": "r69"
+  },
+  "R69Leonora.dc.html": {
+   "x": 0,
+   "y": 2040,
+   "w": 1440,
+   "h": 900,
+   "title": "Leonora Castillo (suite admin, no systems) · out: a suite admin with no systems skips the launcher",
+   "page": "r69"
+  }
+ },
+ "order": [
+  "Main.dc.html",
+  "R49Tabs.dc.html",
+  "R49Keys.dc.html",
+  "R49Depot.dc.html",
+  "R49Search.dc.html",
+  "R49Menu.dc.html",
+  "R49Ledger.dc.html",
+  "R49Fleet.dc.html",
+  "R49Pins.dc.html",
+  "R49Drawers.dc.html",
+  "R49AdmColumn.dc.html",
+  "R49AdmStrip.dc.html",
+  "R49AdmMenu.dc.html",
+  "R49AdmTabs.dc.html",
+  "R49AdmFirst.dc.html",
+  "R49SuiteHome.dc.html",
+  "R49SuiteLedger.dc.html",
+  "R49SuiteKeys.dc.html",
+  "R50Road.dc.html",
+  "R50Stage.dc.html",
+  "R50Keys.dc.html",
+  "R50Depot.dc.html",
+  "R50Ledger.dc.html",
+  "R50Hero.dc.html",
+  "R50Fleet.dc.html",
+  "R50Bays.dc.html",
+  "R50SuiteBar.dc.html",
+  "R50SuiteAccount.dc.html",
+  "R50SuiteLine.dc.html",
+  "R50SuiteGreeting.dc.html",
+  "R50SuiteCard.dc.html",
+  "R50FourRoad.dc.html",
+  "R50FourKeys.dc.html",
+  "R51G1Tiles.dc.html",
+  "R51G2Cards.dc.html",
+  "R51G3Icons.dc.html",
+  "R51G4Scenes.dc.html",
+  "R51G5Admin.dc.html",
+  "R51N1Rail.dc.html",
+  "R51N3Depot.dc.html",
+  "R51N4Float.dc.html",
+  "R52IconPlain.dc.html",
+  "R52IconFrame.dc.html",
+  "R52IconDisc.dc.html",
+  "R52IconVehicle.dc.html",
+  "R52IconLine.dc.html",
+  "R52IconNone.dc.html",
+  "R52G1Panel.dc.html",
+  "R52G2Panel.dc.html",
+  "R52G1Admin.dc.html",
+  "R52G1Outline.dc.html",
+  "R52G2Outline.dc.html",
+  "R52G2Admin.dc.html",
+  "R52NavPlain.dc.html",
+  "R52NavEdge.dc.html",
+  "R52NavInBar.dc.html",
+  "R52NavBand.dc.html",
+  "R52NavMark.dc.html",
+  "R52NavGarages.dc.html",
+  "R53L1.dc.html",
+  "R53L2.dc.html",
+  "R53L3.dc.html",
+  "R53L4.dc.html",
+  "R53L5.dc.html",
+  "R53L6.dc.html",
+  "R53L1Admin.dc.html",
+  "R53L2Admin.dc.html",
+  "R53L6Admin.dc.html",
+  "R53B1.dc.html",
+  "R53B3.dc.html",
+  "R53B4.dc.html",
+  "R53B5.dc.html",
+  "R53B6.dc.html",
+  "R53B7.dc.html",
+  "R53M1.dc.html",
+  "R53M2.dc.html",
+  "R53M3.dc.html",
+  "R53M4.dc.html",
+  "R53M5.dc.html",
+  "R53M6.dc.html",
+  "R54D1.dc.html",
+  "R54D2.dc.html",
+  "R54D3.dc.html",
+  "R54D4.dc.html",
+  "R54D5.dc.html",
+  "R54D6.dc.html",
+  "R54T1.dc.html",
+  "R54T2.dc.html",
+  "R54T3.dc.html",
+  "R54T4.dc.html",
+  "R54T5.dc.html",
+  "R54T6.dc.html",
+  "R55H1.dc.html",
+  "R55H2.dc.html",
+  "R55H3.dc.html",
+  "R55H4.dc.html",
+  "R55H5.dc.html",
+  "R55H6.dc.html",
+  "R56P1.dc.html",
+  "R56P2.dc.html",
+  "R56P3.dc.html",
+  "R56P4.dc.html",
+  "R56P5.dc.html",
+  "R57Q1.dc.html",
+  "R57Q2.dc.html",
+  "R57Q3.dc.html",
+  "R57Q4.dc.html",
+  "R57Q5.dc.html",
+  "R57D1.dc.html",
+  "R57D2.dc.html",
+  "R57D3.dc.html",
+  "R57D4.dc.html",
+  "R57D5.dc.html",
+  "R57D6.dc.html",
+  "R58Q1.dc.html",
+  "R58Q1a.dc.html",
+  "R58Q1b.dc.html",
+  "R58Q1c.dc.html",
+  "R58Q1d.dc.html",
+  "R58Q1e.dc.html",
+  "R58Q1f.dc.html",
+  "R58F1.dc.html",
+  "R58F2.dc.html",
+  "R58F3.dc.html",
+  "R58F4.dc.html",
+  "R58F5.dc.html",
+  "R58F6.dc.html",
+  "R58F7.dc.html",
+  "R58F8.dc.html",
+  "R59P1.dc.html",
+  "R59P2.dc.html",
+  "R59P3.dc.html",
+  "R59P4.dc.html",
+  "R59P5.dc.html",
+  "R59A1.dc.html",
+  "R59A2.dc.html",
+  "R59A3.dc.html",
+  "R59A4.dc.html",
+  "R59A5.dc.html",
+  "R59F1.dc.html",
+  "R59F2.dc.html",
+  "R59F3.dc.html",
+  "R59F4.dc.html",
+  "R59F5.dc.html",
+  "R59F6.dc.html",
+  "R60E1.dc.html",
+  "R60E2.dc.html",
+  "R60E3.dc.html",
+  "R60E4.dc.html",
+  "R60E5.dc.html",
+  "R60E6.dc.html",
+  "R61E1.dc.html",
+  "R61E1a.dc.html",
+  "R61E1b.dc.html",
+  "R61E1c.dc.html",
+  "R61E1d.dc.html",
+  "R61E1e.dc.html",
+  "R61E1f.dc.html",
+  "R61E1g.dc.html",
+  "R62K1.dc.html",
+  "R62K2.dc.html",
+  "R62K3.dc.html",
+  "R62K4.dc.html",
+  "R62K5.dc.html",
+  "R62K6.dc.html",
+  "R63K3.dc.html",
+  "R63K3a.dc.html",
+  "R63K3b.dc.html",
+  "R63K3c.dc.html",
+  "R63K3d.dc.html",
+  "R63J1.dc.html",
+  "R63J2.dc.html",
+  "R63J3.dc.html",
+  "R63J4.dc.html",
+  "R63J5.dc.html",
+  "R63J6.dc.html",
+  "R63J7.dc.html",
+  "R64A1.dc.html",
+  "R64A2.dc.html",
+  "R64A3.dc.html",
+  "R64A4.dc.html",
+  "R64A5.dc.html",
+  "R64A6.dc.html",
+  "R31LaunchRoute.dc.html",
+  "R31ArrTruck.dc.html",
+  "R34Sequence.dc.html",
+  "ArrQuiet.dc.html",
+  "ArrSweep.dc.html",
+  "ArrHandoff.dc.html",
+  "ArrPark.dc.html",
+  "ArrDeal.dc.html",
+  "ArrFocus.dc.html",
+  "R65A34.dc.html",
+  "R65L1.dc.html",
+  "R65L2.dc.html",
+  "R65L3.dc.html",
+  "R65L4.dc.html",
+  "R65L5.dc.html",
+  "R66A3.dc.html",
+  "R66D1.dc.html",
+  "R66D2.dc.html",
+  "R66D3.dc.html",
+  "R66D4.dc.html",
+  "R67N1.dc.html",
+  "R67N2.dc.html",
+  "R67N3.dc.html",
+  "R67N4.dc.html",
+  "R68Victor3.dc.html",
+  "R68Victor4.dc.html",
+  "R68Danilo3.dc.html",
+  "R68Danilo4.dc.html",
+  "R68Corazon3.dc.html",
+  "R68Corazon4.dc.html",
+  "R68Felicidad3.dc.html",
+  "R68Felicidad4.dc.html",
+  "R68Armando3.dc.html",
+  "R68Armando4.dc.html",
+  "R68Leonora3.dc.html",
+  "R68Leonora4.dc.html",
+  "R69SuiteIcons.dc.html",
+  "R69Victor.dc.html",
+  "R69Danilo.dc.html",
+  "R69Corazon.dc.html",
+  "R69Felicidad.dc.html",
+  "R69Armando.dc.html",
+  "R69Leonora.dc.html"
+ ],
+ "notes": {
+  "t49a": {
+   "x": 0,
+   "y": -300,
+   "text": "Launcher as a module picker: Corazon Villareal, BMS, VMMS and VRMS",
+   "kind": "title1",
+   "maxW": 4480,
+   "page": "r49launcher"
+  },
+  "t49b": {
+   "x": 0,
+   "y": -300,
+   "text": "Suite management for a system admin: Felicidad Roxas, VMMS and VRMS Admin",
+   "kind": "title1",
+   "maxW": 4480,
+   "page": "r49suite"
+  },
+  "t49c": {
+   "x": 0,
+   "y": 2100,
+   "text": "Suite admin, no systems: Leonora Castillo",
+   "kind": "title1",
+   "maxW": 4480,
+   "page": "r49suite"
+  },
+  "t50a": {
+   "x": 0,
+   "y": -300,
+   "text": "Only BMS, VMMS and VRMS are clickable: Corazon Villareal",
+   "kind": "title1",
+   "maxW": 4480,
+   "page": "r50launcher"
+  },
+  "t50b": {
+   "x": 0,
+   "y": -300,
+   "text": "Suite management somewhere else (Felicidad Roxas, VMMS and VRMS Admin)",
+   "kind": "title1",
+   "maxW": 4480,
+   "page": "r50suite"
+  },
+  "t50c": {
+   "x": 0,
+   "y": 2100,
+   "text": "Suite management as a choice of its own",
+   "kind": "title1",
+   "maxW": 4480,
+   "page": "r50suite"
+  },
+  "t51a": {
+   "x": 0,
+   "y": -300,
+   "text": "App grid from the top left (all under navbar N2, the compact hero)",
+   "kind": "title1",
+   "maxW": 4480,
+   "page": "r51grid"
+  },
+  "t51b": {
+   "x": 0,
+   "y": -300,
+   "text": "Navy navbar (all over grid G1); N2 is on the app grid page",
+   "kind": "title1",
+   "maxW": 4480,
+   "page": "r51nav"
+  },
+  "t52i": {
+   "x": 0,
+   "y": -300,
+   "text": "What goes in the icon spot (each shown on G1 tiles, the navy Suite tile, and G2 cards)",
+   "kind": "title1",
+   "maxW": 4480,
+   "page": "r52icon"
+  },
+  "t52a": {
+   "x": 0,
+   "y": -300,
+   "text": "G1 or G2 (navbar N3a); B1 panel or B2 outline at the bottom",
+   "kind": "title1",
+   "maxW": 4480,
+   "page": "r52grid"
+  },
+  "t52b": {
+   "x": 0,
+   "y": -300,
+   "text": "Navbar: N1 family (top row) or N3 family (bottom row), all over G1 + B1",
+   "kind": "title1",
+   "maxW": 4480,
+   "page": "r52nav"
+  },
+  "t53a": {
+   "x": 0,
+   "y": -300,
+   "text": "G1 style layouts: no \"Your role:\" label; bottom row is the admin case, Suite management in white",
+   "kind": "title1",
+   "maxW": 4480,
+   "page": "r53lay"
+  },
+  "t53b": {
+   "x": 0,
+   "y": -300,
+   "text": "The bottom of the page (all on L1, I1, band M1)",
+   "kind": "title1",
+   "maxW": 4480,
+   "page": "r53bot"
+  },
+  "t53c": {
+   "x": 0,
+   "y": -300,
+   "text": "N3b, the band with the WeLinc mark (all on L1, I1, bottom B1)",
+   "kind": "title1",
+   "maxW": 4480,
+   "page": "r53mark"
+  },
+  "t54a": {
+   "x": 0,
+   "y": -300,
+   "text": "Bottom designs, each with \"WeLinc Logistics · Since 2018\" (L1, M1, I1)",
+   "kind": "title1",
+   "maxW": 4480,
+   "page": "r54bot"
+  },
+  "t54b": {
+   "x": 0,
+   "y": -300,
+   "text": "Telling the navbar from the blue band (L1, M1, I1)",
+   "kind": "title1",
+   "maxW": 4480,
+   "page": "r54sep"
+  },
+  "t55": {
+   "x": 0,
+   "y": -300,
+   "text": "The whole top area, navbar and band together (L1, I1; footer is the company line only)",
+   "kind": "title1",
+   "maxW": 4480,
+   "page": "r55top"
+  },
+  "t56": {
+   "x": 0,
+   "y": -300,
+   "text": "No greeting, a shorter band, a white profile circle (L1, I1)",
+   "kind": "title1",
+   "maxW": 4480,
+   "page": "r56top"
+  },
+  "t57a": {
+   "x": 0,
+   "y": -300,
+   "text": "The band holds the navbar and the mark only, no text (L1, I1)",
+   "kind": "title1",
+   "maxW": 4480,
+   "page": "r57top"
+  },
+  "t57b": {
+   "x": 0,
+   "y": -300,
+   "text": "Footer designs with \"WeLinc Logistics · Since 2018\", no Privacy or Terms (top Q3, L1, I1)",
+   "kind": "title1",
+   "maxW": 4480,
+   "page": "r57bot"
+  },
+  "t58a": {
+   "x": 0,
+   "y": -300,
+   "text": "Q1 picked: refinements of the 88px band, no text (L1, I1)",
+   "kind": "title1",
+   "maxW": 4480,
+   "page": "r58top"
+  },
+  "t58b": {
+   "x": 0,
+   "y": -300,
+   "text": "Footers drawn on the page, no navy bar: \"WeLinc Logistics · Since 2018\" (top Q1, L1, I1)",
+   "kind": "title1",
+   "maxW": 4480,
+   "page": "r58foot"
+  },
+  "t59p": {
+   "x": 0,
+   "y": -300,
+   "text": "The page itself: layout ideas for the tiles and the space under the band (top Q1)",
+   "kind": "title1",
+   "maxW": 4480,
+   "page": "r59page"
+  },
+  "t59a": {
+   "x": 0,
+   "y": -300,
+   "text": "The 88px band with a surface or a job, not the mark moved (no text)",
+   "kind": "title1",
+   "maxW": 4480,
+   "page": "r59band"
+  },
+  "t59f": {
+   "x": 0,
+   "y": -300,
+   "text": "Footers that are not the company name; the small company line stays",
+   "kind": "title1",
+   "maxW": 4480,
+   "page": "r59foot"
+  },
+  "t60": {
+   "x": 0,
+   "y": -300,
+   "text": "The bottom: E1 to E4 move slowly, E5 and E6 are still (band Q1, P5 number keys)",
+   "kind": "title1",
+   "maxW": 4480,
+   "page": "r60foot"
+  },
+  "t61": {
+   "x": 0,
+   "y": -300,
+   "text": "E1 still: the hairline at the bottom (E1, the fallback) and options around it (band Q1, P5)",
+   "kind": "title1",
+   "maxW": 4480,
+   "page": "r61line"
+  },
+  "t62": {
+   "x": 0,
+   "y": -300,
+   "text": "A design in the empty lower page, above E1's line (band Q1, P5); E1 alone is the fallback",
+   "kind": "title1",
+   "maxW": 4480,
+   "page": "r62art"
+  },
+  "t63b": {
+   "x": 0,
+   "y": -300,
+   "text": "K3 made to fit the page, with E1g under it (band Q1, P5)",
+   "kind": "title1",
+   "maxW": 4480,
+   "page": "r63box"
+  },
+  "t63i": {
+   "x": 0,
+   "y": -300,
+   "text": "The system icons, on the page as picked (Q1, P5, K3, E1g)",
+   "kind": "title1",
+   "maxW": 4480,
+   "page": "r63icon"
+  },
+  "t64": {
+   "x": 0,
+   "y": -300,
+   "text": "Arrival from the picked sign in to the launcher as picked (Q1, J1, P5, K3a, E1g): press Replay or Slow",
+   "kind": "title1",
+   "maxW": 4480,
+   "page": "r64arr"
+  },
+  "tsaved": {
+   "x": 0,
+   "y": -300,
+   "text": "Saved copies: Launch 3 (built) and the earlier arrivals. Launches 1, 2 and 4 stayed on the codesamtm canvas",
+   "kind": "title1",
+   "maxW": 4480,
+   "page": "saved"
+  },
+  "t65": {
+   "x": 0,
+   "y": -300,
+   "text": "A3 + A4 arrival, then the launch screens after you click VRMS (Launches 1, 2, 4 redrawn; 3 as built; 5 new)",
+   "kind": "title1",
+   "maxW": 4480,
+   "page": "r65"
+  },
+  "t66": {
+   "x": 0,
+   "y": -300,
+   "text": "A3 with the keys arriving on their tiles, then four wordings for the system descriptions",
+   "kind": "title1",
+   "maxW": 4480,
+   "page": "r66"
+  },
+  "t67": {
+   "x": 0,
+   "y": -300,
+   "text": "Fewer rows per tile, and VMMS's full name on one line",
+   "kind": "title1",
+   "maxW": 2960,
+   "page": "r67"
+  },
+  "t68": {
+   "x": 0,
+   "y": -300,
+   "text": "N3 for each kind of person: 3 to a row (left) and 4 to a row (right)",
+   "kind": "title1",
+   "maxW": 2960,
+   "page": "r68"
+  },
+  "t69": {
+   "x": 0,
+   "y": -300,
+   "text": "3 to a row, a bigger name label, Suite management in full with no count: icon options first, then each kind of person (S1 shown)",
+   "kind": "title1",
+   "maxW": 4480,
+   "page": "r69"
+  }
+ },
+ "designSystems": []
+}

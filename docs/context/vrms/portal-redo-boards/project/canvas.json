@@ -1,0 +1,826 @@
+{
+  "v": 3,
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-11-25T14:00:00Z"
+  },
+  "title": "WeLinc portal redo: sign in, arrival, launcher",
+  "launch": {
+    "view": "canvas",
+    "page": "r47s27"
+  },
+  "pages": [
+    {
+      "id": "signin",
+      "name": "Sign in, left side"
+    },
+    {
+      "id": "arrival",
+      "name": "Arrival"
+    },
+    {
+      "id": "launcher",
+      "name": "Launcher"
+    },
+    {
+      "id": "r44launcher",
+      "name": "Round 44: launcher"
+    },
+    {
+      "id": "r44signin",
+      "name": "Round 44: sign in"
+    },
+    {
+      "id": "r45signin",
+      "name": "Round 45: sign in, dark split"
+    },
+    {
+      "id": "r45launcher",
+      "name": "Round 45: launcher, own layouts"
+    },
+    {
+      "id": "r46signin",
+      "name": "Round 46: S18b on the real map"
+    },
+    {
+      "id": "r47s27",
+      "name": "Round 47: S27 styles"
+    }
+  ],
+  "boards": {
+    "Main.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 1360,
+      "title": "Copy options",
+      "page": "signin"
+    },
+    "SignLivery.dc.html": {
+      "x": 1520,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "S1 Light side, line drawing (copy 1)",
+      "page": "signin"
+    },
+    "SignPhoto.dc.html": {
+      "x": 3040,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "S2 Real photo, full bleed (copy 2) · out: the photo",
+      "page": "signin"
+    },
+    "SignCutouts.dc.html": {
+      "x": 0,
+      "y": 1480,
+      "w": 1440,
+      "h": 900,
+      "title": "S3 Real fleet photos (copy 7)",
+      "page": "signin"
+    },
+    "SignVan.dc.html": {
+      "x": 1520,
+      "y": 1480,
+      "w": 1440,
+      "h": 900,
+      "title": "S4 Drawn van at the garage (copy 8)",
+      "page": "signin"
+    },
+    "SignRoute.dc.html": {
+      "x": 3040,
+      "y": 1480,
+      "w": 1440,
+      "h": 900,
+      "title": "S5 One trip, out and back (copy 3)",
+      "page": "signin"
+    },
+    "SignType.dc.html": {
+      "x": 0,
+      "y": 2500,
+      "w": 1440,
+      "h": 900,
+      "title": "S6 Type and the mark (copy 4)",
+      "page": "signin"
+    },
+    "SignPreview.dc.html": {
+      "x": 1520,
+      "y": 2500,
+      "w": 1440,
+      "h": 900,
+      "title": "S7 Product preview (copy 5)",
+      "page": "signin"
+    },
+    "SignFacts.dc.html": {
+      "x": 3040,
+      "y": 2500,
+      "w": 1440,
+      "h": 900,
+      "title": "S8 Three facts (copy 9)",
+      "page": "signin"
+    },
+    "SignPhotoCard.dc.html": {
+      "x": 0,
+      "y": 3520,
+      "w": 1440,
+      "h": 900,
+      "title": "S9 Real photo, framed (copy 6) · out: the photo",
+      "page": "signin"
+    },
+    "LauPhoto.dc.html": {
+      "x": 3040,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "L3 Real photo band · out: the photo",
+      "page": "launcher"
+    },
+    "LauRows.dc.html": {
+      "x": 0,
+      "y": 1020,
+      "w": 1440,
+      "h": 900,
+      "title": "L4 Short band, systems as rows",
+      "page": "launcher"
+    },
+    "LauVan.dc.html": {
+      "x": 1520,
+      "y": 1020,
+      "w": 1440,
+      "h": 900,
+      "title": "L5 Drawn van at the garage",
+      "page": "launcher"
+    },
+    "LauScenes.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "L1 Slim header, each card shows its work",
+      "page": "launcher"
+    },
+    "LauLivery.dc.html": {
+      "x": 1520,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "L2 Light band, line drawing",
+      "page": "launcher"
+    },
+    "LauLineup.dc.html": {
+      "x": 3040,
+      "y": 1020,
+      "w": 1440,
+      "h": 900,
+      "title": "L6 The fleet parked in bays",
+      "page": "launcher"
+    },
+    "LauRoute.dc.html": {
+      "x": 0,
+      "y": 2040,
+      "w": 1440,
+      "h": 900,
+      "title": "L7 One trip, out and back",
+      "page": "launcher"
+    },
+    "LauWhite.dc.html": {
+      "x": 1520,
+      "y": 2040,
+      "w": 1440,
+      "h": 900,
+      "title": "L8 No band, gold hairline",
+      "page": "launcher"
+    },
+    "AdmStrip.dc.html": {
+      "x": 0,
+      "y": 3360,
+      "w": 1440,
+      "h": 900,
+      "title": "M1 Admin: Suite management as a row under the card",
+      "page": "launcher"
+    },
+    "AdmColumn.dc.html": {
+      "x": 1520,
+      "y": 3360,
+      "w": 1440,
+      "h": 900,
+      "title": "M2 Admin: Suite management beside the system",
+      "page": "launcher"
+    },
+    "AdmSide.dc.html": {
+      "x": 3040,
+      "y": 3360,
+      "w": 1440,
+      "h": 900,
+      "title": "M3 Admin: a right column",
+      "page": "launcher"
+    },
+    "AdmBand.dc.html": {
+      "x": 0,
+      "y": 4380,
+      "w": 1440,
+      "h": 900,
+      "title": "M4 Admin: counts in the band",
+      "page": "launcher"
+    },
+    "ArrSweep.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "A1 The navy side sweeps into the band",
+      "page": "arrival",
+      "is_interactive": true
+    },
+    "ArrHandoff.dc.html": {
+      "x": 1520,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "A2 The sign in page rolls up like a shutter",
+      "page": "arrival",
+      "is_interactive": true
+    },
+    "ArrPark.dc.html": {
+      "x": 3040,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "A3 The van pulls out of the garage",
+      "page": "arrival",
+      "is_interactive": true
+    },
+    "ArrQuiet.dc.html": {
+      "x": 0,
+      "y": 1020,
+      "w": 1440,
+      "h": 900,
+      "title": "A4 Quiet rise",
+      "page": "arrival",
+      "is_interactive": true
+    },
+    "ArrDeal.dc.html": {
+      "x": 1520,
+      "y": 1020,
+      "w": 1440,
+      "h": 900,
+      "title": "A5 Cards dispatched from the band",
+      "page": "arrival",
+      "is_interactive": true
+    },
+    "ArrFocus.dc.html": {
+      "x": 3040,
+      "y": 1020,
+      "w": 1440,
+      "h": 900,
+      "title": "A6 Sign in steps back, launcher comes forward",
+      "page": "arrival",
+      "is_interactive": true
+    },
+    "R44Depot.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "L9 One depot across the band, a column under each part · out",
+      "page": "r44launcher"
+    },
+    "R44Tall.dc.html": {
+      "x": 1520,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "L10 Tall cards, each opens on its part of the depot · out",
+      "page": "r44launcher"
+    },
+    "R44Preview.dc.html": {
+      "x": 3040,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "L11 Pick on the left, a big look on the right · out",
+      "page": "r44launcher"
+    },
+    "R44Light.dc.html": {
+      "x": 0,
+      "y": 1020,
+      "w": 1440,
+      "h": 900,
+      "title": "L12 Light band, the depot line drawn · out",
+      "page": "r44launcher"
+    },
+    "R44Words.dc.html": {
+      "x": 1520,
+      "y": 1020,
+      "w": 1440,
+      "h": 900,
+      "title": "L13 Big words, the work first · out",
+      "page": "r44launcher"
+    },
+    "R44Account.dc.html": {
+      "x": 3040,
+      "y": 1020,
+      "w": 1440,
+      "h": 900,
+      "title": "L14 What you do there, and your account · out",
+      "page": "r44launcher"
+    },
+    "R44SignDock.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "S10 S1's light side, the dock drawn big · out",
+      "page": "r44signin"
+    },
+    "R44SignType.dc.html": {
+      "x": 1520,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "S11 Type and the mark, facts along the bottom · out",
+      "page": "r44signin"
+    },
+    "R44SignCentre.dc.html": {
+      "x": 3040,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "S12 Centred card above the whole depot · out",
+      "page": "r44signin"
+    },
+    "R44SignPreview.dc.html": {
+      "x": 0,
+      "y": 1020,
+      "w": 1440,
+      "h": 900,
+      "title": "S13 A look at the workspace · out",
+      "page": "r44signin"
+    },
+    "R44SignBand.dc.html": {
+      "x": 1520,
+      "y": 1020,
+      "w": 1440,
+      "h": 900,
+      "title": "S14 The band on top, like the launcher · out",
+      "page": "r44signin"
+    },
+    "R44SignFleet.dc.html": {
+      "x": 3040,
+      "y": 1020,
+      "w": 1440,
+      "h": 900,
+      "title": "S15 On the road since 2018, the fleet parked · out",
+      "page": "r44signin"
+    },
+    "R45SignRoad.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "S16 Night road, the van ahead, lamps going by",
+      "page": "r45signin"
+    },
+    "R45SignIso.dc.html": {
+      "x": 1520,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "S17 The depot as a model at night",
+      "page": "r45signin"
+    },
+    "R45SignMap.dc.html": {
+      "x": 3040,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "S18 The route map tilted into the distance · liked",
+      "page": "r45signin"
+    },
+    "R45SignFront.dc.html": {
+      "x": 0,
+      "y": 1020,
+      "w": 1440,
+      "h": 900,
+      "title": "S19 Headlights at the garage door · liked",
+      "page": "r45signin"
+    },
+    "R45LaunchRoad.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "L15 Night road band, cards show each system's first screen",
+      "page": "r45launcher"
+    },
+    "R45LaunchModel.dc.html": {
+      "x": 1520,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "L16 The depot model fills the band, one bar of three",
+      "page": "r45launcher"
+    },
+    "R45LaunchSplit.dc.html": {
+      "x": 3040,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "L17 Split like the sign in, last opened leads",
+      "page": "r45launcher"
+    },
+    "R45LaunchBento.dc.html": {
+      "x": 0,
+      "y": 1020,
+      "w": 1440,
+      "h": 900,
+      "title": "L18 Bento: pick up where you left off, clock, account",
+      "page": "r45launcher"
+    },
+    "R45LaunchPanels.dc.html": {
+      "x": 1520,
+      "y": 1020,
+      "w": 1440,
+      "h": 900,
+      "title": "L19 Three panels, the one you point at opens up",
+      "page": "r45launcher"
+    },
+    "R45SignRoads.dc.html": {
+      "x": 1520,
+      "y": 1020,
+      "w": 1440,
+      "h": 900,
+      "title": "S18b S18 again: real roads, street grids, twelve trips out and back along them · picked, redrawn in Round 46",
+      "page": "r45signin"
+    },
+    "R45SignNav.dc.html": {
+      "x": 0,
+      "y": 2400,
+      "w": 1440,
+      "h": 900,
+      "title": "S20 Navigation view: the map rolls under the van on NLEX",
+      "page": "r45signin"
+    },
+    "R45SignWing.dc.html": {
+      "x": 1520,
+      "y": 2400,
+      "w": 1440,
+      "h": 900,
+      "title": "S21 The wing van at the dock, its wing lifting",
+      "page": "r45signin"
+    },
+    "R45SignToll.dc.html": {
+      "x": 3040,
+      "y": 2400,
+      "w": 1440,
+      "h": 900,
+      "title": "S22 The toll gate: the arm lifts, the truck rolls through",
+      "page": "r45signin"
+    },
+    "R45SignYard.dc.html": {
+      "x": 0,
+      "y": 3420,
+      "w": 1440,
+      "h": 900,
+      "title": "S23 The yard from above at night",
+      "page": "r45signin"
+    },
+    "R45SignTrails.dc.html": {
+      "x": 1520,
+      "y": 3420,
+      "w": 1440,
+      "h": 900,
+      "title": "S24 Light trails on the interchange",
+      "page": "r45signin"
+    },
+    "R45SignCab.dc.html": {
+      "x": 3040,
+      "y": 3420,
+      "w": 1440,
+      "h": 900,
+      "title": "S25 From the driver's seat",
+      "page": "r45signin"
+    },
+    "R46Notes.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "Read first: the map check and suggestions",
+      "page": "r46signin"
+    },
+    "R46Real.dc.html": {
+      "x": 1520,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "S26 S18b on the real map: same layout, labels upright",
+      "page": "r46signin"
+    },
+    "R46Bleed.dc.html": {
+      "x": 3040,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "S27 The map runs under the form, the form on glass · picked, plain (no turn-taking, no traffic dots)",
+      "page": "r46signin"
+    },
+    "R46Spot.dc.html": {
+      "x": 0,
+      "y": 1020,
+      "w": 1440,
+      "h": 900,
+      "title": "S28 The garages take turns, each with its four runs",
+      "page": "r46signin"
+    },
+    "R46Board.dc.html": {
+      "x": 1520,
+      "y": 1020,
+      "w": 1440,
+      "h": 900,
+      "title": "S29 A departures board of the regular runs",
+      "page": "r46signin"
+    },
+    "R46Chart.dc.html": {
+      "x": 3040,
+      "y": 1020,
+      "w": 1440,
+      "h": 900,
+      "title": "S30 A navigator's chart: flat, true north, coordinates",
+      "page": "r46signin"
+    },
+    "R46Horizon.dc.html": {
+      "x": 0,
+      "y": 2040,
+      "w": 1440,
+      "h": 900,
+      "title": "S31 To the horizon: the map runs into the night sky",
+      "page": "r46signin"
+    },
+    "R46Trails.dc.html": {
+      "x": 1520,
+      "y": 2040,
+      "w": 1440,
+      "h": 900,
+      "title": "S32 No route lines: the trucks draw them as they go",
+      "page": "r46signin"
+    },
+    "R46Drift.dc.html": {
+      "x": 3040,
+      "y": 2040,
+      "w": 1440,
+      "h": 900,
+      "title": "S33 Slow camera: the map turns and drifts, a minute a loop",
+      "page": "r46signin"
+    },
+    "R46Low.dc.html": {
+      "x": 0,
+      "y": 3060,
+      "w": 1440,
+      "h": 900,
+      "title": "S34 Map first: the map fills the panel, the title sits low",
+      "page": "r46signin"
+    },
+    "R47Notes.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "Read first: S27 picked plain, what changes board to board",
+      "page": "r47s27"
+    },
+    "R47Plain.dc.html": {
+      "x": 1520,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "S27 as picked: navy glass panel, no traffic dots",
+      "page": "r47s27"
+    },
+    "R47Frost.dc.html": {
+      "x": 3040,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "S27a Frosted: a heavier panel, a gold hairline edge",
+      "page": "r47s27"
+    },
+    "R47Card.dc.html": {
+      "x": 0,
+      "y": 1020,
+      "w": 1440,
+      "h": 900,
+      "title": "S27b Floating card: no panel, the map on every side",
+      "page": "r47s27"
+    },
+    "R47Open.dc.html": {
+      "x": 1520,
+      "y": 1020,
+      "w": 1440,
+      "h": 900,
+      "title": "S27c Open: no panel, no card, a navy pool behind the form",
+      "page": "r47s27"
+    },
+    "R47Quiet.dc.html": {
+      "x": 3040,
+      "y": 1020,
+      "w": 1440,
+      "h": 900,
+      "title": "S27d Quiet map: the roads dim back, only the runs lit · picked (on S27's glass panel)",
+      "page": "r47s27"
+    },
+    "R47Etch.dc.html": {
+      "x": 0,
+      "y": 2040,
+      "w": 1440,
+      "h": 900,
+      "title": "S27e Gold etching: fine gold roads, the runs in white",
+      "page": "r47s27"
+    },
+    "R47Lights.dc.html": {
+      "x": 1520,
+      "y": 2040,
+      "w": 1440,
+      "h": 900,
+      "title": "S27f City lights: the dense streets glow warm",
+      "page": "r47s27"
+    },
+    "R47Flat.dc.html": {
+      "x": 3040,
+      "y": 2040,
+      "w": 1440,
+      "h": 900,
+      "title": "S27g Flat: straight down, true to scale, the map stays left",
+      "page": "r47s27"
+    }
+  },
+  "order": [
+    "Main.dc.html",
+    "SignLivery.dc.html",
+    "SignPhoto.dc.html",
+    "SignCutouts.dc.html",
+    "SignVan.dc.html",
+    "SignRoute.dc.html",
+    "SignType.dc.html",
+    "SignPreview.dc.html",
+    "SignFacts.dc.html",
+    "SignPhotoCard.dc.html",
+    "LauPhoto.dc.html",
+    "LauRows.dc.html",
+    "LauVan.dc.html",
+    "LauScenes.dc.html",
+    "LauLivery.dc.html",
+    "LauLineup.dc.html",
+    "LauRoute.dc.html",
+    "LauWhite.dc.html",
+    "AdmStrip.dc.html",
+    "AdmColumn.dc.html",
+    "AdmSide.dc.html",
+    "AdmBand.dc.html",
+    "ArrSweep.dc.html",
+    "ArrHandoff.dc.html",
+    "ArrPark.dc.html",
+    "ArrQuiet.dc.html",
+    "ArrDeal.dc.html",
+    "ArrFocus.dc.html",
+    "R44Depot.dc.html",
+    "R44Tall.dc.html",
+    "R44Preview.dc.html",
+    "R44Light.dc.html",
+    "R44Words.dc.html",
+    "R44Account.dc.html",
+    "R44SignDock.dc.html",
+    "R44SignType.dc.html",
+    "R44SignCentre.dc.html",
+    "R44SignPreview.dc.html",
+    "R44SignBand.dc.html",
+    "R44SignFleet.dc.html",
+    "R45SignRoad.dc.html",
+    "R45SignIso.dc.html",
+    "R45SignMap.dc.html",
+    "R45SignFront.dc.html",
+    "R45SignRoads.dc.html",
+    "R45SignNav.dc.html",
+    "R45SignWing.dc.html",
+    "R45SignToll.dc.html",
+    "R45SignYard.dc.html",
+    "R45SignTrails.dc.html",
+    "R45SignCab.dc.html",
+    "R45LaunchRoad.dc.html",
+    "R45LaunchModel.dc.html",
+    "R45LaunchSplit.dc.html",
+    "R45LaunchBento.dc.html",
+    "R45LaunchPanels.dc.html",
+    "R46Notes.dc.html",
+    "R46Real.dc.html",
+    "R46Bleed.dc.html",
+    "R46Spot.dc.html",
+    "R46Board.dc.html",
+    "R46Chart.dc.html",
+    "R46Horizon.dc.html",
+    "R46Trails.dc.html",
+    "R46Drift.dc.html",
+    "R46Low.dc.html",
+    "R47Notes.dc.html",
+    "R47Plain.dc.html",
+    "R47Frost.dc.html",
+    "R47Card.dc.html",
+    "R47Open.dc.html",
+    "R47Quiet.dc.html",
+    "R47Etch.dc.html",
+    "R47Lights.dc.html",
+    "R47Flat.dc.html"
+  ],
+  "notes": {
+    "t1": {
+      "x": 0,
+      "y": -300,
+      "text": "Sign in: the left side, nine looks and ten lines of copy",
+      "kind": "title1",
+      "maxW": 4480,
+      "page": "signin"
+    },
+    "t2": {
+      "x": 0,
+      "y": -300,
+      "text": "Arrival: from Sign in to the launcher (Replay, Slow)",
+      "kind": "title1",
+      "maxW": 4480,
+      "page": "arrival"
+    },
+    "t3": {
+      "x": 0,
+      "y": -300,
+      "text": "Launcher: Corazon Villareal, three systems",
+      "kind": "title1",
+      "maxW": 4480,
+      "page": "launcher"
+    },
+    "t4": {
+      "x": 0,
+      "y": 3060,
+      "text": "Launcher for an admin: Victor Ramos, VRMS Admin",
+      "kind": "title1",
+      "maxW": 4480,
+      "page": "launcher"
+    },
+    "t5": {
+      "x": 0,
+      "y": -300,
+      "text": "Round 44 launcher: one depot, every card without the icon tile, pill and Open row",
+      "kind": "title1",
+      "maxW": 4480,
+      "page": "r44launcher"
+    },
+    "t6": {
+      "x": 0,
+      "y": -300,
+      "text": "Round 44 sign in: whole page open, no system codes",
+      "kind": "title1",
+      "maxW": 4480,
+      "page": "r44signin"
+    },
+    "t7": {
+      "x": 0,
+      "y": -300,
+      "text": "Round 45 sign in: dark navy all around, split, gold sign in",
+      "kind": "title1",
+      "maxW": 4480,
+      "page": "r45signin"
+    },
+    "t8": {
+      "x": 0,
+      "y": -300,
+      "text": "Round 45 launcher: a different layout on every board",
+      "kind": "title1",
+      "maxW": 4480,
+      "page": "r45launcher"
+    },
+    "t9": {
+      "x": 0,
+      "y": 2100,
+      "text": "Round 45 sign in, more ideas: six new scenes on the same dark split",
+      "kind": "title1",
+      "maxW": 4480,
+      "page": "r45signin"
+    },
+    "t10": {
+      "x": 0,
+      "y": -300,
+      "text": "Round 46: S18b redrawn from OpenStreetMap, nine ways to use it. Title: WeLinc Logistics Operations Workspace",
+      "kind": "title1",
+      "maxW": 4480,
+      "page": "r46signin"
+    },
+    "t11": {
+      "x": 0,
+      "y": -300,
+      "text": "Round 47: S27 picked plain. Eight looks for its style: the form surface, the map look, the angle",
+      "kind": "title1",
+      "maxW": 4480,
+      "page": "r47s27"
+    }
+  },
+  "designSystems": []
+}

@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Admin launcher, Suite management in a right column</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=IBM+Plex+Mono:wght@500;600&amp;display=swap">
+<style>
+body{margin:0}
+.pg{width:1440px;height:900px;background:#f3f5f9;font-family:Inter,system-ui,sans-serif;position:relative;overflow:hidden;color:#0f172a}
+.band{position:relative;background:#0f1445;color:#fff;overflow:hidden}
+.top{position:relative;z-index:2;height:64px;width:1200px;margin:0 auto;display:flex;align-items:center}
+.lk{display:flex;align-items:center;gap:10px}.lk svg{height:20px;fill:#e8b800}.lk span{font-weight:800;font-style:italic;font-size:16px}
+.me{margin-left:auto;display:flex;align-items:center;gap:10px;height:44px;padding:0 8px;border-radius:12px;border:0;background:none;color:inherit;font:500 14px Inter,sans-serif;cursor:pointer}
+.av{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.12);box-shadow:inset 0 0 0 1px rgba(255,255,255,.2);display:grid;place-items:center;font-size:12px;font-weight:600}
+.gr{position:relative;z-index:2;width:1200px;margin:0 auto}
+.dt{margin:0;font-size:13px;font-weight:600;color:#e8b800}
+h1{margin:10px 0 0;font-size:48px;line-height:1;font-weight:800;letter-spacing:-.03em}
+.l{margin:12px 0 0;font-size:16px;color:rgba(255,255,255,.7)}
+.main{width:1200px;margin:24px auto 0}
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;list-style:none;margin:0;padding:0}
+.cards li{display:flex}
+.card{flex:1;display:flex;flex-direction:column;min-height:196px;background:#fff;border-radius:24px;box-shadow:0 1px 2px rgba(15,23,42,.05),0 6px 20px rgba(15,23,42,.06);padding:22px 24px 18px;text-decoration:none;color:inherit;box-sizing:border-box}
+.hd{display:flex;align-items:center;gap:14px}
+.tile{flex:none;width:48px;height:48px;border-radius:16px;background:#eef0f8;color:#1a1f6e;display:grid;place-items:center}
+.code{font-size:20px;font-weight:700}
+.chip{font-size:12px;font-weight:500;padding:3px 10px;border-radius:999px;background:#eef1f6;color:#475569;box-shadow:inset 0 0 0 1px #e2e8f0}
+.nm{margin-top:14px;font-size:14px;font-weight:500}
+.ds{margin-top:4px;font-size:13px;color:#5b6779}
+.ft{margin-top:auto;padding-top:12px;border-top:1px solid #eef1f6;display:flex;justify-content:space-between;align-items:center;font-size:14px;font-weight:600;color:#1a1f6e}
+.band{height:300px}
+.gr{padding-top:48px}
+.mk{position:absolute;right:120px;top:96px;height:150px;fill:rgba(255,255,255,.05)}
+.main{margin-top:24px}
+.panel{background:#fff;border-radius:24px;box-shadow:0 1px 2px rgba(15,23,42,.05),0 6px 20px rgba(15,23,42,.06);box-sizing:border-box}
+.wide{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:20px;padding:24px 28px;text-decoration:none;color:inherit}
+.wide .tile{width:56px;height:56px}
+.wt{display:flex;flex-direction:column;gap:4px}
+.wt .hd{gap:10px}
+.wt .nm{margin-top:4px}.wt .ds{margin-top:0}
+.go{display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 18px;border-radius:12px;background:#0f1445;color:#fff;font-size:15px;font-weight:700}
+.sh{flex:none;width:44px;height:44px;border-radius:14px;background:#e6ecfa;color:#1e3a8a;display:grid;place-items:center}
+.st{display:flex;flex-direction:column;gap:2px}
+.st b{font-size:16px;font-weight:700}
+.st span{font-size:13px;color:#5b6779}
+.ol{display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 16px;border-radius:12px;border:1px solid #cbd2e0;background:#fff;color:#1a1f6e;font:600 14px Inter,sans-serif;text-decoration:none}
+.n{font-family:"IBM Plex Mono",monospace;font-weight:600}
+.cnt{min-width:28px;height:24px;padding:0 8px;border-radius:8px;background:#e6ecfa;color:#1e3a8a;display:inline-grid;place-items:center;font-size:13px;box-sizing:border-box}
+
+.lay{display:grid;grid-template-columns:minmax(0,1fr) 384px;gap:24px;align-items:start}
+.side{margin-top:-140px;position:relative;z-index:3;padding:24px;display:flex;flex-direction:column}
+.side .who{display:flex;align-items:center;gap:14px}
+.rows{list-style:none;margin:16px 0 0;padding:0}
+.rows li+li{border-top:1px solid #eef1f6}
+.rw{display:flex;align-items:center;gap:14px;height:56px;text-decoration:none;color:inherit;font-size:15px;font-weight:500}
+.rw svg.i{color:#1a1f6e}
+.rw .sp{margin-left:auto;display:flex;align-items:center;gap:10px;color:#5b6779;font-size:13px;font-weight:400}
+.side .ol{margin-top:16px;justify-content:center}
+.sys{display:flex;flex-direction:column;padding:28px;text-decoration:none;color:inherit}
+.sys .tile{width:56px;height:56px}
+.sys .nm{margin-top:20px;font-size:16px}
+.sys .ds{font-size:14px}
+.sys .ft{margin-top:24px;padding-top:16px;font-size:15px}
+.mk{display:none}
+
+</style>
+</helmet>
+<div class="pg">
+<div class="band"><svg class="mk" viewBox="0 0 330 185" aria-hidden="true"><polygon points="82,0 144,0 66,183 4,183"/><polygon points="177,0 240,0 162,183 100,183"/><polygon points="265,0 328,0 268,140 328,140 328,183 187,183"/></svg><div class="top"><div class="lk"><svg viewBox="0 0 330 185" aria-hidden="true"><polygon points="82,0 144,0 66,183 4,183"/><polygon points="177,0 240,0 162,183 100,183"/><polygon points="265,0 328,0 268,140 328,140 328,183 187,183"/></svg><span>WeLinc Logistics</span></div><button class="me" type="button" aria-label="Account menu for Victor Ramos"><span class="av">VR</span>Victor Ramos<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" opacity=".7" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></div><div class="gr"><p class="dt">Wednesday, November 25</p><h1>Good morning, Victor</h1><p class="l">Pick where you want to work today.</p></div></div>
+<main class="main"><div class="lay">
+<a class="panel sys" href="#"><span class="hd"><span class="tile"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></span><span class="code">VRMS</span><span class="chip">Admin</span></span><span class="nm">Vehicle Repair Management System</span><span class="ds">Repair tickets, mechanics and workshop work</span><span class="ft">Open VRMS <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a>
+<aside class="panel side" aria-label="Suite management"><div class="who"><span class="sh"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg></span><span class="st"><b>Suite management</b><span>Users and permissions</span></span></div><ul class="rows"><li><a class="rw" href="#" aria-label="Users need a look: 3"><svg class="i" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>Users need a look<span class="sp"><span class="cnt n">3</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></span></a></li><li><a class="rw" href="#" aria-label="Deletion requests: 1"><svg class="i" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m17 8 5 5M22 8l-5 5"/></svg>Deletion requests<span class="sp"><span class="cnt n">1</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></span></a></li><li><a class="rw" href="#"><svg class="i" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>Audit log<span class="sp"><span>Sign ins and changes</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></span></a></li></ul><a class="ol" href="#">Open Suite management <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></a></aside>
+</div></main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

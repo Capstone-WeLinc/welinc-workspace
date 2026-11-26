@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>P6 · Fullest case (sample: Admin in all three systems): Suite management as the fourth card</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=IBM+Plex+Mono:wght@500;600&amp;display=swap">
+<style>
+body{margin:0}
+*{box-sizing:border-box}
+.pg{width:1440px;min-height:900px;font-family:Inter,system-ui,sans-serif;position:relative;overflow:hidden;color:#0f172a;background:#f3f5f9}
+a{color:inherit;text-decoration:none}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+.w{width:1200px;margin:0 auto;position:relative}
+.top{position:relative;z-index:3;height:64px;display:flex;align-items:center}
+.lk{display:flex;align-items:center;gap:10px}.lk svg{height:20px;fill:#e8b800}.lk span{font-weight:800;font-style:italic;font-size:16px}
+.me{margin-left:auto;display:flex;align-items:center;gap:10px;height:44px;padding:0 8px;border-radius:12px;border:0;background:none;color:inherit;font:500 14px Inter,sans-serif;cursor:pointer}
+.av{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.12);box-shadow:inset 0 0 0 1px rgba(255,255,255,.2);display:grid;place-items:center;font-size:12px;font-weight:600}
+.lt .av{background:#e6e9f2;box-shadow:none;color:#0f1445}
+.band{position:relative;background:#0f1445;color:#fff;overflow:hidden}
+.dt{margin:0;font:600 13px "IBM Plex Mono",monospace;letter-spacing:.04em;color:#e8b800}
+.band{height:400px}
+.gr{padding-top:40px}
+h1{margin:12px 0 0;font-size:60px;line-height:1;font-weight:800;letter-spacing:-.035em}
+.l{margin:14px 0 0;font-size:17px;color:rgba(255,255,255,.68)}
+.road{position:absolute;left:0;right:0;bottom:0;height:96px;background:#0a0d33;box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+.road b{position:absolute;left:0;right:0;top:0;height:6px;background:#141a55}
+.road i{position:absolute;left:0;right:0;top:52px;height:3px;background:repeating-linear-gradient(90deg,rgba(203,210,234,.32) 0 44px,transparent 44px 104px)}
+.veh{position:absolute;left:0;animation:drive 30s linear infinite}
+.v1{width:210px;bottom:16px;animation-delay:-6s}.v2{width:140px;bottom:15px;animation-delay:-20s}
+@keyframes drive{from{transform:translateX(-260px)}to{transform:translateX(1700px)}}
+.cards{margin-top:36px;display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.cards a{position:relative;display:flex;flex-direction:column;min-height:250px;padding:30px 30px 28px;border-radius:24px;background:#fff;box-shadow:0 1px 2px rgba(15,23,42,.05),0 10px 28px rgba(15,23,42,.07);transition:transform .25s,box-shadow .25s}
+.cards a:hover{transform:translateY(-4px);box-shadow:0 2px 4px rgba(15,23,42,.06),0 22px 44px rgba(15,23,42,.12)}
+.cards b{font-size:44px;line-height:1;font-weight:800;letter-spacing:-.035em;color:#0f1445}
+.cards .nm{margin-top:12px;font-size:15px;font-weight:600}
+.cards .ln{margin-top:6px;font-size:14px;color:#5b6779;line-height:1.5}
+.cards .rl{margin-top:auto;padding-top:20px;font-size:14px;color:#5b6779}
+.cards .rl strong{color:#0f172a;font-weight:600}
+.cards .arw{position:absolute;right:28px;top:34px;color:#c3cad8;transition:transform .25s,color .25s}
+.cards a:hover .arw{color:#0f1445;transform:translateX(4px)}.cards{grid-template-columns:repeat(4,1fr);gap:20px}
+.cards a{min-height:270px;padding:28px 26px}.cards b{font-size:40px}.cards .arw{right:24px;top:30px}
+.cards a.su{background:#0f1445;color:#fff;box-shadow:0 14px 34px rgba(15,20,69,.25)}
+.cards a.su b{color:#fff}.cards a.su .nm{color:#fff}.cards a.su .ln,.cards a.su .rl{color:rgba(255,255,255,.66)}.cards a.su .rl strong{color:#e8b800}
+.cards a.su .arw{color:rgba(255,255,255,.4)}@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</helmet>
+<div class="pg"><div class="band"><div class="w"><div class="top"><div class="lk"><svg viewBox="0 0 330 185" aria-hidden="true"><polygon points="82,0 144,0 66,183 4,183"/><polygon points="177,0 240,0 162,183 100,183"/><polygon points="265,0 328,0 268,140 328,140 328,183 187,183"/></svg><span>WeLinc Logistics</span></div><button class="me" type="button" aria-label="Account menu, Corazon Villareal"><span class="av">CV</span>Corazon Villareal<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" opacity=".7" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></div><div class="gr"><p class="dt">Wednesday, November 25</p><h1>Good morning, Corazon</h1><p class="l">Pick a system to start.</p></div></div><div class="road"><b></b><i></i><svg class="veh v1" viewBox="-8 -2 138 56"><defs><symbol id="van" viewBox="-8 -2 138 56">
+<rect x="0" y="0" width="92" height="38" rx="2.5" fill="#f7f8fb" stroke="#c9d0de"/>
+<path d="M0.5 25 C28 19 60 31 91.5 15 V22 C60 34 28 24 0.5 30 Z" fill="#f29a1f"/>
+<path d="M0.5 30 C28 24 60 34 91.5 22 V36 a2 2 0 0 1 -2 2 H2.5 a2 2 0 0 1 -2 -2 Z" fill="#1f5cc4"/>
+<g transform="translate(6 6) scale(0.0541)" fill="#e8b800"><polygon points="82,0 144,0 66,183 4,183"/><polygon points="177,0 240,0 162,183 100,183"/><polygon points="265,0 328,0 268,140 328,140 328,183 187,183"/></g>
+<text x="26" y="15" font-size="11" font-weight="800" font-style="italic" fill="#0f1445" font-family="Inter,sans-serif">WeLinc</text>
+<path d="M95 10h16l13 13v15H95z" fill="#eef1f6" stroke="#c3cad8"/>
+<path d="M99 14h10l8 8h-18z" fill="#14205a"/>
+<rect x="95" y="30" width="29" height="3" fill="#c3cad8"/>
+<rect x="86" y="36" width="38" height="5" fill="#2a2f45"/>
+<rect x="-4" y="27" width="4" height="13" rx="1" fill="#8d96ab"/>
+<circle cx="16" cy="44" r="7" fill="#11131f"/><circle cx="16" cy="44" r="3" fill="#aab2c5"/>
+<circle cx="34" cy="44" r="7" fill="#11131f"/><circle cx="34" cy="44" r="3" fill="#aab2c5"/>
+<circle cx="110" cy="44" r="7" fill="#11131f"/><circle cx="110" cy="44" r="3" fill="#aab2c5"/>
+<rect x="124" y="24" width="4" height="6" rx="1" fill="#f29a1f"/>
+</symbol></defs><use href="#van"/></svg><svg class="veh v2" viewBox="-6 -2 96 50"><defs><symbol id="l300" viewBox="-6 -2 96 50">
+<path d="M0 4a4 4 0 0 1 4-4h52l20 17a4 4 0 0 1 1.5 3V34a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2z" fill="#f7f8fb" stroke="#c9d0de"/>
+<path d="M58 4l15 13H58z" fill="#14205a"/>
+<rect x="45" y="4" width="11" height="12" rx="1.5" fill="#14205a"/>
+<path d="M0.5 21H77v5H0.5z" fill="#f29a1f"/>
+<path d="M0.5 26H77v8a2 2 0 0 1-2 2H2a1.5 1.5 0 0 1-1.5-1.5z" fill="#1f5cc4"/>
+<g transform="translate(4 7) scale(0.035)" fill="#e8b800"><polygon points="82,0 144,0 66,183 4,183"/><polygon points="177,0 240,0 162,183 100,183"/><polygon points="265,0 328,0 268,140 328,140 328,183 187,183"/></g>
+<text x="16.5" y="13.5" font-size="7.5" font-weight="800" font-style="italic" fill="#0f1445" font-family="Inter,sans-serif">WeLinc</text>
+<rect x="74" y="29" width="7" height="6" rx="1" fill="#2a2f45"/>
+<rect x="75" y="20" width="3" height="5" rx="1" fill="#f29a1f"/>
+<circle cx="16" cy="38" r="7" fill="#11131f"/><circle cx="16" cy="38" r="3" fill="#aab2c5"/>
+<circle cx="62" cy="38" r="7" fill="#11131f"/><circle cx="62" cy="38" r="3" fill="#aab2c5"/>
+</symbol></defs><use href="#l300"/></svg></div></div><main class="w"><div class="cards"><a href="#"><b>BMS</b><svg class="arw" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg><span class="nm">Booking Management System</span><span class="ln">Bookings, trips and drivers</span><span class="rl">Your role: <strong>Admin</strong></span></a><a href="#"><b>VMMS</b><svg class="arw" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg><span class="nm">Vehicle Maintenance Management System</span><span class="ln">Maintenance schedules and fleet upkeep</span><span class="rl">Your role: <strong>Admin</strong></span></a><a href="#"><b>VRMS</b><svg class="arw" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg><span class="nm">Vehicle Repair Management System</span><span class="ln">Repair tickets, mechanics and workshop work</span><span class="rl">Your role: <strong>Admin</strong></span></a><a class="su" href="#"><b>Suite</b><svg class="arw" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg><span class="nm">Suite management</span><span class="ln">People, roles and access for your systems</span><span class="rl"><strong>4 to review</strong></span></a></div></main></div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

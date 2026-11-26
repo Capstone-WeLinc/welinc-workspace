@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>S2 · Suite admin as a ledger (pairs with G)</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=IBM+Plex+Mono:wght@500;600&amp;display=swap">
+<style>
+body{margin:0}
+*{box-sizing:border-box}
+.pg{width:1440px;min-height:900px;font-family:Inter,system-ui,sans-serif;position:relative;overflow:hidden;color:#0f172a;background:#f3f5f9}
+a{color:inherit;text-decoration:none}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+.w{width:1200px;margin:0 auto;position:relative}
+.top{position:relative;z-index:3;height:64px;display:flex;align-items:center}
+.lk{display:flex;align-items:center;gap:10px}.lk svg{height:20px;fill:#e8b800}.lk span{font-weight:800;font-style:italic;font-size:16px}
+.me{margin-left:auto;display:flex;align-items:center;gap:10px;height:44px;padding:0 8px;border-radius:12px;border:0;background:none;color:inherit;font:500 14px Inter,sans-serif;cursor:pointer}
+.av{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.12);box-shadow:inset 0 0 0 1px rgba(255,255,255,.2);display:grid;place-items:center;font-size:12px;font-weight:600}
+.lt .av{background:#e6e9f2;box-shadow:none;color:#0f1445}
+.band{position:relative;background:#0f1445;color:#fff;overflow:hidden}
+.dt{margin:0;font:600 13px "IBM Plex Mono",monospace;letter-spacing:.04em;color:#e8b800}
+.pg{background:#f7f7f4}
+.bar{height:64px;background:#0f1445;color:#fff;position:relative}
+.bar:after{content:"";position:absolute;left:0;right:0;bottom:-3px;height:3px;background:#e8b800}
+.gr{padding:46px 0 30px}.gr .dt{color:#8a6d00}
+h1{margin:12px 0 0;font-size:72px;line-height:.95;font-weight:800;letter-spacing:-.045em;color:#0f1445}
+.gr p.s{margin:16px 0 0;font-size:16px;color:#5b6779}
+.sec{border-top:2px solid #0f1445;padding:12px 0 18px;display:grid;grid-template-columns:200px 1fr}
+.sec h2{margin:12px 0 0;font:600 13px "IBM Plex Mono",monospace;letter-spacing:.08em;color:#0f1445}
+.gl{display:grid;grid-template-columns:repeat(3,1fr);column-gap:24px}
+.gl a{display:flex;flex-direction:column;justify-content:center;height:70px}
+.gl a b{font-size:26px;font-weight:700;letter-spacing:-.02em;color:#0f172a}
+.gl a em{font-style:normal;font-size:13px;font-weight:600;color:#8a6d00;margin-top:2px}
+.gl a:hover b{color:#1a1f6e;text-decoration:underline;text-decoration-color:#e8b800;text-decoration-thickness:3px;text-underline-offset:6px}@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</helmet>
+<div class="pg"><div class="bar"><div class="w"><div class="top"><div class="lk"><svg viewBox="0 0 330 185" aria-hidden="true"><polygon points="82,0 144,0 66,183 4,183"/><polygon points="177,0 240,0 162,183 100,183"/><polygon points="265,0 328,0 268,140 328,140 328,183 187,183"/></svg><span>WeLinc Logistics</span></div><button class="me" type="button" aria-label="Account menu, Leonora Castillo"><span class="av">LC</span>Leonora Castillo<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" opacity=".7" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></div></div></div><main class="w lt"><div class="gr"><p class="dt">Wednesday, November 25</p><h1>Suite management.</h1><p class="s">Good morning, Leonora. You run people and access for BMS, VMMS and VRMS.</p></div><section class="sec"><h2>OVERVIEW</h2><div class="gl"><a href="#"><b>Overview</b></a></div></section><section class="sec"><h2>ACCOUNTS</h2><div class="gl"><a href="#"><b>People</b><em>5 need a look</em></a><a href="#"><b>Deletion requests</b><em>2 waiting</em></a><a href="#"><b>Suite admins</b><em>1 of 3</em></a></div></section><section class="sec"><h2>ACCESS</h2><div class="gl"><a href="#"><b>Roles</b></a><a href="#"><b>Temporary access</b><em>4 active</em></a></div></section><section class="sec"><h2>AUDIT</h2><div class="gl"><a href="#"><b>Activity</b></a></div></section></main></div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

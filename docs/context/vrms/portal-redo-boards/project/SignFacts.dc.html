@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sign in, three facts</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=IBM+Plex+Mono:wght@500;600&amp;display=swap">
+<style>
+body{margin:0}
+.pg{width:1440px;height:900px;display:grid;grid-template-columns:840px 600px;font-family:Inter,system-ui,sans-serif;color:#0f172a;overflow:hidden}
+.rt{background:#fff;display:flex;align-items:center;justify-content:center}
+.fm{width:384px;display:flex;flex-direction:column;gap:26px;margin:0}
+.fm h2{margin:0;font-size:28px;font-weight:800;letter-spacing:-.02em}
+.sub{margin:8px 0 0;font-size:15px;color:#475569}
+.fs{display:flex;flex-direction:column;gap:18px}
+.fm label{display:block;font-size:14px;font-weight:600;margin-bottom:6px}
+.row{display:flex;justify-content:space-between;align-items:flex-start}
+.row a{font-size:14px;font-weight:600;color:#1a1f6e}
+.in{box-sizing:border-box;width:100%;height:46px;border:1px solid #64748b;border-radius:12px;padding:0 14px;font:15px Inter,sans-serif;color:#0f172a;background:#fff}
+.in::placeholder{color:#5b6779}
+.btn{height:48px;border:0;border-radius:12px;background:#0f1445;color:#fff;font:700 16px Inter,sans-serif;display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer}
+.hint{margin:0;font-size:14px;line-height:1.5;color:#5b6779}
+.lf{position:relative;overflow:hidden;background:#0f1445;color:#fff}
+.lk{position:absolute;left:64px;top:40px;display:flex;align-items:center;gap:10px}.lk svg{height:20px;fill:#e8b800}.lk span{font-weight:800;font-style:italic;font-size:16px}
+.cp{position:absolute;left:64px;top:140px}
+h1{margin:0;font-size:64px;line-height:1;font-weight:800;letter-spacing:-.035em}
+h1 em{font-style:normal;color:#e8b800}
+.ln{margin:18px 0 0;font-size:18px;line-height:1.55;color:rgba(255,255,255,.72);max-width:470px}
+.facts{position:absolute;left:64px;right:64px;top:520px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin:0}
+.facts div{padding:0 0 0 22px;border-left:1px solid rgba(255,255,255,.14)}
+.facts div:first-child{padding-left:0;border-left:0}
+.facts dt{font:600 52px 'IBM Plex Mono',monospace;letter-spacing:-.03em;color:#fff}
+.facts dd{margin:6px 0 0;font-size:15px;color:rgba(255,255,255,.66);line-height:1.45}
+.road{position:absolute;left:0;bottom:0;width:840px;height:140px}
+.drive{animation:drive 14s linear infinite}
+@keyframes drive{from{transform:translateX(-160px)}to{transform:translateX(980px)}}
+@media (prefers-reduced-motion:reduce){.drive{animation:none;transform:translateX(560px)}}
+</style>
+</helmet>
+<div class="pg">
+<div class="lf">
+<div class="lk"><svg viewBox="0 0 330 185" aria-hidden="true"><polygon points="82,0 144,0 66,183 4,183"/><polygon points="177,0 240,0 162,183 100,183"/><polygon points="265,0 328,0 268,140 328,140 328,183 187,183"/></svg><span>WeLinc Logistics</span></div>
+<div class="cp"><h1>On the road<br><em>since 2018.</em></h1><p class="ln">The WeLinc Logistics operations workspace: bookings, maintenance and repairs.</p></div>
+<dl class="facts">
+<div><dt>3</dt><dd>garages: Marikina, Sta. Rosa and Pulilan</dd></div>
+<div><dt>3</dt><dd>systems: BMS, VMMS and VRMS</dd></div>
+<div><dt>1</dt><dd>account for all of them</dd></div>
+</dl>
+<svg class="road" viewBox="0 0 840 140" aria-hidden="true">
+<rect x="0" y="96" width="840" height="44" fill="#0a0d36"/>
+<g fill="#cbd2ea" opacity=".3"><rect x="20" y="116" width="60" height="4" rx="2"/><rect x="160" y="116" width="60" height="4" rx="2"/><rect x="300" y="116" width="60" height="4" rx="2"/><rect x="440" y="116" width="60" height="4" rx="2"/><rect x="580" y="116" width="60" height="4" rx="2"/><rect x="720" y="116" width="60" height="4" rx="2"/></g>
+<g class="drive"><g transform="translate(0 44)">
+<rect x="0" y="0" width="70" height="38" rx="2.5" fill="#f7f8fb" stroke="#c9d0de"/>
+<path d="M0.5 25 C21 19 46 31 69.5 15 V22 C46 34 21 24 0.5 30 Z" fill="#f29a1f"/>
+<path d="M0.5 30 C21 24 46 34 69.5 22 V36 a2 2 0 0 1 -2 2 H2.5 a2 2 0 0 1 -2 -2 Z" fill="#1f5cc4"/>
+<g transform="translate(6 6) scale(0.0541)" fill="#e8b800"><polygon points="82,0 144,0 66,183 4,183"/><polygon points="177,0 240,0 162,183 100,183"/><polygon points="265,0 328,0 268,140 328,140 328,183 187,183"/></g>
+<path d="M73 10h16l13 13v15H73z" fill="#eef1f6" stroke="#c3cad8"/><path d="M77 14h10l8 8h-18z" fill="#14205a"/>
+<rect x="64" y="36" width="38" height="5" fill="#2a2f45"/>
+<circle cx="16" cy="44" r="7" fill="#11131f"/><circle cx="16" cy="44" r="3" fill="#aab2c5"/><circle cx="88" cy="44" r="7" fill="#11131f"/><circle cx="88" cy="44" r="3" fill="#aab2c5"/>
+</g></g>
+</svg>
+</div>
+<div class="rt"><form class="fm">
+<div><h2>Sign in</h2><p class="sub">Use your WeLinc work email.</p></div>
+<div class="fs">
+<div><label for="e">Work email</label><input id="e" class="in" placeholder="you@welinc.com"></div>
+<div><div class="row"><label for="p">Password</label><a href="#">Forgot password?</a></div><input id="p" type="password" class="in" placeholder="Enter password"></div>
+<button type="button" class="btn">Sign in <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+</div>
+<p class="hint">No account yet? Ask your admin to add you. You'll get an email to set your password.</p>
+</form></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

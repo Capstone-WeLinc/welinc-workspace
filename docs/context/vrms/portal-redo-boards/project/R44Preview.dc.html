@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Launcher, pick on the left, a big look on the right</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=IBM+Plex+Mono:wght@500;600&amp;display=swap">
+<style>
+body{margin:0}
+*{box-sizing:border-box}
+.pg{width:1440px;height:900px;background:#f3f5f9;font-family:Inter,system-ui,sans-serif;position:relative;overflow:hidden;color:#0f172a}
+.wrap{width:1200px;margin:0 auto;position:relative}
+.top{height:64px;display:flex;align-items:center}
+.lk{display:flex;align-items:center;gap:10px;color:#fff}.lk svg{height:20px;fill:#e8b800}.lk span{font-weight:800;font-style:italic;font-size:16px}
+.me{margin-left:auto;display:flex;align-items:center;gap:10px;height:44px;padding:0 8px;border-radius:12px;border:0;background:none;color:#fff;font:500 14px Inter,sans-serif}
+.av{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.12);box-shadow:inset 0 0 0 1px rgba(255,255,255,.2);display:grid;place-items:center;font-size:12px;font-weight:600}
+.dt{margin:0;font-size:13px;font-weight:600;color:#e8b800}
+h1{margin:8px 0 0;font-size:44px;line-height:1.05;font-weight:800;letter-spacing:-.03em}
+.l{margin:10px 0 0;font-size:16px;color:rgba(255,255,255,.72)}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+a{color:inherit;text-decoration:none}
+.acct{display:flex;align-items:center;gap:28px;font-size:13px;color:#5b6779;border-top:1px solid #e2e8f0;padding-top:16px}
+.acct b{font-weight:600;color:#0f172a}
+.acct a{margin-left:auto;font-weight:600;color:#1a1f6e;text-decoration:underline;text-underline-offset:3px;text-decoration-color:#c7cde0}
+.acct .sep{width:1px;height:14px;background:#d5dbe6}
+.dep .w{fill:var(--w);stroke:var(--e);stroke-width:var(--sw)}
+.dep .p{fill:var(--p);stroke:var(--e);stroke-width:var(--sw)}
+.dep .d{fill:var(--d);stroke:var(--e);stroke-width:var(--sw)}
+.dep .b{fill:var(--b);stroke:var(--e);stroke-width:var(--sw)}
+.dep .k{fill:var(--k)}
+.dep .bd{fill:var(--bd);stroke:var(--e);stroke-width:var(--sw)}
+.dep .bl{stroke:var(--bl);stroke-width:2;fill:none;stroke-linecap:round}
+.dep .rd{fill:var(--rd)}
+.dep .rdl{stroke:var(--e);stroke-width:var(--sw)}
+.dep .dash{stroke:var(--dash);stroke-width:3;stroke-dasharray:28 26}
+.dep .tk{stroke:var(--tick);stroke-width:2.4;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.dep .glow{fill:#e8b800}
+.box{animation:box 7s ease-in-out infinite;transform-box:fill-box}
+@keyframes box{0%,12%{transform:translateX(0);opacity:1}46%{transform:translateX(58px);opacity:1}52%,100%{transform:translateX(58px);opacity:0}}
+.box.n2{animation-delay:-3.5s}
+.t1,.t2,.t3,.t4{opacity:0;animation:tick 8s linear infinite}
+.t2{animation-delay:1.2s}.t3{animation-delay:2.4s}.t4{animation-delay:3.6s}
+@keyframes tick{0%{opacity:0}4%,70%{opacity:1}76%,100%{opacity:0}}
+.lift{animation:lift 9s ease-in-out infinite}
+@keyframes lift{0%,14%{transform:translateY(0)}46%,64%{transform:translateY(-26px)}96%,100%{transform:translateY(0)}}
+.cone{animation:cone 4.6s ease-in-out infinite}
+@keyframes cone{0%,100%{opacity:.18}50%{opacity:.11}}
+.pass{animation:pass 16s linear infinite}
+@keyframes pass{0%{transform:translateX(-140px)}100%{transform:translateX(1340px)}}
+.hot .cone{opacity:.34;animation:none}
+
+.band{background:#0f1445;color:#fff;height:316px}
+.gr{padding-top:20px}
+.panel{margin-top:-96px;background:#fff;border-radius:24px;box-shadow:0 1px 2px rgba(15,23,42,.05),0 14px 40px rgba(15,23,42,.10);display:grid;grid-template-columns:372px 1fr;overflow:hidden;height:520px}
+.list{padding:18px;display:flex;flex-direction:column;gap:6px;border-right:1px solid #eef1f6;margin:0;list-style:none}
+.it{display:block;border-radius:16px;padding:18px 20px;border:0;background:none;text-align:left;width:100%;font:inherit;color:inherit;cursor:pointer}
+.it .nm{display:block;font-size:16px;font-weight:700}
+.it .rl{display:block;margin-top:4px;font-size:13px;color:#5b6779}
+.it.on{background:#0f1445;color:#fff}.it.on .rl{color:rgba(255,255,255,.7)}
+.it:not(.on):hover{background:#f3f5f9}
+.lh{font-size:12px;font-weight:600;color:#5b6779;padding:6px 20px 4px}
+.lnote{margin-top:auto;padding:16px 20px;font-size:13px;line-height:1.5;color:#5b6779;border-top:1px solid #eef1f6}
+.view{display:flex;flex-direction:column}
+.big{background:#0f1445;height:300px;position:relative;overflow:hidden;margin:14px 14px 0;border-radius:16px}
+.big .dep{position:absolute;left:50%;bottom:0;width:640px;height:367px;transform:translateX(-50%)}
+.vt{padding:22px 32px 0 32px;display:grid;grid-template-columns:1fr auto;gap:0 32px;align-items:start}
+.vt h2{margin:0;font-size:24px;font-weight:800;letter-spacing:-.02em}
+.vt .rows{grid-column:1/3;display:grid;grid-template-columns:repeat(3,1fr);gap:0 24px;margin-top:14px}
+.vt .rows li{border-top:1px solid #e2e8f0;padding-top:10px}
+.go{grid-column:2;grid-row:1;align-self:center;height:48px;padding:0 26px;border-radius:12px;background:#0f1445;color:#fff;font-weight:700;font-size:15px;display:flex;align-items:center}
+.foot{margin-top:24px}
+.rows{list-style:none;margin:16px 0 0;padding:0}.rows li{padding:9px 0;border-top:1px solid #eef1f6;font-size:14px;color:#334155}@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</helmet>
+<div class="pg">
+<div class="band"><div class="wrap"><div class="top"><div class="lk"><svg viewBox="0 0 330 185" aria-hidden="true"><polygon points="82,0 144,0 66,183 4,183"/><polygon points="177,0 240,0 162,183 100,183"/><polygon points="265,0 328,0 268,140 328,140 328,183 187,183"/></svg><span>WeLinc Logistics</span></div><button class="me" type="button" aria-label="Account menu for Corazon Villareal"><span class="av">CV</span>Corazon Villareal<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" opacity=".7" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></div><div class="gr"><p class="dt">Wednesday, November 25</p><h1>Good morning, Corazon</h1><p class="l">Your three systems, one sign in.</p></div></div></div>
+<div class="wrap"><div class="panel">
+<ul class="list"><li class="lh">Your systems</li><li><button type="button" class="it" aria-pressed="false"><span class="nm">Booking Management System</span><span class="rl">Operations</span></button></li><li><button type="button" class="it" aria-pressed="false"><span class="nm">Vehicle Maintenance Management System</span><span class="rl">Operations</span></button></li><li><button type="button" class="it on" aria-pressed="true"><span class="nm">Vehicle Repair Management System</span><span class="rl">Chief Mechanic</span></button></li><li class="lnote">Need a role in another system? Ask your admin.</li></ul>
+<div class="view"><div class="big"><svg class="dep" style="--w:#121852;--p:#1a2263;--d:#070a2e;--b:#2a3290;--k:#05071f;--e:none;--sw:0;--bd:#1f2670;--bl:#3b43a3;--rd:#0a0d36;--dash:rgba(203,210,234,.28);--tick:#e8b800" viewBox="0 0 384 220" aria-hidden="true">
+<defs><symbol id="van" viewBox="-8 -2 138 56">
+<rect x="0" y="0" width="92" height="38" rx="2.5" fill="#f7f8fb" stroke="#c9d0de"/>
+<path d="M0.5 25 C28 19 60 31 91.5 15 V22 C60 34 28 24 0.5 30 Z" fill="#f29a1f"/>
+<path d="M0.5 30 C28 24 60 34 91.5 22 V36 a2 2 0 0 1 -2 2 H2.5 a2 2 0 0 1 -2 -2 Z" fill="#1f5cc4"/>
+<g transform="translate(6 6) scale(0.0541)" fill="#e8b800"><polygon points="82,0 144,0 66,183 4,183"/><polygon points="177,0 240,0 162,183 100,183"/><polygon points="265,0 328,0 268,140 328,140 328,183 187,183"/></g>
+<text x="26" y="15" font-size="11" font-weight="800" font-style="italic" fill="#0f1445" font-family="Inter,sans-serif">WeLinc</text>
+<path d="M95 10h16l13 13v15H95z" fill="#eef1f6" stroke="#c3cad8"/>
+<path d="M99 14h10l8 8h-18z" fill="#14205a"/>
+<rect x="95" y="30" width="29" height="3" fill="#c3cad8"/>
+<rect x="86" y="36" width="38" height="5" fill="#2a2f45"/>
+<rect x="-4" y="27" width="4" height="13" rx="1" fill="#8d96ab"/>
+<circle cx="16" cy="44" r="7" fill="#11131f"/><circle cx="16" cy="44" r="3" fill="#aab2c5"/>
+<circle cx="34" cy="44" r="7" fill="#11131f"/><circle cx="34" cy="44" r="3" fill="#aab2c5"/>
+<circle cx="110" cy="44" r="7" fill="#11131f"/><circle cx="110" cy="44" r="3" fill="#aab2c5"/>
+<rect x="124" y="24" width="4" height="6" rx="1" fill="#f29a1f"/>
+</symbol><symbol id="l300" viewBox="-6 -2 96 50">
+<path d="M0 4a4 4 0 0 1 4-4h52l20 17a4 4 0 0 1 1.5 3V34a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2z" fill="#f7f8fb" stroke="#c9d0de"/>
+<path d="M58 4l15 13H58z" fill="#14205a"/>
+<rect x="45" y="4" width="11" height="12" rx="1.5" fill="#14205a"/>
+<path d="M0.5 21H77v5H0.5z" fill="#f29a1f"/>
+<path d="M0.5 26H77v8a2 2 0 0 1-2 2H2a1.5 1.5 0 0 1-1.5-1.5z" fill="#1f5cc4"/>
+<g transform="translate(4 7) scale(0.035)" fill="#e8b800"><polygon points="82,0 144,0 66,183 4,183"/><polygon points="177,0 240,0 162,183 100,183"/><polygon points="265,0 328,0 268,140 328,140 328,183 187,183"/></g>
+<text x="16.5" y="13.5" font-size="7.5" font-weight="800" font-style="italic" fill="#0f1445" font-family="Inter,sans-serif">WeLinc</text>
+<rect x="74" y="29" width="7" height="6" rx="1" fill="#2a2f45"/>
+<rect x="75" y="20" width="3" height="5" rx="1" fill="#f29a1f"/>
+<circle cx="16" cy="38" r="7" fill="#11131f"/><circle cx="16" cy="38" r="3" fill="#aab2c5"/>
+<circle cx="62" cy="38" r="7" fill="#11131f"/><circle cx="62" cy="38" r="3" fill="#aab2c5"/>
+</symbol><symbol id="lvan" viewBox="-8 -2 138 56">
+<rect x="0" y="0" width="92" height="38" rx="2.5" fill="#fff" stroke="#0f1445" stroke-width="1.6"/>
+<g transform="translate(6 6) scale(0.0541)" fill="#e8b800"><polygon points="82,0 144,0 66,183 4,183"/><polygon points="177,0 240,0 162,183 100,183"/><polygon points="265,0 328,0 268,140 328,140 328,183 187,183"/></g>
+<text x="26" y="15" font-size="11" font-weight="800" font-style="italic" fill="#0f1445" font-family="Inter,sans-serif">WeLinc</text>
+<path d="M0.5 28H91.5" stroke="#0f1445" stroke-width="1" opacity=".35"/>
+<path d="M95 10h16l13 13v15H95z" fill="#fff" stroke="#0f1445" stroke-width="1.6"/>
+<path d="M99 14h10l8 8h-18z" fill="#eef0f8" stroke="#0f1445" stroke-width="1.2"/>
+<rect x="86" y="36" width="38" height="5" fill="#fff" stroke="#0f1445" stroke-width="1.4"/>
+<circle cx="16" cy="44" r="7" fill="#fff" stroke="#0f1445" stroke-width="1.6"/><circle cx="16" cy="44" r="2.5" fill="#0f1445"/>
+<circle cx="34" cy="44" r="7" fill="#fff" stroke="#0f1445" stroke-width="1.6"/><circle cx="34" cy="44" r="2.5" fill="#0f1445"/>
+<circle cx="110" cy="44" r="7" fill="#fff" stroke="#0f1445" stroke-width="1.6"/><circle cx="110" cy="44" r="2.5" fill="#0f1445"/>
+<rect x="124" y="24" width="4" height="6" rx="1" fill="#e8b800"/>
+</symbol></defs>
+<g transform="translate(0 0)" class="hot"><g>
+<rect class="w" x="6" y="44" width="372" height="156"/>
+<rect class="p" x="0" y="30" width="384" height="14"/>
+<path class="bl" d="M196 44v16"/><path class="p" d="M182 60h28l6 10h-40z"/>
+<path class="glow cone" d="M184 70 L120 200 H272 L208 70Z"/>
+<rect class="p" x="90" y="84" width="12" height="116"/><rect class="p" x="290" y="84" width="12" height="116"/>
+<g class="lift">
+<rect class="b" x="84" y="190" width="224" height="8"/>
+<use href="#van" x="116" y="138.6" width="160" height="64.9"/>
+</g>
+<rect class="w" x="324" y="132" width="44" height="68" rx="2"/>
+<path class="bl" d="M330 148h32M330 164h32M330 180h32"/>
+<rect class="w" x="22" y="150" width="46" height="50" rx="2"/>
+<path class="bl" d="M30 162h30M30 174h30"/>
+</g>
+<rect class="rd" x="-10" y="200" width="404" height="20"/><path class="rdl" d="M-10 200H394"/><path class="dash" d="M-10 211H394"/></g>
+</svg></div>
+<div class="vt"><h2>Vehicle Repair Management System</h2><a class="go" href="#">Open Repairs</a>
+<ul class="rows"><li>Open and track repair tickets</li><li>Assign mechanics to the work</li><li>Record the parts used</li></ul></div></div>
+</div><div class="foot"><div class="acct"><span>Last sign in <b>yesterday, 5:42 PM</b> on Chrome, Windows</span><span class="sep"></span><span><b>2</b> devices signed in</span><span class="sep"></span><span>corazon.villareal@welinc.com</span><a href="#">Your profile and sign ins</a></div></div></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
