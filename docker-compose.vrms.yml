@@ -65,6 +65,7 @@ services:
       AUTH_JWKS_URL: http://auth-service:3001/auth/.well-known/jwks.json
       # welinc-auth on the internal network; every request's account check calls it (spec 0009)
       AUTH_INTERNAL_URL: http://auth-service:3001
+      SUITE_GATEWAY_INTERNAL_URL: http://api-gateway:3000
       # VRMS's client id at welinc-auth; its private key comes from the .env file
       AUTH_CLIENT_ID: vrms
       CORS_ORIGINS: http://localhost:8000,http://localhost:8001

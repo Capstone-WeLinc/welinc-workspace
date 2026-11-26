@@ -189,6 +189,9 @@ var vrmsSettings = {
   NODE_ENV: 'production'
   AUTH_CLIENT_ID: 'vrms'
   AUTH_INTERNAL_URL: authInternal
+  // VRMS spec 0029: calls to VMMS and BMS go through the gateway. Its ingress is external, so
+  // inside the environment it answers at its own name without the .internal part
+  SUITE_GATEWAY_INTERNAL_URL: 'https://api-gateway${nameSuffix}.${platform.outputs.defaultDomain}'
   AUTH_JWKS_URL: '${authInternal}/auth/.well-known/jwks.json'
   AUTH_ISSUER: issuer
   AUTH_PUBLIC_URL: issuer
