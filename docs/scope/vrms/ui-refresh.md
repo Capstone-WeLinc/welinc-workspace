@@ -209,5 +209,5 @@ spec [0028](../../specs/vrms/0028-error-scenes/index.md) · code in `welinc-web-
   - [x] Workspace drift check and its CI job (AC-2)
 - [x] Verify it: `/check verify error scenes`
   - Note (2026-11-26, your call): marked done with these `verify.md` steps not run, left unticked there: a mechanic on someone else's ticket (AC-10), the staff crash view (AC-5), a portal view crash (AC-22), staging `/dev/ui`, the system reduced motion setting, the before and after looks (AC-21, AC-23) and the portal `Portal.test.tsx` title test that fails only in a full run. Verify found and fixed one bug: a shell crash showed the router's default page (web-vrms PR 91).
-- [ ] Test it: `/test error scenes`
+- [x] Test it: `/test error scenes`
 - [ ] Polish it (optional, ask first): `emil-design-eng` (looping motion, reduced motion) · `web-design-guidelines`
