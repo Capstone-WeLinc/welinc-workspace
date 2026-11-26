@@ -8,23 +8,25 @@ Run at `/check verify roles page` (child 0001) and `/check verify custom roles` 
 2. Open the built page at 1280px with Playwright and take one `browser_snapshot` (structure and wording) and one `browser_evaluate` that returns `getComputedStyle` for the same elements (list pane, role row, draft bubble, header tile, name, chip, facts, tabs, group header, permission row, switch, save bar, change list, review dialog, delete dialog).
 3. List every difference. Allowed only: (a) Plex Mono instead of the boards' JetBrains Mono, and Inter instead of Inter Tight for headings (spec 0016, amended 2026-11-23); (b) spec 0016 token values that changed after the boards (`muted-foreground` `#5b6779`, `destructive` and `error` `#b42318`, `background` `#f3f5f9`, its radius and shadow tables); (c) shadcn based parts with their spec 0016 styles; (d) real data lengths. Also expected, decided after the boards: descriptions under labels, the "Find a permission" field, no Rename or Delete on built in roles, no Reset to defaults on custom roles. Anything else is a bug to fix before the PR.
 
+Run 2026-11-26 (computed styles at 1280px against `Roles9` and `SaveBar9`): accepted differences, all from spec 0016 tokens and shared components: the type scale (tab 14px, group name 16px, blurb 14px, pills 12px), Plex Mono for the facts numbers and the Last changed date, the shared `RoleChip` and `Button` styles, and the system switch and Find a role sizes. Fixed: the permission row and group name at 52px, the group meter at 96px, the tab padding and gap.
+
 ## Major flows, child 0001
 
-- [ ] `suite.admin@` opens Roles: VRMS, VMMS, BMS switch; Chief mechanic shows its header, facts, tabs and the first group open with descriptions (AC-1 to AC-4)
-- [ ] Change one switch on Chief mechanic and one on Mechanic: two draft bubbles, "2 unsaved changes in 2 roles", the change list grouped by role (AC-7, AC-8)
-- [ ] Review: a removal opens the note as required and Save stays disabled until it's filled; save; both roles' History tabs show the change with the note (AC-9, AC-11, AC-15)
-- [ ] Leave for People and come back: the toast, then "Kept from [time]" (AC-12)
-- [ ] Stale save from a second browser: the warning toast and only still valid entries kept (AC-11)
-- [ ] Reset to defaults on a changed built in role stages the differences (AC-10)
-- [ ] Refused save: lock a cell in the catalog (or archive a custom role) after drafting a change on it, then save: the error toast names "[permission] for [role]" (or "[Role] was deleted…"), the entry leaves the draft, the rest stays (AC-11)
-- [ ] Network failure in review: stop welinc-auth, press Save: the dialog stays open with the error inline and Save enabled; start it again and save (AC-11)
+- [x] `suite.admin@` opens Roles: VRMS, VMMS, BMS switch; Chief mechanic shows its header, facts, tabs and the first group open with descriptions (AC-1 to AC-4)
+- [x] Change one switch on Chief mechanic and one on Mechanic: two draft bubbles, "2 unsaved changes in 2 roles", the change list grouped by role (AC-7, AC-8)
+- [x] Review: a removal opens the note as required and Save stays disabled until it's filled; save; both roles' History tabs show the change with the note (AC-9, AC-11, AC-15)
+- [x] Leave for People and come back: the toast, then "Kept from [time]" (AC-12)
+- [x] Stale save from a second browser: the warning toast and only still valid entries kept (AC-11)
+- [x] Reset to defaults on a changed built in role stages the differences (AC-10)
+- [x] Refused save: lock a cell in the catalog (or archive a custom role) after drafting a change on it, then save: the error toast names "[permission] for [role]" (or "[Role] was deleted…"), the entry leaves the draft, the rest stays (AC-11)
+- [x] Network failure in review: stop welinc-auth, press Save: the dialog stays open with the error inline and Save enabled; start it again and save (AC-11)
 - [ ] Kept draft on a deleted role: draft a change on a custom role, delete the role from a second browser, come back: "1 change to a role that was deleted was removed from your draft." and the other entries stay (AC-11, AC-12)
-- [ ] "Find a permission" with "cost" (AC-5)
+- [x] "Find a permission" with "cost" (AC-5)
 - [ ] `vrms.admin@`: On and Off text, no bar, Add people works; moving the last admin answers the `LAST_ADMIN` message and nobody moves (AC-6, AC-13, AC-14)
-- [ ] `bms.admin@`: only the People tab with the help line (AC-3)
+- [x] `bms.admin@`: only the People tab with the help line (AC-3)
 - [ ] Download as spreadsheet: one row per permission (28 for VRMS), the People row, one column per role; a role named "=SUM(1)" stays text (AC-16)
-- [ ] `/admin/permissions?system=VRMS` lands on `/admin/roles/VRMS` (AC-1)
-- [ ] Phone width (375px): list and role are separate screens; keyboard pass and one axe pass (AC-1, AC-18)
+- [x] `/admin/permissions?system=VRMS` lands on `/admin/roles/VRMS` (AC-1)
+- [x] Phone width (375px): list and role are separate screens; keyboard pass and one axe pass (AC-1, AC-18)
 
 ## Major flows, child 0002
 
