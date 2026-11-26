@@ -95,12 +95,12 @@ A failed message gets a Retry button for the sender's Admin (VMMS for A and B, V
 | Client | Audience | Scopes | For | Granted in welinc-auth today |
 |---|---|---|---|---|
 | `bms` | `VMMS` | `fleet.read` | route A1 | yes |
-| `vmms` | `BMS` | `fleet.availability.write`, `fleet.change.write` | routes A2, A3 | no (VMMS's code already asks for them) |
+| `vmms` | `BMS` | `fleet.availability.write`, `fleet.change.write` | routes A2, A3 | yes (since 2026-11-27, VRMS spec 0029) |
 | `vmms` | `BMS` | `schedule.read`, `maintenance.write` | routes B1, B2, B3 | no, and new |
-| `vrms` | `BMS` | `schedule.read`, `repair.update.write` | routes C1, C2, C4 | no |
-| `bms` | `VRMS` | `repair.status.read`, `repair.expedite.write` | routes C3, C5 | no |
+| `vrms` | `BMS` | `schedule.read`, `repair.update.write` | routes C1, C2, C4 | yes (since 2026-11-27) |
+| `bms` | `VRMS` | `repair.status.read`, `repair.expedite.write` | routes C3, C5 | yes (since 2026-11-27) |
 
-"Today" means `welinc-auth/prisma/seeds/clients.seed.ts`: `bms` has `fleet.read` on VMMS, `vmms` and `vrms` have only the directory scopes. Grants are added in welinc-auth by its owners. Until then these calls are refused at the token request.
+"Today" means `welinc-auth/prisma/seeds/clients.seed.ts`, applied locally and on staging on 2026-11-27. Only Flow B's scopes are still missing; ask the shared services lead to add them once the Flow B shapes are agreed. Until then those calls are refused at the token request.
 
 ## Routes
 
