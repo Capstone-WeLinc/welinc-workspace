@@ -2,7 +2,8 @@ name: CI
 
 # The workspace's own checks: the setup as code compiles, the shell scripts pass shellcheck,
 # the gateway answers every route the way suite spec 0008 says, and welinc-auth's generated
-# API docs still hold every route of contract 0001 section 16 (VRMS spec 0026).
+# API docs still hold every route of contract 0001 section 16 (VRMS spec 0026), and the two web
+# apps hold the same scene kit (VRMS spec 0028).
 # Docs only changes skip CI (Actions minutes on private repos), except contract 0001, which
 # the contract-routes job reads. Later lines win, so the last one adds the contract back.
 on:
@@ -110,3 +111,30 @@ jobs:
         with:
           node-version: 24
       - run: node scripts/check-contract-routes.mjs welinc-auth/docs/openapi.json
+
+  # VRMS spec 0028, AC-2: web-vrms and the portal hold the same scene kit. Both repos are public, so
+  # no token. Not part of the gateway deploy: a called run carries the caller's workflow name, so the
+  # job skips there (web drift must never block a gateway deploy). The daily run catches a kit change
+  # merged in one app only; merge a kit change in both apps the same day.
+  scenes:
+    if: github.workflow == 'CI'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7
+        with:
+          repository: Capstone-WeLinc/welinc-web-vrms
+          ref: development
+          path: welinc-web-vrms
+          persist-credentials: false
+      - uses: actions/checkout@v7
+        with:
+          repository: Capstone-WeLinc/welinc-web-portal
+          ref: development
+          path: welinc-web-portal
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      - run: node scripts/check-scenes.mjs welinc-web-vrms welinc-web-portal
