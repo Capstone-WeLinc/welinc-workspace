@@ -35,7 +35,7 @@ Local stack: sign in on the portal (`http://localhost:8000`) as `vrms.admin@weli
 - [ ] Block `/vrms/permissions/me` (devtools request blocking) and reload → the reader or lanyard band, "Could not load your permissions", Try again and an outlined Sign out → AC-13
 - [ ] Press Try again while still blocked → the same picture comes back, never the other one → AC-16
 - [ ] Stop `welinc_auth_service` and reload → the same band pair, "Can't reach the sign in service", Try again, no Sign out → AC-14
-- [ ] At 360px and at 1440px, check each band → the truck, pole, gate, reader or rack stays in view; lane lines run the whole width → AC-4
+- [ ] At 360px and at 1440px, check each band → the truck, pole, gate, reader or rack stays in view; lane lines run the whole width, except on the road band, where the line stops short of the barrier and the barrier may crop at 360px (the portal road scene is reused as it stands) → AC-4
 - [ ] On staging with `VITE_SENTRY_TEST_ROUTES=true`, trigger a crash on `/debug/sentry` → the hazard glow panel inside the shell; staff see the line and Reference code under it; an admin sees the details box and Copy details inside the panel → AC-5
 - [ ] Trigger a crash of the shell itself → the blackout pole band with spec 0025's copy word for word, Back to dashboard as a plain link → AC-6
 - [ ] With a screen reader on either crash → only the title and line are announced, not the code, details or buttons → AC-5, AC-18
