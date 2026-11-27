@@ -139,3 +139,9 @@ Your call: drop it from the sidebar. New repair stays one click away where the w
 - Keep it white: one action button in a navigation column, competing with the hot counts.
 - Make it gold as the board drew it: breaks Signature 3, gold would no longer mean "needs you".
 
+## Update 2026-11-28, Launcher pill and open groups
+
+- **Launcher, not Home.** The pill goes to the launcher, the page of system tiles, so it says what it opens. `LayoutGrid` (tiles) fits it, and stays distinct from the grid button's `Grip` dots. The house read as a home page that WeLinc doesn't have. Both apps change together, and suite spec 0019's AC-20 follows.
+- **Groups open on load, folded only by the chevron.** Clicking a name both moved you and folded or unfolded the group, two effects from one click. Now the name only navigates and the chevron only folds. Every group starts open on each load, so the counts underneath are always in view, and nothing is remembered, which drops the `welinc:nav-open` key. Runner up: remember the fold per user (the old rule), which hid counts after a reload.
+- **Your profile in foreground.** It rendered in the base link navy while Sign out was foreground; both are menu items, so both use foreground.
+
