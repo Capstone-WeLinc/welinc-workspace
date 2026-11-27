@@ -9,13 +9,13 @@ Flow A's reads already work (see [fleet-api.md](fleet-api.md)). Everything else 
 **Flow A, fleet and availability:**
 
 - [ ] **Route your gateway:** add `/bms/integrations/vmms/*` and `/bms/integrations/vrms/*` to `bms-gateway/src/routes.ts`.
-- [ ] **Receive truck status changes** ([route A2](#route-a2-truck-status-vmms-sends-bms-receives)). VMMS's sender is built and queues one event per status change, but none can be delivered yet: welinc-auth doesn't grant `vmms` the scopes ([auth grants](#auth-grants)), and BMS has no receiver (its gateway routes only the `welinc` and `wix` integrations).
-- [ ] **Receive fleet changes** ([route A3](#route-a3-fleet-change-vmms-sends-bms-receives)) and read the record fresh (route A1), like VRMS does.
+- [ ] **Receive truck status changes** ([route A2](#route-a2-truck-status-vmms-sends-bms-receives)). VMMS's sender is built and queues one event per status change, and welinc-auth already grants `vmms` the scopes ([auth grants](#auth-grants)). The only missing piece is BMS's receiver (its gateway routes only the `welinc` and `wix` integrations).
+- [ ] **Receive fleet changes** ([route A3](#route-a3-fleet-change-vmms-sends-bms-receives)) and read the record fresh (route A1), like VRMS does. Treat `VEHICLE_DEACTIVATED` like `VEHICLE_DELETED`.
 - [ ] **Flag affected work:** when a truck turns unavailable or is deactivated, flag its upcoming bookings and Job Orders "Needs update" and notify Operations and Customer Support.
 - [ ] **Update the availability page right away**, with no refresh.
 - [ ] **Filter by garage and truck type**, next to the status filter. For example: "Available trucks in the Valenzuela garage".
 - [ ] **Show "Managed in VMMS"** on the truck page instead of edit buttons.
-- [ ] **Keep the last fleet list** and show it with "VMMS offline, last updated Nov 21, 9:40 AM" when VMMS can't be reached. Assigning still reads fresh and refuses ([open question 1](#open-questions)).
+- [ ] **Keep the last fleet list** and show it with "VMMS offline, last updated Nov 21, 9:40 AM" when VMMS can't be reached. Assigning still reads fresh and refuses with 503 ([fleet-api.md](fleet-api.md#bms-rules)): showing an old copy is fine, acting on one isn't.
 
 **Flow B, maintenance:**
 
@@ -32,7 +32,7 @@ Flow A's reads already work (see [fleet-api.md](fleet-api.md)). Everything else 
 
 Flow A's senders and fleet reads are already built. Flow B is new.
 
-- [ ] **Flow A:** nothing new. Keep sending routes A2 and A3. Your fixes toward BMS are in [repair-integration.md](repair-integration.md#vmms-checklist) (stop retrying a 400 forever, check `client_id === 'bms'` on the fleet routes).
+- [ ] **Flow A:** keep sending routes A2 and A3. One fix left toward BMS: **stop retrying a 400 forever in the A3 sender** (`bms-fleet-changes.service.ts`), as A2 already does. Done: the A2 sender marks a 400 failed for good and lets the truck's later events through, and the fleet routes accept only `client_id` `bms` (`@ServiceRoute('fleet.read', 'bms')`).
 - [ ] **Flow B, read the schedule:** when maintenance comes due, read the truck's upcoming trips (route B1) and check the proposed dates (route B2) before booking it.
 - [ ] **Flow B, let staff decide:** move the maintenance to a free day, or confirm it anyway when it can't wait (for example an overdue safety item).
 - [ ] **Flow B, tell BMS:** send route B3 when the maintenance is confirmed, moved or cancelled, from your every-minute outbox, with the [retry rule](#the-retry-rule) and a VMMS Admin retry button.
@@ -43,7 +43,7 @@ All in [repair-integration.md](repair-integration.md#vrms-checklist-ours-so-you-
 
 ## When you can test
 
-**Flow A** (once BMS has routes A2 and A3 and the `vmms` grants are applied; local stacks with shared, VMMS and BMS up and migrated):
+**Flow A** (once BMS has routes A2 and A3; the `vmms` grants are already applied; local stacks with shared, VMMS and BMS up and migrated):
 1. In VMMS, set a truck that has a confirmed Job Order tomorrow to Under Maintenance.
 2. Within a minute, BMS's availability page shows it Under Maintenance without a refresh, the Job Order shows "Needs update", and Operations gets a notification.
 3. Add a truck in VMMS. It appears in BMS's list.
@@ -88,7 +88,7 @@ The same as [repair-integration.md](repair-integration.md#how-every-call-works):
 
 A failed message gets a Retry button for the sender's Admin (VMMS for A and B, VRMS or BMS for C), and Retry restarts the 24 hours. Messages for one truck (A2) or one work order (B3) go in order: a later one waits while an earlier one is failed.
 
-**Today's VMMS senders (A2, A3) differ:** they retry every failure, 400s included, starting at 30 s and doubling up to 1 hour, with no 24-hour limit and no Admin retry. A2 already keeps one truck's events in order (a later one waits while an earlier one is failing). A3 sends in time order but holds nothing back, so a later fleet change can arrive before an earlier one that is still retrying. That is harmless for BMS, which reads the record fresh on every A3. [repair-integration.md](repair-integration.md#vmms-checklist) asks VMMS to stop retrying a 400.
+**Today's VMMS senders (A2, A3) differ:** they retry failures starting at 30 s and doubling up to 1 hour, with no 24-hour limit and no Admin retry. A2 marks a 400 failed for good and lets that truck's later events through (`bms-availability.service.ts`); it retries every other failure and keeps one truck's events in order (a later one waits while an earlier one is retrying). A3 still retries every failure, 400 included. It sends in time order but holds nothing back, so a later fleet change can arrive before an earlier one that is still retrying. That is harmless for BMS, which reads the record fresh on every A3. The [VMMS checklist](#vmms-checklist) asks VMMS to stop retrying a 400 in A3.
 
 ### Auth grants
 
@@ -96,27 +96,27 @@ A failed message gets a Retry button for the sender's Admin (VMMS for A and B, V
 |---|---|---|---|---|
 | `bms` | `VMMS` | `fleet.read` | route A1 | yes |
 | `vmms` | `BMS` | `fleet.availability.write`, `fleet.change.write` | routes A2, A3 | yes (since 2026-11-27, VRMS spec 0029) |
-| `vmms` | `BMS` | `schedule.read`, `maintenance.write` | routes B1, B2, B3 | no, and new |
+| `vmms` | `BMS` | `schedule.read`, `maintenance.write` | routes B1, B2, B3 | no: added once VMMS agrees the B1 to B3 shapes |
 | `vrms` | `BMS` | `schedule.read`, `repair.update.write` | routes C1, C2, C4 | yes (since 2026-11-27) |
 | `bms` | `VRMS` | `repair.status.read`, `repair.expedite.write` | routes C3, C5 | yes (since 2026-11-27) |
 
-"Today" means `welinc-auth/prisma/seeds/clients.seed.ts`, applied locally and on staging on 2026-11-27. Only Flow B's scopes are still missing; ask the shared services lead to add them once the Flow B shapes are agreed. Until then those calls are refused at the token request.
+"Today" means `welinc-auth/prisma/seeds/clients.seed.ts`, applied locally and on staging on 2026-11-27. Only Flow B's scopes are still missing. The shared services lead adds them in welinc-auth once VMMS agrees the B1 to B3 shapes. Until then those calls are refused at the token request.
 
 ## Routes
 
 | # | Caller → served by | Route | Scope | Built |
 |---|---|---|---|---|
 | A1 | BMS → VMMS | `GET /vmms/fleet/vehicles`, `/vehicles/:id`, `/garages` | `fleet.read` | yes, both |
-| A2 | VMMS → BMS | `POST /bms/integrations/vmms/vehicle-availability` | `fleet.availability.write` | VMMS sender yes; grant no; BMS no |
-| A3 | VMMS → BMS | `POST /bms/integrations/vmms/fleet-changes` | `fleet.change.write` | VMMS sender yes; grant no; BMS no |
+| A2 | VMMS → BMS | `POST /bms/integrations/vmms/vehicle-availability` | `fleet.availability.write` | VMMS sender yes; grant yes; BMS no |
+| A3 | VMMS → BMS | `POST /bms/integrations/vmms/fleet-changes` | `fleet.change.write` | VMMS sender yes; grant yes; BMS no |
 | B1 | VMMS → BMS | `GET /bms/integrations/vmms/vehicles/:vmmsVehicleId/schedule` | `schedule.read` | no |
 | B2 | VMMS → BMS | `GET /bms/integrations/vmms/vehicles/:vmmsVehicleId/maintenance-check` | `schedule.read` | no |
 | B3 | VMMS → BMS | `POST /bms/integrations/vmms/maintenance-events` | `maintenance.write` | no |
-| C1 | VRMS → BMS | `GET /bms/integrations/vrms/vehicles/:vmmsVehicleId/schedule` (repair route 9) | `schedule.read` | no |
-| C2 | VRMS → BMS | `POST /bms/integrations/vrms/repair-updates` (repair route 10) | `repair.update.write` | no |
-| C3 | BMS → VRMS | `POST /vrms/integrations/bms/expedite-requests` (repair route 11) | `repair.expedite.write` | no |
-| C4 | VRMS → BMS | `POST /bms/integrations/vrms/expedite-answers` (repair route 12) | `repair.update.write` | no |
-| C5 | BMS → VRMS | `GET /vrms/integrations/bms/vehicles/:vmmsVehicleId/active-repair` (repair route 13) | `repair.status.read` | no |
+| C1 | VRMS → BMS | `GET /bms/integrations/vrms/vehicles/:vmmsVehicleId/schedule` (repair route 9) | `schedule.read` | VRMS yes, BMS no |
+| C2 | VRMS → BMS | `POST /bms/integrations/vrms/repair-updates` (repair route 10) | `repair.update.write` | VRMS yes, BMS no |
+| C3 | BMS → VRMS | `POST /vrms/integrations/bms/expedite-requests` (repair route 11) | `repair.expedite.write` | VRMS yes, BMS sender no |
+| C4 | VRMS → BMS | `POST /bms/integrations/vrms/expedite-answers` (repair route 12) | `repair.update.write` | VRMS yes, BMS no |
+| C5 | BMS → VRMS | `GET /vrms/integrations/bms/vehicles/:vmmsVehicleId/active-repair` (repair route 13) | `repair.status.read` | VRMS yes, BMS client no |
 
 ## Flow A: fleet list and availability (VMMS > BMS)
 
@@ -163,13 +163,13 @@ VMMS treats only 200 and 202 as done. BMS never answers 4xx for a truck it doesn
   eventId: string;
   entityType: 'VEHICLE' | 'GARAGE';
   entityId: string;              // VMMS vehicles.id or garages.id
-  changeType: 'VEHICLE_CREATED' | 'VEHICLE_IMPORTED' | 'VEHICLE_UPDATED' | 'VEHICLE_DELETED' | 'ODOMETER_UPDATED'
-            | 'GARAGE_CREATED' | 'GARAGE_UPDATED' | 'GARAGE_DELETED';
+  changeType: 'VEHICLE_CREATED' | 'VEHICLE_IMPORTED' | 'VEHICLE_UPDATED' | 'VEHICLE_DELETED' | 'VEHICLE_DEACTIVATED'
+            | 'ODOMETER_UPDATED' | 'GARAGE_CREATED' | 'GARAGE_UPDATED' | 'GARAGE_DELETED';
   occurredAt: string;
 }
 ```
 
-As VMMS's sender builds it (`bms-fleet-changes.service.ts`); the change types are every value VMMS records today. BMS answers 202 and reads the record fresh (route A1). It never uses the message's fields beyond the ids. `VEHICLE_DELETED` is VMMS's soft delete (`deletedAt` set, `isActive` false), its only way to deactivate a truck: it flags that truck's upcoming work "Needs update". A move to another garage arrives as `VEHICLE_UPDATED`. `ODOMETER_UPDATED` needs nothing in BMS.
+As VMMS's sender builds it (`bms-fleet-changes.service.ts`); the change types are every value VMMS records today. BMS answers 202 and reads the record fresh (route A1). It never uses the message's fields beyond the ids. `VEHICLE_DELETED` is VMMS's soft delete (`deletedAt` set, `isActive` false). `VEHICLE_DEACTIVATED` is new: VMMS sends it when Operations approves a truck retirement that VRMS asked for (`isActive` false; VRMS flow 4, `vrms-retirement-requests.service.ts`). BMS treats both the same way: it flags that truck's upcoming bookings and Job Orders "Needs update". A move to another garage arrives as `VEHICLE_UPDATED`. `ODOMETER_UPDATED` needs nothing in BMS.
 
 ## Flow B: maintenance dates (VMMS <> BMS)
 
@@ -197,7 +197,7 @@ Before VMMS books preventive maintenance, it checks the truck's trips in BMS, so
 }[] }
 ```
 
-`DispatchAssignment` rows for that `vehicleId` in `PENDING` or `CONFIRMED`, from today (Asia/Manila), ordered by date and time. No client name, address or rate. Subcon rows have no `vehicleId`, so they never appear.
+`DispatchAssignment` rows for that `vehicleId` whose `state` is `PENDING` or `CONFIRMED`, from today (Asia/Manila), ordered by date and time. No client name, address or rate. Subcon rows have no `vehicleId`, so they never appear. `RELEASING` is left out on purpose, although dispatch's own active list counts it: that truck is being taken off the trip, so the trip is no longer its.
 
 ### Route B2: date check (BMS serves)
 
@@ -263,6 +263,9 @@ Flows A, B and C all flag bookings and Job Orders. BMS keeps one flag per bookin
 
 ## Open questions
 
-1. **The offline list.** Flow A asks BMS to show the last list with "VMMS offline, last updated …" when VMMS is down. [fleet-api.md](fleet-api.md#bms-rules) says today that the list answers 503 `FLEET_UNAVAILABLE` and no stale list is served. Proposal: the list may show the last copy with the banner, and assignment keeps reading fresh and refusing (503), so nothing is dispatched on a stale status. fleet-api.md would change with it.
-2. **New scopes for Flow B.** `schedule.read` and `maintenance.write` for client `vmms` on audience `BMS` need the welinc-auth owners and the VMMS group to agree.
-3. **Flow B route shapes** are a BMS proposal for VMMS to review before either side builds them.
+1. **Flow B route shapes** (B1 to B3) are a BMS proposal for VMMS to review before either side builds them.
+
+Settled:
+
+- **The offline list** (agreed 2026-11-27): when VMMS is down, the list shows the last copy with "VMMS offline, last updated …", and assignment keeps reading fresh and refusing with 503 `FLEET_UNAVAILABLE`. Showing an old copy is fine; acting on one isn't. [fleet-api.md](fleet-api.md#bms-rules) is updated to match.
+- **Flow B scopes** (agreed 2026-11-27): `schedule.read` and `maintenance.write` for client `vmms` on audience `BMS` get added in welinc-auth once VMMS agrees the B1 to B3 shapes.

@@ -55,7 +55,7 @@ Each field is the VMMS `vehicles` column of the same name. `engineType` is not s
 |---|---|
 | The vehicle list is cached 30 s and shows every active vehicle with its VMMS status | Dispatchers see what VMMS sees, a few seconds late at most |
 | At assignment, read the one vehicle fresh (`GET /vmms/fleet/vehicles/:id`, never the cache) and refuse anything but `AVAILABLE` with 409 `VEHICLE_UNAVAILABLE` | A truck VMMS just sent for maintenance is never dispatched |
-| VMMS doesn't answer in 3 s, or answers 5xx: the list and the assignment answer 503 `FLEET_UNAVAILABLE` | No stale list is served and nothing is assigned |
+| VMMS doesn't answer in 3 s, or answers 5xx: the list shows the last copy with "VMMS offline, last updated …", and the assignment answers 503 `FLEET_UNAVAILABLE` | Showing an old copy is fine, acting on one isn't: nothing is assigned on a stale status |
 | A 401 `TOKEN_EXPIRED`: one new token, one retry | Clock drift between containers |
 | A vehicle VMMS answers 404 for shows as "Unavailable vehicle" and takes no new assignment | Old assignments keep their history |
 | Two assignments racing for one truck keep dispatch's existing guard | Unchanged |
