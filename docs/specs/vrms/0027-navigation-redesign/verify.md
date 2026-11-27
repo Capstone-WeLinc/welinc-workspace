@@ -56,5 +56,5 @@ Run at `/check verify navigation redesign`, locally, with the shared and VRMS st
 ### Value sourcing for step 6a
 
 - Role tag: change `multi.lead@`'s VMMS role in the portal, refresh the VRMS tab after the next token refresh, and see the tag follow `user.systemRoles` (not the VRMS token roles)
-- Suite management card: give a VRMS only chief a temporary suite admin… (or use `suite.admin@` on a temporary VRMS Chief Mechanic role): the card and the grid show from `user.suiteAdmin`
+- Suite management card: give `suite.admin@` a temporary VRMS Chief Mechanic role and open VRMS: the card and the grid show from `user.suiteAdmin`
 - Grid button: the same suite admin with one system gets the grid; drop the suite admin row and it goes on the next refresh
