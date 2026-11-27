@@ -39,7 +39,7 @@ WL-206 and WL-207. Expected completion from priority and issue type, with a rule
   - [x] Hand change and reset: the permission, the PUT and `automatic` routes, the Change dialog on the ticket's Due row (AC-8, AC-9, AC-14, AC-15)
   - [ ] Due soon on screens and the backfill: chips, the mechanic's Due soon group, `npm run due:backfill` locally and on staging (AC-12, AC-13). Built and run locally 2026-11-27; the staging run waits for the deploy
 - [x] Verify it: `/check verify deadlines & fix time estimates`. Passed locally 2026-11-27 (all AC-1 to AC-15, 37 of 38 steps); the staging backfill and `catalog:sync` wait for the deploy
-- [ ] Test it: `/test deadlines & fix time estimates`
+- [x] Test it: `/test deadlines & fix time estimates`. 2026-11-27: 35 new tests in 4 specs (recompute, route DTOs, category fix time, setDueAt source only); backend 1,922 and web 766 pass
 - [ ] Polish it (optional, ask first): `web-design-guidelines` · `break-ui` (overdue by years, due today, missing estimates)
 
 ### 43. Stuck and stale ticket alerts · planned · needs a decision
