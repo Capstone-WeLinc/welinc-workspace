@@ -4,8 +4,8 @@ Run at `/check verify navigation redesign`, locally, with the shared and VRMS st
 
 ## Board comparison (AC-15), no screenshots
 
-1. Read [boards/Sidebars8.dc.html](boards/Sidebars8.dc.html) (and `BPhone.dc.html` for the phone): text, icons, font sizes and weights, colors, gaps, paddings, radii and states from the markup and its script.
-2. Open web-vrms as `vrms.admin@` and as a mechanic, and the portal Admin as `suite.admin@`, at 1280px; one `browser_snapshot` and one `browser_evaluate` with `getComputedStyle` for the switcher, New repair, section label, line, item, current item, sub item, count bubble (hot and not), account menu and collapse toggle.
+1. Read [boards/Sidebars8.dc.html](boards/Sidebars8.dc.html) (and `BPhone.dc.html` for the phone) for the nav, and suite spec 0019's [Shell20](../../_root/0019-portal-redesign/boards/Shell20.dc.html) and [Switcher16](../../_root/0019-portal-redesign/boards/Switcher16.dc.html) for the top bar, sidebar title, footer strip, switcher popover and avatar: text, icons, font sizes and weights, colors, gaps, paddings, radii and states from the markup and its script.
+2. Open web-vrms as `vrms.admin@` and as a mechanic, and the portal Suite management as `suite.admin@`, at 1280px; one `browser_snapshot` and one `browser_evaluate` with `getComputedStyle` for the sidebar title, New repair, section label, line, item, current item, sub item, count bubble (hot and not), footer strip, collapse button, top bar, breadcrumb, grid button, switcher popover and avatar. The VRMS top bar, title, footer, popover and avatar values must equal the portal's (AC-15).
 3. Allowed differences: (a) Plex Mono instead of the boards' JetBrains Mono, and Inter instead of Inter Tight for headings (spec 0016, amended 2026-11-23); (b) spec 0016 token values that changed after the boards; (c) shadcn based parts with their spec 0016 styles; (d) real data lengths. Also expected: no Fleet section, no On hold sub page. Anything else is a bug.
 
 ## Major flows
@@ -16,10 +16,12 @@ Run at `/check verify navigation redesign`, locally, with the shared and VRMS st
 - [ ] Send a ticket for verification as the mechanic: Sent back to me drops without a reload (AC-7)
 - [ ] `/repairs?view=signoff` with a garage filter pages correctly; picking a status chip clears the view (AC-4)
 - [ ] Collapse: dots on Repair tickets, New repair as an icon, tooltips (AC-6, AC-8)
-- [ ] `multi.chief@`: the switcher menu opens VMMS straight through the launcher; a VRMS only mechanic sees a plain label (AC-9, AC-13)
-- [ ] Account menu: name, role name, Profile, Sign out (AC-10)
-- [ ] 375px: mechanic tab bar with a dot on Repairs; admin sheet with sub pages and counts (AC-11)
-- [ ] Portal as `suite.admin@`: the new frame, Roles naming, Deletion requests count in gold; as `vrms.admin@`: no Overview or Suite admins (AC-12)
+- [ ] Top bar: "VRMS › Repair tickets › Waiting for sign off" on `/repairs?view=signoff`, the ticket number as the last crumb on a ticket, "New repair" on the form; no breadcrumb in `PageHeader`; at 375px only the last crumb (AC-9)
+- [ ] `multi.chief@`: the grid opens with VRMS ticked first, then BMS and VMMS with role tags, Home in the title; VMMS opens straight through the launcher; a VRMS only mechanic has no grid button; `vrms.admin@` sees the Suite management card last and it opens `/admin` (AC-9a, AC-13)
+- [ ] The sidebar: "VRMS" with the role name under it, linking to the dashboard; the footer strip with "WeLinc Logistics" and the collapse button; collapsed, the tile alone and the expand button alone; no switcher or account row in the sidebar (AC-10a, AC-10b)
+- [ ] Avatar menu: name and email, Your profile, Sign out, nothing else (AC-10)
+- [ ] 375px: mechanic tab bar with no Account tab and a dot on Repairs, the W tile and avatar in the top bar; admin sheet with the title, sub pages, counts and the footer strip (AC-11)
+- [ ] Portal as `suite.admin@`: "Suite management" with the role line, the footer strip, the grid and avatar top right at 1280px (not in the sidebar), `KeyRound` and `History` icons, Roles naming, Deletion requests count in gold; as `vrms.admin@`: no Overview or Suite admins (AC-12)
 - [ ] Keyboard pass and one axe pass on both sidebars (AC-14)
 - [ ] Added at the build (2026-11-28): open `http://localhost:8000/?open=BMS` as `vrms.chief@` (no BMS role): the launcher shows with an error toast naming BMS, and the address loses `open` (AC-13)
 - [ ] Added at the build: 375px as `vrms.chief@` on `/repairs`: the view chips (All open, Waiting for sign off, Assigned to me) show with the same counts as the sidebar, and tapping one sets the view (AC-11)
