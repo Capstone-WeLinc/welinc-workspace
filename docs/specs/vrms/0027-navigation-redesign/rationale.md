@@ -122,3 +122,20 @@ Choices made without asking, with the reason:
 - `systemRoles` covers exactly the systems in `user.systems` (web openable ones, VRMS included), so the cards and their tags always agree. Runner up: every held system, which would hand VRMS phone only systems it never shows.
 - `canSwitchSystem` also turns on for a suite admin, since they now have a card to go to even with one system.
 - When the fields are missing (an older welinc-auth), the cards show with no tag and the card falls back to the VRMS `ADMIN`: today's behaviour, never an empty tag box.
+
+## Update 2026-11-28, New repair out of the sidebar
+
+### Context
+
+The build made New repair white on navy, not the board's gold, because `design.md` Signature 3 keeps gold for "needs you". Seen live under the title, it was the loudest thing in the sidebar and sat next to the gold sign off and suggestions counts, which are the only things that should pull the eye.
+
+### Decision
+
+Your call: drop it from the sidebar. New repair stays one click away where the work starts: the dashboard header (now at every size, before only on phones) and the Repair tickets page's own "New repair ticket" button. The sidebar is navigation only, the same top for every role (title, line, sections), which also matches Suite management's sidebar.
+
+### Options considered
+
+- **Drop it** (picked): the sidebar is places only; the action lives in the page headers.
+- Keep it white: one action button in a navigation column, competing with the hot counts.
+- Make it gold as the board drew it: breaks Signature 3, gold would no longer mean "needs you".
+
