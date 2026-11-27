@@ -43,3 +43,18 @@ Run at `/check verify navigation redesign`, locally, with the shared and VRMS st
 - [ ] Added by `/architect` (step 6a): a suite admin whose only web system is VRMS (a temporary non admin role) gets the grid button and the Suite management card; their cards list only the systems they hold a role in (AC-9a)
 - [ ] Added by `/architect` (step 6a): a suite admin with no web system is never let into VRMS (`NO_SYSTEM_ACCESS` at the grant), so no switcher shows (AC-9a)
 - [ ] Added by `/architect` (step 6a): a new custom role on another system's card shows in title case until the catalog refetches on focus, then by its name (AC-9a)
+
+## Step 6a, added by /develop (2026-11-28)
+
+- [ ] `POST /vrms/session/refresh` as `multi.lead@`: `user.systems` is `["BMS","VMMS","VRMS"]` and `user.systemRoles` is one entry each, same order (`OPERATIONS`, `OPERATIONS`, `CHIEF_MECHANIC`); `suiteAdmin` false. Seen live at build (AC-9a)
+- [ ] As `multi.lead@` in the browser, the grid shows BMS and VMMS tagged "Operations" by its catalog name, and no Suite management card (AC-9a)
+- [ ] As `multi.admin@` (VRMS and VMMS Admin), the refresh answer's VMMS entry holds `ADMIN`; the VMMS card is tagged "Admin" and the Suite management card shows (AC-9a)
+- [ ] The access token's claims (decode it) hold no `systemRoles` or `suiteAdmin`; the refresh answer does (contract 0001 section 5)
+- [ ] Older welinc-auth fallback: with the two fields removed from a refresh answer (unit tests in `auth-client.spec.ts` and `grantFields.test.ts`), the cards show with no tag and the Suite management card follows the VRMS `ADMIN` alone (AC-9a)
+- [ ] `npm run openapi:check` passes in welinc-auth and `GrantUser` in `docs/openapi.json` lists `systemRoles` and `suiteAdmin` (AC-14)
+
+### Value sourcing for step 6a
+
+- Role tag: change `multi.lead@`'s VMMS role in the portal, refresh the VRMS tab after the next token refresh, and see the tag follow `user.systemRoles` (not the VRMS token roles)
+- Suite management card: give a VRMS only chief a temporary suite admin… (or use `suite.admin@` on a temporary VRMS Chief Mechanic role): the card and the grid show from `user.suiteAdmin`
+- Grid button: the same suite admin with one system gets the grid; drop the suite admin row and it goes on the next refresh
