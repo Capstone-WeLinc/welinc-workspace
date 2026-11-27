@@ -58,3 +58,13 @@ Run at `/check verify navigation redesign`, locally, with the shared and VRMS st
 - Role tag: change `multi.lead@`'s VMMS role in the portal, refresh the VRMS tab after the next token refresh, and see the tag follow `user.systemRoles` (not the VRMS token roles)
 - Suite management card: give `suite.admin@` a temporary VRMS Chief Mechanic role and open VRMS: the card and the grid show from `user.suiteAdmin`
 - Grid button: the same suite admin with one system gets the grid; drop the suite admin row and it goes on the next refresh
+
+## Step 7 sweep, added by /develop (2026-11-28)
+
+The sweep ran these once and fixed what failed (web-vrms `dfc91b4`, portal `52ae02d`); `/check verify` reruns them.
+
+- [ ] At 1280px as `mech.juan@`, the "VRMS" crumb link computes `muted-foreground` (rgb 91, 103, 121), not the navy link color, and turns `foreground` on hover → AC-9
+- [ ] The VRMS sidebar title tile is 36px with a 10px radius, the same as the portal's Suite management tile; collapsed, the 64px strip still centres it → AC-10a, AC-15
+- [ ] With the grid switcher open in VRMS (`multi.admin@`) and in the portal, the popover is a dialog named "Switch system", and axe finds nothing but the dev only dataset switch → AC-9a, AC-14
+- [ ] The VRMS switcher cards compute the same text color as the portal's (rgb 15, 23, 42) → AC-15
+- [ ] axe at 375px and 1280px in both apps, with the sheet, the switcher and the account menu each open in turn → no violations outside the dev only dataset switch and whatever the account menu decision allows → AC-14
