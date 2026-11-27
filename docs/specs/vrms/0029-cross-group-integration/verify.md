@@ -147,7 +147,7 @@ _Steps derived from spec 0029 acceptance criteria. `/check verify` runs these; `
 - [ ] Set the setting to 7, run `DeliveryRetentionJob.run()`: `SENT` and `DISMISSED` rows older than 7 days go; `PENDING` and `FAILED` rows of any age stay → AC-23
 
 ### Local test data from this run
-- Two referrals were inserted by hand: `WO-20261127-000101` (CAK 9043, added to REP-20261126-7J6W) and `WO-20261127-000102` (NRE 471, rejected, its message marked `FAILED` by hand and then dismissed). Their deliveries and audit rows stay; the referral rows can be deleted with `DELETE FROM referrals WHERE work_order_number IN ('WO-20261127-000101','WO-20261127-000102')` once the deliveries pointing at them are gone or set aside.
+- Cleaned on 2026-11-27: the hand inserted referrals `WO-20261127-000101`, `102` and `201` to `203`, the ticket opened from `203`, their deliveries, issues and audit rows (the audit trigger was switched off inside one transaction, then restored). Only `WO-20261116-000026` and its ticket remain.
 
 ## Acceptance criteria coverage (milestone 3)
 - AC-8: concurrent decisions · AC-9: Add steps · AC-10: Reject steps · AC-11: permission steps · AC-13: repair event steps · AC-14, AC-15: the two reads · AC-21: per ticket order, Retry · AC-22: Deliveries steps · AC-23: retention · AC-24: token and `no-store` steps · AC-25: audit rows for decisions and deliveries (system actor rows come with flow 3) · AC-36: outside shop steps (M9 itself with feature 37)
