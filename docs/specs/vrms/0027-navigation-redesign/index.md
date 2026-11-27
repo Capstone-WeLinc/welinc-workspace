@@ -114,10 +114,10 @@ Count and view rules: `open`, `signoff` need `ticket.view_all`; `mine` needs an 
 
 Facade first (the UI refresh phase's approach): the new sidebar on the data the app already has, then the counts and views behind it. Starts after S18's milestone 3 (the sidebar restyle and collapse, spec 0016 step 6) **and** after suite spec 0018 child 0002's step 2 (VRMS on permissions, the roster by `ticket.assignable`, role names from the catalog), since both touch `navItems.ts`, `session.ts`, `RoleBadge` and the account menu.
 
-1. web-vrms: the nav model with sections, sub pages and open state, the switcher (menu or label), New repair button, account menu, Profile out of the nav; sub pages link to `view` presets that the list reads client side for now, satisfies **AC-1**, **AC-2**, **AC-3**, **AC-8**, **AC-9**, **AC-10**
-2. welinc-backend-vrms: the `sent_back_at` migration with its backfill and the moves that set and clear it; `view` on `GET /vrms/repairs` with the rules, `inRoster` on `/vrms/permissions/me`, `GET /vrms/nav/counts` (one grouped query, authenticated tag), tests per view and per count (each count equals its list total), the API docs; web-vrms switches the list to send `view`, satisfies **AC-2**, **AC-4**, **AC-5**
-3. web-vrms: count bubbles, hot rule, collapsed dots, refresh timing; phones (tab bar dot, sheet with sub pages and counts, New repair in page headers), satisfies **AC-5**, **AC-6**, **AC-7**, **AC-11**
-4. Portal and welinc-auth: `pendingDeletionRequests` on `/auth/admin/me`, the `AdminShell` sidebar frame (switcher, sections, Roles naming, count, account menu), the launcher's `open`, satisfies **AC-12**, **AC-13**
+1. [x] web-vrms: the nav model with sections, sub pages and open state, the switcher (menu or label), New repair button, account menu, Profile out of the nav; sub pages link to `view` presets that the list reads client side for now, satisfies **AC-1**, **AC-2**, **AC-3**, **AC-8**, **AC-9**, **AC-10**
+2. [x] welinc-backend-vrms: the `sent_back_at` migration with its backfill and the moves that set and clear it; `view` on `GET /vrms/repairs` with the rules, `inRoster` on `/vrms/permissions/me`, `GET /vrms/nav/counts` (one grouped query, authenticated tag), tests per view and per count (each count equals its list total), the API docs; web-vrms switches the list to send `view`, satisfies **AC-2**, **AC-4**, **AC-5**
+3. [x] web-vrms: count bubbles, hot rule, collapsed dots, refresh timing; phones (tab bar dot, sheet with sub pages and counts, New repair in page headers), satisfies **AC-5**, **AC-6**, **AC-7**, **AC-11**
+4. [x] Portal and welinc-auth: `pendingDeletionRequests` on `/auth/admin/me`, the `AdminShell` sidebar frame (switcher, sections, Roles naming, count, account menu), the launcher's `open`, satisfies **AC-12**, **AC-13**
 5. Sweep: 375px and 1280px in both apps, keyboard, axe, lint, typecheck, builds, tests, the board comparison, satisfies **AC-14**, **AC-15**
 
 ## Consequences

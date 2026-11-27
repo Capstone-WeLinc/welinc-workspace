@@ -183,13 +183,13 @@ Rework the VRMS sidebar (and the portal Admin sidebar to match): a system switch
 - Note (2026-11-23): the sidebar's look is settled by `Sidebars8` (canvas "WeLinc design directions", page "Round 8") and spec 0016 *Layout and navigation*: section labels with lines between them and **no folding** (only a page with pages under it, such as Repair tickets and Knowledge base, opens), section names Work, Fleet, Insights and Admin, counts as mono bubbles (gold only when hot), and the icon collapse. So "folding sections" in the intent above is out of date. What's left for this feature's `/architect` is which pages each role sees, the New repair button, and the phone tab bar or sheet (spec 0016 AC-16 leaves those here).
 - Note (2026-11-23, board check): also open, since `Sidebars8` doesn't draw them: what the system switcher and the account menu hold, the "Back to the portal" link, and the phone layout (only round 1's `BPhone` drew one; spec 0016 says a bottom tab bar for roles with at most 5 items, a sheet otherwise). Settled in round 6: no Inbox, Settings without a dropdown, Audit logs uses the ScrollText icon and Settings a cog.
 - Note (2026-11-23, `/architect`): decided: sections Work, Insights, Admin (no Fleet: VMMS owns the trucks, feature 56); sub pages as `view` presets of the repair list with live counts from `GET /vrms/nav/counts` (On hold waits for feature 31); New repair at the top of the sidebar, in page headers on phones; the switcher keeps spec 0007's rule (two or more systems, or a VRMS Admin) and opens systems through the launcher's new `?open=`; Profile moves to the account menu; the portal Admin sidebar gets the same frame with a Deletion requests count. Builds after S18's milestone 3 and suite spec 0018's VRMS step.
-spec [0027](../../specs/vrms/0027-navigation-redesign/index.md) · code in `welinc-web-vrms/src/components/layout/`, `welinc-backend-vrms/src/modules/vrms/`, `welinc-web-portal/src/pages/admin/AdminShell.tsx`
+spec [0027](../../specs/vrms/0027-navigation-redesign/index.md) · code in `welinc-web-vrms/src/components/layout/`, `welinc-backend-vrms/src/modules/vrms/` (`repair-views.ts`, `nav-counts.*`), `welinc-web-portal/src/pages/admin/AdminShell.tsx`, `welinc-auth/src/auth/admin/admin.controller.ts`; branch `feat/navigation-redesign` in all four, local only
 - [x] Design it (spec): `/architect navigation redesign`
 - [ ] Build it: `/develop navigation redesign` (after S18's milestone 3 and S21's VRMS milestone)
-  - [ ] Sidebar UI on today's data: sections, sub pages, open state, switcher, New repair, account menu (AC-1 to AC-3, AC-8 to AC-10)
-  - [ ] Backend: `sent_back_at`, `view` on the repair list, `inRoster`, `/vrms/nav/counts` (AC-2, AC-4, AC-5)
-  - [ ] Counts in the sidebar, hot rule, collapsed dots, phones (AC-5 to AC-7, AC-11)
-  - [ ] Portal Admin frame, `pendingDeletionRequests`, the launcher's `open`, then the sweep and board comparison (AC-12 to AC-15)
+  - [x] Sidebar UI on today's data: sections, sub pages, open state, switcher, New repair, account menu (AC-1 to AC-3, AC-8 to AC-10)
+  - [x] Backend: `sent_back_at`, `view` on the repair list, `inRoster`, `/vrms/nav/counts` (AC-2, AC-4, AC-5)
+  - [x] Counts in the sidebar, hot rule, collapsed dots, phones (AC-5 to AC-7, AC-11)
+  - [ ] Portal Admin frame, `pendingDeletionRequests`, the launcher's `open`, then the sweep and board comparison (AC-12 to AC-15). 2026-11-28: the frame, the count and `open` are built and committed; left is the sweep (375px, keyboard, axe) and the board comparison, which `/check verify` runs from `verify.md`
 - [ ] Verify it: `/check verify navigation redesign`
 - [ ] Test it: `/test navigation redesign`
 

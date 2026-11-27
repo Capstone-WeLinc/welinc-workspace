@@ -463,7 +463,7 @@ Existing routes stay unless marked. "System" means the token's `aud`; the old `?
 
 | Route | Method | Who | In | Out | Errors |
 |---|---|---|---|---|---|
-| `/auth/admin/me` | GET | anyone signed in | | `{ user: { id, name, email, picture }, suiteAdmin, adminOf: SystemType[], codeRequired, codePassed, temporaryGrants }` (`temporaryGrants`: the caller's own live grants, empty unless a suite admin) | 401 `NOT_SIGNED_IN` |
+| `/auth/admin/me` | GET | anyone signed in | | `{ user: { id, name, email, picture }, suiteAdmin, adminOf: SystemType[], codeRequired, codePassed, temporaryGrants, pendingDeletionRequests }` (`temporaryGrants`: the caller's own live grants, empty unless a suite admin; `pendingDeletionRequests`: pending deletion requests the caller can act on, every one for a suite admin, their systems' for a system admin, 0 otherwise, VRMS spec 0027 AC-12) | 401 `NOT_SIGNED_IN` |
 | `/auth/admin/code` | POST | admin | | `{ challengeId, email, resendAfter }`, or 200 `{ passed: true }` and no email when already passed | 409 `CODE_NOT_REQUIRED`, 429 `CODE_SEND_LIMIT`, 503 `MAIL_FAILED` |
 | `/auth/admin/code/verify` | POST | admin | `{ challengeId, code }` | 204 | 400 `INVALID_CODE` with `attemptsLeft`, 400 `CODE_EXPIRED`, 409 `CODE_NOT_REQUIRED` |
 | `/auth/admin/verify-password` | POST | admin | `{ password, purpose }` (`ADMIN_ACTION` or `TEMPORARY_ACCESS`) | `{ reauthToken, expiresAt }` | 400 `WRONG_PASSWORD` with `attemptsLeft`, 403 `ACCOUNT_LOCKED`, 403 `NOT_SUITE_ADMIN` (`TEMPORARY_ACCESS`), 429 `RATE_LIMITED` |
