@@ -1,6 +1,6 @@
 # 0017. Fuel operations reconciliation and anomaly follow-up
 
-**Status**: Draft for approval; implementation is not authorized
+**Status**: Implementation complete; runtime and cross-user acceptance pending
 **Scope**: [Fuel expenses and anomaly handling](../../../scope/vmms/index.md#5-fuel-expenses-and-anomaly-handling)
 
 Decision history: [rationale.md](rationale.md). Verification plan: [verify.md](verify.md).
@@ -29,39 +29,50 @@ flows; they do not reopen or replace the approved baseline fuel requirements.
 
 - After an import save, show a summary of submitted, saved, and failed rows,
   grouped by worksheet and station where that information is already available.
-- Show liters and VMMS-calculated cost totals for saved rows only. Clearly
-  separate failed rows; never use a workbook's printed total as an authoritative
-  amount.
+- Show liters and VMMS-calculated cost totals for saved rows only. The backend
+  returns each saved row's persisted `totalCost`; the web aggregates those
+  values and never recalculates them from workbook values or uses a printed
+  total. Clearly separate failed rows.
 - Keep row-level outcomes and actionable errors available. A summary must not
   turn partial success into a success-shaped result.
-- Only the Operations user who owns the import draft can see its review and
-  results. Do not add a retained import-history report or store the workbook.
+- Show the summary only in the current import flow. Do not add a separate
+  reconciliation history or store the workbook. Existing draft ownership and
+  saved/failed row results remain unchanged.
 
 ### Anomaly follow-up
 
 - Add an open-anomaly table/queue that includes vehicle, efficiency, rolling
   average, severity, status, first-detected time, and age in days.
+- Display age as elapsed 24-hour periods since `createdAt`, matching the
+  existing escalation thresholds. The escalation cron continues to run at
+  midnight Asia/Manila.
 - Keep existing notes, attachments, acknowledgment, resolution, access rules,
   and escalation behavior. Age is informational and does not create a new SLA
   or trigger notifications.
 - Admin and Operations may review the queue; preserve the existing role
   permissions for edits, acknowledgments, and resolution.
 
-## Approval requested
+## Approved decisions
 
-1. Approve an import result summary that is shown only in the current import
-   flow, with no persistent history or new file retention.
-2. Approve anomaly age as an informational value using the existing
-   Asia/Manila escalation clock; no new age thresholds or notifications.
-3. Confirm that existing Admin/Operations visibility and Operations-owned
-   import isolation remain the intended access rules.
+Approved by the user on 2026-11-27:
+
+1. Keep import reconciliation transient in the current import flow, without a
+   separate history or new file retention.
+2. Add an additive `totalCost` field to successful import-row results, sourced
+   from the persisted VMMS fill-up. No migration or stored workbook is needed.
+3. Display anomaly age as elapsed 24-hour periods, aligned with existing
+   escalation thresholds and the Asia/Manila escalation schedule.
+4. Preserve Admin/Operations web visibility, Operations-owned draft isolation,
+   and all existing mutation, acknowledgment, and resolution permissions.
 
 ## API, data, and migration impact
 
-- Prefer the existing import row results and anomaly response fields.
-- No new database table, migration, file retention, or API contract is planned.
-- If existing API responses cannot support the approved view, stop and propose
-  the smallest VMMS-only API addition before implementation.
+- Reuse existing import counts, row outcomes, worksheet/station IDs, and
+  anomaly `createdAt` response data.
+- Add `totalCost` to each successful import-row response so the web can
+  aggregate only VMMS-calculated persisted totals. This is additive and
+  requires no database migration.
+- No new database table, separate history, or file retention is added.
 
 ## Security and failure behavior
 

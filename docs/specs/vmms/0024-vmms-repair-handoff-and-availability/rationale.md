@@ -51,8 +51,12 @@ VMMS sends a small, idempotent fleet-change event. BMS refreshes the service-aut
 - A referral remains pending until VRMS confirms acceptance or rejection. Delivery acceptance (`202`) is distinct from VRMS Admin acceptance.
 - On VRMS rejection, the existing work-order restart path returns to the assigned mechanic. On cancellation, retain active `FOR_REPAIR` state and show the reason to the Chief Mechanic. On completion, retain the established final-verification path in spec 0023.
 - The existing cost boundary applies to VRMS history: Mechanic does not receive repair cost.
+- An `OPENED` service odometer remains event evidence only. A `COMPLETED` event with a reading creates one pending Operations review in the same transaction as its event receipt.
+- Operations may confirm or dismiss a completed reading from the Vehicles page. Confirmation reuses the established master-odometer update, validation, audit, and schedule-refresh transaction; dismissal records the reviewer and time without changing the vehicle master.
 - VMMS owns provider mapping; unmatched shop values must not silently create or mutate the VMMS catalog.
 - BMS publication is an outbox side effect of a committed VMMS status change. Event delivery retries in order and never blocks the status transition.
+- The existing fleet-change outbox event is delivered to both BMS and VRMS with separate audience-bound tokens. It is marked sent only after both accept; a partial failure retries the same event ID so an already-accepting receiver can deduplicate the invalidation.
+- A BMS HTTP 400 response means the immutable availability event cannot be repaired by retrying. Keep its error code for diagnosis, stop retrying it, and let later versions for the same vehicle proceed; transient failures retain ordered backoff.
 - BMS reads active garages and vehicles through the existing VMMS `fleet.read` service routes. A pre-dispatch read reports `isAssignable` only when the vehicle is active and `AVAILABLE`; non-successful reads must block dispatch.
 - Preserve the fleet detail endpoint's existing `404` for inactive, deleted, or unknown vehicle IDs; BMS treats any non-success as unassignable. This avoids changing established route semantics.
 - Vehicle/garage creation, material update, deactivation, and soft deletion create durable fleet-change invalidations in the same database transaction. Availability changes continue through the ordered availability outbox; BMS owns `ON_DELIVERY` and other trip states.

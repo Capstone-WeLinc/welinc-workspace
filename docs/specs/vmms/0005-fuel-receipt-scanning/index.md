@@ -221,5 +221,6 @@ endpoint/key or receipt corpus was configured for this task. Production
 rollout remains gated on configuring an endpoint in an organization-approved
 region and completing the accuracy/latency pilot.
 
-Full image decoding and a final-upload rate limit are approved hardening
-extensions. They are not yet implemented or verified.
+Full image decoding with a 20 MP / 8,000-pixel-side cap and a final-upload
+rate limit of five attempts per actor per minute are implemented and covered
+by focused tests. Deployed runtime acceptance remains pending.

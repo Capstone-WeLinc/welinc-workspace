@@ -1,14 +1,14 @@
 # 0018. Maintenance costing exports and analysis
 
-**Status**: Draft for approval; implementation is not authorized
+**Status**: Approved and implemented; migration deployment and runtime acceptance pending
 **Scope**: [Maintenance costing](../../../scope/vmms/index.md#6-maintenance-costing)
 
 Decision history: [rationale.md](rationale.md). Verification plan: [verify.md](verify.md).
 
 ## Summary
 
-Propose completing costing exports and audit evidence, then adding period and
-category analysis to the existing read-only Maintenance Costing dashboard.
+Complete costing exports and audit evidence, and add period and category
+analysis to the existing read-only Maintenance Costing dashboard.
 Existing rules for eligible completed work, threshold management, role access,
 and exclusion of income/profit remain unchanged.
 
@@ -20,7 +20,7 @@ and exclusion of income/profit remain unchanged.
 - Existing append-only audit requirements remain authoritative; do not create
   a second audit store.
 
-## Proposed behavior
+## Approved behavior
 
 ### Exports
 
@@ -52,22 +52,21 @@ and exclusion of income/profit remain unchanged.
 - Continue to audit threshold changes through the existing domain audit path.
 - Record each completed export with actor, export format, date range, and
   selected truck scope using the existing append-only VMMS audit mechanism.
-- Do not record each background refresh as a report-view event. Whether to
-  audit intentional report-page access is an approval decision.
+- Do not audit intentional report-page access or background refreshes.
+- CSV is not included.
 - Admin and Operations retain report read access; only Admin can change the
   threshold. Backend authorization remains authoritative.
 
-## Approval requested
+## Approval record
 
-1. Approve the two-sheet `.xlsx` export while retaining the existing PDF.
-   Confirm whether CSV is also required.
-2. Approve equivalent-period comparison and type/garage breakdowns, including
-   the custom-range comparison rule and current-garage labeling when historical
-   attribution is unavailable.
-3. Approve audit events for completed exports; decide whether intentional
-   report-page access should also be audited. Background refreshes are excluded.
-4. Confirm existing Admin/Operations read access and Admin-only threshold
-   changes.
+Approved by the user on 2026-11-26: retain PDF and add two-sheet `.xlsx`;
+exclude CSV; use the stated preceding-equivalent-period rule and type/garage
+breakdowns; label garage groups as current assignments; audit completed exports
+and threshold changes but not page views or background refreshes; retain
+Admin/Operations read access and Admin-only threshold changes.
+
+An additive export-audit migration was separately approved because the
+existing append-only costing audit records threshold changes only.
 
 ## API, data, and migration impact
 
@@ -75,8 +74,9 @@ and exclusion of income/profit remain unchanged.
   dataset where it contains the fields needed for the proposed breakdowns.
 - If data or audit fields are missing, prefer additive VMMS-only service/API
   changes that preserve existing response contracts.
-- No schema migration is planned unless approval and implementation discovery
-  demonstrate that required historical breakdown data cannot be derived.
+- Add `maintenance_costing_export_audit` for approved export metadata and
+  protect it with the existing append-only database trigger. No historical
+  garage snapshot is added; garage analysis uses and labels current assignments.
 - No shared auth, portal, gateway, analytics service, mobile, or cross-system
   change is included.
 
@@ -92,16 +92,16 @@ and exclusion of income/profit remain unchanged.
 
 ## Affected repositories
 
-- `welinc-web-vmms`: Excel export, monthly trend, and type/garage breakdown UI.
-- `welinc-backend-vmms`: only if existing costing data or audit capabilities
-  cannot support the approved behavior.
+- `welinc-web-vmms`: Excel export, period comparison, and type/garage breakdown UI.
+- `welinc-backend-vmms`: XLSX generation, export auditing, and the additive
+  export-audit migration.
 - VMMS-owned specs; update the VMMS scope status only after approval and
   evidence-based implementation.
 
 ## Acceptance criteria
 
 1. Admin and Operations can export the current selected costing period to PDF
-   and `.xlsx`; CSV behavior follows the approval decision.
+   and `.xlsx`; CSV is excluded.
 2. The workbook summary and detail rows match the dashboard's period,
    eligibility rules, totals, and flags; truck selection scopes both sheets.
 3. Period comparison uses the approved preceding-period rule and the same
@@ -110,15 +110,16 @@ and exclusion of income/profit remain unchanged.
 4. Missing categories remain represented as unclassified; garage attribution
    is labeled accurately and is not presented as historical without source
    data.
-5. Export events are recorded with approved metadata in the existing audit
-   system; page-view auditing follows the approval decision.
+5. Export events are recorded with approved metadata in the existing
+   append-only audit mechanism; page views and background refreshes are not
+   audited.
 6. Admin/Operations read access, Admin-only threshold changes, and threshold
    audit behavior remain intact.
 7. No income, profit, revenue, VRMS repair, or fuel costs are included.
 
 ## Verification plan and status
 
-- Planned checks are listed in [verify.md](verify.md).
-- No implementation or acceptance evidence is claimed by this draft.
-- Existing costing correctness and role tests remain applicable; this proposal
-  adds export parity, breakdown accuracy, and audit checks.
+- Verification status and remaining runtime checks are listed in
+  [verify.md](verify.md).
+- Backend and web implementation is complete. Automated verification passed;
+  database migration deployment and interactive acceptance remain pending.

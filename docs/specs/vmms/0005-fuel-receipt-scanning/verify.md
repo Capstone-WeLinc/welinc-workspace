@@ -24,12 +24,11 @@ Steps derived from the acceptance criteria in [index.md](index.md).
   AC-7
 - [ ] Search logs and persistence for raw OCR text, payment-card data, and image
   bytes; confirm they are not stored or logged → AC-8
-- [ ] Submit truncated images with valid headers and verify full decode rejects
-  them before OCR or persistence; exercise dimension/pixel limits while
-  confirming valid uploaded bytes are unchanged → AC-9
-- [ ] Exceed the final-upload per-actor limit and confirm the request is
-  rejected with a rate-limit response before storage or database writes →
+- [x] Unit tests reject truncated/corrupt images and images exceeding the
+  20 MP or 8,000-pixel-side limits; valid JPEG/PNG bytes remain unchanged →
   AC-9
+- [x] Controller tests reject the sixth final-upload attempt with HTTP 429
+  before calling the fuel service and confirm actor isolation → AC-9
 
 ## UI / manual
 
@@ -49,9 +48,14 @@ Steps derived from the acceptance criteria in [index.md](index.md).
 
 ## Commands
 
-- [x] Build `welinc-backend-vmms`
+- [x] Build `welinc-backend-vmms` (`npm run build`)
 - [x] Build `welinc-web-vmms`
-- [ ] Run the focused receipt scan/save/download test suite
+- [x] Run focused receipt validation and upload-rate-limit tests
+  (`npm test -- --runInBand modules/vmms/fuel/fuel-receipt-file.spec.ts
+  modules/vmms/fuel/fuel.controller.receipt.spec.ts`; 2 suites, 7 tests passed)
+- [x] Run targeted backend ESLint (non-format rules), Prettier on new/focused
+  files, and the backend build; standard ESLint reports formatting issues
+  outside the changed hunks, and the `--fix` project script was avoided
 - [ ] Apply and verify the additive receipt migration
 - [ ] Run the representative-receipt accuracy and latency pilot
 
