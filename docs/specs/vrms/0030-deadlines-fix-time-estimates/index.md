@@ -1,7 +1,7 @@
 # 0030. Due dates from priority, issue types and history
 
 **Date**: 2026-11-27
-**Status**: In Progress
+**Status**: Accepted
 
 ## Summary
 

@@ -201,6 +201,7 @@ spec [0027](../../specs/vrms/0027-navigation-redesign/index.md) · code in `weli
   - Note (2026-11-28, your call): marked done with four `verify.md` steps not run, left unticked there: a suite admin on a temporary VRMS role, a suite admin with no web system, a new custom role's tag before the catalog refetches, and the older welinc-auth fallback (all rare setups, covered by unit tests). Verify found and fixed one bug: `?open=<SYSTEM>` froze under React StrictMode in development (portal `d4cc037`). The portal's Overview page has one axe `heading-order` finding, outside this feature.
 - [x] Test it: `/test navigation redesign`
   - Note (2026-11-28): the suites are green (web-vrms 805, portal 576); the StrictMode regression test is in.
+- Note (2026-11-28, replan, from the handoff): small leftovers, not a new row: per page tab titles for VRMS like the portal's (today every tab reads "VRMS · WeLinc"), and a look at the sidebar counts and the grid on staging after its deploys.
 
 ### 73. Error scenes · done
 Give every error state in web-vrms its own drawn road and depot scene in place of the small icon, and reuse the scenes in the portal. The crash copy from spec 0025 (AC-7, AC-7a) stays; only the picture changes.
