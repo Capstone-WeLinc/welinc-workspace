@@ -11,6 +11,7 @@ WL-203. Replace free text with Admin managed pickers (issue types, parts, reason
 - Note (2026-10-29): the lists are managed from the Settings hub (feature 52), not on pages of their own.
 - Note (2026-10-30): spec 0012 built the Lookup lists section of the hub with issue categories on `lookups.manage`. Add parts, reasons and locations there.
 - Note (2026-11-01, replan): from spec 0016. Generic `LookupValue` lists already exist (vehicle types, corporations). Move root causes and other plain lists into them.
+- Note (2026-11-27, from spec 0030): the due date dialog's reason becomes a picker plus an optional note once the reasons list exists.
 - [ ] Design it (spec): `/architect lookup lists`
 - [ ] Polish it (optional, ask first): `impeccable` · `web-design-guidelines` · `break-ui` (long list items, empty lists, many items)
 
@@ -21,14 +22,23 @@ spec [0007](../../specs/vrms/0007-knowledge-base-fix-library/index.md)
 - Note (2026-10-25): merged into feature 15 (knowledge base page). Spec 0007 builds the common issues library (WL-704) and this picker (WL-702, its AC-24 to AC-26), so the work is tracked and built there. The estimate shows as info only; saving it is feature 42's call.
 - [x] Design it (spec): covered by spec 0007
 
-### 42. Deadlines & fix time estimates · planned · needs a decision
+### 42. Deadlines & fix time estimates · in-progress
 WL-206 and WL-207. Expected completion from priority and issue type, with a rule for which wins.
 **Done when:** each ticket shows a deadline from creation, Admin configures durations, changes need a logged reason, overdue tickets are highlighted, and the mechanic is warned 24 hours before.
 - Note (2026-10-30): spec 0012 follow up. Add the duration settings as entries in the settings catalog (Thresholds section), not code constants.
 - Note (2026-11-01, replan): from spec 0015. Default the Chief Mechanic to **on** for setting fix time estimates. Reuse `repair_tickets.status_changed_at` for time in status.
 - Note (2026-11-03, replan): from spec 0019. Admins can now change a ticket's priority after create. Decide whether that recomputes a `dueAt` that came from priority.
 - Note (2026-11-21, integration talks): the due date becomes the **expected return date** BMS plans around (feature 56, flow 3 "Repair impact on bookings"). VRMS sends BMS every set or change of `dueAt`, and BMS flags bookings before it. This makes the feature a dependency of the integration defense (Dec 4), so design it with feature 56. Recommended answer to the priority question above: recompute only when `dueAtSource` is `PRIORITY` or `ISSUE_TYPE`, never `MANUAL`, and send BMS the new date either way. Inside VRMS it stays "due date"; toward BMS it's "expected return date".
-- [ ] Design it (spec): `/architect deadlines & fix time estimates`
+- Note (2026-11-27, replan, from spec 0029): write `dueAt` only through child 0003's `setDueAt`, so BMS hears every change.
+- Note (2026-11-27, `/architect`): spec [0030](../../specs/vrms/0030-deadlines-fix-time-estimates/index.md). One calculator, stored at create and on priority, issue, known fix, referral and expedite changes, written only through `setDueAt`. The later of priority hours (8, 24, 72, 168 by default) and the summed issue hours (knowledge base typical hours, then the fix's estimate, then the category's fix time); calendar hours from `createdAt`, now plus the priority hours when that is already past. Hand change and reset with `ticket.due_date.edit` (Admin and Chief Mechanic). Due soon at the smaller of 24 h and half the fix time. A one time `due:backfill`.
+- [x] Design it (spec): `/architect deadlines & fix time estimates`
+- [ ] Build it: `/develop deadlines & fix time estimates`
+  - [ ] Priority dates end to end: the five settings, `computeDueAt`, create through `setDueAt`, `dueSoonAt`, hours in the due labels (AC-1, AC-2, AC-6, AC-10, AC-11)
+  - [ ] Issue hours: `fix_hours` migration and the categories page, the knowledge first sum, every recompute path, the seed (AC-3, AC-4, AC-5, AC-7)
+  - [ ] Hand change and reset: the permission, the PUT and `automatic` routes, the Change dialog on the ticket's Due row (AC-8, AC-9, AC-14, AC-15)
+  - [ ] Due soon on screens and the backfill: chips, the mechanic's Due soon group, `npm run due:backfill` locally and on staging (AC-12, AC-13)
+- [ ] Verify it: `/check verify deadlines & fix time estimates`
+- [ ] Test it: `/test deadlines & fix time estimates`
 - [ ] Polish it (optional, ask first): `web-design-guidelines` · `break-ui` (overdue by years, due today, missing estimates)
 
 ### 43. Stuck and stale ticket alerts · planned · needs a decision

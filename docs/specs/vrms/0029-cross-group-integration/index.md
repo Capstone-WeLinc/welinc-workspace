@@ -221,7 +221,7 @@ Tracer Bullet: the first thread runs one referral end to end (VMMS → VRMS → 
 
 ## Follow-up
 
-- [ ] Run `/architect` for feature 42 (due dates) next. It must write `dueAt` only through child 0003's `setDueAt` so BMS hears every change.
+- [x] Run `/architect` for feature 42 (due dates) next (spec [0030](../0030-deadlines-fix-time-estimates/index.md), 2026-11-27). It must write `dueAt` only through child 0003's `setDueAt` so BMS hears every change.
 - [ ] Send VMMS and BMS the link to `docs/integration/repair-integration.md` (written 2026-11-26 as checklists, flows 4 to 7 included). Ask the register request later.
 - [ ] Mark spec 0020 updated: no toggle, no `DISABLED`, status copied from VMMS (AC-4).
 - [ ] Feature 47 (realistic reseed): VRMS's seed must stop creating trucks and garages and run `fleet:link` and the sync after VMMS's seed. Design it with this in mind.

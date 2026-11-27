@@ -266,6 +266,8 @@ WL-304. The shared notification service every alert uses, across in app, email a
 - Note (2026-11-01, replan): from spec 0016. Notify the mechanic on create with mechanics and on assign (WL-201, VRMS-67).
 - Note (2026-11-03, replan): from spec 0019. Notify a mechanic when added to or removed from a ticket by an edit. Once a push channel exists, consider replacing the 3 second visible poll (`useVisiblePoll`) with SSE, or at least a light `GET /repairs/:id/version` check so phones on mobile data fetch only on change.
 - Note (2026-11-20, agreed with VMMS in feature 56): no shared notification service. VRMS keeps its own notifications ("The shared notification service" in the intent now means VRMS's own one service for all its alerts and channels). Integration events from VMMS and BMS (for example a maintenance job sent "For Repair") also become VRMS notifications, so design feature 28 after feature 56 lists which events cross.
+- Note (2026-11-27, replan, from spec 0029): turn the referral and expedite dashboard cards into bell notifications once this exists.
+- Note (2026-11-27, from spec 0030): turn Due soon into a bell notification for the assigned mechanics (WL-207's 24 h notice).
 - [ ] Design it (spec): `/architect in-app notifications`
 - [ ] Polish it (optional, ask first): `emil-design-eng` (notification popover and toasts) · `web-design-guidelines`
 
@@ -292,6 +294,7 @@ WL-208, built on proposed defaults. Pause a ticket for missing parts with the re
 - Note (2026-11-01, replan): from spec 0014. The hold moves (M7 to M13 in its table) are written but off; switch them on through `applyStatusMove` with this feature's trigger. Same for features 37, 38 and 39.
 - Note (2026-11-01, replan): from spec 0015. Default the Chief Mechanic's "approve a parts hold" key to **on**.
 - Note (2026-11-08, replan): feature 66 may widen this to a hold with a reason (parts, approval, tech away) shown on the dashboard. Design it after feature 66.
+- Note (2026-11-27, from spec 0030): decide whether time on hold extends the due date; today On hold tickets can go Overdue.
 - [ ] Design it (spec): `/architect on hold for parts`
 - [ ] Polish it (optional, ask first): `web-design-guidelines`
 
