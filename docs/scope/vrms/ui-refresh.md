@@ -192,8 +192,8 @@ spec [0027](../../specs/vrms/0027-navigation-redesign/index.md) · code in `weli
   - [x] Backend: `sent_back_at`, `view` on the repair list, `inRoster`, `/vrms/nav/counts` (AC-2, AC-4, AC-5)
   - [x] Counts in the sidebar, hot rule, collapsed dots, phones (AC-5 to AC-7, AC-11)
   - [x] Portal Admin frame, `pendingDeletionRequests`, the launcher's `open` (AC-12 first pass, AC-13). 2026-11-28: built and committed; the frame part is redone in the Suite management frame milestones below
-  - [ ] VRMS on the Suite management frame: top bar with breadcrumb, grid switcher and avatar menu; sidebar title with your role and the footer strip; no Account tab on phones (spec step 5: AC-8, AC-9, AC-9a, AC-9b, AC-10, AC-10a, AC-10b, AC-11)
-  - [ ] Portal back on `Shell20`: undo `f6e4985`'s sidebar switcher, account menu, Collapse row and icons by hand; keep the count, `open` and the `me` refresh (spec step 6: AC-12)
+  - [x] VRMS on the Suite management frame: top bar with breadcrumb, grid switcher and avatar menu; sidebar title with your role and the footer strip; no Account tab on phones (spec step 5: AC-8, AC-9, AC-9a, AC-9b, AC-10, AC-10a, AC-10b, AC-11)
+  - [x] Portal back on `Shell20`: undo `f6e4985`'s sidebar switcher, account menu, Collapse row and icons by hand; keep the count, `open` and the `me` refresh (spec step 6: AC-12). 2026-11-28: built (web-vrms `38e09ad`, `847a04f`; portal `51f4f0a`, local only); the role tags on the BMS and VMMS cards have no source yet (a VRMS token carries only VRMS roles), owed to `/architect`
   - [ ] Sweep: 375px and 1280px, keyboard, axe, the board comparison (VRMS against the portal value for value), the suite `design.md` lines (spec step 7: AC-14, AC-15)
 - [ ] Verify it: `/check verify navigation redesign`
 - [ ] Test it: `/test navigation redesign`
