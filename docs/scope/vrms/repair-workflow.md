@@ -265,6 +265,7 @@ WL-304. The shared notification service every alert uses, across in app, email a
 - Note (2026-11-01, replan): from spec 0014. Notify the mechanic on Send back and on Verify (WL-212).
 - Note (2026-11-01, replan): from spec 0016. Notify the mechanic on create with mechanics and on assign (WL-201, VRMS-67).
 - Note (2026-11-03, replan): from spec 0019. Notify a mechanic when added to or removed from a ticket by an edit. Once a push channel exists, consider replacing the 3 second visible poll (`useVisiblePoll`) with SSE, or at least a light `GET /repairs/:id/version` check so phones on mobile data fetch only on change.
+- Note (2026-11-28, from spec 0027 AC-9b): the bell goes in the VRMS top bar, left of the grid switcher, as a 40px round button like it.
 - Note (2026-11-20, agreed with VMMS in feature 56): no shared notification service. VRMS keeps its own notifications ("The shared notification service" in the intent now means VRMS's own one service for all its alerts and channels). Integration events from VMMS and BMS (for example a maintenance job sent "For Repair") also become VRMS notifications, so design feature 28 after feature 56 lists which events cross.
 - Note (2026-11-27, replan, from spec 0029): turn the referral and expedite dashboard cards into bell notifications once this exists.
 - Note (2026-11-27, from spec 0030): turn Due soon into a bell notification for the assigned mechanics (WL-207's 24 h notice).
@@ -276,6 +277,7 @@ WL-301. Unread count on the bell and counts on queue menus.
 **Done when:** the bell shows the unread count (99+ above 99) updating without a refresh, and sidebar queues show their pending counts.
 - Note (2026-11-01, replan): from spec 0015. The verification queue has no sidebar item, so its count lives in the summary band and the For verification section of the Chief's dashboard (the tiles are gone, spec 0022). Reconsider a badge there.
 - Note (2026-11-23, from spec 0027): the sidebar queue counts are delivered by feature 70 (`/vrms/nav/counts`); what is left here is the bell and its unread count, after feature 28.
+- Note (2026-11-28, from spec 0027 AC-9b): the bell goes in the VRMS top bar, left of the grid switcher, as a 40px round button like it.
 - [ ] Build it: `/develop notification badge`
 - [ ] Polish it (optional, ask first): `emil-design-eng` (badge changes) · `web-design-guidelines` · `break-ui` (0, 99 and 1000+ counts)
 
