@@ -33,7 +33,7 @@ Before you start: the stack is up, `docker exec welinc_auth_service npm run cata
 - [x] Save a hand date equal to the current one → 200, no new audit row, no new delivery → AC-10
 - [x] `PUT /vrms/repairs/:id/due-date` with a `dueAt` without an offset → 400 → API surface
 - [x] `POST /vrms/repairs/:id/due-date/automatic` on an automatic ticket → 409 `NOT_MANUAL`; on a closed one → 409 `TICKET_NOT_OPEN` → AC-9, AC-14
-- [ ] Staging, after the deploy: `npm run due:backfill` once, then `catalog:sync` in welinc-auth → Migration plan phase 2
+- [x] Staging, after the deploy: `npm run due:backfill` once, then `catalog:sync` in welinc-auth → Migration plan phase 2. Ran 2026-11-27: welinc-auth's deploy (#82) ran `catalog:sync` inside `db:deploy`; `due:backfill` ran as a one off on the `vrms-migrate-staging` job (image `37ba38c`) and printed "Nothing to do: every open ticket has a due date." It needs `TS_NODE_TRANSPILE_ONLY=true` there: with the type check, ts-node ran out of its 512 MB heap.
 
 ## Value sourcing
 - [x] Priority hours come from the settings, not code: set Medium to 10 h, create a Medium ticket → due 10 h out

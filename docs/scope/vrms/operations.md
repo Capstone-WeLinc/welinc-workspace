@@ -33,11 +33,11 @@ WL-206 and WL-207. Expected completion from priority and issue type, with a rule
 - Note (2026-11-27, `/architect`): spec [0030](../../specs/vrms/0030-deadlines-fix-time-estimates/index.md). One calculator, stored at create and on priority, issue, known fix, referral and expedite changes, written only through `setDueAt`. The later of priority hours (8, 24, 72, 168 by default) and the summed issue hours (knowledge base typical hours, then the fix's estimate, then the category's fix time); calendar hours from `createdAt`, now plus the priority hours when that is already past. Hand change and reset with `ticket.due_date.edit` (Admin and Chief Mechanic). Due soon at the smaller of 24 h and half the fix time. A one time `due:backfill`.
 - Code: `welinc-backend-vrms/src/modules/vrms/due-dates.ts` (the calculator), `due-backfill.ts`, the due date routes in `ticket-edits.service.ts`; `welinc-web-vrms/src/features/repair/components/due/DueDateDialog.tsx`, `src/lib/utils/due.ts`; the permission in `welinc-auth/prisma/catalog/vrms.ts`. Branch `feat/deadlines-fix-time-estimates` in all three
 - [x] Design it (spec): `/architect deadlines & fix time estimates`
-- [ ] Build it: `/develop deadlines & fix time estimates`
+- [x] Build it: `/develop deadlines & fix time estimates`
   - [x] Priority dates end to end: the five settings, `computeDueAt`, create through `setDueAt`, `dueSoonAt`, hours in the due labels (AC-1, AC-2, AC-6, AC-10, AC-11)
   - [x] Issue hours: `fix_hours` migration and the categories page, the knowledge first sum, every recompute path, the seed (AC-3, AC-4, AC-5, AC-7)
   - [x] Hand change and reset: the permission, the PUT and `automatic` routes, the Change dialog on the ticket's Due row (AC-8, AC-9, AC-14, AC-15)
-  - [ ] Due soon on screens and the backfill: chips, the mechanic's Due soon group, `npm run due:backfill` locally and on staging (AC-12, AC-13). Built and run locally 2026-11-27; the staging run waits for the deploy
+  - [x] Due soon on screens and the backfill: chips, the mechanic's Due soon group, `npm run due:backfill` locally and on staging (AC-12, AC-13). Built and run locally 2026-11-27; run on staging 2026-11-27 through the `vrms-migrate-staging` job ("Nothing to do", every open ticket already had a due date)
 - [x] Verify it: `/check verify deadlines & fix time estimates`. Passed locally 2026-11-27 (all AC-1 to AC-15, 37 of 38 steps); the staging backfill and `catalog:sync` wait for the deploy
 - [x] Test it: `/test deadlines & fix time estimates`. 2026-11-27: 35 new tests in 4 specs (recompute, route DTOs, category fix time, setDueAt source only); backend 1,922 and web 766 pass
 - [ ] Polish it (optional, ask first): `web-design-guidelines` · `break-ui` (overdue by years, due today, missing estimates)
