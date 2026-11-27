@@ -89,3 +89,7 @@ For custom roles:
 - Add people moves only people already in the system, so it never duplicates S19's Add person.
 
 What we accept: VMMS and BMS see a read only page; built in names can't be changed; four deploys in order. The roster switch is guarded by a parity test.
+
+### Update 2026-11-27: where the Delete dialog's grace count comes from
+
+`/develop` found that AC-25's line "[k] people waiting for deletion keep it" had no source: `peopleCount` leaves deleted people out, the 409 counts only live holders, and the People list never shows soft deleted accounts. Chosen: a `graceCount` on each `roles[]` entry of the roles read, counted the same way as `peopleCount` with the deleted filter flipped. The dialog needs the number before you press Delete, so it can't come from the Delete answer or its 409 (the runner up). A separate route for one number would cost a call and a contract row for nothing. The count holds no names, so it adds nothing a system admin shouldn't see. The same update fixes the `peopleCount` line, which still said Delete counts people in the grace period; AC-25 and the rules line say they don't block, and the built route follows those.

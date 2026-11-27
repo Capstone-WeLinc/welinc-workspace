@@ -75,7 +75,7 @@ Run as `suite.admin@` with a portal cookie session (`Origin: http://localhost:80
 
 ### Coverage, milestone 3
 - AC-22: name rules, taken, limit (open), suite admin only · AC-23: create copy and logs · AC-24, AC-26: rename, describe, built in refusals · AC-25: in use, archive, grace period, race (open) · AC-27: VMMS refusal · AC-29: archived role unknown everywhere, contract 8.1 · AC-31: mobile client unchanged · AC-37: other systems tolerate a `C_` code
-- Note: the umbrella's `peopleCount` line says Delete counts every holder row, but AC-25 and the rules line say grace period holders don't block. The build follows AC-25; the umbrella line is owed a fix in `/architect`.
+- Note: the umbrella's `peopleCount` line used to say Delete counts every holder row; fixed by `/architect` on 2026-11-27 to match AC-25 (grace period holders don't block).
 
 ## Milestone 4 steps (child 0002, portal), added 2026-11-27
 
@@ -93,7 +93,7 @@ Run in the portal as `suite.admin@` unless a step says otherwise. Seen passing d
 - [ ] Give the custom role to 2 people, then Delete role → "2 people still have [role]", the DB text, both names with "Change role →", Close, and a disabled "Delete role"; "Change role →" opens that person on the Access tab; with more than 10 holders, "and [k] more" closes the dialog on the role's People tab → AC-25
 - [ ] Open Delete while it shows no holders, give the role to someone in another tab, then press Delete → the dialog turns into the blocked one with the server's count (409 `ROLE_IN_USE`) → AC-25
 - [ ] With no holders: "Delete [role]?", "No one has it. Its history stays on record.", Delete → toast "[role] deleted.", the first VRMS role opens, any draft entries on that role are gone (seen, without a draft) → AC-25
-- [ ] Not built yet: with a person in their deletion grace period holding the role, the dialog adds "[k] people waiting for deletion keep it…" (waits on `/architect` naming the source of k) → AC-25
+- [ ] With a person in their deletion grace period holding the role (and no live holder): `GET /auth/admin/roles/VRMS` shows `graceCount` 1 on it, and the dialog adds "1 person waiting for deletion keeps it…"; with none in grace the line doesn't show (not built yet: `/develop custom roles`) → AC-25
 - [ ] VMMS and BMS: no Custom heading, no New role, no Duplicate, no ⋮ role actions (seen) → AC-27
 - [ ] With a live custom role: it shows with an outlined "Custom" chip in a person's Change role and in Add person, it can be picked in Add people and Temporary access, and a person given it shows it on the Roles page People tab; `maxRolesPerUser` still refuses a second VRMS role → AC-28
 - [ ] Right after a create, rename or delete, open People and the Change role dialog without reloading → the picker already shows the change → AC-28
