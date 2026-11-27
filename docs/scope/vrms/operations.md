@@ -38,7 +38,7 @@ WL-206 and WL-207. Expected completion from priority and issue type, with a rule
   - [x] Issue hours: `fix_hours` migration and the categories page, the knowledge first sum, every recompute path, the seed (AC-3, AC-4, AC-5, AC-7)
   - [x] Hand change and reset: the permission, the PUT and `automatic` routes, the Change dialog on the ticket's Due row (AC-8, AC-9, AC-14, AC-15)
   - [ ] Due soon on screens and the backfill: chips, the mechanic's Due soon group, `npm run due:backfill` locally and on staging (AC-12, AC-13). Built and run locally 2026-11-27; the staging run waits for the deploy
-- [ ] Verify it: `/check verify deadlines & fix time estimates`
+- [x] Verify it: `/check verify deadlines & fix time estimates`. Passed locally 2026-11-27 (all AC-1 to AC-15, 37 of 38 steps); the staging backfill and `catalog:sync` wait for the deploy
 - [ ] Test it: `/test deadlines & fix time estimates`
 - [ ] Polish it (optional, ask first): `web-design-guidelines` · `break-ui` (overdue by years, due today, missing estimates)
 
