@@ -13,6 +13,7 @@ The RTM summary reports 102 requirements. Its body contains 102 requirements acr
 - BRD assumption A-14 says VMMS may reference VRMS repair costs read-only. Keep repair-ticket and repair-cost ownership in VRMS; any integration must use its API and a spec.
 - **Resolved (2026-11-25):** Admin and Operations may access the VMMS AI/Analytics page and fleet analytics read endpoints, aligning FR-27.10 with the BRD role descriptions for Operations fleet dashboards and reports. Preserve the API's Admin/Operations fleet-role guard. Manual analytics sync remains Admin-only, and existing assigned-work-order policies remain unchanged. See [spec 0001](../../specs/vmms/0001-ai-analytics-admin-access/index.md).
 - Explicit non-goals include GPS/telemetry, advanced mechanical-failure prediction, supplier/shop automation, vendor price estimation, payroll/HR, income or profit calculations, and VRMS repair-ticket administration or duplicate repair storage. The VMMS-owned referral, status, and history integration is a scope extension; VRMS `UNDER_REPAIR` status takes precedence over VMMS maintenance status.
+- Proposed VMMS-owned BMS handoffs—Operations-reviewed trip odometer evidence, policy-driven utilization suggestions, and Operations-approved fuel purchases—are specified in [spec 0031](../../specs/vmms/0031-bms-vmms-operational-handoffs/index.md). Partner contract review and explicit implementation authorization remain pending.
 
 | # | Feature | Phase | Status |
 |---:|---|---|---|
@@ -128,6 +129,7 @@ Done when: assigned-work access, complete-checklist submission, approval and rej
 Requirements: BR-12 to BR-15; FR-12.* to FR-15.*; SC-08, SC-09, SC-20.
 
 - VMMS-to-VRMS repair referrals, referral outcomes, ticket status, and VRMS-owned repair-history reads are a scope extension in [spec 0024](../../specs/vmms/0024-vmms-repair-handoff-and-availability/index.md). The cross-system API proposal is pending review in [spec 0026](../../specs/vmms/0026-vmms-vrms-repair-referrals-and-bms-availability/index.md); VRMS and auth implementation are outside VMMS ownership.
+- VMMS in-app notification delivery and the unified web/mobile inbox are an approved scope extension under [spec 0029](../../specs/vmms/0029-notification-enhancement-and-completion/index.md), aligned with proposed VMMS notification contract [spec 0030](../../specs/vmms/0030-vmms-notification-contract/index.md). VMMS implementation is complete; migration deployment and browser/device acceptance remain pending. Other system adoption remains with their owners.
 - VMMS-owned follow-ups for beyond-repair retirement, repeated-repair alerts, and fuel-anomaly referrals (repair integration Flows 4–6) are implemented in backend and web under [spec 0028](../../specs/vmms/0028-vmms-vrms-repair-follow-ups/index.md). Partner contract review, auth grants, migration application, and live integration remain pending.
 
 - [x] Reconcile the 14 Module 4 RTM rows with API workflow rules, admin views, and VMMS mobile screens.
