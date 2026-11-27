@@ -56,7 +56,7 @@ Requirements: BR-01 to BR-03; FR-01.* to FR-03.*; SC-01, SC-02, SC-16.
 
 ### 2. Vehicles, garages, and fleet records
 
-Maintain vehicle records, odometer and status data, branch and account classifications, and the fleet reference data used by other modules.
+Maintain vehicle records, odometer and status data, branch, and the fleet reference data used by other modules.
 
 Done when: vehicle lifecycle, role permissions, import, odometer handling, and cross-system vehicle status rules meet the BRD acceptance criteria.
 
@@ -75,7 +75,7 @@ Requirements: BR-04 to BR-06; FR-04.* to FR-06.*; SC-03, SC-04.
   - VMMS vehicle availability integration is documented in [spec 0024](../../specs/vmms/0024-vmms-repair-handoff-and-availability/index.md). VMMS remains the status writer; BMS event receipt and shared auth grants are proposed external contracts in [spec 0026](../../specs/vmms/0026-vmms-vrms-repair-referrals-and-bms-availability/index.md).
   - Flow A VMMS slice: serve BMS fleet/availability reads and publish durable vehicle/garage master-data invalidations. VMMS implementation and BMS integration remain in progress under [spec 0024](../../specs/vmms/0024-vmms-repair-handoff-and-availability/index.md).
   - FR-06.1: Implemented for maintenance schedules. Outsourced providers are Operations-managed, active provider names are the only accepted outsourced value, and Admin has view-only access. Per [spec 0013](../../specs/vmms/0013-outsourced-provider-lifecycle/index.md), unreferenced providers can be renamed or deleted; referenced providers retain their name and may only be activated or deactivated.
-  - FR-06.2: Gap. Account type is a fixed enum (`IN_HOUSE`/`OUTSOURCED`), not the BRD's configurable Online/Corporate classification, and no Operations-managed account-type catalog exists.
+  - FR-06.2: Removed from VMMS scope by user decision (2026-11-26). Do not add the Online/Corporate account classification or an Operations-managed account-type catalog. The existing maintenance-schedule `IN_HOUSE`/`OUTSOURCED` field remains unchanged.
   - FR-06.3: Implemented. A vehicle's registered Garage assignment represents its branch; seeded Garage records include Marikina, Sta. Rosa and Pulilan. No separate vehicle-branch field is needed.
   - FR-06.4: Implemented. The vehicle list has a default Garage Branch column, branch filter and ascending/descending branch sort.
   - FR-06.5: Implemented. `.xlsx` preview validates all rows, duplicate plates and active garage names, then saves valid rows and returns row-specific errors for invalid rows; the limit is 1,000 rows.
@@ -106,7 +106,7 @@ Requirements: BR-07 to BR-11; FR-07.* to FR-11.*; SC-05 to SC-07, SC-18, SC-19, 
   - FR-08.3–08.5: Implemented in code. Web and VMMS mobile use Pending green, Due orange, Overdue red, In Progress blue, Done/awaiting review amber, and closed muted; schedule, work-order, dashboard, and notification surfaces include status guidance. Visual and integrated runtime acceptance remain pending.
   - FR-08.6: Implemented. Priority defaults to Medium and create/update/permissions tests cover Admin/Operations control.
   - FR-08.7: Implemented in code. Web registered-option selectors are searchable without creating or activating records; Parts Used remains free text with prior-name suggestions on web and mobile. Keyboard, focus, empty-result, and inactive-option acceptance remain pending.
-  - FR-09.1: Partial. In-app maintenance and general notifications plus a one-minute schedule evaluation cron exist. Semaphore SMS delivery is not confirmed in repository evidence.
+  - FR-09.1: Semaphore SMS is explicitly excluded from the approved VMMS implementation by [spec 0012](../../specs/vmms/0012-maintenance-scheduling-completion/index.md) until separately approved. Existing in-app maintenance notifications and the schedule evaluation cron remain in scope; do not treat SMS as an implementation gap.
   - FR-09.2: Implemented in code for +1 Chief Mechanic, +3 Admin/Operations and +7 critical escalation, with a daily Manila-time cron and deduplicated notifications.
   - FR-10.1: Implemented in the adjacent checklist module. Admin can create and duplicate checklist templates; copies persist independently.
   - FR-10.2: Implemented in API/mobile scope. Mechanics receive only assigned work; scope checks protect reassigned work.
@@ -128,6 +128,7 @@ Done when: assigned-work access, complete-checklist submission, approval and rej
 Requirements: BR-12 to BR-15; FR-12.* to FR-15.*; SC-08, SC-09, SC-20.
 
 - VMMS-to-VRMS repair referrals, referral outcomes, ticket status, and VRMS-owned repair-history reads are a scope extension in [spec 0024](../../specs/vmms/0024-vmms-repair-handoff-and-availability/index.md). The cross-system API proposal is pending review in [spec 0026](../../specs/vmms/0026-vmms-vrms-repair-referrals-and-bms-availability/index.md); VRMS and auth implementation are outside VMMS ownership.
+- VMMS-owned follow-ups for beyond-repair retirement, repeated-repair alerts, and fuel-anomaly referrals (repair integration Flows 4–6) are implemented in backend and web under [spec 0028](../../specs/vmms/0028-vmms-vrms-repair-follow-ups/index.md). Partner contract review, auth grants, migration application, and live integration remain pending.
 
 - [x] Reconcile the 14 Module 4 RTM rows with API workflow rules, admin views, and VMMS mobile screens.
 
@@ -183,6 +184,8 @@ Requirements: BR-16 to BR-19; FR-16.* to FR-19.*; SC-10, SC-11, SC-22, SC-24 to 
   - FR-19.4: Verified. Per-truck/fleet views, filtered PDF/XLSX content, and local-calendar XLSX filenames are covered by web tests and runtime checks. The browser opened a PDF report popup with the expected title, columns, and vehicle row; the native print dialog was also observed. Its preview is unsupported in this environment, so no PDF file was saved.
   - Acceptance evidence as of 2026-11-21: backend fuel tests passed (32 tests), web fuel-data tests passed (5), web fuel UI tests passed (19), and mobile critical-approval tests passed (32); backend and web production builds passed. In local Docker, all three escalation stages delivered notifications to eligible roles; the temporary anomaly, fill-up, and notifications were removed. The local web app rendered fleet and per-vehicle reports, generated XLSX workbooks containing expected rows, and rendered the PDF popup report. After manual sign-in through the shared portal at `http://localhost:8000`, the browser redirected to VMMS and the Fuel Management page rendered its summary, fill-up table, views, and reports. The earlier fresh-session limitation was due to the browser not being signed in; no application or shared-service code change was needed. Fuel module status is **done**. Receipt scanning is implemented as an approved extension and now also suggests product and SI number; runtime OCR accuracy on representative Caltex/Petron receipts and migration deployment remain unverified pending Azure configuration and a receipt pilot.
   - [Spec 0006](../../specs/vmms/0006-bulk-fuel-statement-import/index.md) adds an Operations workbook import with editable per-row review for billing statements. Backend and web implementation is present; code verification and migration deployment remain pending.
+  - Approved and implemented [spec 0017](../../specs/vmms/0017-fuel-operations-reconciliation/index.md) adds a transient import reconciliation summary and informational age for open anomalies without changing existing fuel rules. Runtime and cross-user acceptance remain pending.
+  - Fuel-anomaly referral UI and Chief Mechanic anomaly-only access are implemented as part of the VRMS follow-up slice in [spec 0028](../../specs/vmms/0028-vmms-vrms-repair-follow-ups/index.md); partner contract and live integration checks remain pending.
 
 ### 6. Maintenance costing
 
@@ -204,10 +207,11 @@ Requirements: BR-20 to BR-22; FR-20.* to FR-22.*; SC-12, SC-13.
   - FR-21.3: Implemented. The backend marks recurring-high-cost candidates when monthly totals exceed the threshold in the latest three consecutive Manila months.
   - FR-21.4: Implemented. The dashboard defaults to the current Manila month and supports custom and common period types, truck selection and cost detail updates.
   - FR-22.1: Implemented. API and web costing access is limited to Admin and Operations.
-  - FR-22.2: Partial. Fleet costing exports in PDF exist. Excel per-truck/fleet export and runtime export verification are not confirmed.
-  - FR-22.3: Partial. Threshold changes record actor and previous/new values. Dashboard access and report exports are not confirmed in an append-only audit trail.
+  - FR-22.2: Implemented in code under approved [spec 0018](../../specs/vmms/0018-maintenance-costing-exports-and-analysis/index.md). PDF remains; the new two-sheet `.xlsx` export includes summary/detail, period, generation timestamp, totals and flags, and scopes both sheets to a selected truck. CSV is excluded. Runtime export verification remains pending.
+  - FR-22.3: Threshold changes retain the existing audit path. Completed PDF/XLSX exports now append actor, format, date range and optional truck scope to the VMMS business audit; page views and refreshes are not audited. The additive migration is not yet applied, and runtime audit verification remains pending.
+  - Cost analysis: The web dashboard compares the selected period with the approved preceding equivalent range and groups eligible completed costs by maintenance type and current garage assignment. Missing categories remain unclassified; garage attribution is explicitly current, not historical.
   - Role visibility: Mobile does not expose the aggregate costing dashboard, while submitted work can show individual cost data subject to its existing role restrictions.
-  - Acceptance evidence: unit/API coverage exists for approved completed-cost aggregation, recurring flags, threshold validation and role boundaries. Runtime export and audit-access evidence remain unexecuted. Feature status remains **in progress**.
+  - Acceptance evidence: backend costing/export/audit tests (20) and web period/breakdown tests (5) pass; backend and web production builds pass. Migration deployment, browser export parity, and runtime audit acceptance remain unexecuted. Feature status remains **in progress**.
 
 ### 7. Reports and fleet dashboard
 
@@ -231,7 +235,7 @@ Requirements: BR-23 to BR-26; FR-23.* to FR-26.*; SC-14, SC-15.
   - FR-26.3: Implemented. Cost fields use Philippine Peso and reports contain maintenance/fuel cost and efficiency, not income/profit/net revenue.
   - FR-26.4: Implemented. Reports and dashboard routes are management-facing; API report/cost routes restrict access to Admin/Operations.
   - FR-26.5: Partial. Fuel report exports call `recordFuelReportExport`; dashboard/report access and maintenance report export access are not confirmed in a general append-only audit trail.
-  - Business audit logs: Admin-only access is specified in [VMMS spec 0002](../../specs/vmms/0002-business-audit-admin-only/index.md); enforce it in both the web route and backend role guard. The shared integration guide still needs alignment through its review process.
+  - Business audit logs: Admin-only access is implemented in the web route/navigation and backend role guard under [VMMS spec 0002](../../specs/vmms/0002-business-audit-admin-only/index.md). The API role-matrix test, web navigation-permission test, and both production builds pass; interactive route and shared-portal acceptance remain pending. The shared integration guide still needs alignment through its review process.
   - Acceptance evidence: scheduled-report unit coverage and web/fuel export tests exist; spec 0015 frontend dashboard slice implemented in `welinc-web-vmms` (pending integrated/manual verification and build/typecheck evidence in this session where applicable). Fleet-dashboard load timing, print output, full report-source accuracy, and report/dashboard audit coverage remain unexecuted. Feature status remains **in progress**.
 
 ## Cross-cutting
@@ -244,6 +248,7 @@ Done when: analytics refresh and validation, role-gated dashboards and advisorie
 
 Requirements: BR-27 and BR-28; FR-27.1 to FR-27.12 and FR-28.1 to FR-28.3; SC-16, SC-17.
 
+- [ ] Provide an idempotent, relationally complete synthetic development seed across the current VMMS schema; see [spec 0027](../../specs/vmms/0027-complete-vmms-demo-seed/index.md).
 - [x] Reconcile the 15 Cross-Cutting RTM rows with the analytics service and VMMS flows in `welinc-mobile-vrms_vmms`.
 - [ ] Confirm the final integration and deployment evidence for the applicable success criteria.
 

@@ -35,12 +35,14 @@ those business rules.
    changes an approved notification policy and requires recipient and
    deduplication decisions.
 
-## Proposed decision
+## Approved decision
 
-Submit Option 1 for approval. Keep the summary within the owner's import
-workflow, calculate totals from saved rows only, and display anomaly age using
-the existing Asia/Manila escalation clock. Do not add new notifications or
-change escalation rules.
+The user approved Option 1 on 2026-11-27. Keep the summary within the current
+owner's import workflow and do not add a separate history. Add persisted
+`totalCost` to successful import-row results so the web summary totals use
+VMMS values. Display anomaly age in elapsed 24-hour periods, matching the
+existing escalation thresholds; the escalation job remains scheduled at
+midnight Asia/Manila. Do not add new notifications or change escalation rules.
 
 ## Tradeoffs
 
@@ -49,10 +51,14 @@ change escalation rules.
 - **Limitations:** no historical import-reconciliation report and no new SLA
   monitoring; existing backend results remain the source of truth.
 
-## Decisions awaiting approval
+## Approval record
 
-- Whether the import summary should remain transient, as recommended, or have
-  a separately approved retention period.
-- Whether anomaly age should be displayed as calendar days in Asia/Manila,
-  matching escalation stages, or elapsed 24-hour periods.
-- Confirmation that existing role visibility and draft ownership are retained.
+- Summary retention: transient current-flow presentation only; no separate
+  retained reconciliation history.
+- Saved-row totals: backend adds the persisted VMMS `totalCost` per successful
+  row; no new persistence or migration.
+- Anomaly age: elapsed 24-hour periods from `createdAt`, matching existing
+  thresholds; scheduled evaluation remains midnight Asia/Manila.
+- Access: Admin/Operations retain web visibility; import results remain scoped
+  to the owning Operations user; existing edit, acknowledgment, and resolution
+  permissions are unchanged.

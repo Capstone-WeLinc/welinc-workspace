@@ -1,7 +1,7 @@
 # 0002. Restrict VMMS business audit logs to Admin
 
 **Date**: 2026-11-19
-**Status**: User-selected policy; implementation in progress
+**Status**: Implemented; API authorization and builds verified; manual acceptance pending
 **Scope**: [Module 7: Reports and fleet dashboard](../../../scope/vmms/index.md)
 
 Decision history (context, options, rationale): [rationale.md](rationale.md). Verification steps: [verify.md](verify.md).

@@ -37,32 +37,34 @@ income/profit or cross-system repair data.
 3. **Add only Excel export.** Closes the clearest output gap but leaves
    breakdown needs and report-audit questions unresolved.
 
-## Proposed decision
+## Approved decision
 
-Submit Option 1 for approval. Retain the current PDF, add a two-sheet Excel
+On 2026-11-26, the user approved Option 1. Retain the current PDF, add a two-sheet Excel
 export, compare the selected period with the immediately preceding equivalent
 period, and add maintenance-type/garage breakdowns from eligible completed
 records. Record completed exports in the existing append-only audit path; do
 not audit background refreshes.
 
+The user also decided not to audit page views and not to add CSV. Because the
+existing costing audit model only stores threshold changes, the user approved
+an additive VMMS export-audit table protected by the same append-only database
+trigger. No historical garage-at-completion data is added; garage breakdowns
+are explicitly labeled as current vehicle assignments.
+
 ## Tradeoffs
 
 - **Benefits:** stronger operational cost visibility, portable detail, and
   clearer export accountability without changing cost ownership.
-- **Costs/limits:** the Excel output and breakdowns require parity testing; if
-  historical garage or type data is absent, the UI must disclose that limit.
+- **Costs/limits:** the Excel output and breakdowns require parity testing;
+  the garage breakdown is a current-assignment view, not historical
+  attribution.
 - **Excluded:** CSV unless separately approved, per-refresh audit events,
   profit/income calculations, VRMS repair costs, and fuel costs.
 
-## Decisions awaiting approval
+## Implementation decisions
 
-- Excel-only addition versus adding CSV as well.
-- Preceding-period comparison rule and breakdown grouping by maintenance type
-  and garage.
-- Whether garage grouping may use current vehicle assignment when no
-  historical garage-at-completion value exists; the proposal recommends clear
-  labeling rather than historical claims.
-- Whether to audit intentional report-page access in addition to exports and
-  threshold changes.
-- Confirm that only export metadata, not report values, belongs in audit
-  details.
+- CSV remains excluded; no page-view or background-refresh audit is written.
+- Export metadata stores actor, format, date range, and optional truck ID/plate;
+  it never stores report costs or row contents.
+- The database migration is additive and uses the existing append-only audit
+  trigger. It has not yet been applied to a runtime database.

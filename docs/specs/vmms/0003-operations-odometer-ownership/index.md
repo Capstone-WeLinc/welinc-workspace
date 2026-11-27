@@ -60,7 +60,10 @@ dedicated vehicle workflow.
 - Handle stale concurrent submissions without lowering the latest reading; the
   client must receive an explicit conflict/validation error.
 - Reuse `VehicleAuditLog` to record the actor and previous/new values. No new
-  table or migration is expected.
+  table or migration is needed for ordinary Operations odometer updates. The
+  separate pending/confirmed/dismissed review record for VRMS `COMPLETED`
+  readings is specified in [spec 0024](../0024-vmms-repair-handoff-and-availability/index.md);
+  it does not replace or bypass this master-odometer update path.
 - Remove `odometer` from the general vehicle update payload so it cannot bypass
   the dedicated rule.
 

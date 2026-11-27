@@ -20,11 +20,26 @@ Steps derived from the acceptance criteria in [index.md](index.md).
 
 ## Commands
 
-- [ ] Build `welinc-backend-vmms`
-- [ ] Build `welinc-web-vmms`
-- [ ] Run the focused VMMS authorization test or test suite covering the
+- [x] Build `welinc-backend-vmms`
+- [x] Build `welinc-web-vmms`
+- [x] Run the focused VMMS authorization test or test suite covering the
   business audit guard
 
 ## Acceptance-criteria coverage
 
-- AC-1 through AC-6 by the role, route, API, response, and portal checks above.
+- The focused API test covers Admin access and API denial for Operations,
+  Chief Mechanic, and Mechanic (AC-3, AC-4). The web permission test covers
+  role-based Audit Logs navigation visibility. Builds cover compilation only.
+- Manual route, existing-record response comparison, and portal behavior checks
+  remain pending (AC-1, AC-2, AC-5, AC-6).
+
+## Implementation evidence
+
+- `npm test -- --runInBand modules/vmms/audit/audit.controller.spec.ts` passed:
+  Admin access succeeded; Operations, Chief Mechanic, and Mechanic were denied
+  before any audit query.
+- `npm run build` passed in `welinc-backend-vmms`.
+- `npm exec vitest run src/lib/utils/permissions.test.ts` passed all five role
+  visibility cases in `welinc-web-vmms`.
+- `npm run build` passed in `welinc-web-vmms`.
+- Interactive browser and shared-portal acceptance has not been run.
