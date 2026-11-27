@@ -31,12 +31,13 @@ WL-206 and WL-207. Expected completion from priority and issue type, with a rule
 - Note (2026-11-21, integration talks): the due date becomes the **expected return date** BMS plans around (feature 56, flow 3 "Repair impact on bookings"). VRMS sends BMS every set or change of `dueAt`, and BMS flags bookings before it. This makes the feature a dependency of the integration defense (Dec 4), so design it with feature 56. Recommended answer to the priority question above: recompute only when `dueAtSource` is `PRIORITY` or `ISSUE_TYPE`, never `MANUAL`, and send BMS the new date either way. Inside VRMS it stays "due date"; toward BMS it's "expected return date".
 - Note (2026-11-27, replan, from spec 0029): write `dueAt` only through child 0003's `setDueAt`, so BMS hears every change.
 - Note (2026-11-27, `/architect`): spec [0030](../../specs/vrms/0030-deadlines-fix-time-estimates/index.md). One calculator, stored at create and on priority, issue, known fix, referral and expedite changes, written only through `setDueAt`. The later of priority hours (8, 24, 72, 168 by default) and the summed issue hours (knowledge base typical hours, then the fix's estimate, then the category's fix time); calendar hours from `createdAt`, now plus the priority hours when that is already past. Hand change and reset with `ticket.due_date.edit` (Admin and Chief Mechanic). Due soon at the smaller of 24 h and half the fix time. A one time `due:backfill`.
+- Code: `welinc-backend-vrms/src/modules/vrms/due-dates.ts` (the calculator), `due-backfill.ts`, the due date routes in `ticket-edits.service.ts`; `welinc-web-vrms/src/features/repair/components/due/DueDateDialog.tsx`, `src/lib/utils/due.ts`; the permission in `welinc-auth/prisma/catalog/vrms.ts`. Branch `feat/deadlines-fix-time-estimates` in all three
 - [x] Design it (spec): `/architect deadlines & fix time estimates`
 - [ ] Build it: `/develop deadlines & fix time estimates`
-  - [ ] Priority dates end to end: the five settings, `computeDueAt`, create through `setDueAt`, `dueSoonAt`, hours in the due labels (AC-1, AC-2, AC-6, AC-10, AC-11)
-  - [ ] Issue hours: `fix_hours` migration and the categories page, the knowledge first sum, every recompute path, the seed (AC-3, AC-4, AC-5, AC-7)
-  - [ ] Hand change and reset: the permission, the PUT and `automatic` routes, the Change dialog on the ticket's Due row (AC-8, AC-9, AC-14, AC-15)
-  - [ ] Due soon on screens and the backfill: chips, the mechanic's Due soon group, `npm run due:backfill` locally and on staging (AC-12, AC-13)
+  - [x] Priority dates end to end: the five settings, `computeDueAt`, create through `setDueAt`, `dueSoonAt`, hours in the due labels (AC-1, AC-2, AC-6, AC-10, AC-11)
+  - [x] Issue hours: `fix_hours` migration and the categories page, the knowledge first sum, every recompute path, the seed (AC-3, AC-4, AC-5, AC-7)
+  - [x] Hand change and reset: the permission, the PUT and `automatic` routes, the Change dialog on the ticket's Due row (AC-8, AC-9, AC-14, AC-15)
+  - [ ] Due soon on screens and the backfill: chips, the mechanic's Due soon group, `npm run due:backfill` locally and on staging (AC-12, AC-13). Built and run locally 2026-11-27; the staging run waits for the deploy
 - [ ] Verify it: `/check verify deadlines & fix time estimates`
 - [ ] Test it: `/test deadlines & fix time estimates`
 - [ ] Polish it (optional, ask first): `web-design-guidelines` · `break-ui` (overdue by years, due today, missing estimates)
