@@ -21,6 +21,11 @@ Run at `/check verify navigation redesign`, locally, with the shared and VRMS st
 - [ ] 375px: mechanic tab bar with a dot on Repairs; admin sheet with sub pages and counts (AC-11)
 - [ ] Portal as `suite.admin@`: the new frame, Roles naming, Deletion requests count in gold; as `vrms.admin@`: no Overview or Suite admins (AC-12)
 - [ ] Keyboard pass and one axe pass on both sidebars (AC-14)
+- [ ] Added at the build (2026-11-28): open `http://localhost:8000/?open=BMS` as `vrms.chief@` (no BMS role): the launcher shows with an error toast naming BMS, and the address loses `open` (AC-13)
+- [ ] Added at the build: 375px as `vrms.chief@` on `/repairs`: the view chips (All open, Waiting for sign off, Assigned to me) show with the same counts as the sidebar, and tapping one sets the view (AC-11)
+- [ ] Added at the build: as a mechanic, Done lists Closed tickets only, never Cancelled (AC-2)
+- [ ] Added at the build: close Repair tickets, reload: it stays closed; open it again on another page and reload: it stays open (`welinc:nav-open:<user id>`, AC-3)
+- [ ] Added at the build: `vrms.admin@` (outside the roster) has no Assigned to me, and `/repairs?view=mine` shows the plain list (AC-2, AC-4)
 
 ## API checks
 
