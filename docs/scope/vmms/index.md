@@ -13,7 +13,7 @@ The RTM summary reports 102 requirements. Its body contains 102 requirements acr
 - BRD assumption A-14 says VMMS may reference VRMS repair costs read-only. Keep repair-ticket and repair-cost ownership in VRMS; any integration must use its API and a spec.
 - **Resolved (2026-11-25):** Admin and Operations may access the VMMS AI/Analytics page and fleet analytics read endpoints, aligning FR-27.10 with the BRD role descriptions for Operations fleet dashboards and reports. Preserve the API's Admin/Operations fleet-role guard. Manual analytics sync remains Admin-only, and existing assigned-work-order policies remain unchanged. See [spec 0001](../../specs/vmms/0001-ai-analytics-admin-access/index.md).
 - Explicit non-goals include GPS/telemetry, advanced mechanical-failure prediction, supplier/shop automation, vendor price estimation, payroll/HR, income or profit calculations, and VRMS repair-ticket administration or duplicate repair storage. The VMMS-owned referral, status, and history integration is a scope extension; VRMS `UNDER_REPAIR` status takes precedence over VMMS maintenance status.
-- Proposed VMMS-owned BMS handoffs—Operations-reviewed trip odometer evidence, policy-driven utilization suggestions, and Operations-approved fuel purchases—are specified in [spec 0031](../../specs/vmms/0031-bms-vmms-operational-handoffs/index.md). Partner contract review and explicit implementation authorization remain pending.
+- Proposed VMMS-owned BMS handoffs—Operations-reviewed trip odometer evidence, policy-driven utilization suggestions, and driver pre-trip defect reports for Operations review—are specified in [spec 0031](../../specs/vmms/0031-bms-vmms-operational-handoffs/index.md). Partner contract review and explicit implementation authorization remain pending.
 
 | # | Feature | Phase | Status |
 |---:|---|---|---|
@@ -262,18 +262,18 @@ Requirements: BR-27 and BR-28; FR-27.1 to FR-27.12 and FR-28.1 to FR-28.3; SC-16
   - FR-27.5: Implemented. Vehicle analytics produces plate/model/risk/score/reason/action-style ranked maintenance-risk results.
   - FR-27.6: Implemented. Alerts include predictive risk/severity and vehicle threshold data, with below-threshold vehicles excluded by the alert/KPI logic.
   - FR-27.7: Implemented. Forecast logic supplies 7/30/90-day information and AI overview/trend/anomaly context.
-  - FR-27.8: Partial. Semantic maintenance search and embeddings exist in the service, but runtime embedding coverage/vector validation is not recorded.
+  - FR-27.8: Partial. Embedding generation and coverage/vector-fixture validation are implemented. The current schedule search is text-based; no user-facing vector retrieval path was found in the inspected VMMS backend or analytics service.
   - FR-27.9: Implemented in code. Work-order advisory/recommendation routes provide contextual safety, tools/parts, execution and quality guidance with fallback behavior.
   - FR-27.10: Implemented in code; runtime role acceptance remains pending. Admin and Operations can use the web Analytics navigation and direct route, and fleet-read APIs enforce the Admin/Operations guard. Manual sync remains Admin-only; mobile roles cannot access fleet analytics.
   - FR-27.11: Implemented. Overview/report responses include generatedAt, source update time, data age and stale status metadata.
-  - FR-27.12: Partial. Migration/validation code exists for data-mart tables and embeddings, but source/target runtime validation evidence is not recorded.
+  - FR-27.12: Partial. Analytics sync is transactional and validation now checks exact source/mart counts, status totals, cost aggregate, and embedding coverage. Database-backed runtime evidence remains pending.
   - FR-28.1: Implemented. Mobile sync retrieves `/vehicles`, `/maintenance-schedules` and `/checklists` and stores records in SQLite.
   - FR-28.2: Implemented. Snapshot reconciliation occurs inside an SQLite exclusive transaction; partial HTTP failures occur before cache replacement and retain the last successful cache.
   - FR-28.3: Implemented. Checklist state is preserved across reconciliation, `lastSuccessfulSyncAt` is written only after success, and network reconnection starts automatic sync.
   - Mobile global search is an approved scope extension: search role-visible cached work orders/schedules (including associated vehicle plate/model) and current-user notifications, then open the existing workflow. Global Search and Work Orders search also maintain separate per-account recent query histories. See [spec 0011](../../specs/vmms/0011-mobile-global-search/index.md); device acceptance remains pending.
   - Additional gaps:
   - Mobile staging currently contains the offline-sync continuation and revision guards, but no mobile test/build run confirms them.
-  - Analytics HTTP authorization tests exist, but DuckDB/pgvector runtime migration, validation and source consistency are not executed.
-  - Proposed analytics runtime readiness, data-health visibility, and evidence-backed AI work is documented in draft [spec 0021](../../specs/vmms/0021-analytics-data-readiness-and-ai-evidence/index.md); it is not approved or authorized for implementation.
+  - Analytics HTTP authorization tests pass (8 cases, including data-health fleet access and Admin-only sync); DuckDB/pgvector runtime migration, validation and source consistency are not executed.
+  - Analytics runtime readiness, data-health visibility, and evidence-backed AI are implemented in code under [spec 0021](../../specs/vmms/0021-analytics-data-readiness-and-ai-evidence/index.md); migration, database-backed validation, provider, and interactive UI acceptance evidence remain pending.
   - Deployment evidence for shared services, gateway routes, VMMS containers, web/mobile readiness and final environment configuration is not complete.
   - Cross-cutting reconciliation remains **in progress** until runtime integration and deployment evidence are recorded.

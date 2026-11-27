@@ -11,7 +11,7 @@ How VMMS and BMS work with the shared services (auth, portal, gateway). Setting 
 | [account-screens.md](account-screens.md) | Profile, activity, the portal admin section, account deletion |
 | [fleet-api.md](fleet-api.md) | The trucks API: VMMS serves it, BMS reads it |
 | [bms-integration.md](bms-integration.md) | BMS with VMMS and VRMS: the fleet list and truck availability, maintenance dates that avoid booked trips, repair dates and Job Orders, and each group's checklist |
-| [bms-vmms-operational-handoffs.md](bms-vmms-operational-handoffs.md) |BMS-to-VMMS handoffs for completed-trip odometer evidence, utilization summaries, and delivery fuel purchases |
+| [bms-vmms-operational-handoffs.md](bms-vmms-operational-handoffs.md) | BMS-to-VMMS handoffs for completed-trip odometer evidence, utilization summaries, and pre-trip inspection defect reports |
 | [repair-integration.md](repair-integration.md) | Repairs across systems: VMMS referrals into VRMS, repair status back to VMMS, repair impact and expedite requests with BMS, the retry rule, and the asks |
 | [error-monitoring.md](error-monitoring.md) | Optional: reporting your crashes and errors to Sentry, with the gateway tunnel for web apps |
 | [security-checks.md](security-checks.md) | The weekly ZAP scan of your web app, the security headers to copy, secret scanning |

@@ -20,6 +20,7 @@ Use the relevant section only after confirming the target repository's current v
 - Select only fields needed by the operation and response, especially for personal data and costs. Keep query predicates scoped to the caller's authorized system, role, and assignment.
 - Use parameterized Prisma operations; never interpolate untrusted values into raw SQL. Use a transaction when multiple writes represent one indivisible business operation.
 - Make schema changes through the repository's migration workflow and consider existing rows, defaults, nullability, uniqueness, and rollback implications. Do not run destructive database operations without explicit authorization.
+- In `welinc-backend-vmms-analytics-ai`, treat its Prisma schema/client as a projection of the core VMMS PostgreSQL schema: keep all source enum values and their meanings aligned (for example, `DONE` is distinct from `COMPLETED`). Update analytics status summaries when source statuses change. `npm run build` and `npm run start:dev` regenerate Prisma Client automatically; run `npm run generate:client` after schema edits when using another command. Only add database migrations when the authoritative database schema itself changes.
 
 ## React web and mobile clients
 

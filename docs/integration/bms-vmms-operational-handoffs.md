@@ -1,12 +1,12 @@
 # BMS–VMMS operational handoffs
 
-BMS owns trips and delivery activity; VMMS owns vehicle master odometers, maintenance plans, fuel records, and fuel reports. These proposed one-way flows let BMS provide operational evidence without writing VMMS data directly. The VMMS-owned design contract is [spec 0031](../specs/vmms/0031-bms-vmms-operational-handoffs/index.md). This is a design document only: none of the routes, grants, or implementations below is approved for build yet.
+BMS owns trips, dispatch, and driver activity; VMMS owns vehicle master odometers and maintenance plans. These proposed one-way flows let BMS provide operational evidence without writing VMMS data directly. The VMMS-owned design contract is [spec 0031](../specs/vmms/0031-bms-vmms-operational-handoffs/index.md). This is a design document only: none of the routes, grants, or implementations below is approved for build yet.
 
 Three flows are covered:
 
 - **D. Trip odometer evidence** — BMS → VMMS; Operations reviews before the master odometer changes.
 - **E. Utilization summaries** — BMS → VMMS; VMMS presents suggestions and Operations decides whether to adjust maintenance.
-- **F. Fuel purchases** — BMS → VMMS; every accepted purchase waits for Operations approval before it enters the confirmed VMMS fuel ledger.
+- **F. Pre-trip defects** — BMS → VMMS; the driver completes the full inspection in BMS, and failed-item evidence enters VMMS for Operations review.
 
 ## Feasibility
 
@@ -14,7 +14,7 @@ Three flows are covered:
 |---|---|---|---|
 | D. Trip odometer | Doable; fits an existing ownership rule | Operations owns `Vehicle.odometer`; master updates already audit and refresh eligible schedules. VMMS also has a pending-review precedent for VRMS repair readings. | BMS service grant, inbound event/idempotency persistence, Operations review UI, and BMS/VMMS verification |
 | E. Utilization | Doable as a non-mutating planning signal | VMMS already estimates due windows from audited odometer history and leaves schedule creation to Operations. | Agree summary period/version rules, thresholds, suggestion lifecycle and Operations surface |
-| F. Fuel purchase | Doable, with the most domain work | VMMS validates fuel values, active stations, odometers, audits transactions, derives anomalies and owns reports. | Add pending-review intake, Operations approval, explicit station mapping, idempotency, and additive persistence |
+| F. Pre-trip defects | Doable as a review-only handoff | BMS owns trips and driver checks; VMMS owns maintenance decisions and work orders. | Agree checklist versioning, failed-item codes/severity, dispatch blocking/override policy, service scope, and Operations review behavior |
 
 These are API integrations, not shared-database access. All three are BMS-to-VMMS only; VMMS remains authoritative for its records and workflows.
 
@@ -23,7 +23,8 @@ These are API integrations, not shared-database access. All three are BMS-to-VMM
 - [ ] Agree the payload, stable identifiers, correction/version behavior, and field ownership for D–F with VMMS.
 - [ ] Produce the D odometer message only after a trip is completed and its reading is final.
 - [ ] Produce bounded E summaries without customer, route, or booking detail.
-- [ ] Produce F only for a completed purchase; provide an immutable purchase ID, VMMS vehicle ID, purchase timestamp, required PHP amounts and a stable BMS station ID. Unmapped stations remain pending for Operations rather than being inferred from a name.
+- [ ] Keep the full pre-trip inspection, driver identity, and attachments in BMS. Send F only when an item fails, with stable inspection/event and trip IDs, VMMS vehicle ID, checklist version, completion time, and the agreed failed-item fields.
+- [ ] Apply the jointly approved critical-failure dispatch and override policy in BMS; do not infer it from VMMS response status.
 - [ ] Use a durable outbox, persist delivery outcomes, and follow the agreed retry behavior.
 - [ ] Obtain BMS/VMMS and shared-auth owner approval for the receiver contract and scopes before implementation.
 - [ ] Run the joint acceptance scenarios in [When you can test](#when-you-can-test) after both systems are implemented.
@@ -33,10 +34,10 @@ These are API integrations, not shared-database access. All three are BMS-to-VMM
 - [ ] Add service-only receivers that require audience `VMMS`, exact client ID `bms`, and the approved per-flow scope.
 - [ ] Store D as pending evidence only. Provide an Operations review action; confirmation must invoke the existing master-odometer service so audit and schedule recalculation remain canonical.
 - [ ] Store E as BMS-source aggregates and expose an explainable, review-only utilization suggestion. Never use the summary to write the master odometer or automatically create/change a schedule.
-- [ ] Store every accepted F submission as pending review. Operations approval is required before creating a fuel transaction; keep pending and rejected items out of confirmed reports and fuel-efficiency calculations.
-- [ ] Preserve event/purchase idempotency and source metadata transactionally; never accept a VMMS user ID from BMS.
+- [ ] Store F failed-item evidence as pending Operations review. Confirmation may lead Operations to use the normal maintenance workflow; it does not automatically create a schedule/work order or change vehicle status.
+- [ ] Preserve event idempotency and source metadata transactionally; never accept a VMMS user ID from BMS.
 - [ ] Keep manual odometer updates, manual fuel entry, reports, and maintenance workflows compatible.
-- [ ] Do not add a direct BMS database read, fetch a receipt URL, or copy a BMS receipt file.
+- [ ] Do not add a direct BMS database read or fetch/copy BMS checklist attachments.
 
 ## Shared-auth/gateway checklist
 
@@ -55,7 +56,7 @@ Proposed delivery behavior follows the retry guidance in [BMS integration](bms-i
 | 2xx | Mark delivered and retain the result |
 | 401, 403, 408, 429, 5xx, network error, or 5-second timeout | Retry after 30 seconds, doubling up to a 1-hour maximum; stop after 24 hours |
 | Other 4xx | Mark failed and surface the response to an Admin; do not retry an invalid message forever |
-| Duplicate D/E event ID or F purchase ID with identical body | Return the existing intake state as a duplicate |
+| Duplicate D/E/F event ID with identical body | Return the existing intake state as a duplicate |
 | Same idempotency ID with different body | Return 409; require the agreed correction flow |
 
 A failed delivery is exposed to a BMS Admin for manual retry; retry restarts the 24-hour window. Agree rate and payload limits before implementation. Receivers use database transactions to store the idempotency record with the accepted domain state.
@@ -66,11 +67,11 @@ A failed delivery is exposed to a BMS Admin for manual retry; retry restarts the
 |---|---|---|---|---|
 | D | BMS → VMMS | `POST /vmms/integrations/bms/trip-odometer-readings` | `vehicle.odometer.evidence.write` | Proposal |
 | E | BMS → VMMS | `POST /vmms/integrations/bms/utilization-summaries` | `maintenance.utilization.write` | Proposal |
-| F | BMS → VMMS | `POST /vmms/integrations/bms/fuel-purchases` | `fuel.purchase.write` | Proposal |
+| F | BMS → VMMS | `POST /vmms/integrations/bms/pre-trip-inspections` | `maintenance.inspection-defect.write` | Proposal |
 
 Candidate names are not auth grants. Shared-auth and both system owners must approve exact names and scopes.
 
-Proposed successful intake responses are `202 Accepted`: D returns its review ID with `PENDING`, E returns the summary ID and accepted revision, and F returns its purchase-review ID with `PENDING_REVIEW`. A 2xx response means VMMS durably accepted the message, not that Operations approved it or that a fuel transaction was created. D/E use `eventId` for delivery idempotency; F uses `purchaseId` as the business idempotency key. Identical retries return the existing intake state; reused IDs with changed bodies receive 409. Invalid payloads receive an explicit 4xx.
+Proposed successful intake responses are `202 Accepted`: D returns its review ID with `PENDING`, E returns the summary ID and accepted revision, and F returns its inspection-defect review ID with `PENDING_REVIEW`. A 2xx response means VMMS durably accepted the message, not that Operations applied an odometer, approved a suggestion, resolved a defect, or changed trip readiness. D/E/F use stable `eventId` values for delivery idempotency; Flow E corrections use its agreed summary revision. Identical retries return the existing intake state; reused IDs with changed bodies receive 409. Invalid payloads receive an explicit 4xx.
 
 ## Flow D: completed-trip odometer evidence
 
@@ -121,40 +122,36 @@ Proposed payload:
 
 No individual trip, booking, customer, route, or driver data is needed. The utilization summary is not a master odometer reading and must not be added to `Vehicle.odometer` or `VehicleAuditLog` as if Operations entered it. Period length, threshold/baseline, revision ordering, retention, and suggestion lifecycle are open for joint design.
 
-## Flow F: delivery fuel-purchase handoff
+## Flow F: pre-trip inspection defect handoff
 
-1. BMS records a refuelling purchase made during a delivery and queues it using an immutable BMS purchase ID.
-2. BMS submits the VMMS vehicle ID, delivery trip ID, purchase timestamp, odometer, liters, unit price/currency, station identifier, and opaque receipt reference.
-3. VMMS authenticates the message and checks field constraints, vehicle, station mapping, existing fuel history, and possible duplicate manual entries. It never trusts a sender-computed total.
-4. Every valid purchase is stored as pending Operations review; no BMS purchase is automatically entered into the confirmed VMMS fuel ledger. Possible manual duplicates and suspicious values remain visible to the reviewer.
-5. Operations resolves the BMS station ID through an explicit VMMS mapping to an active station. Unmapped station IDs remain pending; name similarity alone is not a mapping.
-6. When Operations approves the submission, VMMS revalidates it and creates the fuel transaction through its existing fuel domain path. VMMS calculates total cost and audits the actual Operations actor. Pending or rejected purchases are excluded from confirmed reports and efficiency calculations. Hard-invalid values receive an explicit 4xx response.
-7. The pending integration record retains BMS source and purchase/trip IDs; VMMS does not fabricate a human submitter identity for the service submission.
-8. The receipt reference stays an opaque BMS identifier. VMMS neither dereferences it as a URL nor copies the receipt. An in-app receipt viewer would require a separately agreed authenticated BMS read API.
+1. BMS assigns a VMMS vehicle to a trip. Immediately before dispatch, the assigned driver completes a short, versioned pre-trip checklist. A dispatcher can see the completion state but does not attest on the driver's behalf.
+2. BMS stores the full inspection, driver identity, answers, completion time, attachments, and trip-readiness decision. BMS applies the critical-failure and override policy approved by both system owners.
+3. If all checklist items pass, BMS keeps the inspection record and sends no event to VMMS.
+4. If an item fails, BMS sends one immutable defect event through its durable outbox. The event contains stable event, inspection, and trip IDs; VMMS vehicle ID; checklist version; completion time; and only the failed item codes, agreed severity, and bounded notes. It excludes customer, booking, route, driver identity, and attachment content.
+5. VMMS authenticates the BMS service, validates the vehicle and payload, and stores the report idempotently as **Pending Operations review**. A `202 Accepted` response confirms durable receipt only; it does not resolve the defect or determine whether the trip can depart.
+6. Operations confirms or dismisses the reported defect with a reason. If confirmed, Operations may use the existing VMMS maintenance workflow to create work. No schedule/work order or vehicle-status change occurs automatically.
+7. Any pre-trip odometer remains BMS data and does not update `Vehicle.odometer`. Completed-trip odometer evidence continues through Flow D.
+8. Photos and other attachments remain in BMS. VMMS does not fetch files or follow URLs.
 
 Proposed payload:
 
 ```ts
 {
-  eventId: string;
-  purchaseId: string;       // unique BMS transaction identity
-  tripId: string;           // BMS delivery identity
-  vmmsVehicleId: string;
-  purchasedAt: string;      // UTC ISO-8601
-  odometerKm: number;
-  liters: number;
-  pricePerLiter: number;
-  currency: 'PHP';
-  station: {
-    bmsStationId: string;
-    name: string;
-  };
-  receiptReference: string; // opaque BMS ID, never a URL
-  isFullTank?: boolean;     // omitted means false; never infer a full tank
+  eventId: string;          // stable delivery id
+  inspectionId: string;     // BMS-owned inspection id
+  tripId: string;           // BMS-owned trip id
+  vmmsVehicleId: string;    // VMMS vehicle UUID
+  checklistVersion: string;
+  completedAt: string;      // UTC ISO-8601
+  failedItems: Array<{
+    itemCode: string;       // stable code from the checklist version
+    severity: 'LOW' | 'HIGH' | 'CRITICAL'; // mapping requires agreement
+    note?: string;          // bounded, no customer or route details
+  }>;
 }
 ```
 
-VMMS requires an active registered fuel station and uses full-tank state in efficiency calculations. Therefore, Operations maintains an explicit mapping from stable BMS station IDs to active VMMS stations; do not resolve stations by name alone. The payload uses PHP, and omitted `isFullTank` means false. Suspect odometer order and possible manual duplicates stay in the Operations review queue. All BMS fuel submissions require Operations approval before they enter the confirmed ledger.
+The proposed event contains no driver identity: BMS retains the actor audit, while VMMS records the BMS service as its source. Critical-failure dispatch blocking, severity definitions, and authorized override behavior remain open for joint approval. A proposed safety default is to block dispatch for a critical failure and audit any authorized override. The initial flow does not transfer inspection photos or pre-trip odometer readings.
 
 ## When you can test
 
@@ -174,19 +171,20 @@ Only after the proposal is approved, both implementations and grants are present
 4. Retry and revise a period using the approved revision rule; verify no duplicate suggestions.
 
 **Flow F**
-1. Send a valid, mapped purchase; verify it is pending and excluded from reports/efficiency.
-2. Approve it as Operations; verify server-calculated total, audit, source link, and report inclusion exactly once.
-3. Send an unknown station, possible duplicate, and odometer-order anomaly; verify each remains reviewable and excluded before approval. Reject one and approve another to confirm both outcomes.
-4. Send malformed amounts or changed content under a reused purchase ID; verify explicit rejection or conflict as appropriate.
-5. Verify no receipt URL is followed and manual VMMS fuel entry remains unchanged.
+1. Complete an all-pass inspection and verify the full record is in BMS and no VMMS event is sent.
+2. Complete an inspection with failed items; verify only the agreed failed-item payload is accepted as pending Operations review in VMMS.
+3. Verify identical event retries are idempotent and changed content under the same event ID is rejected.
+4. Confirm and dismiss defects as Operations; verify the audit reason and that no schedule, work order, or vehicle-status change happens automatically.
+5. After owners agree dispatch policy, verify critical-failure blocking and authorized overrides are enforced and recorded by BMS.
+6. Verify driver identity, full answers, and attachments stay in BMS; VMMS does not access BMS storage.
 
 ## Implementation gates
 
 1. Agree stable identifiers, correction/version rules, retention, payload bounds, exact routes, and response schemas between BMS and VMMS.
 2. Define the VMMS utilization policy, threshold values, review surface, and suggestion lifecycle before enabling computed suggestions.
-3. Confirm BMS can provide the purchase timestamp and PHP amounts; if full-tank state is absent, VMMS treats it as false.
+3. Agree BMS checklist ownership, template versioning, failure codes/severity, retention, payload bounds, critical-failure behavior, and override authority.
 4. Approve exact service scopes, rate limits, and failure notifications with the shared-auth owner. Delivery retry timing follows the retry rule above.
-5. Receipt viewing is out of scope; any future viewer needs a separate authenticated BMS API and cannot use a caller-provided URL.
+5. Attachment viewing is out of scope; any future viewer needs a separate authenticated BMS API and cannot use a caller-provided URL.
 
 ## Boundary
 
