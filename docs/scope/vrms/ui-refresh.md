@@ -176,7 +176,7 @@ spec [0024](../../specs/vrms/0024-ticket-detail-redesign/index.md) · code in `w
 - [ ] Test it: `/test ticket detail redesign`
 - [ ] Polish it (optional, ask first): `impeccable` · `web-design-guidelines` · `break-ui` (10 issues with 20 steps each, long issue text, no known fix, returned issues)
 
-### 70. Navigation redesign · in-progress
+### 70. Navigation redesign · done
 Rework the VRMS sidebar (and the portal Admin sidebar to match): a system switcher dropdown at the top, folding sections, a primary New repair button, queue counts, and an account menu at the bottom, instead of today's flat list.
 **Done when:** the chosen sidebar ships in web-vrms and the portal Admin, keeps the permission gating of `navItems.ts`, folds to icons on desktop, and still becomes the tab bar or sheet on phones.
 - Note (2026-11-18): raised by you: the sidebar is too plain. Four options are mocked up (N1 to N4 on the design directions canvas). Build it on the S18 design direction; the portal Admin half rides with S19 and S20.
