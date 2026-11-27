@@ -95,3 +95,30 @@ Choices made without asking, with the reason:
 - VRMS copies the portal's **built** values, not the boards', where they differ (64px bar, not 56px), so the two apps match each other.
 - The breadcrumb's last crumb on a record comes from the page through a small context (`useBreadcrumbTail`) rather than a route table, because only the page knows the ticket number once it loads.
 - The system icons, one lines and the ///L mark are copied from the portal, with no drift checker: three small constants and one icon. Runner up: a checker like `check-scenes.mjs`, more than this needs.
+
+## Update 2026-11-28, the switcher's role source
+
+### Context
+
+Build step 5 found that AC-9a's role tags on the BMS and VMMS cards had no source. A VRMS token, and the grant answer's `user.roles`, carry only VRMS roles (welinc-auth `rolesFor` filters to the audience). The same gap hid the Suite management card from a VMMS or BMS Admin who isn't a VRMS Admin, and from a suite admin on a temporary non admin VRMS role. The answer already carries `user.systems` (spec 0007), read fresh at each grant and never in a token, and contract 0001 section 5 lets welinc-auth add fields to `user`.
+
+### Options considered
+
+- **A. Two fields on the grant answer's `user`** (picked): `systemRoles` (held codes per system) and `suiteAdmin`, beside `systems`. No route, no extra call, fresh at every refresh. Cons: two more reads per grant; backend-vrms now sees the person's other roles (display only).
+- **B. A new `GET /auth/me/systems` read** with the user token. Always live, but a new cross system read on a VRMS audience token, plus a call on every load and its own CORS and docs.
+- **C. Every system's roles in the JWT.** Breaks the one `aud` design: every backend would carry roles it must ignore, and tokens grow.
+
+Shape, within A:
+
+- **Held codes per system** (picked): web-vrms runs the portal's `roleTag` rule itself, so one rule serves both apps, and the data matches the launcher's `roles`.
+- One tag per system, worked out in welinc-auth: shares a little less, but the rule would live in two repos and could drift.
+- Codes plus names: duplicates `GET /auth/systems`, which VRMS already loads.
+
+### Rationale
+
+A reuses the field VRMS already reads for the same switcher (`systems`) and the contract's own extension point, so the change is additive and any deploy order is safe. The Suite management card now follows who Suite management actually admits (an Admin of any system, or a suite admin), which removes the earlier tradeoff where a suite admin inside VRMS saw no card.
+
+Choices made without asking, with the reason:
+- `systemRoles` covers exactly the systems in `user.systems` (web openable ones, VRMS included), so the cards and their tags always agree. Runner up: every held system, which would hand VRMS phone only systems it never shows.
+- `canSwitchSystem` also turns on for a suite admin, since they now have a card to go to even with one system.
+- When the fields are missing (an older welinc-auth), the cards show with no tag and the card falls back to the VRMS `ADMIN`: today's behaviour, never an empty tag box.
