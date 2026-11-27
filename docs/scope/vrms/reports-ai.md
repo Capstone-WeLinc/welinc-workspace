@@ -9,6 +9,7 @@ WL-601 and WL-602. One place for every export, with filters and a preview.
 **Done when:** old export buttons are gone, filters cover date range, status, vehicle, mechanic, issue type, priority and in house vs outsourced, CSV and Excel export match the preview, large exports don't time out, and every export is logged.
 - Note (2026-11-03): from feature 23. Ticket exports should carry the verifier's name and time (`verifiedByName`, `verifiedAt`), and a verifier filter like the one on History (`verifiedBy` on `GET /vrms/repairs/history`).
 - Note (2026-11-03, replan): from spec 0020. Availability reports can join `vehicle_changes` on `repair_ticket_id`.
+- Note (2026-11-27, from spec 0030): add due date, Overdue, and on time versus late to the reports and their export (WL-207's "shown in reports").
 - [ ] Design it (spec): `/architect reports module`
 - [ ] Polish it (optional, ask first): `impeccable` · `web-design-guidelines` · `break-ui` (huge result sets, empty filters, long names)
 

@@ -22,7 +22,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | Repair workflow | [repair-workflow.md](repair-workflow.md) | 12 done, 1 in-progress, 9 planned, 1 dropped |
 | Platform | [platform.md](platform.md) | 2 done, 3 in-progress, 5 planned, 3 dropped |
 | Outsourcing | [outsourcing.md](outsourcing.md) | 4 planned |
-| Operations | [operations.md](operations.md) | 6 planned, 1 dropped |
+| Operations | [operations.md](operations.md) | 1 in-progress, 5 planned, 1 dropped |
 | Reports & AI | [reports-ai.md](reports-ai.md) | 4 planned |
 
 ## At a glance
@@ -99,7 +99,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | 39 | Management approval for outsourced repairs | Slice 4 | planned |
 | 40 | Lookup lists & fewer typed fields | Slice 5 | planned |
 | 41 | Common issues picker | Slice 5 | dropped |
-| 42 | Deadlines & fix time estimates | Slice 5 | planned |
+| 42 | Deadlines & fix time estimates | Slice 5 | in-progress |
 | 43 | Stuck and stale ticket alerts | Slice 5 | planned |
 | 44 | Driver role | Slice 5 | planned |
 | 59 | Mechanic home garage | Slice 5 | planned |
