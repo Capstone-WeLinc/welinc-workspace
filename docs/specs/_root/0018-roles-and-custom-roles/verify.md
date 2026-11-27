@@ -52,3 +52,27 @@ Run 2026-11-26 (computed styles at 1280px against `Roles9` and `SaveBar9`): acce
 - [ ] Restart welinc-backend-vrms with welinc-auth stopped: the roster is unchanged (AC-33)
 - [ ] The roster parity test passes in welinc-backend-vrms (AC-33)
 - [ ] `npm run openapi:check` in welinc-auth and `node scripts/check-contract-routes.mjs welinc-auth/docs/openapi.json` pass (AC-18, AC-36)
+
+## Milestone 3 steps (child 0002, welinc-auth routes), added 2026-11-27
+
+Run as `suite.admin@` with a portal cookie session (`Origin: http://localhost:8000`, `Content-Type: application/json`). Seen passing during `/develop` on 2026-11-27; `/check verify` runs them again and ticks them.
+
+- [ ] `POST /auth/admin/roles/VRMS` `{name: "Tire specialist", from: "MECHANIC"}` → 201 with code `C_TIRE_SPECIALIST`, a cell for every VRMS key with Mechanic's saved values, and `version` one higher; `permission_changes` gets one row per cell, note "Created from Mechanic" → AC-23
+- [ ] `GET /auth/admin/roles/VRMS/C_TIRE_SPECIALIST/history` → a single `CREATED` entry, the copied cell rows not listed one by one → AC-23
+- [ ] Create refusals: "chief MECHANIC" and "tire SPECIALIST" → 409 `ROLE_NAME_TAKEN`; "!!" → "Use letters or numbers in the name."; "A" → "Name needs 2 to 40 characters."; a 40 character name passes and its code is at most 30; `from: "NOPE"` → 400 `UNKNOWN_ROLE` → AC-22
+- [ ] `POST /auth/admin/roles/VMMS` → 409 `CUSTOM_ROLES_NOT_SUPPORTED` → AC-27
+- [ ] As `vrms.admin@`: create, `PATCH` and `DELETE` → 403 `NOT_SUITE_ADMIN` → AC-22
+- [ ] `PATCH …/C_TIRE_SPECIALIST` with a new name, then a new description → `RENAMED` and `DESCRIBED` events; a rename to "Mechanic" → 409 `ROLE_NAME_TAKEN`; an empty body → 400 `VALIDATION_FAILED`; `PATCH` or `DELETE` on `MECHANIC` → 400 `BUILT_IN_ROLE` → AC-24, AC-26
+- [ ] Give the role to 2 people, then `DELETE` → 409 `ROLE_IN_USE` with `details.count` 2; move them off, `DELETE` → 200, `deleted_at` set, cells removed and logged with after null, version raised; `DELETE` again → 404 → AC-25
+- [ ] After the delete: giving the archived code through `PATCH /auth/users/:id`, `attachExisting` and a temporary grant each answer 400 `UNKNOWN_ROLE`; `GET /auth/systems` doesn't list it → AC-29
+- [ ] Create "Tire specialist" again → code `C_TIRE_SPECIALIST_2` (a code is never reused) → AC-22
+- [ ] A person in their deletion grace period holding the role doesn't block `DELETE`; restoring them drops the archived role and records `RESTORED` with the role change → AC-25
+- [ ] Not yet run: 20 live custom roles, then the 21st create → 409 `CUSTOM_ROLE_LIMIT` with "VRMS has 20 custom roles, the most it can have. Delete one to make another." → AC-22
+- [ ] Not yet run: a `DELETE` and an Add people on the same role fired at once (two shells, `&`), ten times: each round ends with either `ROLE_IN_USE` or `UNKNOWN_ROLE`, never an archived role still held → AC-25
+- [ ] AC-37 (passed 2026-11-27): `multi.lead@` with `C_NIGHT_SHIFT_LEAD` in VRMS gets the same answers from 13 VMMS routes, 15 BMS routes and both web apps as with `CHIEF_MECHANIC`, and no backend logs an error → AC-37
+- [ ] `vmms-mobile` client still allows only MECHANIC and CHIEF_MECHANIC for VRMS (`prisma/seeds/clients.seed.ts` unchanged) → AC-31
+- [ ] `npm run openapi:check` in welinc-auth and `node scripts/check-contract-routes.mjs welinc-auth/docs/openapi.json` pass; contract 0001 reads version 8.1 → AC-29
+
+### Coverage, milestone 3
+- AC-22: name rules, taken, limit (open), suite admin only · AC-23: create copy and logs · AC-24, AC-26: rename, describe, built in refusals · AC-25: in use, archive, grace period, race (open) · AC-27: VMMS refusal · AC-29: archived role unknown everywhere, contract 8.1 · AC-31: mobile client unchanged · AC-37: other systems tolerate a `C_` code
+- Note: the umbrella's `peopleCount` line says Delete counts every holder row, but AC-25 and the rules line say grace period holders don't block. The build follows AC-25; the umbrella line is owed a fix in `/architect`.
