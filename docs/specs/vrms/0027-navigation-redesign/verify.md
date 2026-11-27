@@ -67,4 +67,6 @@ The sweep ran these once and fixed what failed (web-vrms `dfc91b4`, portal `52ae
 - [ ] The VRMS sidebar title tile is 36px with a 10px radius, the same as the portal's Suite management tile; collapsed, the 64px strip still centres it → AC-10a, AC-15
 - [ ] With the grid switcher open in VRMS (`multi.admin@`) and in the portal, the popover is a dialog named "Switch system", and axe finds nothing but the dev only dataset switch → AC-9a, AC-14
 - [ ] The VRMS switcher cards compute the same text color as the portal's (rgb 15, 23, 42) → AC-15
-- [ ] axe at 375px and 1280px in both apps, with the sheet, the switcher and the account menu each open in turn → no violations outside the dev only dataset switch and whatever the account menu decision allows → AC-14
+- [ ] axe at 375px and 1280px in both apps, with the sheet, the switcher and the account menu each open in turn → no violations outside the dev only dataset switch and the account menu's `region` finding (allowed below) → AC-14
+
+**Allowed axe difference (your call, 2026-11-28):** with the account menu open, axe's best practice `region` rule flags `div[data-radix-popper-content-wrapper]` in both apps: the name and email block inside the shadcn menu, which renders at the end of `body`, sits outside a landmark. It is not a WCAG failure and the menu keeps its accessible name, so it is accepted, like the dev only dataset switch. Any other axe finding is a bug.
