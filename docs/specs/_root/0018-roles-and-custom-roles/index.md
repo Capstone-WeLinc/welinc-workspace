@@ -1,7 +1,7 @@
 # 0018. Roles page and custom roles
 
 **Date**: 2026-11-23
-**Status**: In Progress
+**Status**: Accepted
 **Scope rows**: [S20](../../../scope/_root/shared-services.md#s20-permissions-page-redesign--planned--needs-a-decision--beta) (child 0001) and [S21](../../../scope/_root/shared-services.md#s21-custom-roles-per-system--planned--needs-a-decision--ga) (child 0002)
 **Repos**: `welinc-auth`, `welinc-web-portal`, `welinc-backend-vrms`, `welinc-web-vrms`, workspace (`docs/integration/`, contract 0001)
 **Design source**: boards `Roles9`, `DraftMarks` (B), `SaveBar9`, `Picks8` (RC) and `Confirm6` (DB) on the canvas "WeLinc design directions" (https://claude.ai/artifact/VFhLSMNhfpAFD4D4c2VQzp), page "Round 8". Copies live in [boards/](boards/) (`.dc.html` source, readable from any account). The look follows spec [0016](../0016-design-direction-refresh/index.md); the app shell and People routes follow spec [0017](../0017-person-page-systems/index.md).
