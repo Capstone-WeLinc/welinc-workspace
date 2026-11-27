@@ -20,7 +20,7 @@
 | **On Hold – No Parts** | *Jira (WL-208, unsure).* Mechanic pauses a ticket for missing parts with a reason; someone verifies it. Hold time is tracked separately. |
 | **Repair history** | Closed tickets, plus a clickable timeline per ticket built from the audit log (WL-205/219). BRD rule: closed tickets are locked; Admin unlocks one edit with a logged reason. |
 | **Audit log** | Already exists on the admin side. Jira (WL-219) extends it to every ticket event: actor, role, time, before/after, note. Not editable. |
-| **Vehicle status** | *Code:* `AVAILABLE`, `UNDER_REPAIR`, `UNDER_MAINTENANCE`, shared with VMMS; `UNDER_REPAIR` wins a conflict. *Jira (WL-501, unanswered):* set automatically from the ticket, plus a manual toggle with a reason. |
+| **Vehicle status** | *Code:* `AVAILABLE`, `UNDER_REPAIR`, `UNDER_MAINTENANCE`, shared with VMMS; `UNDER_REPAIR` wins a conflict. *Now:* only the VMMS sync writes it. VRMS sends repair events and VMMS sets the status; there is no manual toggle in VRMS (spec 0029 AC-4). |
 | **In house / Outsourced** | Who does the repair. Business rule (WL-401, confirmed): try in-house first; outsourcing needs a justification. In-house mechanics are records in `mechanics`. |
 | **Outsourced shop** | *Jira (WL-405).* An entry in the Admin-managed shop directory. Shops get no system access: Admin or Chief Mechanic records the transfer, prints a job order, then uploads the receipt and total cost to close it (WL-404/402). Replaces the old free-text shop name. |
 | **Driver license number** | The driver key: an LTO number like `A01-23-456789`, unique per driver. A new driver is added by it, and a license that already belongs to a driver answers with that driver (spec 0016). |

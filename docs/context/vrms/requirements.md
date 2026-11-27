@@ -15,6 +15,8 @@
 | 8 sprints of 2 weeks | Jira's sprint plan | Jira |
 | Mechanic required on every new ticket, driver typed by name | Mechanics are optional so a ticket starts Open and is assigned later; a driver is picked by search or added in place, keyed by the LTO license number; a truck can have one open ticket at a time | Spec 0016 |
 | Driver details, license photo, cost vs income, daily and monthly reports | Not carried in Jira; treat as possibly dropped | [system-overview.md](system-overview.md) |
+| Plate and garage are Admin managed dropdowns; vehicle status goes `UNDER_REPAIR` on create and back on close | Trucks and garages are a read only copy of VMMS's; VRMS never writes truck status, VMMS sets it from VRMS repair events | Spec 0029 (AC-1 to AC-4) |
+| Target due date optional, set by Admin | Every ticket gets an automatic due date from priority and issue hours; Admin and Chief Mechanic can change it with a reason (`ticket.due_date.edit`); Overdue and Due soon show on screens | Spec 0030 (AC-1, AC-8, AC-12) |
 | Mechanics on a separate mobile app | Responsive web now, then one mobile app shared with VMMS | Scope, slice 7 (feature 48) |
 
 The old backlog also contradicts the BRD on who fills the repair form: the BRD says Admin creates tickets, while VRMS002/009/010/012 say the mechanic submits it on mobile. Jira WL-201 decides.

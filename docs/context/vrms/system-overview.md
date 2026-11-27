@@ -37,13 +37,13 @@ browser ─► web-portal (:8000, login) ─► web-vrms (:8001)
                      /vrms ─► backend-vrms (:3002, includes AI and analytics) ─► Postgres (vrms)
 ```
 
-Shared tables owned by VRMS (other subsystems reference them): vehicles, garages, in house mechanics.
+Trucks and garages belong to VMMS; VRMS keeps a read only copy synced from VMMS (`Vehicle.vmmsVehicleId`, spec 0029 child 0001). VRMS owns its repair tickets and their history.
 
 ## Decisions (confirmed by the team lead, 2026-10-22)
 
 - **Architecture is microservices**, as in the code. The BRD and diagrams that show a modular monolith are outdated.
 - **Mechanic mobile app: one app shared with VMMS** (decided 2026-10-29). VMMS already has a mobile app; VRMS adds its repair screens to it. Its platform and repo are settled after the integration meeting (scope feature 56). Jira still lists this as an open platform decision (WL-801, ticket missing). Update Jira.
-- **Hosting: Azure** (Static Web Apps, Container Apps, one shared PostgreSQL server) with GitHub Actions, per spec 0008; this replaced the earlier Vercel and Render plan. Email goes through Brevo from `noreply@welinc.app` when hosted; SMS is dropped as not worth the cost. Staging went live on 2026-11-19; production is planned for 2026-11-20. Jira still says "Vercel vs Netlify" (WL-901, ticket missing). Update Jira. License photo storage may be dropped.
+- **Hosting: Azure** (Static Web Apps, Container Apps, one shared PostgreSQL server) with GitHub Actions, per spec 0008; this replaced the earlier Vercel and Render plan. Email goes through Brevo from `noreply@welinc.app` when hosted; SMS is dropped as not worth the cost. Staging went live on 2026-11-19; production exists as code only and is never run live (spec 0008 AC-24). Jira still says "Vercel vs Netlify" (WL-901, ticket missing). Update Jira. License photo storage may be dropped.
 - **AI and analytics is a Capstone 2 addition** not covered by BRD v1.1. It lives in `welinc-backend-vrms` (`src/modules/ai` and `src/modules/analytics`), not the old separate analytics repo, and stays optional.
 
 ## Still open
@@ -51,6 +51,6 @@ Shared tables owned by VRMS (other subsystems reference them): vehicles, garages
 1. **AI provider.** The code uses Gemini (behind an `AiProvider` adapter) plus pgvector, inside `welinc-backend-vrms` (spec 0013 retired the Python service and its MongoDB, Redis and DuckDB stores); Jira WL-E7 says "optional local AI (Ollama)". Decide the provider with `/architect` (scope feature in `reports-ai.md`), then align Jira.
 2. **Missing Jira tickets.** Stories depend on WL-106 (role-per-process flowchart), WL-213 (cancellation with reason), WL-701/703 (AI), WL-801 (platform) and WL-901 (hosting), but none of them exist in Jira.
 3. **Status names.** WL-200 must fix the final list before the migration from the code's four statuses.
-4. **Schema copy.** `welinc-backend-vrms/prisma/schema.prisma` also defines `Booking` and maintenance models (VMMS/BMS data). Clarify which service owns those tables.
+4. **Schema copy.** Resolved: `welinc-backend-vrms/prisma/schema.prisma` no longer defines `Booking` or maintenance models.
 5. **Stakeholder questions** are collected in WL-1101: Driver role, Admin override, stuck threshold, escalation, no-parts verifier, fix-time targets, management approval, vehicle disable flow, report types.
 6. **Sprints.** Jira stories carry a planned sprint (1 to 7+); Jira holds the current plan, not the BRD's 8 sprints.

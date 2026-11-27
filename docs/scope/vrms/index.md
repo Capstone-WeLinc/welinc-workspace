@@ -18,7 +18,7 @@ _These are recommendations to keep your build orderly, not requirements. Skip an
 | Epic | File | Status |
 |---|---|---|
 | Foundations | [foundations.md](foundations.md) | 8 existing, 7 done, 1 planned |
-| UI refresh | [ui-refresh.md](ui-refresh.md) | 4 done, 7 in-progress, 2 planned, 1 dropped |
+| UI refresh | [ui-refresh.md](ui-refresh.md) | 5 done, 6 in-progress, 2 planned, 1 dropped |
 | Repair workflow | [repair-workflow.md](repair-workflow.md) | 12 done, 1 in-progress, 9 planned, 1 dropped |
 | Platform | [platform.md](platform.md) | 2 done, 4 in-progress, 4 planned, 3 dropped |
 | Outsourcing | [outsourcing.md](outsourcing.md) | 4 planned |
