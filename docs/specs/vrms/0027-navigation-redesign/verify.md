@@ -28,6 +28,11 @@ Run at `/check verify navigation redesign`, locally, with the shared and VRMS st
 - [ ] Added at the build: as a mechanic, Done lists Closed tickets only, never Cancelled (AC-2)
 - [ ] Added at the build: close Repair tickets, reload: it stays closed; open it again on another page and reload: it stays open (`welinc:nav-open:<user id>`, AC-3)
 - [ ] Added at the build: `vrms.admin@` (outside the roster) has no Assigned to me, and `/repairs?view=mine` shows the plain list (AC-2, AC-4)
+- [ ] Added at step 5 (2026-11-28): as `multi.lead@` the BMS and VMMS cards show no role tag today: a VRMS token carries only VRMS roles (welinc-auth `rolesFor`), so AC-9a's tag has no source until `/architect` picks one. Check the cards show with no empty tag box, and recheck once the source exists (AC-9a)
+- [ ] Added at step 5: as a VMMS or BMS admin who is not a VRMS admin, the Suite management card is missing for the same reason; as `multi.admin@` (VRMS Admin) it shows (AC-9a)
+- [ ] Added at step 5: `http://localhost:8000/?open=VRMS` as `multi.lead@` showed the "Opening VRMS…" cover but stayed on the launcher in Playwright; check it in a real browser before calling AC-13 met (AC-13)
+- [ ] Added at step 5: in the avatar menu, "Your profile" reads in link blue while "Sign out" is foreground; compare with the portal's menu and match it (AC-10, AC-15)
+- [ ] Added at step 5: the sidebar title "VRMS" is white on navy, expanded and in the phone sheet (it was navy on navy before `847a04f`) (AC-10a)
 
 ## API checks
 
