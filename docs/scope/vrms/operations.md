@@ -22,7 +22,7 @@ spec [0007](../../specs/vrms/0007-knowledge-base-fix-library/index.md)
 - Note (2026-10-25): merged into feature 15 (knowledge base page). Spec 0007 builds the common issues library (WL-704) and this picker (WL-702, its AC-24 to AC-26), so the work is tracked and built there. The estimate shows as info only; saving it is feature 42's call.
 - [x] Design it (spec): covered by spec 0007
 
-### 42. Deadlines & fix time estimates · in-progress
+### 42. Deadlines & fix time estimates · done
 WL-206 and WL-207. Expected completion from priority and issue type, with a rule for which wins.
 **Done when:** each ticket shows a deadline from creation, Admin configures durations, changes need a logged reason, overdue tickets are highlighted, and the mechanic is warned 24 hours before.
 - Note (2026-10-30): spec 0012 follow up. Add the duration settings as entries in the settings catalog (Thresholds section), not code constants.
