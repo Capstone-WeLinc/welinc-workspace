@@ -42,8 +42,8 @@ _These are recommendations to keep the build orderly, not requirements. Skip any
 | S17 | Contract and code agree on errors | Contract | planned |
 | S18 | Design direction refresh | Design | done |
 | S19 | Person page shows only the person's systems | Design | done |
-| S20 | Permissions page redesign | Design | in-progress |
-| S21 | Custom roles per system | Configuration | in-progress |
+| S20 | Permissions page redesign | Design | done |
+| S21 | Custom roles per system | Configuration | done |
 | S22 | Portal redesign from the design rounds | Design | in-progress |
 | S23 | Profile page for the suite | Account | planned |
 
@@ -417,7 +417,7 @@ spec [0017](../../specs/_root/0017-person-page-systems/index.md) · code in `wel
 - [x] Verify it: `/check verify person page systems`
 - [x] Test it: `/test person page systems`
 
-### S20. Permissions page redesign · in-progress · Beta
+### S20. Permissions page redesign · done · Beta
 Replace the long checkbox grid with a role first view: pick a role, see its permissions in grouped sections with switches and plain descriptions, locks in place. Keep the full grid as a grouped "Compare roles" view, and send changes through a pending changes bar into the existing review dialog.
 **Done when:** an admin can read and change one role's permissions without scanning 27 rows by 3 columns, the compare view still shows every role, and saving still goes through the review step and the matrix history.
 - Note (2026-11-23): already designed in the S18 rounds; `/architect` starts from these boards (canvas "WeLinc design directions", page "Round 8", spec 0016 *Board index*), not new design rounds. `Roles9`: the app shell with a full height role list (title with count, system switch, search, sticky Built in and Custom headings, dashed New role pinned at the bottom, people in words on each row) beside the role, whose tabs are Permissions, People and History; "Add people" on the People tab. `DraftMarks` B: a gold count bubble on a role with unsaved changes. `SaveBar9` and `SaveWidths10`: the 640px navy save bar with the change list. `Picks8`: review, leaving with a draft, the two ways to save. The compare view is out of date: round 6 replaced the grid with "Who can do what" and made the full grid a spreadsheet download, then round 8 **dropped "Who can do what"** (no page, no button on Roles). So the intent's "Compare roles" view and the Done when's "the compare view still shows every role" need settling in `/architect` (the spreadsheet download is the only compare left from the rounds). Also settled: the review dialog is RC (folded groups, who it touches, the activity log note folded behind "Add a note for the activity log", shown on the role's History tab); deleting a role is DB (blocked until no one has it); the role header facts end with "Last changed [date] by …". The Nov 18 picks are in git: `docs/context/vrms/handoff-2026-11-18.md` (commit 33db0d0).
@@ -436,7 +436,7 @@ spec [0018](../../specs/_root/0018-roles-and-custom-roles/index.md) (child [0001
 
 ## Configuration
 
-### S21. Custom roles per system · in-progress · GA
+### S21. Custom roles per system · done · GA
 Let a suite admin create, rename, duplicate and delete roles per system instead of the fixed list in each `prisma/catalog/<system>.ts`. Built in roles stay (renamable, never deletable); custom roles start as a copy of one. Behaviour that today keys on a role name (the VRMS mechanic list and audit events) moves to a permission such as "can be assigned tickets".
 **Done when:** a suite admin makes a custom VRMS role in the portal, gives it to a person, and that person's token and permissions follow it; deleting a role that people still hold is refused until they are moved; VMMS and BMS keep working on their built in roles, and contract 0001 gets a version with a Changes line.
 - Note (2026-11-18): your call: as much configurable as makes sense. The R2 mockup (role list with built in and custom sections) is the starting point; the S20 permissions redesign should be built so a longer role list fits.
