@@ -1,7 +1,7 @@
 # 0022. Mobile job order and post-service sync for team members
 
 **Date**: 2026-11-28
-**Status**: Backend implemented, not yet in a pull request; mobile app not started
+**Status**: Backend and mobile app implemented, not yet in pull requests; not yet tested on a phone
 **Scope**: `welinc-backend-bms` (dispatch, completion) and `welinc-mobile-bms`. No change to `welinc-web-bms`, shared auth, portal or the suite gateway (Nginx).
 
 Decision history: [rationale.md](rationale.md). Verification plan: [verify.md](verify.md).
@@ -61,11 +61,11 @@ Nothing is sent while the app is fully closed. A waiting form is sent the next t
 
 | Server answer | The record | The driver sees |
 |---|---|---|
-| No connection, timeout | Stays queued | "Waiting for internet" on the form |
-| 409 (job order not ready), 5xx | Stays queued, retried on the next sync | The server's message |
-| 409 `POST_SERVICE_FINALIZED` | Blocked; the office's version is kept | "Finalized by office", form read-only |
+| No connection, timeout | Stays queued | "Saved on this phone. It will be sent when you're online." on the form; "Waiting to be sent" on the card |
+| 409 (job order not ready), 404 (backend not deployed yet), 5xx | Stays queued with the reason, retried on the next sync | "Not sent yet: (server's message) It will be retried automatically." |
+| 409 `POST_SERVICE_FINALIZED` | Blocked; the office's version is kept | "Finalized by office. This record can no longer be changed.", form read-only |
 | 409 `POST_SERVICE_CHANGED` | Replaced by `current`, `syncPending = 0` | "The office updated this record. Check it and submit again if needed." Form stays editable |
-| 400 | Blocked until the driver submits again | The server's message on the form |
+| 400, 403 (not this driver's job) | Blocked until the driver submits again | "Not sent: (server's message). Fix it and submit again."; "Not sent" on the card |
 | 401 after token refresh | Stays queued | Signed out, as today |
 
 ### `GET /bms/job-order/mine` (dispatch)
@@ -149,11 +149,15 @@ The app's "Bank transfer" option is relabelled **BDO** so drivers and Customer S
 
 ### Mobile app
 
-- `TEAM_JOB_ORDER_ROUTES_READY = true`, with the two routes above (`PUT`, as today).
-- NetInfo listener: offline to online starts a sync. A 45-second timer runs only in the foreground with a user signed in.
-- On `POST_SERVICE_CHANGED`, `current` is mapped back to the app's fields (`additionalMaterials` to add-on keys, `reported…` methods to app values), and `baseVersion` becomes `current.version`.
-- `reconcileSnapshot` keeps the phone's `status` and `postServiceFormSubmitted` for a job order whose form is waiting to upload.
-- `types/bms.ts`: `driverId` and `helperIds` are team member record ids, matched against `TeamMember.teamMemberId`.
+- The `TEAM_JOB_ORDER_ROUTES_READY` switch is removed; the sync always calls the three routes above (`PUT`, as today). Helpers skip the upload and the post-service status call.
+- NetInfo listener: offline to online starts a sync. A 45-second timer runs only in the foreground with a user signed in. Neither runs in seeder mode.
+- Every update to a record after an upload is matched on its `submittedAt`, so a form submitted again while the upload was running stays queued.
+- On `POST_SERVICE_CHANGED`, `current` is mapped back to the app's fields (`additionalMaterials` to add-on keys, `reported…` methods to app values, a "2:30 PM" arrival time to "14:30"), and `baseVersion` becomes `current.version`.
+- A job order with a record on the phone shows as submitted (and Done when the service was completed), whatever the snapshot says, as before.
+- **Which job orders are shown.** A real sign-in shows the downloaded list as it is: the server only sends the caller's own job orders, and the cache is cleared when a different user signs in. Seeder mode still filters by account. Before, the filter compared the job order's ids with `TeamMember.teamMemberId`, which a real sign-in never fills, so every real job order would have been hidden.
+- `types/bms.ts`: `driverId` and `helperIds` are team member record ids (not login ids).
+- **Post Service list.** A submitted job shows "Record submitted · Job done" with **Edit Record**, so the driver can correct it until the office finalizes. A finalized one shows "Finalized by office" with **View Record**. An unsent record adds "Waiting to be sent" or "Not sent" under it. Before, a submitted job could not be opened again.
+- **Payment choices.** "Bank Transfer" reads **BDO** ("Paid via BDO" for add-ons). The booked method pre-selects the matching choice from text such as "GCash", "Bank Transfer", "BDO" or "COD", the same way the web suggests one.
 
 ## API and data impact
 
@@ -200,12 +204,16 @@ The app's "Bank transfer" option is relabelled **BDO** so drivers and Customer S
 | backend | `bms-completion-service/src/dispatch-client.service.ts` | `driverBookingUuids` |
 | backend | `bms-completion-service/src/collections/collections.service.ts` | Drafts suggest `reportedPaymentMethod` first |
 | backend | `bms-completion-service/prisma/schema.prisma`, `prisma/migrations/20261128090000_team_post_service` | Five `work_outcomes` columns |
-| mobile | `services/SyncService.ts` | Routes on, post-service status for drivers, failure table, `baseVersion`, `postServiceLocked` |
+| mobile | `services/SyncService.ts` | Routes on, post-service status for drivers, failure table, `baseVersion`, office version mapping |
 | mobile | `App.tsx` | NetInfo listener and 45-second timer |
-| mobile | `repositories/JobOrderRepository.ts`, `repositories/PostServiceRepository.ts` | Keep pending status; new columns |
-| mobile | `database/tables.ts`, `database/database.ts` | Database version 5 |
-| mobile | Post-service form screen, `types/bms.ts`, payment option labels | Read-only when finalized, messages, "BDO" label, id comments |
-| mobile | `package.json`, `OFFLINE_DATABASE.md` | NetInfo; describe the sync |
+| mobile | `repositories/PostServiceRepository.ts` | `syncBlocked`, `lastError`, `baseVersion`; updates matched on `submittedAt` |
+| mobile | `repositories/JobOrderRepository.ts` | `postServiceLocked` |
+| mobile | `database/tables.ts`, `database/database.ts` | Database version 5 (migration 5) |
+| mobile | `screens/PostServiceFormScreen.tsx` | Status notice, read-only when finalized |
+| mobile | `screens/PostServiceScreen.tsx` | Edit Record / View Record on submitted and finalized jobs, unsent state |
+| mobile | `stores/jobOrdersStore.ts`, `stores/userStore.ts` | Sync knows whether the signed-in person is a driver; real sign-in shows the downloaded list as is |
+| mobile | `seeders/payments.ts`, `seeders/jobOrders.ts`, `types/bms.ts` | "BDO" labels and web name mapping; `postServiceLocked`; id comments |
+| mobile | `package.json`, `package-lock.json`, `OFFLINE_DATABASE.md` | `@react-native-community/netinfo` 12.0.1; describe the sync |
 
 ## Deploy notes
 
