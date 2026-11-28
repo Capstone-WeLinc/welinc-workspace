@@ -1,12 +1,14 @@
 # Verify: mobile job order and post-service sync · spec 0022
 
-Steps derived from [spec 0022 acceptance criteria](index.md). The backend has unit tests and local build checks only; nothing has been run against a database, the gateway or a phone yet.
+Steps derived from [spec 0022 acceptance criteria](index.md). The backend has unit tests and local build checks; the mobile app has a type-check and a bundle build (the repo has no tests yet). Nothing has been run against a database, the gateway or a phone yet.
 
 ## Build
 
 - [x] `npm run typecheck`, `npm run lint:ci`, `npm run build` and `npm test` pass in `welinc-backend-bms` locally (2026-11-28).
 - [ ] Backend CI is green on the pull request.
-- [ ] `npx tsc --noEmit` passes in `welinc-mobile-bms`.
+- [x] `npx tsc --noEmit` passes in `welinc-mobile-bms` (2026-11-28).
+- [x] `npx expo export --platform android` bundles the app, NetInfo included (2026-11-28).
+- [ ] A new development build installs and starts on a phone (NetInfo is a native module).
 - [x] `prisma validate` accepts the completion schema with the five new columns.
 - [ ] The completion migration applies on a fresh database and on one with existing work outcomes.
 
@@ -66,8 +68,10 @@ Steps derived from [spec 0022 acceptance criteria](index.md). The backend has un
 
 ## Phone failure handling (AC-8, AC-11)
 
+- [ ] A submitted job shows "Record submitted · Job done" with Edit Record; editing and submitting again reaches the web.
+- [ ] A submitted form waiting offline shows "Waiting to be sent" on its card.
 - [ ] A rejected form (400) shows the message and isn't retried until submitted again.
-- [ ] After the office finalizes, the form opens read-only with "Finalized by office".
+- [ ] After the office finalizes, the card shows "Finalized by office" with View Record, and the form opens read-only with no Submit button.
 - [ ] After a web edit, a driver resubmit shows "The office updated this record…" with the web's values; submitting again is accepted.
 - [ ] Same as above, with the resubmit queued offline and sent when the internet returns.
 
