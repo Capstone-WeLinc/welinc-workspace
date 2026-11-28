@@ -108,7 +108,7 @@ Admins (and `state.unverified@`) type a 6 digit code from their email when they 
 | BMS drivers | 12 | 3401 to 3412 (`driver.ramon@` to `driver.antonio@`) | BMS Driver | `driver1234` |
 | BMS helpers | 20 | 3501 to 3520 (`helper.markanthony@` to `helper.bryan@`) | BMS Helper | `helper1234` |
 
-Driver n is BMS `DRV-00n` and helper n is `HLP-00n`; both carry a `+63` phone.
+Drivers and helpers carry a `+63` phone. BMS no longer gives crew an employee ID (spec bms/0012), so they're matched by their account id.
 
 `vmms.mech@` holds only VMMS Mechanic, so the VMMS web app turns them away (phone app only). The `multi.*` people hold two or three systems: they land on the launcher after sign in, while a one system person goes straight in.
 

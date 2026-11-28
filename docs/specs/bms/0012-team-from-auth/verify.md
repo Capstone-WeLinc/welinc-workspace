@@ -60,6 +60,11 @@ stack running the change, with the migration applied.
   from names itself, and doesn't call the crew-leave or crew list routes yet (leave requests
   are kept on the device)
 
+## Docs
+
+- [x] `docs/integration/seed-accounts.md` no longer says drivers and helpers carry `DRV-00n` /
+  `HLP-00n` employee IDs, since this spec removed them (fixed on `docs/bms-seed-accounts-crew-ids`)
+
 ## Commands
 
 - [x] `bms-dispatch-service`: `npx tsc --noEmit`
